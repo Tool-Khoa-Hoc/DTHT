@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 const CATEGORIES = [
   { label: 'Tất cả', value: '' },
@@ -12,25 +13,51 @@ const CATEGORIES = [
   { label: 'Tiếng Anh', value: 'anh' },
   { label: 'Lịch Sử', value: 'su' },
   { label: 'Địa Lý', value: 'dia' },
-  { label: 'GDCD', value: 'gdcd' },
   { label: 'Tin Học', value: 'tin' },
-  { label: 'Giải Tích', value: 'giai_tich' },
-  { label: 'Lập Trình', value: 'lap_trinh' },
-  { label: 'Kiến Trúc', value: 'kien_truc' },
-  { label: 'Kinh Tế', value: 'kinh_te' },
-  { label: 'Khác', value: 'khac' },
+  { label: 'GD KT&PL', value: 'gdktpl' },
+];
+
+const REPORT_REASONS = [
+  'Link tài liệu bị lỗi / không mở được',
+  'Nội dung không phù hợp',
+  'Sai môn học / thông tin sai',
+  'Vi phạm bản quyền',
+  'Lý do khác',
 ];
 
 export default function Library() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [educationLevel, setEducationLevel] = useState('thpt'); // 'thpt' | 'university'
+  const [educationLevel, setEducationLevel] = useState('thpt');
 
+  // Report modal state
+  const [reportTarget, setReportTarget] = useState(null); // doc object
+  const [reportReason, setReportReason] = useState('');
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportSuccess, setReportSuccess] = useState(false);
+
+  // Notifications state
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifs, setShowNotifs] = useState(false);
+  const notifRef = useRef(null);
+
+  useEffect(() => { fetchDocuments(); }, []);
+  useEffect(() => { if (user) fetchNotifications(); }, [user]);
+
+  // Close notif dropdown on outside click
   useEffect(() => {
-    fetchDocuments();
+    const handler = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotifs(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   const fetchDocuments = async () => {
@@ -39,13 +66,89 @@ export default function Library() {
         .from('documents')
         .select('id, title, file_url, category, education_level, uploaded_by, author_name, created_at')
         .order('created_at', { ascending: false });
-
       if (error) throw error;
       setDocuments(data || []);
     } catch (error) {
       console.error('Error fetching documents:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const { data } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      setNotifications(data || []);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  const markAllRead = async () => {
+    if (!user) return;
+    await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', user.id)
+      .eq('is_read', false);
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+  };
+
+  const handleOpenNotifs = () => {
+    setShowNotifs(v => !v);
+    if (!showNotifs) markAllRead();
+  };
+
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
+  const openReportModal = (doc) => {
+    if (!user) { alert('Bạn cần đăng nhập để báo cáo tài liệu.'); return; }
+    if (doc.uploaded_by === user.id) { alert('Bạn không thể báo cáo tài liệu của chính mình.'); return; }
+    setReportTarget(doc);
+    setReportReason('');
+    setReportSuccess(false);
+  };
+
+  const handleSubmitReport = async () => {
+    if (!reportReason) return;
+    setReportLoading(true);
+    try {
+      // Insert report (unique constraint ngăn báo cáo trùng)
+      const { error: reportError } = await supabase
+        .from('document_reports')
+        .insert({ document_id: reportTarget.id, reported_by: user.id, reason: reportReason });
+
+      if (reportError) {
+        if (reportError.code === '23505') {
+          alert('Bạn đã báo cáo tài liệu này rồi.');
+          setReportTarget(null);
+          return;
+        }
+        throw reportError;
+      }
+
+      // Gửi notification cho người upload (nếu có)
+      if (reportTarget.uploaded_by) {
+        await supabase.from('notifications').insert({
+          user_id: reportTarget.uploaded_by,
+          title: '⚠️ Tài liệu của bạn bị báo cáo',
+          message: `Tài liệu "${reportTarget.title}" vừa bị báo cáo với lý do: ${reportReason}`,
+          link: '/library',
+        });
+      }
+
+      setReportSuccess(true);
+      setTimeout(() => setReportTarget(null), 2000);
+    } catch (err) {
+      console.error('Report error:', err);
+      alert('Có lỗi xảy ra, vui lòng thử lại.');
+    } finally {
+      setReportLoading(false);
     }
   };
 
@@ -70,9 +173,59 @@ export default function Library() {
               <span className="material-symbols-outlined">arrow_back_ios_new</span>
             </button>
             <h1 className="text-xl font-bold tracking-tight">Tài Liệu Học Free</h1>
-            <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 transition-colors">
-              <span className="material-symbols-outlined">notifications</span>
-            </button>
+
+            {/* Notification Bell */}
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={handleOpenNotifs}
+                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 transition-colors relative"
+              >
+                <span className="material-symbols-outlined">notifications</span>
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] font-bold flex items-center justify-center shadow-lg shadow-red-500/50 animate-pulse">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notifications Dropdown */}
+              {showNotifs && (
+                <div className="absolute right-0 top-12 w-80 bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                    <span className="font-bold text-sm">Thông báo</span>
+                    {notifications.length > 0 && (
+                      <button onClick={markAllRead} className="text-xs text-blue-400 hover:text-blue-300">
+                        Đánh dấu đã đọc
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="py-8 flex flex-col items-center text-slate-500">
+                        <span className="material-symbols-outlined text-3xl mb-2">notifications_off</span>
+                        <p className="text-sm">Chưa có thông báo nào</p>
+                      </div>
+                    ) : (
+                      notifications.map(n => (
+                        <div
+                          key={n.id}
+                          className={`px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors ${!n.is_read ? 'bg-blue-500/5' : ''}`}
+                        >
+                          {!n.is_read && (
+                            <span className="inline-block w-2 h-2 bg-blue-400 rounded-full mr-2 mb-0.5 align-middle"></span>
+                          )}
+                          <p className="text-sm font-semibold text-white">{n.title}</p>
+                          <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{n.message}</p>
+                          <p className="text-[10px] text-slate-600 mt-1">
+                            {new Date(n.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-2">
@@ -186,7 +339,18 @@ export default function Library() {
               </div>
             ) : (
               filteredDocs.map(doc => (
-                <div key={doc.id} className="bg-white/5 backdrop-blur-md border border-white/10 p-2.5 sm:p-3 rounded-2xl flex flex-col gap-2.5 sm:gap-3 hover:bg-white/10 transition-colors cursor-pointer group">
+                <div key={doc.id} className="bg-white/5 backdrop-blur-md border border-white/10 p-2.5 sm:p-3 rounded-2xl flex flex-col gap-2.5 sm:gap-3 hover:bg-white/10 transition-colors cursor-pointer group relative">
+                  {/* Report button */}
+                  {user && doc.uploaded_by !== user.id && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openReportModal(doc); }}
+                      title="Báo cáo tài liệu"
+                      className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/0 hover:bg-red-500/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                    >
+                      <span className="material-symbols-outlined text-[16px] text-slate-400 hover:text-red-400 transition-colors">flag</span>
+                    </button>
+                  )}
+
                   <div className="aspect-[4/3] rounded-xl bg-[#306ee8]/20 flex items-center justify-center relative overflow-hidden">
                     <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay bg-gradient-to-br from-indigo-500 to-purple-500 group-hover:scale-110 transition-transform duration-500"></div>
                     <span className="material-symbols-outlined text-3xl sm:text-4xl text-white drop-shadow-md relative z-10">picture_as_pdf</span>
@@ -221,6 +385,79 @@ export default function Library() {
           </div>
         </main>
       </div>
+
+      {/* === REPORT MODAL === */}
+      {reportTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#0f172a] border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
+            {reportSuccess ? (
+              <div className="p-8 flex flex-col items-center text-center">
+                <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center mb-4">
+                  <span className="material-symbols-outlined text-green-400 text-3xl">check_circle</span>
+                </div>
+                <h3 className="font-bold text-lg mb-1">Đã gửi báo cáo!</h3>
+                <p className="text-slate-400 text-sm">Cảm ơn bạn đã phản hồi. Chúng tôi sẽ xem xét sớm nhất có thể.</p>
+              </div>
+            ) : (
+              <>
+                <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-red-400">flag</span>
+                    <h3 className="font-bold">Báo cáo tài liệu</h3>
+                  </div>
+                  <button onClick={() => setReportTarget(null)} className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-slate-400">close</span>
+                  </button>
+                </div>
+
+                <div className="p-5">
+                  <p className="text-sm text-slate-400 mb-1">Tài liệu:</p>
+                  <p className="text-sm font-semibold line-clamp-2 mb-4 text-white">{reportTarget.title}</p>
+
+                  <p className="text-sm text-slate-400 mb-3">Chọn lý do báo cáo:</p>
+                  <div className="flex flex-col gap-2">
+                    {REPORT_REASONS.map(r => (
+                      <button
+                        key={r}
+                        onClick={() => setReportReason(r)}
+                        className={`text-left px-4 py-2.5 rounded-xl text-sm transition-all border ${reportReason === r
+                          ? 'border-red-500/60 bg-red-500/15 text-red-300'
+                          : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+                          }`}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="px-5 pb-5 flex gap-3">
+                  <button
+                    onClick={() => setReportTarget(null)}
+                    className="flex-1 py-2.5 rounded-xl border border-white/10 text-sm text-slate-400 hover:bg-white/10 transition-colors"
+                  >
+                    Huỷ
+                  </button>
+                  <button
+                    onClick={handleSubmitReport}
+                    disabled={!reportReason || reportLoading}
+                    className="flex-1 py-2.5 rounded-xl bg-red-500/80 hover:bg-red-500 text-white text-sm font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                  >
+                    {reportLoading ? (
+                      <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-[16px]">flag</span>
+                        Gửi báo cáo
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
