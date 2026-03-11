@@ -37,7 +37,7 @@ export default function WelcomeModal() {
                     
                     <div className="space-y-3 text-sm font-medium text-slate-600 dark:text-slate-400 mb-8 bg-slate-50 dark:bg-white/5 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
                         <p>
-                            Chào mừng bạn đến với <strong className="text-[#fe5f36] font-black">Trạm Học Sinh Sinh Viên!</strong>
+                            Chào mừng bạn đến với <strong className="text-[#fe5f36] font-black">Đấu Trường Học Tập!</strong>
                         </p>
                         <p>
                             Hiện tại, hệ thống trang web đang trong quá trình nâng cấp và hoàn thiện. Đặc biệt, tính năng <b className="text-[#3b82f6]">Phòng Thi</b> đang được gấp rút cập nhật để mang lại trải nghiệm tốt nhất.
