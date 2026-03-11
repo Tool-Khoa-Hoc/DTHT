@@ -40,16 +40,7 @@ export default function Home() {
 
   return (
     <div className="bg-gradient-to-b from-[#201216] to-[#150a0d] min-h-screen pb-24 text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/5 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-white/10">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[#e36488] text-3xl">menu</span>
-          <h1 className="text-xl font-extrabold tracking-tight">Đấu Trường <span className="text-[#e36488]">Học Tập</span></h1>
-        </div>
-        <button className="bg-[#e36488]/20 text-[#e36488] px-4 py-1.5 rounded-full text-sm font-bold border border-[#e36488]/30">
-          Dùng miễn phí
-        </button>
-      </header>
+
 
       <main className="relative flex flex-col items-center">
         <div className="absolute inset-0 bg-[radial-gradient(at_0%_0%,rgba(227,100,136,0.15)_0px,transparent_50%),radial-gradient(at_100%_100%,rgba(227,100,136,0.1)_0px,transparent_50%)] pointer-events-none"></div>

@@ -301,7 +301,7 @@ export default function Admin() {
   return (
     <div className="bg-[#f8f6f6] dark:bg-[#1a0f12] font-display text-slate-900 dark:text-white min-h-screen pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-30 px-6 py-4 bg-white/50 dark:bg-[#201216]/80 backdrop-blur-md border-b border-[#7f13ec]/10 flex flex-col gap-4">
+      <header className="sticky top-[57px] md:top-0 z-30 px-6 py-4 bg-white/50 dark:bg-[#201216]/80 backdrop-blur-md border-b border-[#7f13ec]/10 flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#7f13ec]/20 flex items-center justify-center text-[#7f13ec] shadow-[0_0_15px_rgba(127,19,236,0.3)]">
             <span className="material-symbols-outlined">admin_panel_settings</span>

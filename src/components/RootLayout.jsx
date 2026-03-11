@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function RootLayout() {
   const { user, profile } = useAuth();
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   if (!user) {
     return <Navigate to="/auth" />;
@@ -15,13 +21,36 @@ export default function RootLayout() {
   return (
     <div className="bg-[#f8f6f6] dark:bg-[#201216] font-display text-slate-900 dark:text-slate-100 min-h-screen selection:bg-[#e36488]/30 flex flex-col md:flex-row">
 
-      {/* --- DESKTOP SIDEBAR --- */}
-      <aside className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 bg-white/50 dark:bg-[#1a0f12]/80 backdrop-blur-2xl border-r border-[#e36488]/10 z-50 p-6">
-        <div className="flex items-center gap-3 mb-10">
-          <div className="w-10 h-10 bg-[#e36488]/20 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(227,100,136,0.3)] border border-[#e36488]/30">
-            <span className="material-symbols-outlined text-[#e36488] text-2xl">school</span>
+      {/* --- MOBILE TOP HEADER --- */}
+      <header className="md:hidden sticky top-0 left-0 right-0 z-40 bg-white/80 dark:bg-[#201216]/80 backdrop-blur-xl border-b border-[#e36488]/10 px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-[#e36488]/20 rounded-lg flex items-center justify-center border border-[#e36488]/30">
+            <span className="material-symbols-outlined text-[#e36488] text-xl">school</span>
           </div>
-          <h2 className="text-[#e36488] font-bold tracking-widest uppercase truncate">Đấu Trường Học Tập</h2>
+          <h2 className="text-[#e36488] font-bold tracking-widest uppercase text-sm">Đấu Trường Học Tập</h2>
+        </div>
+        <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+          <span className="material-symbols-outlined">menu</span>
+        </button>
+      </header>
+
+      {/* --- MOBILE OVERLAY --- */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
+      {/* --- SIDEBAR (DESKTOP & MOBILE DRAWER) --- */}
+      <aside className={`flex flex-col w-64 h-screen fixed left-0 top-0 bg-white dark:bg-[#1a0f12] md:bg-white/50 md:dark:bg-[#1a0f12]/80 backdrop-blur-2xl border-r border-[#e36488]/10 z-50 p-6 transition-transform duration-300 md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#e36488]/20 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(227,100,136,0.3)] border border-[#e36488]/30">
+              <span className="material-symbols-outlined text-[#e36488] text-2xl">school</span>
+            </div>
+            <h2 className="text-[#e36488] font-bold tracking-widest uppercase truncate leading-none">Đấu Trường<br/><span className="text-[10px] tracking-normal">Học Tập</span></h2>
+          </div>
+          <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden p-2 text-slate-500 hover:text-white bg-slate-100 dark:bg-white/5 rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
         </div>
 
         <nav className="flex flex-col gap-2 flex-1">
@@ -78,51 +107,6 @@ export default function RootLayout() {
       <main className="flex-1 md:ml-64 relative min-h-screen">
         <Outlet />
       </main>
-
-      {/* --- MOBILE BOTTOM NAVIGATION --- */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#201216]/80 backdrop-blur-xl border-t border-[#e36488]/10 px-4 py-3 flex items-center justify-between pb-safe">
-        <Link to="/home" className={`flex flex-col items-center gap-1 ${isActive('/home') ? 'text-[#e36488]' : 'text-slate-500'}`}>
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/home') ? "'FILL' 1" : "'FILL' 0" }}>home</span>
-          <span className="text-[10px] font-bold">Trang chủ</span>
-        </Link>
-        <Link to="/gpa" className={`flex flex-col items-center gap-1 ${isActive('/gpa') ? 'text-[#e36488]' : 'text-slate-500'}`}>
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/gpa') ? "'FILL' 1" : "'FILL' 0" }}>calculate</span>
-          <span className="text-[10px] font-bold">Tính điểm</span>
-        </Link>
-        <Link to="/schools" className={`flex flex-col items-center gap-1 ${isActive('/schools') ? 'text-[#306ee8]' : 'text-slate-500'}`}>
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/schools') ? "'FILL' 1" : "'FILL' 0" }}>apartment</span>
-          <span className="text-[10px] font-bold">Tìm trường</span>
-        </Link>
-        <Link to="/roadmap" className="relative -top-6">
-          <div className="w-14 h-14 bg-[#e36488] rounded-full flex items-center justify-center shadow-lg shadow-[#e36488]/30 border-4 border-[#f8f6f6] dark:border-[#201216]">
-            <span className="material-symbols-outlined text-white text-3xl">add</span>
-          </div>
-        </Link>
-        <Link to="/arena" className={`flex flex-col items-center gap-1 ${isActive('/arena') ? 'text-[#fe5f36]' : 'text-slate-500'}`}>
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/arena') ? "'FILL' 1" : "'FILL' 0" }}>local_fire_department</span>
-          <span className="text-[10px] font-bold">Tranh tài</span>
-        </Link>
-        <Link to="/library" className={`flex flex-col items-center gap-1 ${isActive('/library') ? 'text-[#e36488]' : 'text-slate-500'}`}>
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/library') ? "'FILL' 1" : "'FILL' 0" }}>folder_open</span>
-          <span className="text-[10px] font-bold">Tài Liệu Free</span>
-        </Link>
-        <Link to="/profile" className={`flex flex-col items-center gap-1 ${isActive('/profile') ? 'text-[#e36488]' : 'text-slate-500'}`}>
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/profile') ? "'FILL' 1" : "'FILL' 0" }}>person</span>
-          <span className="text-[10px] font-bold">Cá nhân</span>
-        </Link>
-        {profile?.role === 'admin' && (
-          <Link to="/admin" className={`flex flex-col items-center gap-1 ${isActive('/admin') ? 'text-[#7f13ec]' : 'text-slate-500'}`}>
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/admin') ? "'FILL' 1" : "'FILL' 0" }}>admin_panel_settings</span>
-            <span className="text-[10px] font-bold">Admin</span>
-          </Link>
-        )}
-        {(profile?.role === 'admin' || profile?.role === 'collaborator') && (
-          <Link to="/collaborator" className={`flex flex-col items-center gap-1 ${isActive('/collaborator') ? 'text-[#10b981]' : 'text-slate-500'}`}>
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/collaborator') ? "'FILL' 1" : "'FILL' 0" }}>local_library</span>
-            <span className="text-[10px] font-bold">TĐ.Sư</span>
-          </Link>
-        )}
-      </nav>
     </div>
   );
 }

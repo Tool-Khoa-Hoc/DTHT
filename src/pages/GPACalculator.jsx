@@ -32,24 +32,9 @@ function SubjectRow({ sub, index, label, onUpdate, onRemove }) {
   return (
     <div className="bg-[#0f172a]/60 backdrop-blur-md border border-white/10 rounded-xl p-4 flex items-center gap-3">
       <div className="flex-1 space-y-2">
-        <input list="common-subjects" className="w-full bg-transparent border-none p-0 text-white placeholder:text-slate-600 focus:ring-0 font-medium outline-none"
+        <input list="uni-subjects" className="w-full bg-transparent border-none p-0 text-white placeholder:text-slate-600 focus:ring-0 font-medium outline-none"
           placeholder={`Tên môn học ${index + 1}`} value={sub.name}
           onChange={e => onUpdate(sub.id, 'name', e.target.value)} />
-        <datalist id="common-subjects">
-          <option value="Toán" />
-          <option value="Ngữ văn" />
-          <option value="Tiếng Anh" />
-          <option value="Vật lý" />
-          <option value="Hóa học" />
-          <option value="Sinh học" />
-          <option value="Lịch sử" />
-          <option value="Địa lý" />
-          <option value="GDCD" />
-          <option value="Tin học" />
-          <option value="Công nghệ" />
-          <option value="Giáo dục Quốc phòng" />
-          <option value="Thể dục" />
-        </datalist>
         <div className="flex gap-4">
           <div className="flex-1">
             <p className="text-[10px] uppercase text-slate-500 font-bold mb-1">Tín chỉ / Hệ số</p>
@@ -180,7 +165,7 @@ function THPTExamCalc() {
       <div className="space-y-3">
         {subjects.map((sub, i) => (
           <div key={sub.id} className="bg-[#0f172a]/60 backdrop-blur-md border border-white/10 rounded-xl p-4 flex items-center justify-between gap-3">
-            <input list="common-subjects" className="w-1/2 bg-transparent border-none p-0 text-white placeholder:text-slate-600 focus:ring-0 font-bold text-sm outline-none"
+            <input list="thpt-subjects" className="w-1/2 bg-transparent border-none p-0 text-white placeholder:text-slate-600 focus:ring-0 font-bold text-sm outline-none"
               placeholder={`Tên môn thi ${i + 1}`} value={sub.name}
               onChange={e => update(sub.id, 'name', e.target.value)} />
             <div className="flex items-center gap-3">
@@ -288,7 +273,7 @@ function THPTTranscriptCalc() {
           return (
             <div key={sub.id} className="bg-[#0f172a]/60 backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <input list="common-subjects" className="w-2/3 bg-transparent border-none p-0 text-white placeholder:text-slate-600 focus:ring-0 font-bold text-sm outline-none"
+                <input list="thpt-subjects" className="w-2/3 bg-transparent border-none p-0 text-white placeholder:text-slate-600 focus:ring-0 font-bold text-sm outline-none"
                   placeholder={`Tên môn xét tuyển ${i + 1}`} value={sub.name}
                   onChange={e => update(sub.id, 'name', e.target.value)} />
                 <button onClick={() => remove(sub.id)} className="text-slate-500 hover:text-red-400 transition-colors p-1">
@@ -850,7 +835,41 @@ export default function GPACalculator() {
     <div className="bg-[#0b0f1a] font-display text-white min-h-screen pb-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(at_0%_0%,rgba(48,110,232,0.12)_0,transparent_50%),radial-gradient(at_100%_0%,rgba(244,63,94,0.12)_0,transparent_50%)] pointer-events-none" />
 
-      <header className="sticky top-0 z-50 px-4 py-4 flex items-center justify-between bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10">
+      <datalist id="thpt-subjects">
+        <option value="Toán" />
+        <option value="Ngữ văn" />
+        <option value="Tiếng Anh" />
+        <option value="Vật lý" />
+        <option value="Hóa học" />
+        <option value="Sinh học" />
+        <option value="Lịch sử" />
+        <option value="Địa lý" />
+        <option value="GDCD" />
+        <option value="Tin học" />
+        <option value="Công nghệ" />
+      </datalist>
+
+      <datalist id="uni-subjects">
+        <option value="Triết học Mác - Lênin" />
+        <option value="Kinh tế chính trị Mác - Lênin" />
+        <option value="Chủ nghĩa xã hội khoa học" />
+        <option value="Tư tưởng Hồ Chí Minh" />
+        <option value="Lịch sử Đảng Cộng sản Việt Nam" />
+        <option value="Toán cao cấp" />
+        <option value="Đại số tuyến tính" />
+        <option value="Giải tích" />
+        <option value="Xác suất thống kê" />
+        <option value="Vật lý đại cương" />
+        <option value="Pháp luật đại cương" />
+        <option value="Tiếng Anh chuyên ngành" />
+        <option value="Ngoại ngữ không chuyên" />
+        <option value="Tin học đại cương" />
+        <option value="Kỹ năng mềm" />
+        <option value="Giáo dục thể chất" />
+        <option value="Giáo dục Quốc phòng - An ninh" />
+      </datalist>
+
+      <header className="sticky top-[57px] md:top-0 z-50 px-4 py-4 flex items-center justify-between bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10">
         <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-slate-800/50 flex items-center justify-center hover:bg-slate-700 transition-colors">
           <span className="material-symbols-outlined">arrow_back_ios_new</span>
         </button>

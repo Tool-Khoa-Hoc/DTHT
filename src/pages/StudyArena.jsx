@@ -225,7 +225,7 @@ export default function StudyArena() {
             <div className="absolute top-[30%] right-[-5%] w-80 h-80 bg-pink-500/10 blur-[100px] rounded-full pointer-events-none" />
 
             {/* Header */}
-            <header className="sticky top-0 z-30 px-6 py-4 bg-white/60 dark:bg-[#1a0f12]/60 backdrop-blur-xl border-b border-[#fe5f36]/10 flex flex-col gap-4">
+            <header className="sticky top-[57px] md:top-0 z-30 px-6 py-4 bg-white/60 dark:bg-[#1a0f12]/60 backdrop-blur-xl border-b border-[#fe5f36]/10 flex flex-col gap-4">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#fe5f36] to-pink-600 flex items-center justify-center text-white shadow-lg shadow-[#fe5f36]/30 border border-white/20">
                         <span className="material-symbols-outlined text-2xl">local_fire_department</span>

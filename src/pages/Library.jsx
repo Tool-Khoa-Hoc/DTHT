@@ -167,7 +167,7 @@ export default function Library() {
       <div className="fixed inset-0 bg-[radial-gradient(at_0%_0%,#4f46e5_0px,transparent_50%),radial-gradient(at_100%_0%,#7e22ce_0px,transparent_50%),radial-gradient(at_100%_100%,#3b82f6_0px,transparent_50%),radial-gradient(at_0%_100%,#ec4899_0px,transparent_50%)] opacity-30 pointer-events-none"></div>
 
       <div className="w-full max-w-6xl mx-auto flex flex-col flex-1 relative z-10">
-        <header className="sticky top-0 z-50 px-4 pt-6 pb-4 bg-[#0f172a]/80 backdrop-blur-xl border-b border-white/5 mt-0 md:mt-4 md:rounded-2xl">
+        <header className="sticky top-[57px] md:top-0 z-50 px-4 pt-6 pb-4 bg-[#0f172a]/80 backdrop-blur-xl border-b border-white/5 mt-0 md:mt-4 md:rounded-2xl">
           <div className="flex items-center justify-between mb-4">
             <button onClick={() => navigate(-1)} className="md:hidden flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 transition-colors">
               <span className="material-symbols-outlined">arrow_back_ios_new</span>
