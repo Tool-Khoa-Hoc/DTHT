@@ -3,6 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
+// Helper to normalize Vietnamese text for search
+function normalizeText(str) {
+  if (!str) return '';
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
 // Helper to determine score type from method string
 function getScoreType(method = '') {
   const m = method.toLowerCase();
@@ -27,20 +33,40 @@ function MethodBadge({ type }) {
   );
 }
 
-function SchoolCard({ school, myScores }) {
+function SchoolCard({ school, myScores, subjectGroupFilter, query }) {
   const [open, setOpen] = useState(false);
   
-  // Find which methods this school has across all its majors
+  // Filter majors based on subjectGroupFilter if provided
+  const filteredMajors = useMemo(() => {
+    let majors = school.majors;
+    if (subjectGroupFilter && subjectGroupFilter.trim() !== '') {
+      const sgQuery = normalizeText(subjectGroupFilter.trim());
+      majors = majors.filter(m => m.subject_groups && normalizeText(m.subject_groups).includes(sgQuery));
+    }
+    if (query && query.trim() !== '') {
+      const q = normalizeText(query.trim());
+      const matchesSchool = normalizeText(school.university_name).includes(q) || normalizeText(school.university_code).includes(q);
+      if (!matchesSchool) {
+        majors = majors.filter(m => 
+          normalizeText(m.major_name).includes(q) || 
+          normalizeText(m.subject_groups).includes(q)
+        );
+      }
+    }
+    return majors;
+  }, [school.majors, subjectGroupFilter, query, school.university_name, school.university_code]);
+
+  // Find which methods this school has across all its FILTERED majors
   const schoolMethodTypes = new Set();
   
-  school.majors.forEach(m => {
+  filteredMajors.forEach(m => {
     const type = getScoreType(m.method);
     schoolMethodTypes.add(type);
   });
 
   // Calculate qualification
   let hasEligibleMajor = false;
-  school.majors.forEach(m => {
+  filteredMajors.forEach(m => {
     const type = getScoreType(m.method);
     if (type !== 'other' && myScores[type] > 0 && myScores[type] >= m.score) {
       hasEligibleMajor = true;
@@ -52,13 +78,13 @@ function SchoolCard({ school, myScores }) {
   // Group majors by method type for rendering inside
   const groupedMajors = useMemo(() => {
     const groups = {};
-    school.majors.forEach(m => {
+    filteredMajors.forEach(m => {
       const type = getScoreType(m.method);
       if (!groups[type]) groups[type] = [];
       groups[type].push(m);
     });
     return groups;
-  }, [school.majors]);
+  }, [filteredMajors]);
   
   return (
     <div className={`bg-[#0f172a]/60 border rounded-2xl overflow-hidden transition-all ${hasEligibleMajor ? 'border-green-500/30' : 'border-white/10'}`}>
@@ -192,13 +218,13 @@ export default function SchoolFinder() {
     let result = schoolsData;
     
     if (query) {
-       const q = query.toLowerCase();
+       const q = normalizeText(query);
        result = result.filter(s => 
-         s.university_name.toLowerCase().includes(q) || 
-         s.university_code.toLowerCase().includes(q) ||
+         normalizeText(s.university_name).includes(q) || 
+         normalizeText(s.university_code).includes(q) ||
          s.majors.some(m => 
-           m.major_name.toLowerCase().includes(q) || 
-           (m.subject_groups && m.subject_groups.toLowerCase().includes(q))
+           normalizeText(m.major_name).includes(q) || 
+           normalizeText(m.subject_groups).includes(q)
          )
        );
     }
@@ -210,9 +236,9 @@ export default function SchoolFinder() {
     }
 
     if (subjectGroupFilter.trim() !== '') {
-       const sgQuery = subjectGroupFilter.trim().toLowerCase();
+       const sgQuery = normalizeText(subjectGroupFilter.trim());
        result = result.filter(s => {
-         return s.majors.some(m => m.subject_groups && m.subject_groups.toLowerCase().includes(sgQuery));
+         return s.majors.some(m => normalizeText(m.subject_groups).includes(sgQuery));
        });
     }
 
@@ -248,15 +274,19 @@ export default function SchoolFinder() {
     return sorted.slice(0, displayLimit);
   }, [sorted, displayLimit]);
 
-  const handleScroll = (e) => {
-    const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 100;
-    if (bottom && displayLimit < sorted.length) {
-      setDisplayLimit(prev => prev + 20);
-    }
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      const bottom = document.documentElement.scrollHeight - document.documentElement.scrollTop <= document.documentElement.clientHeight + 100;
+      if (bottom && displayLimit < sorted.length) {
+        setDisplayLimit(prev => prev + 20);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [displayLimit, sorted.length]);
 
   return (
-    <div className="bg-[#0b0f1a] text-white min-h-[calc(100vh)] md:min-h-[calc(100vh-0px)] flex flex-col font-display overflow-hidden relative">
+    <div className="bg-[#0b0f1a] text-white min-h-screen flex flex-col font-display relative">
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(at_30%_0%,rgba(48,110,232,0.10)_0,transparent_60%)]" />
 
       {/* Header and Top Filters */}
@@ -274,7 +304,7 @@ export default function SchoolFinder() {
            <div className="relative flex-1">
              <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-base">search</span>
              <input value={query} onChange={e => {setQuery(e.target.value); setDisplayLimit(20);}}
-               placeholder="Nhập tên, mã trường..."
+               placeholder="Nhập tên trường, ngành học..."
                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-[#306ee8]/40 placeholder:text-slate-500 transition-all" />
            </div>
 
@@ -296,7 +326,7 @@ export default function SchoolFinder() {
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 pt-5 pb-6 space-y-4 md:space-y-5 relative z-10 overflow-y-auto custom-scrollbar" onScroll={handleScroll}>
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 pt-5 pb-6 space-y-4 md:space-y-5 relative z-10">
 
         {/* My Score Banner */}
         {hasAnyScore ? (
@@ -346,7 +376,7 @@ export default function SchoolFinder() {
               <p className="text-xs mt-1">Thử đổi từ khóa hoặc bỏ lọc</p>
             </div>
           ) : (
-            displayedSchools.map((s, i) => <SchoolCard key={s.university_code + i} school={s} myScores={myScores} />)
+            displayedSchools.map((s, i) => <SchoolCard key={s.university_code + i} school={s} myScores={myScores} subjectGroupFilter={subjectGroupFilter} query={query} />)
           )}
           
           {displayLimit < sorted.length && !loadingData && (

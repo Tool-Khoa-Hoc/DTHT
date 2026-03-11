@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import WelcomeModal from './WelcomeModal';
 
 export default function RootLayout() {
   const { user, profile } = useAuth();
@@ -36,11 +37,11 @@ export default function RootLayout() {
 
       {/* --- MOBILE OVERLAY --- */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity" onClick={() => setIsMobileMenuOpen(false)} />
+        <div className="fixed inset-0 bg-black/60 z-[90] md:hidden backdrop-blur-sm transition-opacity" onClick={() => setIsMobileMenuOpen(false)} />
       )}
 
       {/* --- SIDEBAR (DESKTOP & MOBILE DRAWER) --- */}
-      <aside className={`flex flex-col w-64 h-screen fixed left-0 top-0 bg-white dark:bg-[#1a0f12] md:bg-white/50 md:dark:bg-[#1a0f12]/80 backdrop-blur-2xl border-r border-[#e36488]/10 z-50 p-6 transition-transform duration-300 md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`flex flex-col w-64 h-screen fixed left-0 top-0 bg-white dark:bg-[#1a0f12] md:bg-white/50 md:dark:bg-[#1a0f12]/80 backdrop-blur-2xl border-r border-[#e36488]/10 z-[100] p-6 transition-transform duration-300 md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-[#e36488]/20 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(227,100,136,0.3)] border border-[#e36488]/30">
@@ -78,6 +79,10 @@ export default function RootLayout() {
             <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/arena') ? "'FILL' 1" : "'FILL' 0" }}>local_fire_department</span>
             Đấu trường
           </Link>
+          <Link to="/exam-room" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/exam-room') ? 'bg-[#3b82f6] text-white shadow-lg shadow-[#3b82f6]/20 font-semibold' : 'text-slate-500 hover:bg-[#3b82f6]/10 hover:text-[#3b82f6]'}`}>
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/exam-room') ? "'FILL' 1" : "'FILL' 0" }}>quiz</span>
+            Phòng thi
+          </Link>
           {profile?.role === 'admin' && (
             <Link to="/admin" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all border border-transparent ${isActive('/admin') ? 'bg-[#7f13ec] text-white shadow-lg shadow-[#7f13ec]/20 font-semibold' : 'text-slate-500 hover:bg-[#7f13ec]/10 hover:text-[#7f13ec] hover:border-[#7f13ec]/20'}`}>
               <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/admin') ? "'FILL' 1" : "'FILL' 0" }}>admin_panel_settings</span>
@@ -106,6 +111,7 @@ export default function RootLayout() {
       {/* Add left margin on desktop to accommodate the sidebar */}
       <main className="flex-1 md:ml-64 relative min-h-screen">
         <Outlet />
+        <WelcomeModal />
       </main>
     </div>
   );

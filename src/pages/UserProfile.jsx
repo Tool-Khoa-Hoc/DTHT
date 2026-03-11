@@ -38,7 +38,7 @@ export default function UserProfile() {
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('*')
+                .select('id, display_name, avatar_url, role, university, user_mode, target_gpa, target_thpt, target_dgnl, current_gpa')
                 .eq('id', id)
                 .single();
 
@@ -138,7 +138,7 @@ export default function UserProfile() {
             // Fetch public campaigns
             const { data: camps } = await supabase
                 .from('campaigns')
-                .select('*')
+                .select('id, title, description, points, is_completed, created_at')
                 .eq('user_id', id)
                 .eq('is_public', true)
                 .order('created_at', { ascending: false });
@@ -147,7 +147,7 @@ export default function UserProfile() {
             // Fetch documents (only those that are public)
             const { data: docs } = await supabase
                 .from('documents')
-                .select('*')
+                .select('id, title, description, points, user_id, is_completed, created_at')
                 .eq('uploaded_by', id)
                 .eq('is_public', true)
                 .order('created_at', { ascending: false });

@@ -31,6 +31,7 @@ export default function Collaborator() {
     const [fileUrl, setFileUrl] = useState('');
     const [authorName, setAuthorName] = useState('');
     const [category, setCategory] = useState('khac');
+    const [customCategory, setCustomCategory] = useState('');
     const [educationLevel, setEducationLevel] = useState('thpt'); // 'thpt' | 'university'
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
@@ -72,6 +73,8 @@ export default function Collaborator() {
         setLoading(true);
         setMessage({ type: '', text: '' });
 
+        const finalCategory = category === 'khac' && customCategory.trim() !== '' ? customCategory.trim() : category;
+
         try {
             if (docId) {
                 // Update existing document (RLS ensures they can only update their own)
@@ -82,7 +85,7 @@ export default function Collaborator() {
                         description,
                         file_url: fileUrl,
                         author_name: authorName || profile?.display_name || 'Khuyết danh',
-                        category,
+                        category: finalCategory,
                         education_level: educationLevel
                     })
                     .eq('id', docId); // Note: uploaded_by = uid() is enforced by RLS
@@ -101,7 +104,7 @@ export default function Collaborator() {
                             author_name: authorName || profile?.display_name || 'Khuyết danh',
                             uploaded_by: user.id,
                             is_public: true,
-                            category,
+                            category: finalCategory,
                             education_level: educationLevel
                         }
                     ]);
@@ -129,6 +132,7 @@ export default function Collaborator() {
         setFileUrl('');
         setAuthorName('');
         setCategory('khac');
+        setCustomCategory('');
         setEducationLevel('thpt');
     };
 
@@ -138,7 +142,15 @@ export default function Collaborator() {
         setDescription(doc.description || '');
         setFileUrl(doc.file_url);
         setAuthorName(doc.author_name || '');
-        setCategory(doc.category || 'khac');
+        
+        const isPredefined = CATEGORIES.some(c => c.value === doc.category);
+        if (!isPredefined && doc.category) {
+            setCategory('khac');
+            setCustomCategory(doc.category);
+        } else {
+            setCategory(doc.category || 'khac');
+            setCustomCategory('');
+        }
         setEducationLevel(doc.education_level || 'thpt');
 
         // Scroll to form automatically
@@ -161,7 +173,7 @@ export default function Collaborator() {
     return (
         <div className="bg-[#f8f6f6] dark:bg-[#1a0f12] font-display text-slate-900 dark:text-white min-h-screen pb-24">
             {/* Header */}
-            <header className="sticky top-[57px] md:top-0 z-30 px-6 py-4 bg-white/50 dark:bg-[#201216]/80 backdrop-blur-md border-b border-[#10b981]/10 flex flex-col gap-4">
+            <header className="relative z-30 px-6 py-4 bg-white/50 dark:bg-[#201216]/80 backdrop-blur-md border-b border-[#10b981]/10 flex flex-col gap-4">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-[#10b981]/20 flex items-center justify-center text-[#10b981] shadow-[0_0_15px_rgba(16,185,129,0.3)]">
                         <span className="material-symbols-outlined">menu_book</span>
@@ -219,6 +231,16 @@ export default function Collaborator() {
                                     </button>
                                 ))}
                             </div>
+                            {category === 'khac' && (
+                                <div className="mt-3">
+                                    <input 
+                                        value={customCategory} 
+                                        onChange={(e) => setCustomCategory(e.target.value)} 
+                                        className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-[#10b981]/50 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" 
+                                        placeholder="Nhập tên môn học / danh mục khác..." 
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -275,7 +297,7 @@ export default function Collaborator() {
                                             <div className="flex-1 min-w-0 flex flex-col justify-center">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${doc.is_featured ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
-                                                        {doc.is_featured ? 'Nổi bật' : catInfo.label}
+                                                        {doc.is_featured ? 'Nổi bật' : (catInfo?.label || doc.category)}
                                                     </span>
                                                     <h4 className="font-bold text-sm truncate text-emerald-600 dark:text-emerald-400" title={doc.title}>{doc.title}</h4>
                                                 </div>

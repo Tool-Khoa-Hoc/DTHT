@@ -20,6 +20,7 @@ export default function Profile() {
     const [isSaving, setIsSaving] = useState(false);
 
     const [completedCampaignsCount, setCompletedCampaignsCount] = useState(0);
+    const [uploadCount, setUploadCount] = useState(0);
 
     useEffect(() => {
         if (user) {
@@ -35,8 +36,26 @@ export default function Profile() {
                 target_thpt: profile.target_thpt || '24',
                 target_dgnl: profile.target_dgnl || '850'
             });
+            if (profile.role === 'collaborator' || profile.role === 'admin') {
+                fetchUploadCount();
+            }
         }
     }, [user, profile]);
+
+    const fetchUploadCount = async () => {
+        try {
+            if (!user) return;
+            const { count, error } = await supabase
+                .from('documents')
+                .select('*', { count: 'exact', head: true })
+                .eq('uploaded_by', user.id);
+            if (!error) {
+                setUploadCount(count || 0);
+            }
+        } catch (error) {
+            console.error('Lỗi lấy số tài liệu:', error);
+        }
+    };
 
     const fetchSubjects = async () => {
         try {
@@ -178,6 +197,22 @@ export default function Profile() {
                                 <span className="material-symbols-outlined text-sm">{profile?.user_mode === 'student' ? 'local_library' : 'school'}</span>
                                 {profile?.university || (profile?.user_mode === 'student' ? 'Chưa cập nhật trường THPT' : 'Chưa cập nhật trường ĐH')}
                             </p>
+                        )}
+
+                        {/* Upload Stat for Collaborator/Admin */}
+                        {(profile?.role === 'collaborator' || profile?.role === 'admin') && !isEditing && (
+                            <div className="mt-5 border border-[#10b981]/30 bg-[#10b981]/10 rounded-2xl p-4 flex flex-col justify-center shadow-lg md:min-w-[320px] max-w-sm mx-auto relative overflow-hidden">
+                                <span className="absolute -right-4 -top-4 material-symbols-outlined text-8xl text-[#10b981]/10 -rotate-12 pointer-events-none">auto_stories</span>
+                                <div className="flex items-center gap-4 relative z-10 w-fit mx-auto">
+                                    <div className="w-12 h-12 rounded-xl bg-[#10b981]/20 flex items-center justify-center text-[#10b981] border border-[#10b981]/30">
+                                        <span className="material-symbols-outlined text-[24px]">upload_file</span>
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-[10px] text-[#10b981] uppercase tracking-widest font-black mb-0.5">Tài liệu đã chia sẻ</p>
+                                        <p className="text-2xl font-black text-white leading-none">{uploadCount} <span className="text-sm text-slate-400 font-medium tracking-normal lowercase">tài liệu</span></p>
+                                    </div>
+                                </div>
+                            </div>
                         )}
 
                         {/* Rank Card */}

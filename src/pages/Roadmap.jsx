@@ -153,7 +153,7 @@ export default function Roadmap() {
             </div>
 
             {/* Header Section */}
-            <header className="sticky top-[57px] md:top-0 z-30 flex items-center justify-center bg-white/10 dark:bg-[#191022]/80 backdrop-blur-md">
+            <header className="relative z-30 flex items-center justify-center bg-white/10 dark:bg-[#191022]/80 backdrop-blur-md">
                 <div className="w-full max-w-4xl px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full border-2 border-[#7f13ec]/30 overflow-hidden bg-slate-200 dark:bg-slate-800">

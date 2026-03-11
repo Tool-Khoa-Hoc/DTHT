@@ -73,7 +73,7 @@ export default function Admin() {
     try {
       const { data, error } = await supabase
         .from('documents')
-        .select('*')
+        .select('id, title, file_url, category, education_level, uploaded_by, author_name, created_at, is_featured, document_reports(id, reason, created_at, document_id, reported_by, documents(id, title, author_name))')
         .order('created_at', { ascending: false });
       if (error) throw error;
       setDocuments(data || []);
@@ -95,7 +95,7 @@ export default function Admin() {
         const eligibleIds = Object.keys(counts).filter(id => counts[id] >= 50);
 
         if (eligibleIds.length > 0) {
-          const { data: profiles } = await supabase.from('profiles').select('*').in('id', eligibleIds);
+          const { data: profiles } = await supabase.from('profiles').select('id, display_name, email, role, avatar_url, created_at').in('id', eligibleIds);
           if (profiles) {
             setCandidates(profiles.map(p => ({ ...p, completedCount: counts[p.id] })).sort((a, b) => b.completedCount - a.completedCount));
           }
@@ -143,7 +143,7 @@ export default function Admin() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, email, display_name, full_name, role, avatar_url')
         .or(`email.ilike.%${collabSearchTerm}%,display_name.ilike.%${collabSearchTerm}%,full_name.ilike.%${collabSearchTerm}%`)
         .neq('role', 'admin') // don't show admins
         .limit(10);
@@ -301,7 +301,7 @@ export default function Admin() {
   return (
     <div className="bg-[#f8f6f6] dark:bg-[#1a0f12] font-display text-slate-900 dark:text-white min-h-screen pb-24">
       {/* Header */}
-      <header className="sticky top-[57px] md:top-0 z-30 px-6 py-4 bg-white/50 dark:bg-[#201216]/80 backdrop-blur-md border-b border-[#7f13ec]/10 flex flex-col gap-4">
+      <header className="relative z-30 px-6 py-4 bg-white/50 dark:bg-[#201216]/80 backdrop-blur-md border-b border-[#7f13ec]/10 flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#7f13ec]/20 flex items-center justify-center text-[#7f13ec] shadow-[0_0_15px_rgba(127,19,236,0.3)]">
             <span className="material-symbols-outlined">admin_panel_settings</span>

@@ -702,12 +702,12 @@ function UniCalc() {
   }, [selectedSem]);
 
   const loadSems = async () => {
-    const { data } = await supabase.from('semesters').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+    const { data } = await supabase.from('semesters').select('id, name, created_at').eq('user_id', user.id).order('created_at', { ascending: false });
     setSemesters(data || []);
     if (data?.length > 0 && !selectedSem) setSelSem(data[0].id);
   };
   const loadSubs = async (id) => {
-    const { data } = await supabase.from('subjects').select('*').eq('semester_id', id).order('created_at');
+    const { data } = await supabase.from('subjects').select('id, name, credits, grade_number, semester_id, created_at').eq('semester_id', id).order('created_at');
     if (data?.length > 0) setSubjects(data.map(s => ({ id: s.id, name: s.name, credits: s.credits, grade: s.grade_number })));
     else setSubjects([{ id: Date.now(), name: '', credits: 2, grade: 0 }]);
   };
@@ -869,7 +869,7 @@ export default function GPACalculator() {
         <option value="Giáo dục Quốc phòng - An ninh" />
       </datalist>
 
-      <header className="sticky top-[57px] md:top-0 z-50 px-4 py-4 flex items-center justify-between bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10">
+      <header className="relative z-20 px-4 py-4 flex items-center justify-between bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10">
         <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-slate-800/50 flex items-center justify-center hover:bg-slate-700 transition-colors">
           <span className="material-symbols-outlined">arrow_back_ios_new</span>
         </button>

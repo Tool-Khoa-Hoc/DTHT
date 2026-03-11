@@ -256,7 +256,7 @@ export default function AdmissionCalculator() {
       <div className="fixed inset-0 bg-[radial-gradient(at_0%_0%,rgba(227,100,136,0.12)_0,transparent_55%),radial-gradient(at_100%_0%,rgba(48,110,232,0.12)_0,transparent_55%)] pointer-events-none" />
 
       {/* Header */}
-      <header className="sticky top-[57px] md:top-0 z-50 px-4 py-4 flex items-center justify-between bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10">
+      <header className="relative z-50 px-4 py-4 flex items-center justify-between bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10">
         <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-slate-800/50 flex items-center justify-center hover:bg-slate-700 transition-colors">
           <span className="material-symbols-outlined">arrow_back_ios_new</span>
         </button>

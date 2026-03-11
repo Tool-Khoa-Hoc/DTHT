@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -60,6 +60,14 @@ export default function Library() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  const categoriesList = useMemo(() => {
+    const dynamicCats = Array.from(new Set(documents.map(d => d.category).filter(c => c && !CATEGORIES.some(cat => cat.value === c))));
+    return [
+      ...CATEGORIES,
+      ...dynamicCats.map(c => ({ label: c, value: c }))
+    ];
+  }, [documents]);
+
   const fetchDocuments = async () => {
     try {
       const { data, error } = await supabase
@@ -79,7 +87,7 @@ export default function Library() {
     try {
       const { data } = await supabase
         .from('notifications')
-        .select('*')
+        .select('id, title, message, link, is_read, created_at, user_id')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20);
@@ -167,7 +175,7 @@ export default function Library() {
       <div className="fixed inset-0 bg-[radial-gradient(at_0%_0%,#4f46e5_0px,transparent_50%),radial-gradient(at_100%_0%,#7e22ce_0px,transparent_50%),radial-gradient(at_100%_100%,#3b82f6_0px,transparent_50%),radial-gradient(at_0%_100%,#ec4899_0px,transparent_50%)] opacity-30 pointer-events-none"></div>
 
       <div className="w-full max-w-6xl mx-auto flex flex-col flex-1 relative z-10">
-        <header className="sticky top-[57px] md:top-0 z-50 px-4 pt-6 pb-4 bg-[#0f172a]/80 backdrop-blur-xl border-b border-white/5 mt-0 md:mt-4 md:rounded-2xl">
+        <header className="relative z-50 px-4 pt-6 pb-4 bg-[#0f172a]/80 backdrop-blur-xl border-b border-white/5 mt-0 md:mt-4 md:rounded-2xl">
           <div className="flex items-center justify-between mb-4">
             <button onClick={() => navigate(-1)} className="md:hidden flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 transition-colors">
               <span className="material-symbols-outlined">arrow_back_ios_new</span>
@@ -264,7 +272,7 @@ export default function Library() {
         <main className="flex-1 relative z-10 pt-2">
           {/* Categories */}
           <div className="flex gap-2 p-4 overflow-x-auto no-scrollbar">
-            {CATEGORIES.map(cat => (
+            {categoriesList.map(cat => (
               <button
                 key={cat.value}
                 onClick={() => setActiveCategory(cat.value)}
@@ -306,7 +314,7 @@ export default function Library() {
                         )}
                         {doc.category && (
                           <span className="text-[9px] font-semibold uppercase tracking-wide text-amber-400/70 bg-amber-500/10 rounded px-1.5 py-0.5 w-fit mt-1 inline-block">
-                            {CATEGORIES.find(c => c.value === doc.category)?.label || doc.category}
+                            {categoriesList.find(c => c.value === doc.category)?.label || doc.category}
                           </span>
                         )}
                       </div>
@@ -366,7 +374,7 @@ export default function Library() {
                     )}
                     {doc.category && (
                       <span className="text-[10px] font-semibold uppercase tracking-wide text-[#306ee8]/80 bg-[#306ee8]/10 rounded px-1.5 py-0.5 w-fit mt-0.5">
-                        {CATEGORIES.find(c => c.value === doc.category)?.label || doc.category}
+                        {categoriesList.find(c => c.value === doc.category)?.label || doc.category}
                       </span>
                     )}
                     <p className="text-[11px] text-slate-500 line-clamp-1 mt-1">{doc.description}</p>
