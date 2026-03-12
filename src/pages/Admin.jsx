@@ -31,8 +31,10 @@ export default function Admin() {
   const [docId, setDocId] = useState(null); // null means adding new
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [publishDate, setPublishDate] = useState('');
   const [fileUrl, setFileUrl] = useState('');
   const [authorName, setAuthorName] = useState('');
+  const [major, setMajor] = useState('');
   const [category, setCategory] = useState('khac');
   const [isFeatured, setIsFeatured] = useState(false);
   const [educationLevel, setEducationLevel] = useState('thpt'); // 'thpt' | 'university'
@@ -73,7 +75,7 @@ export default function Admin() {
     try {
       const { data, error } = await supabase
         .from('documents')
-        .select('id, title, file_url, category, education_level, uploaded_by, author_name, created_at, is_featured, document_reports(id, reason, created_at, document_id, reported_by, documents(id, title, author_name))')
+        .select('id, title, file_url, category, education_level, uploaded_by, author_name, created_at, is_featured, publish_date, major, document_reports(id, reason, created_at, document_id, reported_by, documents(id, title, author_name))')
         .order('created_at', { ascending: false });
       if (error) throw error;
       setDocuments(data || []);
@@ -204,9 +206,11 @@ export default function Admin() {
             description,
             file_url: fileUrl,
             author_name: authorName || 'Khuyết danh',
-            category,
+            category: educationLevel === 'university' ? (category || 'Chuyên ngành') : category,
+            major: educationLevel === 'university' ? major : null,
             is_featured: isFeatured,
-            education_level: educationLevel
+            education_level: educationLevel,
+            publish_date: publishDate || null
           })
           .eq('id', docId);
 
@@ -224,9 +228,11 @@ export default function Admin() {
               author_name: authorName || 'Khuyết danh',
               uploaded_by: user.id,
               is_public: true,
-              category,
+              category: educationLevel === 'university' ? (category || 'Chuyên ngành') : category,
+              major: educationLevel === 'university' ? major : null,
               is_featured: isFeatured,
-              education_level: educationLevel
+              education_level: educationLevel,
+              publish_date: publishDate || null
             }
           ]);
 
@@ -252,9 +258,11 @@ export default function Admin() {
     setDescription('');
     setFileUrl('');
     setAuthorName('');
+    setMajor('');
     setCategory('khac');
     setIsFeatured(false);
     setEducationLevel('thpt');
+    setPublishDate('');
   };
 
   const handleEdit = (doc) => {
@@ -263,9 +271,11 @@ export default function Admin() {
     setDescription(doc.description || '');
     setFileUrl(doc.file_url);
     setAuthorName(doc.author_name || '');
+    setMajor(doc.major || '');
     setCategory(doc.category || 'khac');
     setIsFeatured(doc.is_featured || false);
     setEducationLevel(doc.education_level || 'thpt');
+    setPublishDate(doc.publish_date || '');
 
     // Scroll to form automatically
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -368,15 +378,8 @@ export default function Admin() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">Danh mục / Môn học <span className="text-red-500">*</span></label>
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                  {CATEGORIES.map(cat => (
-                    <button key={cat.value} type="button" onClick={() => setCategory(cat.value)} className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all text-xs font-semibold ${category === cat.value ? 'border-[#7f13ec] bg-[#7f13ec]/10 text-[#7f13ec]' : 'border-slate-200 dark:border-white/8 bg-slate-50 dark:bg-white/3 text-slate-500 dark:text-slate-400 hover:border-[#7f13ec]/40 hover:text-[#7f13ec]'}`}>
-                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center`}><span className="material-symbols-outlined text-white text-base">{cat.icon}</span></div>
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
+                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Ngày - tháng - năm <span className="text-slate-400 font-normal">(Tùy chọn)</span></label>
+                <input type="date" value={publishDate} onChange={(e) => setPublishDate(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white dark:[color-scheme:dark]" />
               </div>
 
               <div>
@@ -395,6 +398,29 @@ export default function Admin() {
                     </div>
                   </label>
                 </div>
+              </div>
+
+              {educationLevel === 'university' && (
+                <div>
+                  <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Trường / Ngành học <span className="text-red-500">*</span></label>
+                  <input required value={major} onChange={(e) => setMajor(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="VD: ĐH Bách Khoa, CNTT, Y Dược..." />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">{educationLevel === 'university' ? 'Tên Môn học / Học phần ' : 'Danh mục / Môn học '}<span className="text-red-500">*</span></label>
+                {educationLevel === 'university' ? (
+                  <input required value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="VD: Giải tích 1, Toán cao cấp..." />
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                    {CATEGORIES.map(cat => (
+                      <button key={cat.value} type="button" onClick={() => setCategory(cat.value)} className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all text-xs font-semibold ${category === cat.value ? 'border-[#7f13ec] bg-[#7f13ec]/10 text-[#7f13ec]' : 'border-slate-200 dark:border-white/8 bg-slate-50 dark:bg-white/3 text-slate-500 dark:text-slate-400 hover:border-[#7f13ec]/40 hover:text-[#7f13ec]'}`}>
+                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center`}><span className="material-symbols-outlined text-white text-base">{cat.icon}</span></div>
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div>

@@ -61,18 +61,27 @@ export default function Library() {
   }, []);
 
   const categoriesList = useMemo(() => {
-    const dynamicCats = Array.from(new Set(documents.map(d => d.category).filter(c => c && !CATEGORIES.some(cat => cat.value === c))));
-    return [
-      ...CATEGORIES,
-      ...dynamicCats.map(c => ({ label: c, value: c }))
-    ];
-  }, [documents]);
+    if (educationLevel === 'thpt') {
+      const dynamicCats = Array.from(new Set(documents.filter(d => d.education_level === 'thpt').map(d => d.category).filter(c => c && !CATEGORIES.some(cat => cat.value === c))));
+      return [
+        ...CATEGORIES,
+        ...dynamicCats.map(c => ({ label: c, value: c }))
+      ];
+    } else {
+      // University: dynamic list based on unique majors
+      const dynamicMajors = Array.from(new Set(documents.filter(d => d.education_level === 'university' && d.major).map(d => d.major).filter(Boolean)));
+      return [
+        { label: 'Tất cả Ngành/Trường', value: '' },
+        ...dynamicMajors.map(m => ({ label: m, value: m }))
+      ];
+    }
+  }, [documents, educationLevel]);
 
   const fetchDocuments = async () => {
     try {
       const { data, error } = await supabase
         .from('documents')
-        .select('id, title, file_url, category, education_level, uploaded_by, author_name, created_at')
+        .select('id, title, file_url, category, education_level, uploaded_by, author_name, created_at, is_featured, publish_date, major')
         .order('created_at', { ascending: false });
       if (error) throw error;
       setDocuments(data || []);
@@ -162,7 +171,14 @@ export default function Library() {
 
   const filteredDocs = documents.filter(doc => {
     const matchEduLevel = (doc.education_level || 'thpt') === educationLevel;
-    const matchCat = !activeCategory || doc.category === activeCategory;
+    let matchCat = true;
+    if (activeCategory) {
+      if (educationLevel === 'thpt') {
+        matchCat = doc.category === activeCategory;
+      } else {
+        matchCat = doc.major === activeCategory;
+      }
+    }
     const matchSearch = !searchQuery
       || doc.title?.toLowerCase().includes(searchQuery.toLowerCase())
       || doc.author_name?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -255,13 +271,13 @@ export default function Library() {
           {/* Education Level Switcher */}
           <div className="mt-4 flex bg-white/5 backdrop-blur-md p-1 rounded-xl w-full mx-auto border border-white/10">
             <button
-              onClick={() => setEducationLevel('thpt')}
+              onClick={() => { setEducationLevel('thpt'); setActiveCategory(''); }}
               className={`flex-1 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-2 ${educationLevel === 'thpt' ? 'bg-[#306ee8] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
             >
               <span className="material-symbols-outlined text-[16px] sm:text-[18px]">menu_book</span> THPT Quốc Gia
             </button>
             <button
-              onClick={() => setEducationLevel('university')}
+              onClick={() => { setEducationLevel('university'); setActiveCategory(''); }}
               className={`flex-1 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-2 ${educationLevel === 'university' ? 'bg-[#7f13ec] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
             >
               <span className="material-symbols-outlined text-[16px] sm:text-[18px]">school</span> Đại Học
@@ -277,7 +293,7 @@ export default function Library() {
                 key={cat.value}
                 onClick={() => setActiveCategory(cat.value)}
                 className={`shrink-0 px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors ${activeCategory === cat.value
-                  ? 'bg-[#306ee8] text-white shadow-lg shadow-[#306ee8]/25'
+                  ? educationLevel === 'university' ? 'bg-[#7f13ec] text-white shadow-lg shadow-[#7f13ec]/25' : 'bg-[#306ee8] text-white shadow-lg shadow-[#306ee8]/25'
                   : 'bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10'
                   }`}
               >
@@ -312,11 +328,21 @@ export default function Library() {
                         ) : (
                           <p className="text-[10px] text-slate-400 mt-0.5">{doc.author_name}</p>
                         )}
-                        {doc.category && (
-                          <span className="text-[9px] font-semibold uppercase tracking-wide text-amber-400/70 bg-amber-500/10 rounded px-1.5 py-0.5 w-fit mt-1 inline-block">
-                            {categoriesList.find(c => c.value === doc.category)?.label || doc.category}
-                          </span>
+                        {doc.publish_date && (
+                          <p className="text-[10px] text-slate-400 mt-0.5"><span className="material-symbols-outlined text-[10px] align-middle">calendar_month</span> {new Date(doc.publish_date).toLocaleDateString('vi-VN')}</p>
                         )}
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {doc.major && doc.education_level === 'university' && (
+                            <span className="text-[9px] font-semibold uppercase tracking-wide text-rose-400/80 bg-rose-500/10 rounded px-1.5 py-0.5 inline-block">
+                              {doc.major}
+                            </span>
+                          )}
+                          {doc.category && (
+                            <span className="text-[9px] font-semibold uppercase tracking-wide text-amber-400/70 bg-amber-500/10 rounded px-1.5 py-0.5 inline-block">
+                              {(doc.education_level === 'thpt' && categoriesList.find(c => c.value === doc.category)?.label) ? categoriesList.find(c => c.value === doc.category).label : doc.category}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <a
                         href={doc.file_url}
@@ -372,11 +398,21 @@ export default function Library() {
                     ) : (
                       <p className="text-[11px] text-slate-400">{doc.author_name}</p>
                     )}
-                    {doc.category && (
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-[#306ee8]/80 bg-[#306ee8]/10 rounded px-1.5 py-0.5 w-fit mt-0.5">
-                        {categoriesList.find(c => c.value === doc.category)?.label || doc.category}
-                      </span>
+                    {doc.publish_date && (
+                      <p className="text-[10px] text-slate-400"><span className="material-symbols-outlined text-[10px] align-middle">calendar_month</span> {new Date(doc.publish_date).toLocaleDateString('vi-VN')}</p>
                     )}
+                    <div className="flex flex-wrap gap-1 mt-0.5">
+                      {doc.major && doc.education_level === 'university' && (
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-rose-400/80 bg-rose-500/10 rounded px-1.5 py-0.5 inline-block">
+                          {doc.major}
+                        </span>
+                      )}
+                      {doc.category && (
+                        <span className={`text-[10px] font-semibold uppercase tracking-wide ${doc.education_level === 'university' ? 'text-[#7f13ec]/80 bg-[#7f13ec]/10' : 'text-[#306ee8]/80 bg-[#306ee8]/10'} rounded px-1.5 py-0.5 inline-block`}>
+                          {(doc.education_level === 'thpt' && categoriesList.find(c => c.value === doc.category)?.label) ? categoriesList.find(c => c.value === doc.category).label : doc.category}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[11px] text-slate-500 line-clamp-1 mt-1">{doc.description}</p>
                   </div>
                   <a

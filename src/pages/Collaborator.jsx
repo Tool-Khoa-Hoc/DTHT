@@ -28,8 +28,10 @@ export default function Collaborator() {
     const [docId, setDocId] = useState(null); // null means adding new
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [publishDate, setPublishDate] = useState('');
     const [fileUrl, setFileUrl] = useState('');
     const [authorName, setAuthorName] = useState('');
+    const [major, setMajor] = useState('');
     const [category, setCategory] = useState('khac');
     const [customCategory, setCustomCategory] = useState('');
     const [educationLevel, setEducationLevel] = useState('thpt'); // 'thpt' | 'university'
@@ -85,8 +87,10 @@ export default function Collaborator() {
                         description,
                         file_url: fileUrl,
                         author_name: authorName || profile?.display_name || 'Khuyết danh',
-                        category: finalCategory,
-                        education_level: educationLevel
+                        category: educationLevel === 'university' ? (category || 'Chuyên ngành') : finalCategory,
+                        major: educationLevel === 'university' ? major : null,
+                        education_level: educationLevel,
+                        publish_date: publishDate || null
                     })
                     .eq('id', docId); // Note: uploaded_by = uid() is enforced by RLS
 
@@ -104,8 +108,10 @@ export default function Collaborator() {
                             author_name: authorName || profile?.display_name || 'Khuyết danh',
                             uploaded_by: user.id,
                             is_public: true,
-                            category: finalCategory,
-                            education_level: educationLevel
+                            category: educationLevel === 'university' ? (category || 'Chuyên ngành') : finalCategory,
+                            major: educationLevel === 'university' ? major : null,
+                            education_level: educationLevel,
+                            publish_date: publishDate || null
                         }
                     ]);
 
@@ -131,9 +137,11 @@ export default function Collaborator() {
         setDescription('');
         setFileUrl('');
         setAuthorName('');
+        setMajor('');
         setCategory('khac');
         setCustomCategory('');
         setEducationLevel('thpt');
+        setPublishDate('');
     };
 
     const handleEdit = (doc) => {
@@ -151,7 +159,9 @@ export default function Collaborator() {
             setCategory(doc.category || 'khac');
             setCustomCategory('');
         }
+        setMajor(doc.major || '');
         setEducationLevel(doc.education_level || 'thpt');
+        setPublishDate(doc.publish_date || '');
 
         // Scroll to form automatically
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -222,25 +232,8 @@ export default function Collaborator() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">Danh mục / Môn học <span className="text-red-500">*</span></label>
-                            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                                {CATEGORIES.map(cat => (
-                                    <button key={cat.value} type="button" onClick={() => setCategory(cat.value)} className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all text-xs font-semibold ${category === cat.value ? 'border-[#10b981] bg-[#10b981]/10 text-[#10b981]' : 'border-slate-200 dark:border-white/8 bg-slate-50 dark:bg-white/3 text-slate-500 dark:text-slate-400 hover:border-[#10b981]/40 hover:text-[#10b981]'}`}>
-                                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center`}><span className="material-symbols-outlined text-white text-base">{cat.icon}</span></div>
-                                        {cat.label}
-                                    </button>
-                                ))}
-                            </div>
-                            {category === 'khac' && (
-                                <div className="mt-3">
-                                    <input 
-                                        value={customCategory} 
-                                        onChange={(e) => setCustomCategory(e.target.value)} 
-                                        className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-[#10b981]/50 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" 
-                                        placeholder="Nhập tên môn học / danh mục khác..." 
-                                    />
-                                </div>
-                            )}
+                            <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Ngày - tháng - năm <span className="text-slate-400 font-normal">(Tùy chọn)</span></label>
+                            <input type="date" value={publishDate} onChange={(e) => setPublishDate(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white dark:[color-scheme:dark]" />
                         </div>
 
                         <div>
@@ -259,6 +252,41 @@ export default function Collaborator() {
                                     </div>
                                 </label>
                             </div>
+                        </div>
+
+                        {educationLevel === 'university' && (
+                            <div>
+                                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Trường / Ngành học <span className="text-red-500">*</span></label>
+                                <input required value={major} onChange={(e) => setMajor(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" placeholder="VD: ĐH Bách Khoa, CNTT, Y Dược..." />
+                            </div>
+                        )}
+
+                        <div>
+                            <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">{educationLevel === 'university' ? 'Tên Môn học / Học phần ' : 'Danh mục / Môn học '}<span className="text-red-500">*</span></label>
+                            {educationLevel === 'university' ? (
+                                <input required value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" placeholder="VD: Giải tích 1, Toán cao cấp..." />
+                            ) : (
+                                <>
+                                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                                        {CATEGORIES.map(cat => (
+                                            <button key={cat.value} type="button" onClick={() => setCategory(cat.value)} className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all text-xs font-semibold ${category === cat.value ? 'border-[#10b981] bg-[#10b981]/10 text-[#10b981]' : 'border-slate-200 dark:border-white/8 bg-slate-50 dark:bg-white/3 text-slate-500 dark:text-slate-400 hover:border-[#10b981]/40 hover:text-[#10b981]'}`}>
+                                                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center`}><span className="material-symbols-outlined text-white text-base">{cat.icon}</span></div>
+                                                {cat.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {category === 'khac' && (
+                                        <div className="mt-3">
+                                            <input 
+                                                value={customCategory} 
+                                                onChange={(e) => setCustomCategory(e.target.value)} 
+                                                className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-[#10b981]/50 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" 
+                                                placeholder="Nhập tên môn học / danh mục khác..." 
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         </div>
 
                         <div>

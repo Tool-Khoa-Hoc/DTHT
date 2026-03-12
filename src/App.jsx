@@ -20,6 +20,8 @@ const StudyArena = lazy(() => import('./pages/StudyArena'));
 const Collaborator = lazy(() => import('./pages/Collaborator'));
 const UserProfile = lazy(() => import('./pages/UserProfile'));
 const ExamRoom = lazy(() => import('./pages/ExamRoom'));
+const ExamTaking = lazy(() => import('./pages/ExamTaking'));
+const ExamResult = lazy(() => import('./pages/ExamResult'));
 
 // App Loading Fallback
 const PageLoader = () => (
@@ -53,6 +55,8 @@ function App() {
               <Route path="collaborator" element={<Collaborator />} />
               <Route path="profile/:id" element={<UserProfile />} />
               <Route path="exam-room" element={<ExamRoom />} />
+              <Route path="exam/:subjectFolder/:id" element={<ExamTaking />} />
+              <Route path="exam/:subjectFolder/:id/result" element={<ExamResult />} />
             </Route>
           </Routes>
         </Suspense>

@@ -1,0 +1,1416 @@
+{
+    "status": true,
+    "message": "Get attempts successfully",
+    "part": {
+        "id": "175f096d-073f-4ec7-9b67-6343691a946b",
+        "title": "Đề thường 05 - TSA Khoa Học ",
+        "description": "a",
+        "form_type": "tsa",
+        "topic": "tsa_khoahoc",
+        "time_take": 60,
+        "max_point": 40,
+        "slug": "a",
+        "is_free": true,
+        "image_url": "a",
+        "question_quality": 40,
+        "is_published": true,
+        "link_answers": "a",
+        "created_at": "2026-01-04T00:13:49.369702+07:00",
+        "updated_at": "2026-01-14T20:02:11.224053+07:00",
+        "questions": [
+            {
+                "id": "307eaed2-5871-4ca8-aece-4ad12af3d4e5",
+                "part_id": "175f096d-073f-4ec7-9b67-6343691a946b",
+                "position": 1,
+                "content": "***Đọc văn bản sau và trả lời các câu hỏi từ 1 đến 7:***\nThẩm thấu là sự khuếch tán của dung môi (thường là nước) qua màng bán thấm, từ khu vực có nồng độ chất tan thấp đến khu vực có nồng độ chất tan cao. Chất tan là các nguyên tử, ion hoặc phân tử hòa tan trong chất lỏng. Áp suất thẩm thấu được tạo ra bởi quá trình dung môi di chuyển qua màng, dung môi di chuyển càng nhiều thì áp suất thẩm thấu càng cao và ngược lại. Áp suất thẩm thấu là áp suất tối thiểu cần được cung cấp cho dung dịch để ngăn chặn sự thẩm thấu. Kết quả của quá trình thẩm thấu là trạng thái cân bằng – sự phân bố đồng đều các chất ở cả hai phía của màng.\nThiết bị trong Hình 1 được dùng để đo áp suất thẩm thấu cho các thí nghiệm 1 và 2.\n$/image_{https://cdn.save.moe/b/3lmGYb.png?dl=1}_{center}_{100}_{block}$\n**Thí nghiệm 1**\nPhía kín của thiết bị chứa dung dịch sucrose (dung môi nước) các nồng độ khác nhau. Phía còn lại chứa nước tinh khiết. Hai khu vực này được ngăn cách với nhau bởi màng bán thấm như Hình 1. Ngoài ra, thuốc nhuộm màu xanh được thêm vào các dung dịch sucrose. Áp suất thẩm thấu do piston tạo ra được đo cho từng dung dịch ở 298 K và 348 K. Kết quả được thể hiện trong Bảng 1.\n$/image_{https://cdn.save.moe/b/MThm810.png?dl=1}_{center}_{100}_{block}$\n**Thí nghiệm 2**\nCác dung dịch sucrose của bốn dung môi hữu cơ khác nhau đã được nghiên cứu tương tự như thí nghiệm 1 ở cùng điều kiện 298 K. Kết quả được thể hiện trong Bảng 2.\n$/image_{https://cdn.save.moe/b/xCG2PJj.png?dl=1}_{center}_{100}_{block}$",
+                "difficulty": "M1",
+                "type": "reading_comprehension",
+                "topic": "tsa_hoa",
+                "data_questions": {},
+                "data_answers": {},
+                "answer_detail": null,
+                "option_columns": 1,
+                "status": "active",
+                "access_code": null,
+                "created_at": "2026-01-06T00:22:51.009432+07:00",
+                "updated_at": "2026-01-06T00:22:51.009432+07:00",
+                "questions": [
+                    {
+                        "id": "b8112a11-7241-4b1b-8d8d-a6e52cee6fbd",
+                        "parent_id": "307eaed2-5871-4ca8-aece-4ad12af3d4e5",
+                        "position": 1,
+                        "content": "Phát biểu sau đúng hay sai?\nThẩm thấu là sự di chuyển của dung môi (thường là nước) qua màng bán thấm, từ khu vực có nồng độ chất tan cao sang khu vực có nồng độ chất tan thấp.",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "Đúng."
+                                },
+                                {
+                                    "content": "Sai."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Thẩm thấu là sự di chuyển của dung môi (thường là nước) qua màng bán thấm, từ khu vực có nồng độ chất tan thấp sang khu vực có nồng độ chất tan cao.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "99307862-c1dd-43e1-a1c2-0982212c24ba",
+                        "parent_id": "307eaed2-5871-4ca8-aece-4ad12af3d4e5",
+                        "position": 2,
+                        "content": "Phát biểu sau đúng hay sai?\nỞ áp suất 1 atm và nhiệt độ 298 K, nước trong dung dịch sucrose 0,10 mol/L sẽ di chuyển qua màng bán thấm từ phía nước tinh khiết sang phía dung dịch sucrose, đúng hay sai?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "Đúng."
+                                },
+                                {
+                                    "content": "Sai."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                0
+                            ]
+                        },
+                        "answer_detail": "Dựa vào kết quả thu được từ Bảng 1: dung dịch sucrose 0,1 mol/L (dung môi nước) ở 298 K có áp suất thẩm thấu là 2,45 atm.\r\nÁp suất thẩm thấu là áp suất tối thiểu cần được cung cấp cho dung dịch để ngăn chặn sự thẩm thấu, vì vậy thẩm thấu chỉ xảy ra khi áp suất bên ngoài nhỏ hơn áp suất thẩm thấu. Áp suất bên ngoài là 1 atm \u003c áp suất thẩm thấu nên hiện tượng thẩm thấu sẽ xảy ra.\r\nNhư vậy, nước sẽ di chuyển từ phía có nồng độ chất hòa tan thấp hơn (nước tinh khiết) sang phía có nồng độ cao hơn (dung dịch sucrose).",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "d3630f80-9bf0-4944-b359-5f37630323cc",
+                        "parent_id": "307eaed2-5871-4ca8-aece-4ad12af3d4e5",
+                        "position": 3,
+                        "content": "Điền từ/cụm từ thích hợp vào chỗ trống.\nỞ thí nghiệm 2, các nhà khoa học đã khảo sát tác dụng của (1) ____ đến áp suất thẩm thấu.",
+                        "difficulty": "M1",
+                        "type": "fill_in_blank",
+                        "topic": "",
+                        "data_questions": {},
+                        "data_answers": {
+                            "answer": [
+                                "dung môi và nồng độ"
+                            ]
+                        },
+                        "answer_detail": "Trong thí nghiệm 2, các nhà khoa học đã sử dụng bốn dung môi hữu cơ khác nhau và thay đổi nồng độ của dung dịch sucrose, đồng thời đo áp suất thẩm thấu -\u003e Thí nghiệm 2 nghiên cứu ảnh hưởng của dung môi và nồng độ đến áp suất thẩm thấu.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:23:12.006022+07:00"
+                    },
+                    {
+                        "id": "2d063ae7-4e04-4800-8ea8-baccd75023ba",
+                        "parent_id": "307eaed2-5871-4ca8-aece-4ad12af3d4e5",
+                        "position": 4,
+                        "content": "Ở thí nghiệm 1, các nhà khoa học đã khảo sát tác dụng của",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "dung môi và nồng độ đến áp suất thẩm thấu."
+                                },
+                                {
+                                    "content": "thể tích và nhiệt độ đến áp suất thẩm thấu."
+                                },
+                                {
+                                    "content": "nồng độ và nhiệt độ đến áp suất thẩm thấu."
+                                },
+                                {
+                                    "content": "nhiệt độ đến áp suất khí quyển."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Trong thí nghiệm 1, các nhà khoa học đã thay đổi nồng độ và nhiệt độ của dung dịch sucrose, đồng thời đo áp suất thẩm thấu -\u003e Thí nghiệm 1 nghiên cứu ảnh hưởng của nồng độ và nhiệt độ đến áp suất thẩm thấu.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "fa440357-8682-4663-b0c7-93f080587330",
+                        "parent_id": "307eaed2-5871-4ca8-aece-4ad12af3d4e5",
+                        "position": 5,
+                        "content": "Nếu methanol được sử dụng làm dung môi thì phải tạo áp suất tối thiểu là bao nhiêu cho dung dịch sucrose 0,5 mol/L ở 298K để quá trình thẩm thấu không xảy ra?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "1,23 atm."
+                                },
+                                {
+                                    "content": "2,45 atm."
+                                },
+                                {
+                                    "content": "12,23 atm."
+                                },
+                                {
+                                    "content": "24,46 atm."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                2
+                            ]
+                        },
+                        "answer_detail": "Tất cả thử nghiệm trong thí nghiệm 2 đều được tiến hành ở cùng nhiệt độ (298 K). Do đó, chỉ cần tìm methanol ở 0,5 mol/L (trong Bảng 2) để xác định áp suất tối thiểu là 12,23 atm.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "7c23f927-c880-4522-b433-cff28b6927e4",
+                        "parent_id": "307eaed2-5871-4ca8-aece-4ad12af3d4e5",
+                        "position": 6,
+                        "content": "Áp suất thẩm thấu của dung dịch sucrose có thể được tính bằng công thức $\\Pi = CRT$ trong đó $\\Pi$ là áp suất thẩm thấu (atm), C là nồng độ mol của dung dịch sucrose (mol/L), R là hằng số khí lý tưởng ($R = 0,0806 \\ L.atm.mol^{-1}.K^{-1}$) và T là nhiệt độ tuyệt đối (K). Từ kết quả thu được trong Bảng 1, cho các phát biểu sau:\n(1) Để duy trì áp suất thẩm thấu, nhiệt độ phải không đổi.\n(2) Nhiệt độ tăng, thể tích giảm hoặc ngược lại thì áp suất thẩm thấu không đổi.\n(3) Áp suất thẩm thấu sẽ tăng khi thể tích và nhiệt độ cùng tăng.\nPhát biểu đúng là",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "(1)."
+                                },
+                                {
+                                    "content": "(2)."
+                                },
+                                {
+                                    "content": "(3)."
+                                },
+                                {
+                                    "content": "(2) và (3)."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                3
+                            ]
+                        },
+                        "answer_detail": "(1) Sai. Vì: khi nhiệt độ tăng thì áp suất thẩm thấu tăng. Nếu nhiệt độ không đổi thì áp suất thẩm thấu có thể tăng hoặc giảm, vì nó còn phụ thuộc vào nồng độ dung dịch.\r\n(2) Đúng. Vì:\r\nTheo công thức tính của áp suất thẩm thấu $\\Pi = CRT = \\frac{n}{V}RT$\r\nTa thấy: Áp suất thẩm thấu tỉ lệ nghịch với thể tích và tỉ lệ thuận với nhiệt độ. Do đó, khi nhiệt độ tăng, thể tích giảm hoặc ngược lại thì áp suất thẩm thấu không đổi.\r\n(3) Đúng. Vì: Áp suất thẩm thấu sẽ tăng khi nhiệt độ tăng. Chỉ cần một trong các giá trị C hoặc T tăng thì áp suất thẩm thấu tăng.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    }
+                ]
+            },
+            {
+                "id": "8ce8abfa-51e1-4cf5-8898-9c1a90c196e0",
+                "part_id": "175f096d-073f-4ec7-9b67-6343691a946b",
+                "position": 2,
+                "content": "***Đọc văn bản sau và trả lời các câu hỏi từ 8 đến 13:***\nBảng 1 dưới đây liệt kê hai gene được tìm thấy trong một loại vừng (*Sesamum indicum*), các allele và các kiểu gene có thể có của mỗi gene.\n$/image_{https://cdn.save.moe/b/Rh1L642.png?dl=1}_{center}_{100}_{block}$\nBảng 2 liệt kê các kiểu gene khác nhau và kiểu hình liên quan tới từng kiểu gene.\n$/image_{https://cdn.save.moe/b/2Z8oeur.png?dl=1}_{center}_{100}_{block}$\nBảng 3 liệt kê bốn phép lai, kiểu gene của bố mẹ và tỉ lệ kiểu hình đời con, biết các tính trạng di truyền theo quy luật phân ly độc lập của Mendel.\n$/image_{https://cdn.save.moe/b/uGYYjLA.png?dl=1}_{center}_{100}_{block}$",
+                "difficulty": "M1",
+                "type": "reading_comprehension",
+                "topic": "tsa_sinh",
+                "data_questions": {},
+                "data_answers": {},
+                "answer_detail": null,
+                "option_columns": 1,
+                "status": "active",
+                "access_code": null,
+                "created_at": "2026-01-06T00:22:51.009432+07:00",
+                "updated_at": "2026-01-06T00:22:51.009432+07:00",
+                "questions": [
+                    {
+                        "id": "1de940fe-5afb-4fb8-ac91-0d6f16ccc608",
+                        "parent_id": "8ce8abfa-51e1-4cf5-8898-9c1a90c196e0",
+                        "position": 1,
+                        "content": "Cho biết gene nào quy định kiểu hình của lá?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "Gene P."
+                                },
+                                {
+                                    "content": "Gene L."
+                                },
+                                {
+                                    "content": "Cả gene P và gene L."
+                                },
+                                {
+                                    "content": "Không có gene nào."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Nhìn vào bảng 2, ta thấy đối với kiểu gen P-L- và ppL- đều quy định kiểu hình lá trơn, còn đối với kiểu gen P-ll và ppll thì đều quy định kiểu hình lá nhẵn. Vì vậy gene quy định tính trạng lá là gene L.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "01e0c245-1dd9-402a-b043-25e8c0967681",
+                        "parent_id": "8ce8abfa-51e1-4cf5-8898-9c1a90c196e0",
+                        "position": 2,
+                        "content": "Một cây vừng có 3 quả với lá trơn có thể có kiểu gene nào dưới đây?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "PPll."
+                                },
+                                {
+                                    "content": "ppL1."
+                                },
+                                {
+                                    "content": "ppLL."
+                                },
+                                {
+                                    "content": "PpLl."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Nhìn vào bảng 2, ta có thể nhận thấy:\r\nGen P: allele P: 1 quả \u003e\u003c allele p: 3 quả\r\nGen L: allele L: trơn \u003e\u003c allele l: nhẵn\r\nVậy một cây vừng có 3 quả với lá trơn thì kiểu gene sẽ là: ppLL và ppLl.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "a8554f1a-3aca-4d47-b3a5-29eb3d8b67f8",
+                        "parent_id": "8ce8abfa-51e1-4cf5-8898-9c1a90c196e0",
+                        "position": 3,
+                        "content": "Điền số thích hợp vào chỗ trống dưới đây:\n“Dựa vào bảng 3, có (1) ____ phép lai đời con xuất hiện 2 kiểu hình.”",
+                        "difficulty": "M1",
+                        "type": "fill_in_blank",
+                        "topic": "",
+                        "data_questions": {},
+                        "data_answers": {
+                            "answer": [
+                                "2"
+                            ]
+                        },
+                        "answer_detail": "Phép lai số 1 và phép lai số 3 đời con xuất hiện 2 kiểu hình.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "b0625eed-34df-405d-8c0b-d19c9ebfb267",
+                        "parent_id": "8ce8abfa-51e1-4cf5-8898-9c1a90c196e0",
+                        "position": 4,
+                        "content": "Điền số thích hợp vào chỗ trống dưới đây:\n“Gene P và gene L đều là những gene có (1) ____ allele.",
+                        "difficulty": "M1",
+                        "type": "fill_in_blank",
+                        "topic": "",
+                        "data_questions": {},
+                        "data_answers": {
+                            "answer": [
+                                "2"
+                            ]
+                        },
+                        "answer_detail": "Nhìn vào bảng 1, ta thấy, gene P có 2 allele là P và p, tương tự gene L cũng có 2 allele là L và l.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "10c2995b-5f4a-449d-9961-1982ee99907e",
+                        "parent_id": "8ce8abfa-51e1-4cf5-8898-9c1a90c196e0",
+                        "position": 5,
+                        "content": "Xét phép lai số 2, cây con có 3 quả, lá trơn chiếm tỉ lệ",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "0,25."
+                                },
+                                {
+                                    "content": "0,125."
+                                },
+                                {
+                                    "content": "0,375."
+                                },
+                                {
+                                    "content": "0,5."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Nhìn vào bảng 3, phép lai số 2, ta có:\r\nTỉ lệ kiểu hình 3 quả chiếm: $1 - 0,75 = 0,25$\r\nTỉ lệ kiểu hình lá trơn chiếm: $1 - 0,5 = 0,5$\r\nTổ hợp lại, ta có tỉ lệ cây con có kiểu hình 3 quả, lá trơn chiếm: $0,25 \\times 0,5 = 0,125$",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "a2b99974-da4e-49fd-b759-512a52065138",
+                        "parent_id": "8ce8abfa-51e1-4cf5-8898-9c1a90c196e0",
+                        "position": 6,
+                        "content": "Phát biểu sau đây đúng hay sai?",
+                        "difficulty": "M1",
+                        "type": "true_false",
+                        "topic": "",
+                        "data_questions": {
+                            "items": [
+                                {
+                                    "content": "Phép lai số 2 sẽ tạo ra đời con có 2 kiểu hình."
+                                },
+                                {
+                                    "content": "Tính trạng số lượng quả và dạng lá di truyền theo quy luật tương tác gene."
+                                },
+                                {
+                                    "content": "Phép lai số 4 tạo ra đời con duy nhất một kiểu gene và một kiểu hình."
+                                },
+                                {
+                                    "content": "Quy luật phân li độc lập là cơ sở LG: tính đa dạng ở những loài sinh sản hữu tính."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                false,
+                                false,
+                                true,
+                                true
+                            ]
+                        },
+                        "answer_detail": "(1) sai vì phép lai 2 tạo ra đời con có 4 kiểu hình: 1 quả, trơn ; 1 quả, nhẵn ; 3 quả, trơn ; 3 quả, nhẵn.\r\n(2) sai vì theo bài thì 2 tính trạng này di truyền theo quy luật phân li độc lập của Mendel.\r\n(3) đúng. Phép lai số 4 tạo ra đời con có một kiểu gene là PPLL, có kiểu hình 1 quả, lá trơn.\r\n(4) đúng.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    }
+                ]
+            },
+            {
+                "id": "4aeebb58-19e9-43df-95ff-314ff60290dc",
+                "part_id": "175f096d-073f-4ec7-9b67-6343691a946b",
+                "position": 3,
+                "content": "***Đọc văn bản sau và trả lời các câu hỏi từ 14 đến 20:***\nĐộng đất tạo ra các sóng địa chấn có thể lan truyền đi rất xa trong lòng Trái Đất. Có bốn loại sóng địa chấn được tạo ra cùng lúc, nhưng có tốc độ lan truyền khác nhau và có thể ghi nhận được theo thứ tự đến trạm thu như sau: sóng P, sóng S, sóng Love và cuối cùng là sóng Rayleigh. Sóng P truyền với tốc độ vào khoảng 6–13 km/giây và sóng S truyền với tốc độ vào khoảng 3,5–7,5 km/giây. Hình 1 mô phỏng hình ảnh sóng P và sóng S lan truyền và bị khúc xạ (bẻ cong) khi truyền qua các lớp khác nhau trong lòng Trái Đất. Hình 2 là tín hiệu sóng P và sóng S từ một trận động đất được ghi nhận bởi một máy đo địa chấn (một công cụ phát hiện sóng địa chấn). Hình 3 là đồ thị mô tả thời gian sóng P và sóng S truyền đi những khoảng cách nhất định dọc theo bề mặt Trái Đất tính từ tâm động đất (điểm xuất phát của sóng địa chấn trên bề mặt Trái Đất).\n$/image_{https://cdn.save.moe/b/Q3j8nI6.png?dl=1}_{center}_{100}_{block}$\n$/image_{https://cdn.save.moe/b/4Ae5PTa.png?dl=1}_{center}_{100}_{block}$\n$/image_{https://cdn.save.moe/b/D2DZn8u.png?dl=1}_{center}_{100}_{block}$",
+                "difficulty": "M1",
+                "type": "reading_comprehension",
+                "topic": "tsa_ly",
+                "data_questions": {},
+                "data_answers": {},
+                "answer_detail": null,
+                "option_columns": 1,
+                "status": "active",
+                "access_code": null,
+                "created_at": "2026-01-06T00:22:51.009432+07:00",
+                "updated_at": "2026-01-06T00:22:51.009432+07:00",
+                "questions": [
+                    {
+                        "id": "775c9eb9-f733-4e49-8dae-ae56e43b7696",
+                        "parent_id": "4aeebb58-19e9-43df-95ff-314ff60290dc",
+                        "position": 1,
+                        "content": "Trong 4 loại sóng địa chấn, sóng có tốc độ bé nhất là",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "sóng S."
+                                },
+                                {
+                                    "content": "sóng P."
+                                },
+                                {
+                                    "content": "sóng Love."
+                                },
+                                {
+                                    "content": "sóng Rayleigh."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                3
+                            ]
+                        },
+                        "answer_detail": "Thứ tự ghi nhận được các sóng: sóng P, sóng S, sóng Love và cuối cùng là sóng Rayleigh, tức là sóng P có tốc độ lớn nhất, sóng Rayleigh có tốc độ bé nhất.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "acc9ca80-51f8-4051-ae84-a79805fdba67",
+                        "parent_id": "4aeebb58-19e9-43df-95ff-314ff60290dc",
+                        "position": 2,
+                        "content": "Kéo thả ô vào vị trí thích hợp:\nMáy đo địa chấn nằm ở điểm ____ trên mặt đất tính từ tâm động đất của một trận động đất sẽ nhận được cả sóng P và sóng S.\nMáy đo địa chấn nằm ở điểm ____ trên mặt đất tính từ tâm động đất của một trận động đất sẽ chỉ nhận được sóng P.\nMáy đo địa chấn nằm ở điểm ____ trên mặt đất tính từ tâm động đất của một trận động đất sẽ không nhận được cả sóng P và sóng S.",
+                        "difficulty": "M1",
+                        "type": "drag_and_drop",
+                        "topic": "",
+                        "data_questions": {
+                            "items": [
+                                "160°",
+                                "92°",
+                                "125°"
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1,
+                                0,
+                                2
+                            ]
+                        },
+                        "answer_detail": "Dựa vào Hình 1, ta có:\r\n\r\n\r\n- Máy đo địa chấn nằm ở điểm 92° trên mặt đất tính từ tâm động đất của một trận động đất sẽ nhận được cả sóng P và sóng S.\r\n- Máy đo địa chấn nằm ở điểm 160° trên mặt đất tính từ tâm động đất của một trận động đất sẽ chỉ nhận được sóng P.\r\n- Ở điểm 125° (nằm giữa 103° và 142°) là vùng tối, tức là máy đo sẽ *không* ghi nhận được cả sóng P và sóng S.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "b519a10b-eacc-4f43-b3d4-303dd60b1fa0",
+                        "parent_id": "4aeebb58-19e9-43df-95ff-314ff60290dc",
+                        "position": 3,
+                        "content": "Mỗi phát biểu sau đây là đúng hay sai?",
+                        "difficulty": "M1",
+                        "type": "true_false",
+                        "topic": "",
+                        "data_questions": {
+                            "items": [
+                                {
+                                    "content": "Sóng P là sóng dọc"
+                                },
+                                {
+                                    "content": "Sóng S là sóng ngang"
+                                },
+                                {
+                                    "content": "Khi gặp ranh giới giữa lớp vỏ và lớp lõi Trái Đất, sóng S có thể khúc xạ và tiếp tục truyền vào bên trong lớp lõi của Trái Đất."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                true,
+                                true,
+                                false
+                            ]
+                        },
+                        "answer_detail": "- Sóng dọc truyền được trong rắn , lỏng và khí\r\n- Sóng ngang truyền được trong môi trường chất rắn và bề mặt chất lỏng.\r\nTừ Hình 1 ta thấy, sóng S chỉ truyền được trong lớp vỏ và lớp phủ của Trái đất, không truyền được qua lớp lõi ngoài lỏng nên sóng S là sóng ngang, sóng P là sóng dọc. Sóng dọc P có thể khúc xạ và tiếp tục truyền vào bên trong lớp lõi của Trái Đất.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "05b8239c-c442-4924-9889-139efa0feec5",
+                        "parent_id": "4aeebb58-19e9-43df-95ff-314ff60290dc",
+                        "position": 4,
+                        "content": "So sánh nào sau đây là đúng về biên độ tương đối của sóng P đầu tiên đến máy đo địa chấn so với biên độ tương đối của sóng S đầu tiên đến máy đo địa chấn trong Hình 2?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "Nhỏ hơn."
+                                },
+                                {
+                                    "content": "Lớn hơn."
+                                },
+                                {
+                                    "content": "Bằng nhau."
+                                },
+                                {
+                                    "content": "Đều bằng 0."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                0
+                            ]
+                        },
+                        "answer_detail": "Từ Hình 2 ta thấy biên độ sóng S lớn hơn biên độ sóng P.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "76d69cbc-1255-4811-b2ff-4f65167a1683",
+                        "parent_id": "4aeebb58-19e9-43df-95ff-314ff60290dc",
+                        "part_id": "175f096d-073f-4ec7-9b67-6343691a946b",
+                        "position": 5,
+                        "content": "Điền số thích hợp vào chỗ trống\nThời gian trận động đất bắt đầu tại tâm động đất” trên Hình 2 tương ứng với điểm (1) ____ km, (2) ____ phút trên Hình 3.",
+                        "difficulty": "M1",
+                        "type": "fill_in_blank",
+                        "topic": "",
+                        "data_questions": {},
+                        "data_answers": {
+                            "answer": [
+                                [
+                                    "0"
+                                ],
+                                [
+                                    "0"
+                                ]
+                            ]
+                        },
+                        "answer_detail": "Máy đo địa chấn đặt tại tâm động đất sẽ nhận được tín hiệu đầu tiên ngay khi trận động đất bắt đầu xảy ra tức là tương ứng với điểm 0 km, 0 phút trên Hình 3.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:23:45.905298+07:00"
+                    },
+                    {
+                        "id": "d656db01-0322-436a-a8d6-eb6f83b83f38",
+                        "parent_id": "4aeebb58-19e9-43df-95ff-314ff60290dc",
+                        "position": 6,
+                        "content": "Dựa vào các dữ liệu ở Hình 3, với máy đo địa chấn đặt đặt cách tâm động đất 10500 km, khoảng thời gian từ khi nhận được tín hiệu của sóng P đầu tiên cho đến khi nhận được tín hiệu sóng S đầu tiên có thể là",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "4,5 phút."
+                                },
+                                {
+                                    "content": "9 phút."
+                                },
+                                {
+                                    "content": "10,5 phút."
+                                },
+                                {
+                                    "content": "15 phút."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                2
+                            ]
+                        },
+                        "answer_detail": "Từ Hình 3, ta thấy tại vị trí máy đo địa chấn đặt đặt cách tâm động đất 10500 km thì:\r\n\r\n\r\n- Khoảng thời gian sóng P truyền từ tâm động đất đến máy đo địa chấn xấp xỉ 13,5 phút\r\n- Khoảng thời gian sóng P truyền từ tâm động đất đến máy đo địa chấn xấp xỉ 24 phút\r\n→ Khoảng thời gian từ khi nhận được tín hiệu của sóng P đầu tiên cho đến khi nhận được tín hiệu sóng S đầu tiên xấp xỉ 10,5 phút.\r\n$/image_{https://cdn.save.moe/b/7Dq8N.png?dl=1}_{center}_{100}_{block}$",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "a4b5edf4-5dc7-4234-9fbc-e391b2925cf5",
+                        "parent_id": "4aeebb58-19e9-43df-95ff-314ff60290dc",
+                        "position": 7,
+                        "content": "Tín hiệu sóng địa chấn thu được ở Hình 2 tương ứng với máy đo địa chấn được đặt cách tâm động đất khoảng cách xấp xỉ bằng bao nhiêu trên Hình 3?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "3250 km."
+                                },
+                                {
+                                    "content": "1500 km."
+                                },
+                                {
+                                    "content": "6750 km."
+                                },
+                                {
+                                    "content": "4000 km."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                0
+                            ]
+                        },
+                        "answer_detail": "Từ Hình 2 ta thấy, thời điểm máy đo địa chấn ghi nhận sóng P đầu tiên là 6 phút, ghi nhận sóng S đầu tiên là 10,5 phút.\r\nGióng sang đồ thị Hình 3, ta thấy tương ứng với khoảng cách 3250 km.\r\n$/image_{https://cdn.save.moe/b/p9mf4T1.png?dl=1}_{center}_{100}_{block}$\r\n$/image_{https://cdn.save.moe/b/5vqjAoi.png?dl=1}_{center}_{100}_{block}$",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    }
+                ]
+            },
+            {
+                "id": "ec98d46f-da50-4fab-9312-f541599e00c9",
+                "part_id": "175f096d-073f-4ec7-9b67-6343691a946b",
+                "position": 4,
+                "content": "***Đọc văn bản sau và trả lời các câu hỏi từ 21 đến 27:***\nCác nhà khoa học đã sử dụng sắc ký khí để phân tích nồng độ benzene trong hơi nhiên liệu. Kết quả phân tích được thể hiện trong Bảng 1. Các mẫu từ bốn nhãn hiệu nhiên liệu khác nhau đã được thu thập, mỗi nhãn hiệu cung cấp cả loại nhiên liệu có lead và không lead. Một phần của mỗi mẫu được phân tích về nồng độ benzene trong chất lỏng, trong khi phần còn lại của mẫu được đưa vào lọ và chuẩn bị cho phân tích hơi. Cho mỗi lọ vào lò nung, đun nóng và sử dụng sắc ký khí để phát hiện nồng độ benzene trong hơi. Hình 1 hiển thị nhiệt độ lò nung trong quá trình thí nghiệm.\n$/image_{https://cdn.save.moe/b/OhW2FZ.png?dl=1}_{center}_{100}_{block}$\n$/image_{https://cdn.save.moe/b/h1RHV.png?dl=1}_{center}_{100}_{block}$\nGasohol là nhiên liệu xăng được pha trộn với một số loại alcohol nhất định như ethanol hoặc methanol. Hai trong số các loại nhiên liệu đã được thử nghiệm trong thí nghiệm này (nhãn hiệu C và D) là gasohol. Hình 2 cho thấy nồng độ trung bình của benzene được tìm thấy ở dạng lỏng và hơi của nhiên liệu có lead và không lead được thử nghiệm. Hình 3 so sánh nồng độ trung bình của benzene được tìm thấy trong gasohol và nhiên liệu không lead thông thường.\n$/image_{https://cdn.save.moe/b/InMUWO.png?dl=1}_{center}_{100}_{block}$",
+                "difficulty": "M1",
+                "type": "reading_comprehension",
+                "topic": "tsa_hoa",
+                "data_questions": {},
+                "data_answers": {},
+                "answer_detail": null,
+                "option_columns": 1,
+                "status": "active",
+                "access_code": null,
+                "created_at": "2026-01-06T00:22:51.009432+07:00",
+                "updated_at": "2026-01-06T00:22:51.009432+07:00",
+                "questions": [
+                    {
+                        "id": "5bb8bad1-b622-481f-8a4d-fab0d82d8db3",
+                        "parent_id": "ec98d46f-da50-4fab-9312-f541599e00c9",
+                        "position": 1,
+                        "content": "Phát biểu sau đúng hay sai?\nNồng độ trung bình của benzene có trong nhiên liệu có lead ở dạng lỏng là 250 mg/l.",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "Đúng."
+                                },
+                                {
+                                    "content": "Sai."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Nhìn vào Hình 2, tìm cột biểu thị nhiên liệu dạng lỏng có lead, là cột đầu tiên từ trái sang phải, vì vậy chúng ta có thể xác định được nồng độ trung bình của benzene được tìm thấy trong nhiên liệu có lead ở dạng lỏng xấp xỉ 200 mg/l.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:24:01.533291+07:00"
+                    },
+                    {
+                        "id": "beb7f774-602f-4639-9f3b-deb43061fb92",
+                        "parent_id": "ec98d46f-da50-4fab-9312-f541599e00c9",
+                        "position": 2,
+                        "content": "Theo Hình 3, trong nhiên liệu gasohol, nồng độ trung bình của benzene tìm thấy ở dạng lỏng",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "gấp khoảng hai lần nồng độ trung bình tìm thấy ở dạng hơi."
+                                },
+                                {
+                                    "content": "xấp xỉ một phần hai nồng độ trung bình tìm thấy ở dạng hơi."
+                                },
+                                {
+                                    "content": "xấp xỉ một phần tư nồng độ trung bình tìm thấy ở dạng hơi."
+                                },
+                                {
+                                    "content": "xấp xỉ nồng độ trung bình tìm thấy ở dạng hơi."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Nhìn vào Hình 3, hai cột đầu tiên biểu thị nhiên liệu gasohol. Cột màu trắng biểu thị dạng lỏng của nhiên liệu và cột màu xám tượng trưng cho dạng hơi của nhiên liệu. Bằng cách nhìn vào độ cao tương đối của các cột, có thể xác định rằng cột màu trắng có kích thước xấp xỉ một nửa cột màu xám.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "ab3d8b55-7771-409d-aa4a-0c408c24e513",
+                        "parent_id": "ec98d46f-da50-4fab-9312-f541599e00c9",
+                        "position": 3,
+                        "content": "Phát biểu sau đúng hay sai?\nKết quả phân tích cho thấy nồng độ benzene trong các nhãn hiệu nhiên liệu không chứa lead ở dạng lỏng cao hơn ở dạng khí.",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "Đúng."
+                                },
+                                {
+                                    "content": "Sai."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Dựa vào Bảng 1, nồng độ benzene trong các nhãn hiệu nhiên liệu không chứa lead ở dạng lỏng thấp hơn ở dạng khí.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "f2a13471-9f80-4a55-91ea-60e5d96fbe9e",
+                        "parent_id": "ec98d46f-da50-4fab-9312-f541599e00c9",
+                        "position": 4,
+                        "content": "Kéo thả ô vào vị trí thích hợp:\nDựa vào Hình 2, loại nhiên liệu ____ được thử nghiệm có nồng độ benzene trung bình cao nhất.",
+                        "difficulty": "M1",
+                        "type": "drag_and_drop",
+                        "topic": "",
+                        "data_questions": {
+                            "items": [
+                                "dạng lỏng không có lead ",
+                                "dạng hơi không có lead",
+                                "dạng hơi có lead",
+                                "dạng lỏng có lead"
+                            ],
+                            "answers": []
+                        },
+                        "data_answers": {
+                            "answer": [
+                                2
+                            ]
+                        },
+                        "answer_detail": "Nhìn vào Hình 2, cột màu trắng biểu thị nhiên liệu có lead. Cột màu xám biểu thị nhiên liệu không có lead. Dễ dàng thấy được nhiên liệu dạng hơi có lead có nồng độ trung bình benzene cao nhất.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "768845fe-bc85-4985-ad29-10a52834b2aa",
+                        "parent_id": "ec98d46f-da50-4fab-9312-f541599e00c9",
+                        "position": 5,
+                        "content": "Giả sử, các mẫu nhiên liệu được nung trong lò 20 phút. Dựa trên Hình 1, nhiệt độ trong lò nung sau 20 phút rất có thể",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "nhỏ hơn 100°C."
+                                },
+                                {
+                                    "content": "nằm trong khoảng từ 100°C đến 150°C."
+                                },
+                                {
+                                    "content": "nằm trong khoảng từ 150°C đến 200°C."
+                                },
+                                {
+                                    "content": "lớn hơn 200°C."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                3
+                            ]
+                        },
+                        "answer_detail": "Nhìn vào Hình 1, nhiệt độ trong lò giữ nguyên trong khoảng 5 phút đầu sau đó tăng dần theo thời gian. Có thể suy ra rằng sau 20 phút, nhiệt độ vấn tiếp tục tăng và nhiệt độ trong lò nung sau 20 phút rất có thể lớn hơn 200°C.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "4926cda8-820b-4e30-8091-bd881cc67af4",
+                        "parent_id": "ec98d46f-da50-4fab-9312-f541599e00c9",
+                        "position": 6,
+                        "content": "Kéo thả ô vào vị trí thích hợp:\nTheo Hình 2, nồng độ trung bình của benzene có trong nhiên liệu có lead ở dạng hơi xấp xỉ ____ mg/l.",
+                        "difficulty": "M1",
+                        "type": "drag_and_drop",
+                        "topic": "",
+                        "data_questions": {
+                            "items": [
+                                "240",
+                                "200",
+                                "480",
+                                "400"
+                            ],
+                            "answers": []
+                        },
+                        "data_answers": {
+                            "answer": [
+                                2
+                            ]
+                        },
+                        "answer_detail": "Nhìn vào Hình 2, tìm cột biểu thị nhiên liệu dạng hơi có lead, là cột thứ 3 từ trái sang phải, vì vậy chúng ta có thể xác định được nồng độ trung bình của benzene được tìm thấy trong nhiên liệu có lead ở dạng hơi xấp xỉ 480 mg/l.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "8526e106-8cad-45cb-895d-b38c1f3f235d",
+                        "parent_id": "ec98d46f-da50-4fab-9312-f541599e00c9",
+                        "position": 7,
+                        "content": "Một nhà khoa học cho rằng, ở dạng lỏng, nhiên liệu có lead sẽ thải ra nhiều benzene hơn nhiên liệu không lead. Dữ liệu trong Bảng 1 có hỗ trợ cho khẳng định này không?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "Có, vì đối với tất cả các nhãn hiệu nhiên liệu được thử nghiệm, nồng độ benzene trong nhiên liệu có lead cao hơn trong nhiên liệu không lead."
+                                },
+                                {
+                                    "content": "Có, vì đối với tất cả các loại nhiên liệu được thử nghiệm, lượng benzene được tìm thấy ở dạng hơi cao hơn lượng benzene được tìm thấy ở dạng lỏng."
+                                },
+                                {
+                                    "content": "Không, vì chỉ có 1 nhiên liệu (dạng lỏng) cho thấy lượng benzene trong nhiên liệu có lead cao hơn trong nhiên liệu không lead."
+                                },
+                                {
+                                    "content": "Không, vì chỉ có nhiên liệu không phải gasohol mới thải ra nhiều benzene hơn trong nhiên liệu có lead."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                2
+                            ]
+                        },
+                        "answer_detail": "Nhãn hiệu C là nhãn hiệu duy nhất có nồng độ benzene trong nhiên liệu lead cao hơn. Xem dữ liệu trong Bảng 1, cột thứ hai liệt kê nồng độ benzene được tìm thấy ở dạng lỏng của nhiên liệu. So sánh lượng tìm thấy trong mỗi nhãn hiệu cho lead và không lead. Nhãn hiệu C là nhãn hiệu duy nhất có nồng độ benzene trong nhiên liệu lead cao hơn.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    }
+                ]
+            },
+            {
+                "id": "7946fc70-d3b3-40c2-8320-9f08106db8db",
+                "part_id": "175f096d-073f-4ec7-9b67-6343691a946b",
+                "position": 5,
+                "content": "***Đọc văn bản sau và trả lời các câu hỏi từ 28 đến 34:***\nKhi truyền qua các môi trường, năng lượng sóng âm bị môi trường hấp thụ nên cường độ của nó sẽ giảm dần. Hệ số suy giảm $\\alpha$ được định nghĩa là tỉ lệ giảm của mức cường độ sóng âm theo khoảng cách do sự mất năng lượng này; giá trị của $\\alpha$ càng lớn thì mức cường độ sóng âm giảm theo khoảng cách càng lớn. Hình 1 cho thấy sự thay đổi của $\\alpha$ (tính bằng decibel trên km, dB/km) theo nhiệt độ trong không khí ở độ ẩm tương đối 10% đối với 3 sóng âm có tần số khác nhau (tính bằng hertz, Hz).\n$/image_{https://cdn.save.moe/b/sNm7f03.png?dl=1}_{center}_{100}_{block}$\nHình 2 cho thấy sự thay đổi của $\\alpha$ theo độ ẩm tương đối trong không khí ở nhiệt độ 20°C đối với 3 sóng có tần số khác nhau.\n$/image_{https://cdn.save.moe/b/K2IN3Ku.png?dl=1}_{center}_{100}_{block}$\n*Số liệu từ Richard Lord, \"Calculation of Absorption of Sound by the Atmosphere.\" ©2004 National Physical Laboratory.*",
+                "difficulty": "M1",
+                "type": "reading_comprehension",
+                "topic": "tsa_ly",
+                "data_questions": {},
+                "data_answers": {},
+                "answer_detail": null,
+                "option_columns": 1,
+                "status": "active",
+                "access_code": null,
+                "created_at": "2026-01-06T00:22:51.009432+07:00",
+                "updated_at": "2026-01-06T00:22:51.009432+07:00",
+                "questions": [
+                    {
+                        "id": "4417ab8e-8685-423e-b1a6-4af78adbcd66",
+                        "parent_id": "7946fc70-d3b3-40c2-8320-9f08106db8db",
+                        "position": 1,
+                        "content": "Gọi d là khoảng cách từ nguồn âm đến điểm khảo sát, I là cường độ sóng âm tại điểm khảo sát, $I_0$ là cường độ sóng âm tại vị trí đặt nguồn âm. Công thức nào sau đây biểu diễn đúng cách xác định hệ số suy giảm $\\alpha$?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "$\\alpha = \\dfrac{10\\lg\\dfrac{I}{I_0}}{d}$"
+                                },
+                                {
+                                    "content": "$\\alpha \\sim \\dfrac{I}{I_0} \\cdot \\dfrac{1}{d}$"
+                                },
+                                {
+                                    "content": "$\\alpha \\sim \\dfrac{d}{\\dfrac{I}{I_0}}$"
+                                },
+                                {
+                                    "content": "$\\alpha \\sim \\dfrac{d}{10\\lg\\dfrac{I}{I_0}}$"
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                0
+                            ]
+                        },
+                        "answer_detail": "Hệ số suy giảm $\\alpha$ được định nghĩa là tỉ lệ giảm của mức cường độ sóng âm theo khoảng cách do sự mất năng lượng này; giá trị của $\\alpha$ càng lớn thì mức cường độ sóng âm giảm theo khoảng cách càng lớn tức là $\\alpha \\sim L$ với $L = 10\\lg\\dfrac{I}{I_0} (dB)$. Đơn vị của $\\alpha$ là dB/km nên công thức phù hợp là $\\alpha = \\dfrac{10\\lg\\frac{I}{I_0}}{d}$.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "d754da33-336c-4270-992b-cd7bda979d49",
+                        "parent_id": "7946fc70-d3b3-40c2-8320-9f08106db8db",
+                        "position": 2,
+                        "content": "Kéo thả ô vào vị trí thích hợp:\nGiá trị $\\alpha$ cực đại thể hiện ở Hình 1 đối với sóng âm tần số 200 Hz trong không khí có độ ẩm tương đối 10% là ____, nhiệt độ không khí tương ứng khi $\\alpha$ đạt giá trị cực đại là ____.",
+                        "difficulty": "M1",
+                        "type": "drag_and_drop",
+                        "topic": "",
+                        "data_questions": {
+                            "items": [
+                                "-5°C",
+                                "35°C",
+                                "23 dB/km",
+                                "3 dB/km",
+                                "5°C"
+                            ],
+                            "answers": []
+                        },
+                        "data_answers": {
+                            "answer": [
+                                3,
+                                0
+                            ]
+                        },
+                        "answer_detail": "$/image_{https://cdn.save.moe/b/7b3Tn9X.png?dl=1}_{center}_{100}_{block}$",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "dca491d8-bd2f-409f-b8e3-31df54ea76f0",
+                        "parent_id": "7946fc70-d3b3-40c2-8320-9f08106db8db",
+                        "position": 3,
+                        "content": "Dựa vào Hình 2, hệ số suy giảm của sóng âm có tần số 1000 Hz trong không khí ở nhiệt độ 20°C đạt giá trị nhỏ nhất khi độ ẩm tương đối của không khí gần nhất với giá trị nào sau đây?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "25%."
+                                },
+                                {
+                                    "content": "45%."
+                                },
+                                {
+                                    "content": "65%."
+                                },
+                                {
+                                    "content": "85%."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Nhìn vào sơ đồ Hình 2 dễ thấy với f = 1000 Hz, $\\alpha_{min} \\approx 4,5dB/km$ khi độ ẩm tương đối của không khí vào khoảng 45%.\r\n$/image_{https://cdn.save.moe/b/jfpEQ.png?dl=1}_{center}_{100}_{block}$",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "6c602938-1ffc-40a0-bb6d-3a9f85ec8afc",
+                        "parent_id": "7946fc70-d3b3-40c2-8320-9f08106db8db",
+                        "position": 4,
+                        "content": "Phát biểu sau là đúng hay sai?\nXét trong phạm vi nhiệt độ và phạm vi độ ẩm tương đối được khảo sát trong Hình 1 và Hình 2, giá trị $\\alpha$ đối với sóng âm có tần số 200 Hz bị ảnh hưởng mạnh hơn bởi độ ẩm tương đối vì sự biến thiên lớn nhất của $\\alpha$ là vào khoảng 2,5 dB/km trong Hình 1 nhưng chỉ vào khoảng 0,5 dB/km trong Hình 2.",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "Đúng."
+                                },
+                                {
+                                    "content": "Sai."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Xét với sóng âm có tần số 200 Hz. Ở hình 1, khảo sát ảnh hưởng của nhiệt độ, sự biến thiên lớn nhất của $\\alpha$ là vào khoảng 2,5 dB/km. Ở hình 2, khảo sát ảnh hưởng của độ ẩm tương đối, sự biến thiên lớn nhất của $\\alpha$ là vào khoảng 0,5 dB/km. Như vậy giá trị $\\alpha$ đối với sóng âm có tần số 200 Hz bị ảnh hưởng mạnh hơn bởi nhiệt độ.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "9e193ea5-f677-4511-ae48-3fd5f84b8f31",
+                        "parent_id": "7946fc70-d3b3-40c2-8320-9f08106db8db",
+                        "position": 5,
+                        "content": "Xét Hình 1, với sóng âm có tần số 1000 Hz trong không khí ở độ ẩm tương đối 10%. Ở nhiệt độ bao nhiêu thì $\\alpha$ của sóng này có giá trị 18 dB/km?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "0°C."
+                                },
+                                {
+                                    "content": "2°C."
+                                },
+                                {
+                                    "content": "4°C."
+                                },
+                                {
+                                    "content": "5°C."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                2
+                            ]
+                        },
+                        "answer_detail": "Ở Hình 1, xét với sóng âm có tần số 1000 Hz thì $\\alpha = 18$ dB/km tương ứng với nhiệt độ vào khoảng 4°C.\r\n$/image_{https://cdn.save.moe/b/PwXfP.png?dl=1}_{center}_{100}_{block}$",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "35c4431f-5187-457b-bd98-3d6900c265d3",
+                        "parent_id": "7946fc70-d3b3-40c2-8320-9f08106db8db",
+                        "position": 6,
+                        "content": "Kéo thả ô vào vị trí thích hợp:\nDựa vào Hình 2 có thể nhận định rằng: Khi 2 sóng âm có tần số 150 Hz và 1100 Hz được phát đồng thời từ loa vào không khí ở nhiệt độ 20°C và độ ẩm tương đối 45% thì mức cường độ âm của sóng có tần số ____ sẽ có khả năng bị suy giảm với tốc độ lớn hơn so với sóng âm có tần số ____.",
+                        "difficulty": "M1",
+                        "type": "drag_and_drop",
+                        "topic": "",
+                        "data_questions": {
+                            "items": [
+                                "1100 Hz",
+                                "150 Hz"
+                            ],
+                            "answers": []
+                        },
+                        "data_answers": {
+                            "answer": [
+                                0,
+                                1
+                            ]
+                        },
+                        "answer_detail": "Trên Hình 2, xét ở độ ẩm tương đối 45% ta thấy, tần số âm càng cao thì hệ số suy giảm càng lớn. Như vậy có thể nhận định rằng: Mức cường độ âm của sóng có tần số 1100 Hz sẽ có khả năng bị suy giảm với tốc độ lớn hơn so với sóng âm có tần số 150 Hz.\r\n$/image_{https://cdn.save.moe/b/ZwBBXp.png?dl=1}_{center}_{100}_{block}$",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "d3ab1428-f91a-4f90-9d55-7911f25d5347",
+                        "parent_id": "7946fc70-d3b3-40c2-8320-9f08106db8db",
+                        "position": 7,
+                        "content": "Biểu đồ bên dưới cho thấy sự thay đổi của $\\alpha$ theo độ ẩm tương đối trong không khí ở một nhiệt độ cụ thể đối với 3 sóng âm có tần số khác nhau.\n$/image_{https://cdn.save.moe/b/3hcxTRk.png?dl=1}_{center}_{100}_{block}$\nDựa vào Hình 1 hãy cho biết nhiệt độ không khí được khảo sát trong biểu đồ trên là bao nhiêu?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "–20°C."
+                                },
+                                {
+                                    "content": "0°C."
+                                },
+                                {
+                                    "content": "20°C."
+                                },
+                                {
+                                    "content": "100°C."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Khi độ ẩm tương đối là 10% thì giá trị tương ứng của $\\alpha$ với 3 sóng có tần số 200 Hz, 500 Hz và 1000 Hz lần lượt là: 3 dB/km ; 9 dB/km và 14 dB/km, các giá trị này tương ứng ở nhiệt độ 0°C trên Hình 1.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    }
+                ]
+            },
+            {
+                "id": "47a31c0a-23d9-4676-95cb-3a81fdff43fa",
+                "part_id": "175f096d-073f-4ec7-9b67-6343691a946b",
+                "position": 6,
+                "content": "***Đọc văn bản sau và trả lời các câu hỏi từ 35 đến 40:***\nChất phản ứng mà enzyme tác động đến được gọi là cơ chất của enzyme. Enzyme liên kết với cơ chất (hoặc các cơ chất khi có hai hay nhiều chất phản ứng) tạo nên một phức hệ enzyme – cơ chất. Trong khi enzyme và cơ chất kết hợp, hoạt động xúc tác của enzyme biến cơ chất thành sản phẩm (hoặc các sản phẩm) của phản ứng. Một ví dụ về quá trình này có thể tóm tắt như sau:\n$/image_{https://cdn.save.moe/b/StUP5.png?dl=1}_{center}_{100}_{block}$\n**Hình 1. Cơ chế tác động của enzyme**\nPhản ứng được enzyme xúc tác có có tính đặc hiệu cao, mỗi enzyme có thể nhận biết cơ chất đặc hiệu của nó thậm chí trong số các chất là đồng phân của nhau. Ví dụ, enzyme saccharase sẽ chỉ tác động trên saccharose và sẽ không liên kết với các đường đôi khác như maltose. Tính đặc hiệu của một enzyme bắt nguồn từ cấu hình của nó mà cấu hình là hệ quả của trình tự sắp xếp các amino acid trong protein enzyme.\nChỉ một vùng hạn chế của phân tử enzyme liên kết được với cơ chất. Vùng này được gọi là trung tâm hoạt động (vùng hoạt động), điển hình là cái túi hay hố lõm trên bề mặt của protein trong đó xảy ra sự xúc tác của enzyme. Thông thường, trung tâm hoạt động được hình thành nhờ một số amino acid của enzyme, phần còn lại của phân tử protein quy định khung để xác định cấu hình của vị trí hoạt động. Tính đặc hiệu của một enzyme được cho là do sự phù hợp giữa hình dạng của vị trí hoạt động với hình dạng của cơ chất. Tuy nhiên, vị trí hoạt động không phải là một chỗ chứa cứng nhắc đối với cơ chất. Khi cơ chất xâm nhập vào vị trí hoạt động, các tương tác giữa các nhóm hóa học của nó với các nhóm R (chuỗi bên) của amino acid tạo ra vị trí hoạt động của enzyme làm cho enzyme biến đổi hình dạng một cách tinh tế đến nỗi vị trí hoạt động khớp khít đều hơn bao quanh cơ chất. Sự phù hợp cảm ứng này giống như hai bàn tay khớp với nhau khi bắt tay. Sự phù hợp cảm ứng đưa các nhóm hóa học của vị trí hoạt động vào vị trí làm tăng cường khả năng xúc tác phản ứng hóa học.",
+                "difficulty": "M1",
+                "type": "reading_comprehension",
+                "topic": "tsa_sinh",
+                "data_questions": {},
+                "data_answers": {},
+                "answer_detail": null,
+                "option_columns": 1,
+                "status": "active",
+                "access_code": null,
+                "created_at": "2026-01-06T00:22:51.009432+07:00",
+                "updated_at": "2026-01-06T00:22:51.009432+07:00",
+                "questions": [
+                    {
+                        "id": "6dc3f7ee-3315-4c17-a204-894feb649329",
+                        "parent_id": "47a31c0a-23d9-4676-95cb-3a81fdff43fa",
+                        "position": 1,
+                        "content": "Cơ chất liên kết với enzyme thông qua vùng cấu trúc không gian được gọi là",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "trung tâm điều hành."
+                                },
+                                {
+                                    "content": "trung tâm vận chuyển."
+                                },
+                                {
+                                    "content": "trung tâm xúc tác."
+                                },
+                                {
+                                    "content": "trung tâm hoạt động."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                3
+                            ]
+                        },
+                        "answer_detail": "Theo đoạn thông tin: “…Chỉ một vùng hạn chế của phân tử enzyme liên kết thực sự với cơ chất. Vùng này được gọi là trung tâm hoạt động (vùng hoạt động).”",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "b5ed507d-5d42-4184-94f8-81202281d02b",
+                        "parent_id": "47a31c0a-23d9-4676-95cb-3a81fdff43fa",
+                        "position": 2,
+                        "content": "Điền từ/cụm từ thích hợp vào chỗ trống:\nCơ chất của enzyme saccharase được mô tả trong quá trình 1 là (1) ____.",
+                        "difficulty": "M1",
+                        "type": "fill_in_blank",
+                        "topic": "",
+                        "data_questions": {},
+                        "data_answers": {
+                            "answer": [
+                                "saccharose"
+                            ]
+                        },
+                        "answer_detail": "Enzyme saccharase xúc tác cho phản ứng bẻ gãy liên kết glycosidic trong cơ chất saccharose để tạo thành glucose và fructose.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "5088d368-9c46-42c6-9cfd-7dab9f5b8a79",
+                        "parent_id": "47a31c0a-23d9-4676-95cb-3a81fdff43fa",
+                        "position": 3,
+                        "content": "Kéo thả ô vào vị trí thích hợp:\nCơ chế xúc tác các phản ứng nhờ enzyme như sau:\n____ → ____ → ____",
+                        "difficulty": "M1",
+                        "type": "drag_and_drop",
+                        "topic": "",
+                        "data_questions": {
+                            "items": [
+                                "Hình thành phức hợp enzyme – cơ chất",
+                                "Enzyme xúc tác cho phản ứng",
+                                "Tạo sản phẩm và giải phóng enzyme tự do"
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                0,
+                                1,
+                                2
+                            ]
+                        },
+                        "answer_detail": "Cơ chế xúc tác của enzyme: Hình thành phức hợp enzyme – cơ chất → Enzyme xúc tác cho phản ứng → Tạo sản phẩm và giải phóng enzyme tự do.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "ae225546-d1d9-4016-8874-9dae7326c5a4",
+                        "parent_id": "47a31c0a-23d9-4676-95cb-3a81fdff43fa",
+                        "position": 4,
+                        "content": "Ví dụ nào sau đây nói lên tính đặc hiệu của enzyme?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "Trong một phút, một phân tử amylase thủy phân được 1 triệu phân tử amylopectin."
+                                },
+                                {
+                                    "content": "Amylase chỉ thủy phân được tinh bột, không thủy phân được cellulose."
+                                },
+                                {
+                                    "content": "Amylase bị bất hoạt ở nhiệt độ trên 60°C hoặc dưới 0°C."
+                                },
+                                {
+                                    "content": "Amylase có hoạt tính xúc tác mạnh ở môi trường có pH từ 7 đến 8."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                1
+                            ]
+                        },
+                        "answer_detail": "Ý A thể hiện hoạt tính xúc tác mạnh, ý C thể hiện tính chịu ảnh hưởng bởi nhiệt độ, ý D thể hiện tính chịu ảnh hưởng bởi nồng độ pH.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "25e63cee-662e-4ab7-990d-f6c8f949fa35",
+                        "parent_id": "47a31c0a-23d9-4676-95cb-3a81fdff43fa",
+                        "position": 5,
+                        "content": "Điều nào sau đây nhằm LG: cho tính đặc hiệu cao của enzyme?",
+                        "difficulty": "M1",
+                        "type": "single_choice",
+                        "topic": "",
+                        "data_questions": {
+                            "answers": [
+                                {
+                                    "content": "Enzyme là chất xúc tác sinh học có bản chất là protein."
+                                },
+                                {
+                                    "content": "Enzyme chỉ xúc tác cho các phản ứng hóa sinh ở trong tế bào."
+                                },
+                                {
+                                    "content": "Enzyme chỉ hoạt động tốt nhất trong một điều kiện nhiệt độ, pH thích hợp."
+                                },
+                                {
+                                    "content": "Trung tâm hoạt động của enzyme cần phải tương thích với cơ chất do nó xúc tác."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                3
+                            ]
+                        },
+                        "answer_detail": "Theo đoạn thông tin: “Tính đặc hiệu của một enzyme được cho là do sự phù hợp giữa hình dạng của vị trí hoạt động với hình dạng của cơ chất”.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    },
+                    {
+                        "id": "ca66378e-c3c8-4049-a664-b411f81eac1f",
+                        "parent_id": "47a31c0a-23d9-4676-95cb-3a81fdff43fa",
+                        "position": 6,
+                        "content": "Các phát biểu sau đây đúng hay sai?",
+                        "difficulty": "M1",
+                        "type": "true_false",
+                        "topic": "",
+                        "data_questions": {
+                            "items": [
+                                {
+                                    "content": "Sau phản ứng, sản phẩm được giải phóng, enzyme xúc tác bị phân hủy, các phản ứng mới được tiếp tục với các enzyme mới."
+                                },
+                                {
+                                    "content": "Enzyme có bản chất là protein nên có thể bị biến tính dưới tác động nhiệt độ cao."
+                                },
+                                {
+                                    "content": "Enzyme là thành phần không thể thiếu trong sản phẩm của các phản ứng sinh hóa mà nó xúc tác."
+                                },
+                                {
+                                    "content": "Cơ chất là phức hợp được tạo ra khi enzyme liên kết với chất phản ứng."
+                                }
+                            ]
+                        },
+                        "data_answers": {
+                            "answer": [
+                                false,
+                                true,
+                                false,
+                                false
+                            ]
+                        },
+                        "answer_detail": "(1) sai vì sau phản ứng, sản phẩm được giải phóng, còn enzyme thì không bị biến đổi.\r\n(2) đúng.\r\n(3) sai vì sau phản ứng chỉ có sản phẩm được giải phóng.\r\n(4) sai vì cơ chất là chất tham gia phản ứng do enzyme xúc tác.",
+                        "option_columns": 1,
+                        "status": "active",
+                        "access_code": null,
+                        "created_at": "2026-01-06T00:22:51.009432+07:00",
+                        "updated_at": "2026-01-06T00:22:51.009432+07:00"
+                    }
+                ]
+            }
+        ]
+    },
+    "attempt": {
+        "id": "17aa097c-493b-4e7b-a3ce-68f2264ae327",
+        "mode": "part",
+        "user_id": "8aaa15fa-0473-4672-9619-615e50d17cc5",
+        "part_id": "175f096d-073f-4ec7-9b67-6343691a946b",
+        "status": "in_progress",
+        "created_at": "2026-02-25T09:35:03.781252+07:00",
+        "updated_at": "2026-02-25T09:35:03.781252+07:00",
+        "submited_at": "2026-02-25T09:35:03.781252+07:00"
+    }
+}

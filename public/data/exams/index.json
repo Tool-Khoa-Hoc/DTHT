@@ -1,0 +1,26 @@
+[
+  {
+    "id": "thptqg-toan-2025-01",
+    "title": "Đề minh họa Toán THPTQG 2025",
+    "subject": "Toán học",
+    "subjectFolder": "toan",
+    "time": 90,
+    "questions": 5,
+    "participants": 1328,
+    "status": "ongoing",
+    "color": "from-blue-500 to-indigo-600",
+    "icon": "functions"
+  },
+  {
+    "id": "thptqg-ly-2025-01",
+    "title": "Đề thi thử Vật lý Sở GD&ĐT Hà Nội",
+    "subject": "Vật lý",
+    "subjectFolder": "vat-ly",
+    "time": 50,
+    "questions": 3,
+    "participants": 911,
+    "status": "ongoing",
+    "color": "from-emerald-500 to-teal-600",
+    "icon": "architecture"
+  }
+]

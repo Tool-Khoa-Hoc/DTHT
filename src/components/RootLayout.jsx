@@ -100,9 +100,9 @@ export default function RootLayout() {
         <div className="mt-auto">
           <Link to="/profile" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/profile') ? 'bg-white/10 text-white font-semibold border border-white/20' : 'text-slate-500 hover:bg-white/5'}`}>
             <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-800">
-              <img className="w-full h-full object-cover" src={user?.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'} alt="Avatar" />
+              <img className="w-full h-full object-cover" src={profile?.avatar_url || user?.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'} alt="Avatar" />
             </div>
-            <span className="truncate">{user?.user_metadata?.full_name || 'Cá nhân'}</span>
+            <span className="truncate">{profile?.display_name || user?.user_metadata?.full_name || 'Cá nhân'}</span>
           </Link>
         </div>
       </aside>

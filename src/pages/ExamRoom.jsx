@@ -52,8 +52,24 @@ const EXAMS = [
 export default function ExamRoom() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('all');
+    const [activeSubject, setActiveSubject] = useState('all');
+    const [exams, setExams] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const handleJoin = (id, status) => {
+    React.useEffect(() => {
+        fetch('/data/exams/list.json')
+            .then(res => res.json())
+            .then(data => {
+                setExams(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Failed to load exams", err);
+                setLoading(false);
+            });
+    }, []);
+
+    const handleJoin = (folder, id, status) => {
         if (status === 'upcoming') {
             alert('Kỳ thi chưa bắt đầu. Vui lòng quay lại sau!');
             return;
@@ -62,9 +78,10 @@ export default function ExamRoom() {
             alert('Kỳ thi đã kết thúc. Bạn có thể xem lại đề trong Thư viện.');
             return;
         }
-        // In a real app, this would navigate to the actual quiz taking interface
-        alert(`Đang vào phòng thi: ${id}. Chúc bạn làm bài tốt!`);
+        navigate(`/exam/${folder}/${id}`);
     };
+
+    const uniqueSubjects = ['all', ...new Set(exams.map(e => e.subject))];
 
     return (
         <div className="bg-[#0f080a] text-white min-h-screen font-display relative">
@@ -91,15 +108,32 @@ export default function ExamRoom() {
                 {/* Filters */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
                     <div className="flex bg-white/5 p-1.5 rounded-2xl w-full sm:w-auto overflow-x-auto scrollbar-hide border border-white/5 backdrop-blur-sm shadow-inner">
-                        <button onClick={() => setActiveTab('all')} className={`whitespace-nowrap flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'all' ? 'bg-[#fe5f36] text-white shadow-lg shadow-[#fe5f36]/30 px-6' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>Tất cả</button>
+                        <button onClick={() => setActiveTab('all')} className={`whitespace-nowrap flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'all' ? 'bg-[#fe5f36] text-white shadow-lg shadow-[#fe5f36]/30 px-6' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>Tất cả trạng thái</button>
                         <button onClick={() => setActiveTab('ongoing')} className={`whitespace-nowrap flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'ongoing' ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>Đang diễn ra</button>
                         <button onClick={() => setActiveTab('upcoming')} className={`whitespace-nowrap flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'upcoming' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>Sắp tới</button>
                     </div>
+
+                    <select 
+                        value={activeSubject}
+                        onChange={(e) => setActiveSubject(e.target.value)}
+                        className="w-full sm:w-auto bg-[#1a0f12]/80 border border-white/10 text-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:border-[#fe5f36] focus:ring-1 focus:ring-[#fe5f36] transition-colors"
+                    >
+                        {uniqueSubjects.map(subject => (
+                            <option key={subject} value={subject}>
+                                {subject === 'all' ? 'Tất cả môn học' : subject}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 {/* Exam Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
-                    {EXAMS.filter(e => activeTab === 'all' || e.status === activeTab).map((exam) => (
+                    {loading ? (
+                         <div className="col-span-full py-12 text-center text-slate-400">Đang tải danh sách đề thi...</div>
+                    ) : exams
+                        .filter(e => activeTab === 'all' || e.status === activeTab)
+                        .filter(e => activeSubject === 'all' || e.subject === activeSubject)
+                        .map((exam) => (
                         <div key={exam.id} className="group relative bg-[#1a0f12]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-[#fe5f36]/10 hover:-translate-y-1 overflow-hidden flex flex-col sm:flex-row gap-6">
                             
                             {/* Colorful background accent */}
@@ -166,7 +200,7 @@ export default function ExamRoom() {
                                     </div>
 
                                     <button 
-                                        onClick={() => handleJoin(exam.id, exam.status)}
+                                        onClick={() => handleJoin(exam.subjectFolder, exam.id, exam.status)}
                                         className={`shrink-0 px-6 py-2.5 rounded-xl font-bold text-sm transition-all focus:ring-2 focus:outline-none flex items-center justify-center gap-2 ${
                                             exam.status === 'ongoing' 
                                                 ? 'bg-gradient-to-r from-[#fe5f36] to-pink-600 text-white hover:shadow-lg hover:shadow-[#fe5f36]/30 hover:scale-[1.02] active:scale-95 focus:ring-[#fe5f36]/50' 

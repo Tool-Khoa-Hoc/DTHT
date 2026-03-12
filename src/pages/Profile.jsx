@@ -151,7 +151,7 @@ export default function Profile() {
                         <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#7f13ec] to-[#e36488] opacity-75 blur-md"></div>
                         <div
                             className="relative h-32 w-32 rounded-full border-4 border-[#0f0716] overflow-hidden bg-cover bg-center"
-                            style={{ backgroundImage: `url(${user?.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'})` }}
+                            style={{ backgroundImage: `url(${profile?.avatar_url || user?.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'})` }}
                         ></div>
                     </div>
                     <div className="mt-4 text-center">

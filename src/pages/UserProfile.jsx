@@ -138,7 +138,7 @@ export default function UserProfile() {
             // Fetch public campaigns
             const { data: camps } = await supabase
                 .from('campaigns')
-                .select('id, title, description, points, is_completed, created_at')
+                .select('id, title, description, targets, is_completed, created_at')
                 .eq('user_id', id)
                 .eq('is_public', true)
                 .order('created_at', { ascending: false });
@@ -147,7 +147,7 @@ export default function UserProfile() {
             // Fetch documents (only those that are public)
             const { data: docs } = await supabase
                 .from('documents')
-                .select('id, title, description, points, user_id, is_completed, created_at')
+                .select('id, title, description, category, file_url, created_at')
                 .eq('uploaded_by', id)
                 .eq('is_public', true)
                 .order('created_at', { ascending: false });
