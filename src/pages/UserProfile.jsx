@@ -24,16 +24,6 @@ export default function UserProfile() {
     const [documents, setDocuments] = useState([]);
     const [activeTab, setActiveTab] = useState('campaigns'); // 'campaigns' | 'documents'
 
-    useEffect(() => {
-        if (id) {
-            fetchUserProfile();
-            fetchFollowStats();
-            if (user && user.id !== id) {
-                checkIfFollowing();
-            }
-            fetchUserContent();
-        }
-    }, [id, user, checkIfFollowing, fetchFollowStats, fetchUserContent, fetchUserProfile]);
 
     const fetchUserProfile = useCallback(async () => {
         try {
@@ -158,6 +148,15 @@ export default function UserProfile() {
             console.error('Error fetching user content:', err);
         }
     }, [id]);
+
+    // useEffect after all useCallbacks - fixes TDZ ReferenceError
+    useEffect(() => {
+        if (!id) return;
+        fetchUserProfile();
+        fetchFollowStats();
+        fetchUserContent();
+        if (user && user.id !== id) checkIfFollowing();
+    }, [id, user]); // eslint-disable-line
 
     if (loading) {
         return (

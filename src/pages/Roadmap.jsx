@@ -32,6 +32,7 @@ export default function Roadmap() {
 
     // Milestones State
     const [milestones, setMilestones] = useState([]);
+    const [milestonesLoading, setMilestonesLoading] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingMilestone, setEditingMilestone] = useState({ id: '', title: '', subtitle: '', status: 'active', progress: 0 });
 
@@ -43,21 +44,69 @@ export default function Roadmap() {
         }
     }, [profile]);
 
-    // Load custom roadmap milestones
+    // Load milestones from Supabase (with localStorage migration on first use)
     useEffect(() => {
         if (!user) return;
-        const storageKey = `roadmap_${user.id}_${mode}`;
-        const saved = localStorage.getItem(storageKey);
-        if (saved) {
-            try {
-                setMilestones(JSON.parse(saved));
-            } catch (e) {
-                setMilestones(mode === 'student' ? defaultStudentMilestones : defaultUniversityMilestones);
-            }
-        } else {
-            setMilestones(mode === 'student' ? defaultStudentMilestones : defaultUniversityMilestones);
-        }
+        loadMilestones();
     }, [user, mode]);
+
+    const loadMilestones = async () => {
+        setMilestonesLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('roadmap_milestones')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('mode', mode)
+                .order('sort_order', { ascending: true });
+
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                setMilestones(data.map(r => ({
+                    id: r.id,
+                    title: r.title,
+                    subtitle: r.subtitle || '',
+                    status: r.status,
+                    progress: r.progress,
+                })));
+            } else {
+                // No data in DB: try migrating from localStorage
+                const storageKey = `roadmap_${user.id}_${mode}`;
+                const saved = localStorage.getItem(storageKey);
+                let defaults;
+                try {
+                    defaults = saved ? JSON.parse(saved) : (mode === 'student' ? defaultStudentMilestones : defaultUniversityMilestones);
+                } catch {
+                    defaults = mode === 'student' ? defaultStudentMilestones : defaultUniversityMilestones;
+                }
+                setMilestones(defaults);
+                // Seed the DB silently
+                if (defaults.length > 0) {
+                    await supabase.from('roadmap_milestones').insert(
+                        defaults.map((m, idx) => ({
+                            id: undefined,
+                            user_id: user.id,
+                            mode,
+                            sort_order: idx,
+                            title: m.title,
+                            subtitle: m.subtitle || '',
+                            status: m.status,
+                            progress: m.progress || 0,
+                        }))
+                    );
+                    localStorage.removeItem(storageKey);
+                    // reload to get real UUIDs from DB
+                    await loadMilestones();
+                }
+            }
+        } catch (err) {
+            console.error('loadMilestones error:', err);
+            setMilestones(mode === 'student' ? defaultStudentMilestones : defaultUniversityMilestones);
+        } finally {
+            setMilestonesLoading(false);
+        }
+    };
 
     const handleSaveSettings = async (quiet = false) => {
         if (quiet !== true) setIsSaving(true);
@@ -82,12 +131,9 @@ export default function Roadmap() {
         }
     };
 
+    // No-op: kept for API compatibility but DB operations are done individually
     const handleSaveMilestones = (newMilestones) => {
         setMilestones(newMilestones);
-        if (user) {
-            const storageKey = `roadmap_${user.id}_${mode}`;
-            localStorage.setItem(storageKey, JSON.stringify(newMilestones));
-        }
     };
 
     const openEditModal = (milestone = null) => {
@@ -99,44 +145,77 @@ export default function Roadmap() {
         setIsEditModalOpen(true);
     };
 
-    const saveMilestone = () => {
+    const saveMilestone = async () => {
         if (!editingMilestone.title.trim()) {
             alert("Vui lòng nhập tiêu đề");
             return;
         }
-        let updated;
+
         const index = milestones.findIndex(m => m.id === editingMilestone.id);
-        if (index >= 0) {
-            updated = [...milestones];
-            updated[index] = editingMilestone;
+        const isNew = index < 0;
+
+        if (isNew) {
+            // INSERT new milestone
+            const { data, error } = await supabase
+                .from('roadmap_milestones')
+                .insert({
+                    user_id: user.id,
+                    mode,
+                    sort_order: milestones.length,
+                    title: editingMilestone.title,
+                    subtitle: editingMilestone.subtitle || '',
+                    status: editingMilestone.status,
+                    progress: editingMilestone.progress || 0,
+                })
+                .select('*')
+                .single();
+            if (error) { alert('Lỗi lưu: ' + error.message); return; }
+            setMilestones(prev => [...prev, {
+                id: data.id,
+                title: data.title,
+                subtitle: data.subtitle,
+                status: data.status,
+                progress: data.progress,
+            }]);
         } else {
-            updated = [...milestones, editingMilestone];
+            // UPDATE existing milestone
+            const { error } = await supabase
+                .from('roadmap_milestones')
+                .update({
+                    title: editingMilestone.title,
+                    subtitle: editingMilestone.subtitle || '',
+                    status: editingMilestone.status,
+                    progress: editingMilestone.progress || 0,
+                })
+                .eq('id', editingMilestone.id);
+            if (error) { alert('Lỗi lưu: ' + error.message); return; }
+            setMilestones(prev => prev.map(m => m.id === editingMilestone.id ? { ...m, ...editingMilestone } : m));
         }
-        handleSaveMilestones(updated);
         setIsEditModalOpen(false);
     };
 
-    const deleteMilestone = (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa mốc này?")) {
-            const updated = milestones.filter(m => m.id !== id);
-            handleSaveMilestones(updated);
-        }
+    const deleteMilestone = async (id) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xóa mốc này?")) return;
+        const { error } = await supabase.from('roadmap_milestones').delete().eq('id', id);
+        if (error) { alert('Lỗi xóa: ' + error.message); return; }
+        setMilestones(prev => prev.filter(m => m.id !== id));
     };
     
-    const moveMilestone = (index, direction) => {
+    const moveMilestone = async (index, direction) => {
+        const newMilestones = [...milestones];
         if (direction === 'up' && index > 0) {
-            const updated = [...milestones];
-            const temp = updated[index];
-            updated[index] = updated[index - 1];
-            updated[index - 1] = temp;
-            handleSaveMilestones(updated);
+            [newMilestones[index], newMilestones[index - 1]] = [newMilestones[index - 1], newMilestones[index]];
         } else if (direction === 'down' && index < milestones.length - 1) {
-            const updated = [...milestones];
-            const temp = updated[index];
-            updated[index] = updated[index + 1];
-            updated[index + 1] = temp;
-            handleSaveMilestones(updated);
-        }
+            [newMilestones[index], newMilestones[index + 1]] = [newMilestones[index + 1], newMilestones[index]];
+        } else return;
+
+        setMilestones(newMilestones);
+        // Persist new order to DB
+        await Promise.all(
+            newMilestones.map((m, i) =>
+                supabase.from('roadmap_milestones').update({ sort_order: i }).eq('id', m.id)
+            )
+        );
     };
 
     // Calculate overall progress based on milestones
@@ -251,7 +330,11 @@ export default function Roadmap() {
                     </div>
 
                     <div className="space-y-0 pt-2">
-                        {milestones.length === 0 ? (
+                        {milestonesLoading ? (
+                            <div className="flex justify-center py-12">
+                                <span className="material-symbols-outlined animate-spin text-3xl text-[#7f13ec]">sync</span>
+                            </div>
+                        ) : milestones.length === 0 ? (
                             <div className="text-center py-10 text-slate-500">
                                 <span className="material-symbols-outlined text-4xl mb-2">timeline</span>
                                 <p>Lộ trình đang trống.</p>

@@ -1,14 +1,14 @@
 /**
  * useExamAccess.js
  * Logic kiểm soát quyền truy cập đề thi:
- * - User VIP: không giới hạn
- * - User Free: tối đa 2 đề MỚI/ngày; đề đã làm trước → cho vào tự do
+ * - Admin / VIP: không giới hạn
+ * - User Free: tối đa 3 đề MỚI/ngày; đề đã làm trước → cho vào tự do
  */
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
-const FREE_DAILY_LIMIT = 2; // Số đề mới tối đa mỗi ngày cho user Free
+const FREE_DAILY_LIMIT = 3; // Số đề mới tối đa mỗi ngày cho user Free
 
 /**
  * @param {string} examId  - ID của đề thi (duy nhất, từ file JSON)
