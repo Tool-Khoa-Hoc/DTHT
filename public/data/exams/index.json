@@ -24,31 +24,5 @@
     "status": "ongoing",
     "color": "from-blue-500 to-indigo-600",
     "icon": "functions"
-  },
-  {
-    "id": "le-thanh-tong-tp-hcm-2026",
-    "title": "Đề thi thử TN THPT 2026 môn Toán - Trường Lê Thánh Tông TP.HCM",
-    "subject": "Toán học",
-    "subjectFolder": "toan",
-    "examPath": "le-thanh-tong-tp-hcm-2026",
-    "time": 90,
-    "questions": 28,
-    "participants": 1048,
-    "status": "ongoing",
-    "color": "from-blue-500 to-indigo-600",
-    "icon": "functions"
-  },
-  {
-    "id": "thptqg-ly-2025-01",
-    "title": "Đề thi thử Vật lý Sở GD&ĐT Hà Nội",
-    "subject": "Vật lý",
-    "subjectFolder": "vat-ly",
-    "examPath": "thptqg-ly-2025-01",
-    "time": 50,
-    "questions": 3,
-    "participants": 633,
-    "status": "ongoing",
-    "color": "from-emerald-500 to-teal-600",
-    "icon": "architecture"
   }
 ]
