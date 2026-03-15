@@ -1,0 +1,69 @@
+{
+  "pdfPath": "D:/\u0111\u1ec1 thi/de-thi-thu-tot-nghiep-thpt-2026-mon-toan-lan-1-so-gddt-son-la-pages-1.pdf",
+  "outputDir": "public/data/exams/toan/so-gddt-son-la-2026-lan-1",
+  "defaults": {
+    "xMargin": 18,
+    "topPadding": 10,
+    "bottomPadding": 10,
+    "pageBottomTrim": 28,
+    "scale": 2
+  },
+  "questions": [
+    {
+      "page": 1,
+      "output": "part1-q1.png",
+      "start": "Câu 1.",
+      "end": "Câu 2."
+    },
+    {
+      "page": 1,
+      "output": "part1-q4.png",
+      "start": "Câu 4.",
+      "end": "Câu 5."
+    },
+    {
+      "page": 2,
+      "output": "part1-q11.png",
+      "start": "Câu 11.",
+      "end": "Câu 12.",
+      "bottomPadding": -72
+    },
+    {
+      "page": 2,
+      "output": "part2-q1.png",
+      "start": "Câu 1.",
+      "end": "Câu 2."
+    },
+    {
+      "page": 3,
+      "output": "part2-q4.png",
+      "start": "Câu 4.",
+      "end": "PHẦN III."
+    },
+    {
+      "page": 3,
+      "output": "part3-q1.png",
+      "start": "Câu 1.",
+      "pageBottomTrim": 20
+    },
+    {
+      "page": 4,
+      "output": "part3-q3.png",
+      "start": "Câu 3.",
+      "end": "Câu 4.",
+      "bottomPadding": -72
+    },
+    {
+      "page": 4,
+      "output": "part3-q5.png",
+      "start": "Câu 5.",
+      "end": "Câu 6."
+    },
+    {
+      "page": 4,
+      "output": "part3-q6.png",
+      "start": "Câu 6.",
+      "end": "-------------Hết-------------"
+    }
+  ]
+}

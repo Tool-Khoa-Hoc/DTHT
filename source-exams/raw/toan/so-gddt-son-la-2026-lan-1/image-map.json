@@ -1,0 +1,49 @@
+{
+  "parts": {
+    "part1": [
+      {
+        "question": "q1",
+        "image": "part1-q1.png"
+      },
+      {
+        "question": "q4",
+        "image": "part1-q4.png"
+      },
+      {
+        "question": "q11",
+        "image": "part1-q11.png"
+      }
+    ],
+    "part2": [
+      {
+        "question": "q1",
+        "image": "part2-q1.png"
+      },
+      {
+        "question": "q4",
+        "image": "part2-q4.png"
+      }
+    ],
+    "part3": [
+      {
+        "question": "q1",
+        "image": "part3-q1.png"
+      },
+      {
+        "question": "q3",
+        "image": "part3-q3.png"
+      },
+      {
+        "question": "q5",
+        "image": "part3-q5.png"
+      },
+      {
+        "question": "q6",
+        "image": "part3-q6.png"
+      }
+    ]
+  },
+  "width": 100,
+  "align": "center",
+  "position": "end"
+}

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserRank } from '../utils/rankHelper';
+import { sanitizeExternalUrl } from '../utils/urlSecurity';
 
 export default function UserProfile() {
     const { id } = useParams();
@@ -32,12 +33,12 @@ export default function UserProfile() {
             }
             fetchUserContent();
         }
-    }, [id, user]);
+    }, [id, user, checkIfFollowing, fetchFollowStats, fetchUserContent, fetchUserProfile]);
 
-    const fetchUserProfile = async () => {
+    const fetchUserProfile = useCallback(async () => {
         try {
             const { data, error } = await supabase
-                .from('profiles')
+                .from('public_profile_view')
                 .select('id, display_name, avatar_url, role, university, user_mode, target_gpa, target_thpt, target_dgnl, current_gpa')
                 .eq('id', id)
                 .single();
@@ -58,9 +59,9 @@ export default function UserProfile() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
 
-    const fetchFollowStats = async () => {
+    const fetchFollowStats = useCallback(async () => {
         try {
             const { count: followers } = await supabase
                 .from('follows')
@@ -77,9 +78,9 @@ export default function UserProfile() {
         } catch (err) {
             console.error('Error fetching follow stats:', err);
         }
-    };
+    }, [id]);
 
-    const checkIfFollowing = async () => {
+    const checkIfFollowing = useCallback(async () => {
         try {
             const { data, error } = await supabase
                 .from('follows')
@@ -93,7 +94,7 @@ export default function UserProfile() {
         } catch (err) {
             console.error('Error checking follow status:', err);
         }
-    };
+    }, [id, user]);
 
     const handleToggleFollow = async () => {
         if (!user) {
@@ -133,7 +134,7 @@ export default function UserProfile() {
         }
     };
 
-    const fetchUserContent = async () => {
+    const fetchUserContent = useCallback(async () => {
         try {
             // Fetch public campaigns
             const { data: camps } = await supabase
@@ -156,7 +157,7 @@ export default function UserProfile() {
         } catch (err) {
             console.error('Error fetching user content:', err);
         }
-    };
+    }, [id]);
 
     if (loading) {
         return (
@@ -334,8 +335,11 @@ export default function UserProfile() {
                                 <p>Chưa đóng góp tài liệu nào.</p>
                             </div>
                         ) : (
-                            documents.map(doc => (
-                                <a href={doc.file_url} target="_blank" rel="noopener noreferrer" key={doc.id} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex gap-4 items-center hover:bg-white/10 transition-colors group">
+                            documents.map(doc => {
+                                const safeFileUrl = sanitizeExternalUrl(doc.file_url);
+
+                                return safeFileUrl ? (
+                                <a href={safeFileUrl} target="_blank" rel="noopener noreferrer" key={doc.id} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex gap-4 items-center hover:bg-white/10 transition-colors group">
                                     <div className="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                                         <span className="material-symbols-outlined text-indigo-400">picture_as_pdf</span>
                                     </div>
@@ -344,7 +348,18 @@ export default function UserProfile() {
                                         <p className="text-xs text-slate-400 truncate mt-0.5">{doc.category || 'Khác'}</p>
                                     </div>
                                 </a>
-                            ))
+                                ) : (
+                                <div key={doc.id} className="bg-white/5 border border-red-500/20 rounded-2xl p-4 flex gap-4 items-center text-red-300">
+                                    <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
+                                        <span className="material-symbols-outlined text-red-400">link_off</span>
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="font-bold text-sm text-white truncate">{doc.title}</h3>
+                                        <p className="text-xs text-red-300/80 truncate mt-0.5">Link tài liệu không hợp lệ</p>
+                                    </div>
+                                </div>
+                                );
+                            })
                         )
                     )}
                 </div>

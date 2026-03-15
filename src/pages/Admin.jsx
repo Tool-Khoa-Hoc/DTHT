@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Navigate } from 'react-router-dom';
 import AdmissionsAdmin from './AdmissionsAdmin';
+import { assertSafeExternalUrl } from '../utils/urlSecurity';
 
 const CATEGORIES = [
   { label: 'Toán', value: 'toan', icon: 'calculate', color: 'from-blue-500 to-indigo-600' },
@@ -24,8 +25,17 @@ const CATEGORIES = [
 
 export default function Admin() {
   const { user, profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
 
-  const [mainTab, setMainTab] = useState('library'); // 'library' | 'admissions'
+  const [mainTab, setMainTab] = useState('library'); // 'library' | 'vip' | 'admissions'
+
+  // VIP Management State
+  const [vipSearch, setVipSearch] = useState('');
+  const [vipUsers, setVipUsers] = useState([]);
+  const [vipLoading, setVipLoading] = useState(false);
+  const [paymentLogs, setPaymentLogs] = useState([]);
+  const [paymentLogsLoading, setPaymentLogsLoading] = useState(false);
+  const [vipMsg, setVipMsg] = useState({ type: '', text: '' });
 
   // Library Form State
   const [docId, setDocId] = useState(null); // null means adding new
@@ -55,20 +65,82 @@ export default function Admin() {
   const [collaborators, setCollaborators] = useState([]);
   const [loadingCollabs, setLoadingCollabs] = useState(false);
 
-  // Security Check: Kick out non-admins
-  if (profile?.role !== 'admin') {
-    return <Navigate to="/home" />;
-  }
-
   useEffect(() => {
+    if (!isAdmin) return;
+
     if (mainTab === 'library') {
       fetchDocuments();
     } else if (mainTab === 'thongsoai') {
       fetchCandidates();
     } else if (mainTab === 'collaborators') {
       fetchCollaborators();
+    } else if (mainTab === 'vip') {
+      fetchPaymentLogs();
     }
-  }, [mainTab]);
+  }, [isAdmin, mainTab]);
+
+  // Security Check: Kick out non-admins
+  if (!isAdmin) {
+    return <Navigate to="/home" />;
+  }
+
+  // VIP Management Functions
+  const searchVipUsers = async () => {
+    if (!vipSearch.trim()) return;
+    setVipLoading(true);
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, display_name, avatar_url, is_vip, vip_expired_at')
+        .or(`display_name.ilike.%${vipSearch}%`)
+        .limit(10);
+      setVipUsers(data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setVipLoading(false);
+    }
+  };
+
+  const addVipDays = async (userId, days) => {
+    if (!days || days <= 0) return;
+    try {
+      const { data: p } = await supabase.from('profiles').select('is_vip, vip_expired_at').eq('id', userId).single();
+      const base = (p.vip_expired_at && new Date(p.vip_expired_at) > new Date())
+        ? new Date(p.vip_expired_at)
+        : new Date();
+      const newExpiry = new Date(base.getTime() + days * 86400000);
+      await supabase.from('profiles').update({ is_vip: true, vip_expired_at: newExpiry.toISOString() }).eq('id', userId);
+      setVipMsg({ type: 'success', text: `Đã cộng ${days} ngày VIP!` });
+      searchVipUsers();
+    } catch (err) {
+      setVipMsg({ type: 'error', text: 'Lỗi: ' + err.message });
+    }
+    setTimeout(() => setVipMsg({ type: '', text: '' }), 3000);
+  };
+
+  const toggleVip = async (userId, currentState) => {
+    try {
+      await supabase.from('profiles').update({
+        is_vip: !currentState,
+        vip_expired_at: !currentState ? new Date(Date.now() + 30 * 86400000).toISOString() : null,
+      }).eq('id', userId);
+      setVipMsg({ type: 'success', text: currentState ? 'Đã tắt VIP.' : 'Đã bật VIP 30 ngày.' });
+      searchVipUsers();
+    } catch (err) {
+      setVipMsg({ type: 'error', text: 'Lỗi: ' + err.message });
+    }
+    setTimeout(() => setVipMsg({ type: '', text: '' }), 3000);
+  };
+
+  const fetchPaymentLogs = async () => {
+    setPaymentLogsLoading(true);
+    try {
+      const { data } = await supabase.from('payment_logs').select('*').order('created_at', { ascending: false }).limit(30);
+      setPaymentLogs(data || []);
+    } catch (err) { console.error(err); }
+    finally { setPaymentLogsLoading(false); }
+  };
 
   const fetchDocuments = async () => {
     setLoadingDocs(true);
@@ -197,6 +269,8 @@ export default function Admin() {
     setMessage({ type: '', text: '' });
 
     try {
+      const safeFileUrl = assertSafeExternalUrl(fileUrl);
+
       if (docId) {
         // Update existing document
         const { error } = await supabase
@@ -204,7 +278,7 @@ export default function Admin() {
           .update({
             title,
             description,
-            file_url: fileUrl,
+            file_url: safeFileUrl,
             author_name: authorName || 'Khuyết danh',
             category: educationLevel === 'university' ? (category || 'Chuyên ngành') : category,
             major: educationLevel === 'university' ? major : null,
@@ -224,7 +298,7 @@ export default function Admin() {
             {
               title,
               description,
-              file_url: fileUrl,
+              file_url: safeFileUrl,
               author_name: authorName || 'Khuyết danh',
               uploaded_by: user.id,
               is_public: true,
@@ -336,10 +410,132 @@ export default function Admin() {
           <button onClick={() => setMainTab('thongsoai')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'thongsoai' ? 'bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/40 dark:to-orange-900/20 border-red-200 dark:border-red-900/50 shadow-sm text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
             <span className="material-symbols-outlined text-[18px]">local_fire_department</span> Sắc phong Bang Chủ
           </button>
+          <button onClick={() => setMainTab('vip')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'vip' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-amber-500' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
+            <span className="material-symbols-outlined text-[18px]">workspace_premium</span> Quản lý VIP
+          </button>
         </div>
       </header>
 
       <main className="w-full max-w-3xl mx-auto px-4 pt-8">
+        {/* ─── VIP Management Tab ─────────────────────────────────── */}
+        {mainTab === 'vip' && (
+          <div className="space-y-6">
+            {/* Toast message */}
+            {vipMsg.text && (
+              <div className={`px-4 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 ${
+                vipMsg.type === 'success' ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-red-500/10 border border-red-500/30 text-red-400'
+              }`}>
+                <span className="material-symbols-outlined text-[16px]">{vipMsg.type === 'success' ? 'check_circle' : 'error'}</span>
+                {vipMsg.text}
+              </div>
+            )}
+
+            {/* User search */}
+            <div className="bg-white dark:bg-[#201216] border border-white/10 rounded-2xl p-5 shadow-xl">
+              <h2 className="text-base font-black text-amber-400 flex items-center gap-2 mb-4">
+                <span className="material-symbols-outlined text-[18px]">manage_accounts</span> Tìm kiếm & cấp VIP
+              </h2>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Nhập tên hoặc email..."
+                  value={vipSearch}
+                  onChange={e => setVipSearch(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && searchVipUsers()}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-amber-500/50"
+                />
+                <button
+                  onClick={searchVipUsers}
+                  disabled={vipLoading}
+                  className="px-4 py-2.5 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors flex items-center gap-2 disabled:opacity-70"
+                >
+                  {vipLoading ? <span className="material-symbols-outlined animate-spin text-[16px]">sync</span> : <span className="material-symbols-outlined text-[16px]">search</span>}
+                  Tìm
+                </button>
+              </div>
+
+              {/* Results */}
+              {vipUsers.length > 0 && (
+                <div className="mt-4 space-y-3">
+                  {vipUsers.map(u => (
+                    <div key={u.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-white text-sm">{u.display_name || u.id}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                            u.is_vip ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-500/20 text-slate-400'
+                          }`}>
+                            {u.is_vip ? '⭐ VIP' : 'Free'}
+                          </span>
+                          {u.vip_expired_at && (
+                            <span className="text-xs text-slate-500">
+                              Hết: {new Date(u.vip_expired_at).toLocaleDateString('vi-VN')}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {/* Quick day buttons */}
+                        {[7, 30, 90, 365].map(d => (
+                          <button
+                            key={d}
+                            onClick={() => addVipDays(u.id, d)}
+                            className="px-3 py-1.5 text-xs font-black rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-colors"
+                          >
+                            +{d}d
+                          </button>
+                        ))}
+                        {/* Toggle VIP */}
+                        <button
+                          onClick={() => toggleVip(u.id, u.is_vip)}
+                          className={`px-3 py-1.5 text-xs font-black rounded-lg border transition-colors ${
+                            u.is_vip
+                              ? 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'
+                              : 'bg-green-500/10 border-green-500/20 text-green-400 hover:bg-green-500/20'
+                          }`}
+                        >
+                          {u.is_vip ? 'Tắt VIP' : 'Bật VIP'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Payment Logs */}
+            <div className="bg-white dark:bg-[#201216] border border-white/10 rounded-2xl p-5 shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-black text-slate-300 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">receipt_long</span> Webhook Logs
+                </h2>
+                <button onClick={fetchPaymentLogs} className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">refresh</span> Tải lại
+                </button>
+              </div>
+              {paymentLogsLoading ? (
+                <div className="flex justify-center py-6"><span className="material-symbols-outlined animate-spin text-slate-400">sync</span></div>
+              ) : paymentLogs.length === 0 ? (
+                <p className="text-slate-500 text-sm text-center py-4">Chưa có webhook log nào.</p>
+              ) : (
+                <div className="space-y-2 max-h-80 overflow-y-auto">
+                  {paymentLogs.map(log => (
+                    <div key={log.id} className={`flex items-center gap-3 p-3 rounded-xl border text-xs ${
+                      log.status === 'ok' ? 'border-green-500/20 bg-green-500/5 text-green-400'
+                      : log.status === 'duplicate' ? 'border-blue-500/20 bg-blue-500/5 text-blue-400'
+                      : 'border-red-500/20 bg-red-500/5 text-red-400'
+                    }`}>
+                      <span className="font-mono font-bold uppercase">{log.status}</span>
+                      <span className="text-slate-500 flex-1 truncate">{log.error_message || 'OK'}</span>
+                      <span className="text-slate-600 shrink-0">{new Date(log.created_at).toLocaleString('vi-VN')}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {mainTab === 'library' && (
           <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-xl">
             <div className="flex items-center justify-between mb-6">

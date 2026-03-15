@@ -1,53 +1,22 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const EXAMS = [
-    {
-        id: 'math-2025',
-        title: 'Thi Thử Toán THPTQG 2025 Lần 1',
-        subject: 'Toán học',
-        time: '90 phút',
-        questions: 50,
-        participants: 1245,
-        status: 'ongoing',
-        color: 'from-blue-500 to-indigo-600',
-        icon: 'functions'
-    },
-    {
-        id: 'phys-2025',
-        title: 'Đề VIP Vật Lý - Chống Sai Ngu',
-        subject: 'Vật lý',
-        time: '50 phút',
-        questions: 40,
-        participants: 890,
-        status: 'upcoming',
-        startTime: '20:00 Hôm nay',
-        color: 'from-emerald-500 to-teal-600',
-        icon: 'architecture'
-    },
-    {
-        id: 'eng-2025',
-        title: 'Thi Thử Tiếng Anh Bám Sát Minh Họa',
-        subject: 'Tiếng Anh',
-        time: '60 phút',
-        questions: 50,
-        participants: 2100,
-        status: 'ongoing',
-        color: 'from-rose-500 to-pink-600',
-        icon: 'language'
-    },
-    {
-        id: 'chem-2025',
-        title: 'Chinh Phục Lý Thuyết Hóa Học',
-        subject: 'Hóa học',
-        time: '50 phút',
-        questions: 40,
-        participants: 650,
-        status: 'ended',
-        color: 'from-amber-500 to-orange-600',
-        icon: 'science'
+const DEFAULT_EXAM_META = {
+    status: 'ongoing',
+    color: 'from-[#fe5f36] to-pink-600',
+    icon: 'quiz',
+    participants: 0
+};
+
+function getExamHref(exam) {
+    const routePath = exam?.examPath || exam?.id;
+
+    if (!exam?.subjectFolder || !routePath) {
+        return null;
     }
-];
+
+    return `/exam/${encodeURIComponent(exam.subjectFolder)}/${encodeURIComponent(routePath)}`;
+}
 
 export default function ExamRoom() {
     const navigate = useNavigate();
@@ -57,7 +26,7 @@ export default function ExamRoom() {
     const [loading, setLoading] = useState(true);
 
     React.useEffect(() => {
-        fetch('/data/exams/list.json')
+        fetch('/data/exams/index.json', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => {
                 setExams(data);
@@ -69,7 +38,9 @@ export default function ExamRoom() {
             });
     }, []);
 
-    const handleJoin = (folder, id, status) => {
+    const handleJoin = (exam) => {
+        const status = exam?.status ?? DEFAULT_EXAM_META.status;
+
         if (status === 'upcoming') {
             alert('Kỳ thi chưa bắt đầu. Vui lòng quay lại sau!');
             return;
@@ -78,7 +49,14 @@ export default function ExamRoom() {
             alert('Kỳ thi đã kết thúc. Bạn có thể xem lại đề trong Thư viện.');
             return;
         }
-        navigate(`/exam/${folder}/${id}`);
+
+        const examHref = getExamHref(exam);
+        if (!examHref) {
+            alert('Đề thi này chưa có đường dẫn hợp lệ.');
+            return;
+        }
+
+        navigate(examHref);
     };
 
     const uniqueSubjects = ['all', ...new Set(exams.map(e => e.subject))];
@@ -133,31 +111,35 @@ export default function ExamRoom() {
                     ) : exams
                         .filter(e => activeTab === 'all' || e.status === activeTab)
                         .filter(e => activeSubject === 'all' || e.subject === activeSubject)
-                        .map((exam) => (
-                        <div key={exam.id} className="group relative bg-[#1a0f12]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-[#fe5f36]/10 hover:-translate-y-1 overflow-hidden flex flex-col sm:flex-row gap-6">
+                        .map((exam) => {
+                        const examMeta = { ...DEFAULT_EXAM_META, ...exam };
+                        const examHref = getExamHref(examMeta);
+
+                        return (
+                        <div key={examMeta.id} className="group relative bg-[#1a0f12]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-[#fe5f36]/10 hover:-translate-y-1 overflow-hidden flex flex-col sm:flex-row gap-6">
                             
                             {/* Colorful background accent */}
-                            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${exam.color} opacity-10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-500`} />
+                            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${examMeta.color} opacity-10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-500`} />
                             
                             {/* Icon column */}
                             <div className="shrink-0 flex sm:flex-col items-center gap-4 sm:border-r border-white/10 sm:pr-6">
-                                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br ${exam.color} shadow-lg text-white`}>
-                                    <span className="material-symbols-outlined text-3xl">{exam.icon}</span>
+                                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br ${examMeta.color} shadow-lg text-white`}>
+                                    <span className="material-symbols-outlined text-3xl">{examMeta.icon}</span>
                                 </div>
                                 
-                                {exam.status === 'ongoing' && (
+                                {examMeta.status === 'ongoing' && (
                                     <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/10 text-green-400 text-xs font-bold rounded-lg border border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.2)]">
                                         <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                                         LIVE
                                     </div>
                                 )}
-                                {exam.status === 'upcoming' && (
+                                {examMeta.status === 'upcoming' && (
                                     <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-400 text-xs font-bold rounded-lg border border-amber-500/20">
                                         <span className="material-symbols-outlined text-[14px]">schedule</span>
                                         Sắp diễn ra
                                     </div>
                                 )}
-                                {exam.status === 'ended' && (
+                                {examMeta.status === 'ended' && (
                                     <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-500/10 text-slate-400 text-xs font-bold rounded-lg border border-slate-500/20">
                                         Đã kết thúc
                                     </div>
@@ -168,23 +150,23 @@ export default function ExamRoom() {
                             <div className="flex-1 flex flex-col justify-between">
                                 <div>
                                     <h3 className="text-xl font-bold mb-2 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-colors line-clamp-2">
-                                        {exam.title}
+                                        {examMeta.title}
                                     </h3>
                                     
                                     <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-400 mb-4">
                                         <span className="flex items-center gap-1">
                                             <span className="material-symbols-outlined text-[16px]">menu_book</span>
-                                            {exam.subject}
+                                            {examMeta.subject}
                                         </span>
                                         <span className="w-1 h-1 rounded-full bg-slate-600" />
                                         <span className="flex items-center gap-1">
                                             <span className="material-symbols-outlined text-[16px]">timer</span>
-                                            {exam.time}
+                                            {typeof examMeta.time === 'number' ? `${examMeta.time} phút` : examMeta.time}
                                         </span>
                                         <span className="w-1 h-1 rounded-full bg-slate-600" />
                                         <span className="flex items-center gap-1">
                                             <span className="material-symbols-outlined text-[16px]">format_list_numbered</span>
-                                            {exam.questions} câu
+                                            {examMeta.questions} câu
                                         </span>
                                     </div>
                                 </div>
@@ -193,29 +175,39 @@ export default function ExamRoom() {
                                     <div className="flex items-center gap-2">
                                         <div className="flex -space-x-2">
                                             {[1,2,3].map(i => (
-                                              <img key={i} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${exam.id}${i}`} className="w-7 h-7 rounded-full border border-[#1a0f12] bg-slate-800" alt="avatar" />
+                                              <img key={i} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${examMeta.id}${i}`} className="w-7 h-7 rounded-full border border-[#1a0f12] bg-slate-800" alt="avatar" />
                                             ))}
                                         </div>
-                                        <span className="text-xs font-medium text-slate-400">+{exam.participants} thí sinh</span>
+                                        <span className="text-xs font-medium text-slate-400">+{examMeta.participants} thí sinh</span>
                                     </div>
 
-                                    <button 
-                                        onClick={() => handleJoin(exam.subjectFolder, exam.id, exam.status)}
+                                    {examMeta.status === 'ongoing' && examHref ? (
+                                        <Link
+                                            to={examHref}
+                                            className="shrink-0 px-6 py-2.5 rounded-xl font-bold text-sm transition-all focus:ring-2 focus:outline-none flex items-center justify-center gap-2 bg-gradient-to-r from-[#fe5f36] to-pink-600 text-white hover:shadow-lg hover:shadow-[#fe5f36]/30 hover:scale-[1.02] active:scale-95 focus:ring-[#fe5f36]/50"
+                                        >
+                                            VÀO THI NGAY
+                                            <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                                        </Link>
+                                    ) : (
+                                        <button 
+                                        onClick={() => handleJoin(examMeta)}
                                         className={`shrink-0 px-6 py-2.5 rounded-xl font-bold text-sm transition-all focus:ring-2 focus:outline-none flex items-center justify-center gap-2 ${
-                                            exam.status === 'ongoing' 
+                                            examMeta.status === 'ongoing' 
                                                 ? 'bg-gradient-to-r from-[#fe5f36] to-pink-600 text-white hover:shadow-lg hover:shadow-[#fe5f36]/30 hover:scale-[1.02] active:scale-95 focus:ring-[#fe5f36]/50' 
-                                                : exam.status === 'upcoming'
+                                                : examMeta.status === 'upcoming'
                                                     ? 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white focus:ring-white/20'
                                                     : 'bg-transparent text-slate-500 hover:text-slate-300 border border-white/5 hover:bg-white/5 focus:ring-white/10'
                                         }`}
                                     >
-                                        {exam.status === 'ongoing' ? 'VÀO THI NGAY' : exam.status === 'upcoming' ? 'ĐẶT LỊCH' : 'XEM LẠI'}
-                                        {exam.status === 'ongoing' && <span className="material-symbols-outlined text-[18px]">arrow_forward</span>}
+                                        {examMeta.status === 'ongoing' ? 'VÀO THI NGAY' : examMeta.status === 'upcoming' ? 'ĐẶT LỊCH' : 'XEM LẠI'}
+                                        {examMeta.status === 'ongoing' && <span className="material-symbols-outlined text-[18px]">arrow_forward</span>}
                                     </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    )})}
                 </div>
             </main>
         </div>

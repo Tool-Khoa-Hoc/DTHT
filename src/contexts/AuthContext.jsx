@@ -10,48 +10,52 @@ export const AuthProvider = ({ children }) => {
 
   const fetchProfile = async (userId) => {
     if (!userId) {
-        setProfile(null);
-        return;
+      setProfile(null);
+      return;
     }
     try {
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('id, display_name, avatar_url, role, university, user_mode, target_gpa, target_thpt, target_dgnl, current_gpa')
-            .eq('id', userId)
-            .single();
-            
-        if (error) {
-            console.error('Error fetching profile:', error);
-        } else {
-            setProfile(data);
-        }
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id, display_name, avatar_url, role, university,
+          user_mode, target_gpa, target_thpt, target_dgnl, current_gpa,
+          is_vip, vip_expired_at
+        `)
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      const isVipExpired = data.is_vip && data.vip_expired_at && new Date(data.vip_expired_at) < new Date();
+      setProfile(isVipExpired ? { ...data, is_vip: false } : data);
     } catch (err) {
-        console.error('Unexpected error fetching profile:', err);
+      console.error('Unexpected error fetching profile:', err);
     }
   };
 
   useEffect(() => {
-    // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       if (currentUser) {
-          fetchProfile(currentUser.id).finally(() => setLoading(false));
+        fetchProfile(currentUser.id).finally(() => setLoading(false));
       } else {
-          setLoading(false);
+        setLoading(false);
       }
     });
 
-    // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         if (currentUser) {
-            fetchProfile(currentUser.id).finally(() => setLoading(false));
+          fetchProfile(currentUser.id).finally(() => setLoading(false));
         } else {
-            setProfile(null);
-            setLoading(false);
+          setProfile(null);
+          setLoading(false);
         }
       }
     );
@@ -59,13 +63,15 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Expose refreshProfile để các trang có thể reload sau khi VIP activate
+  const refreshProfile = () => user && fetchProfile(user.id);
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading }}>
+    <AuthContext.Provider value={{ user, profile, loading, refreshProfile }}>
       {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => useContext(AuthContext);

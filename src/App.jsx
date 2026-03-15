@@ -22,6 +22,9 @@ const UserProfile = lazy(() => import('./pages/UserProfile'));
 const ExamRoom = lazy(() => import('./pages/ExamRoom'));
 const ExamTaking = lazy(() => import('./pages/ExamTaking'));
 const ExamResult = lazy(() => import('./pages/ExamResult'));
+const Pricing = lazy(() => import('./pages/Pricing'));
+const PaymentWaiting = lazy(() => import('./pages/PaymentWaiting'));
+const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
 
 // App Loading Fallback
 const PageLoader = () => (
@@ -55,8 +58,11 @@ function App() {
               <Route path="collaborator" element={<Collaborator />} />
               <Route path="profile/:id" element={<UserProfile />} />
               <Route path="exam-room" element={<ExamRoom />} />
-              <Route path="exam/:subjectFolder/:id" element={<ExamTaking />} />
-              <Route path="exam/:subjectFolder/:id/result" element={<ExamResult />} />
+              <Route path="exam/:subjectFolder/:examPath" element={<ExamTaking />} />
+              <Route path="exam/:subjectFolder/:examPath/result" element={<ExamResult />} />
+              <Route path="pricing" element={<Pricing />} />
+              <Route path="payment/waiting/:orderId" element={<PaymentWaiting />} />
+              <Route path="payment/success" element={<PaymentSuccess />} />
             </Route>
           </Routes>
         </Suspense>

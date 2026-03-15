@@ -1,0 +1,905 @@
+{
+  "id": "han-thuyen-2026-lan-1",
+  "title": "Đề thi thử tốt nghiệp THPT lần 1 năm học 2025-2026 Trường THPT Hàn Thuyên - Sinh học",
+  "subject": "Sinh học",
+  "time": 50,
+  "description": "Đề thi thử tốt nghiệp THPT lần 1 năm học 2025-2026 - Trường THPT Hàn Thuyên - Bắc Ninh",
+  "answer_key": {
+    "part1.q1": 2,
+    "part1.q2": 2,
+    "part1.q3": 0,
+    "part1.q4": 2,
+    "part1.q5": 2,
+    "part1.q6": 2,
+    "part1.q7": 2,
+    "part1.q8": 0,
+    "part1.q9": 2,
+    "part1.q10": 2,
+    "part1.q11": 0,
+    "part1.q12": 1,
+    "part1.q13": 3,
+    "part1.q14": 0,
+    "part1.q15": 2,
+    "part1.q16": 3,
+    "part1.q17": 2,
+    "part1.q18": 3,
+    "part2.q1": {
+      "q1a": false,
+      "q1b": false,
+      "q1c": true,
+      "q1d": true
+    },
+    "part2.q2": {
+      "q2a": true,
+      "q2b": false,
+      "q2c": true,
+      "q2d": true
+    },
+    "part2.q3": {
+      "q3a": true,
+      "q3b": false,
+      "q3c": true,
+      "q3d": true
+    },
+    "part2.q4": {
+      "q4a": true,
+      "q4b": true,
+      "q4c": false,
+      "q4d": false
+    },
+    "part3.q1": 0.19,
+    "part3.q2": 2,
+    "part3.q3": 3,
+    "part3.q4": 0.45,
+    "part3.q5": 1,
+    "part3.q6": 3
+  },
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": [
+            "Ở người, trên cánh ngắn của NST Y có gene SRY (sex-determining region Y gene) quy định giới tính nam. Vì vậy, giới tính được quyết định bởi việc có hay không có NST Y mang vùng gene ",
+            {
+              "math": "SRY^+"
+            },
+            ". Hình 3 mô tả 2 cặp NST giới tính (XX và XY) ở người bình thường. Một người nhìn bề ngoài là nam nhưng khi xét nghiệm NST bác sĩ nói rằng bản thân họ là nữ về mặt di truyền. Người đó có thể có cặp NST nào trong số 4 cặp NST giới tính ở Hình 4?",
+            {
+              "image": "1.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "options": [
+            [
+              "Số 4"
+            ],
+            [
+              "Số 2"
+            ],
+            [
+              "Số 1"
+            ],
+            [
+              "Số 3"
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": "Khi môi trường có nhiệt độ cao và trong lục lạp của tế bào mô giậu có lượng O2 hòa tan cao hơn CO2 thì cây nào sau đây không bị giảm lượng sản phẩm quang hợp?",
+          "options": [
+            [
+              "Dưa hấu"
+            ],
+            [
+              "Lúa nước"
+            ],
+            [
+              "Ngô"
+            ],
+            [
+              "Rau cải"
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": "Đặc trưng nào sau đây không phải là đặc trưng của quần thể?",
+          "options": [
+            [
+              "Thành phần loài"
+            ],
+            [
+              "Nhóm tuổi"
+            ],
+            [
+              "Mật độ cá thể"
+            ],
+            [
+              "Tỉ lệ giới tính"
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": [
+            "Hình vẽ dưới đây mô tả một cơ chế di truyền cấp độ phân tử đang diễn ra. Cấu trúc X trên hình vẽ là",
+            {
+              "image": "2.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "options": [
+            [
+              "DNA polymerase"
+            ],
+            [
+              "DNA ligase"
+            ],
+            [
+              "RNA polymerase"
+            ],
+            [
+              "Ribosome"
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": "Theo quan điểm của Darwin, nhận định nào sau đây giải thích cho sự hình thành cổ dài của hươu cao cổ?",
+          "options": [
+            [
+              "Hươu đứng dưới đất để gặm lá cây, lá cây cao dần nên chúng cố gắng vươn cao cổ để lấy thức ăn."
+            ],
+            [
+              "Trong đàn hươu cổ ngắn xuất hiện một con hươu cổ dài, con cổ dài lấy thức ăn tốt hơn nên sống sót và sinh sản."
+            ],
+            [
+              "Hươu non sinh ra, có con cổ dài, con cổ ngắn, những con cổ dài lấy thức ăn tốt hơn nên sống sót và con cháu ngày một đông."
+            ],
+            [
+              "Trong đàn hươu cổ ngắn có thể xuất hiện một ít con cổ dài, con cổ dài lấy thức ăn tốt hơn nên sống sót và sinh sản."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": [
+            "Vi khuẩn ",
+            {
+              "math": "E.coli"
+            },
+            " sản xuất insulin của người là thành quả của"
+          ],
+          "options": [
+            [
+              "Dùng kĩ thuật vi tiêm"
+            ],
+            [
+              "Gây đột biến nhân tạo"
+            ],
+            [
+              "Công nghệ DNA tái tổ hợp"
+            ],
+            [
+              "Lai hai tế bào xoma"
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": "Sự thay đổi tần số allele của quần thể do tác động của các yếu tố ngẫu nhiên như lũ lụt, hạn hán làm giảm số lượng cá thể của quần thể được gọi là:",
+          "options": [
+            [
+              "Dòng gene"
+            ],
+            [
+              "Chọn lọc tự nhiên"
+            ],
+            [
+              "Phiêu bạt di truyền"
+            ],
+            [
+              "Đột biến"
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": [
+            "Khi đánh bắt cá ở 3 quần thể với số lượng như nhau vào cùng một thời điểm, người ta thu được tỉ lệ nhóm tuổi các cá thể trong quần thể như sau. Dựa vào thông tin bảng 2 hãy cho biết nhận xét nào sau đây là đúng?",
+            {
+              "image": "3.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "options": [
+            [
+              "Quần thể 1 đang ở trạng thái phát triển."
+            ],
+            [
+              "Quần thể 2 không nên tiếp tục đánh bắt."
+            ],
+            [
+              "Quần thể 3 đang bị đánh bắt quá mức nên cần được bảo vệ."
+            ],
+            [
+              "Quần thể 3 ổn định nhất."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": [
+            "Khi xét nghiệm DNA để nhận lại họ hàng nhiều năm bị thất lạc do chiến tranh, người ta thu được kết quả như hình dưới đây. Biết rằng, đối tượng 3 (ĐT 3) nhỏ nhất khoảng 10 tuổi, đối tượng 1 (ĐT 1) lớn nhất trên dưới 60 tuổi, 2 đối tượng 2 và 4 (ĐT 2 và ĐT 4) có độ tuổi xấp xỉ nhau khoảng 30 tuổi. Sau khi đọc kết quả này, dịch vụ xét nghiệm DNA trả về cho họ kết quả như hình trên và các kết luận sau:",
+            {
+              "image": "4.jpg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "(1) Cả 4 người đều có quan hệ họ hàng với nhau.",
+              "\n(2) Đối tượng 1 và 2 có quan hệ họ hàng gần hơn đối tượng 3 và 4.",
+              "\n(3) Đối tượng 1 và 2 có quan hệ họ hàng gần hơn đối tượng 2 và 3.",
+              "\n(4) Đối tượng 3 và 4 có quan hệ họ hàng xa nhất.",
+              "\nKết luận chính xác là"
+            ]
+          ],
+          "options": [
+            [
+              "(1) đúng, (2) sai, (3) sai, (4) đúng."
+            ],
+            [
+              "(1) đúng, (2) sai, (3) đúng, (4) đúng."
+            ],
+            [
+              "(1) đúng, (2) đúng, (3) sai, (4) đúng."
+            ],
+            [
+              "(1) đúng, (2) đúng, (3) sai, (4) sai."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": "Ở cây trưởng thành, quá trình thoát hơi nước chủ yếu diễn ra qua con đường nào sau đây?",
+          "options": [
+            [
+              "Khí khổng và lớp cutin."
+            ],
+            [
+              "Lớp cutin."
+            ],
+            [
+              "Khí khổng."
+            ],
+            [
+              "Biểu bì thân và rễ."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": "Ví dụ nào sau đây được xem là bằng chứng tiến hóa trực tiếp?",
+          "options": [
+            [
+              "Hóa thạch tôm ba lá được tìm thấy ở vùng núi cao tỉnh Hà Giang."
+            ],
+            [
+              "Chi trước của mèo và cánh dơi có cấu tạo xương theo trình tự giống nhau."
+            ],
+            [
+              "Các loài sinh vật sử dụng khoảng 20 amino acid để cấu tạo nên các phân tử."
+            ],
+            [
+              "DNA của tinh tinh giống với DNA của người tới 97,6%."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": [
+            "Cấu trúc nào được mô tả ở hình ảnh dưới đây?",
+            {
+              "image": "5.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "options": [
+            [
+              "Amino acid."
+            ],
+            [
+              "Nucleotide."
+            ],
+            [
+              "Protein."
+            ],
+            [
+              "Glycerol."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q13",
+          "type": "single_choice",
+          "content": "Các bằng chứng cổ sinh vật học cho thấy: Trong lịch sử phát triển sự sống trên Trái đất, thực vật có hoa xuất hiện ở",
+          "options": [
+            [
+              "Kỉ Phấn trắng thuộc đại Trung sinh."
+            ],
+            [
+              "Kỉ Đệ tam thuộc đại Tân sinh."
+            ],
+            [
+              "Kỉ Tam điệp thuộc đại Trung sinh."
+            ],
+            [
+              "Kỉ Jurassic thuộc đại Trung sinh."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q14",
+          "type": "single_choice",
+          "content": "Cho chuỗi thức ăn: Cây lúa → Sâu ăn lá lúa → Ếch đồng → Rắn hổ mang → Đại bàng. Trong chuỗi thức ăn này, đại bàng là sinh vật tiêu thụ bậc mấy?",
+          "options": [
+            [
+              "Bậc 4."
+            ],
+            [
+              "Bậc 1."
+            ],
+            [
+              "Bậc 3."
+            ],
+            [
+              "Bậc 2."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q15",
+          "type": "single_choice",
+          "content": "Một quần thể côn trùng sống trên loài cây M. Do quần thể phát triển mạnh, một số cá thể phát tán sang loài cây N. Những cá thể nào có sẵn các gene đột biến giúp chúng khai thác được thức ăn ở loài cây N thì sống sót và sinh sản, hình thành nên quần thể mới. Hai quần thể này sống trong cùng một khu vực địa lí nhưng ở hai ổ sinh thái khác nhau. Qua thời gian, các nhân tố tiến hóa tác động làm phân hóa vốn gene của hai quần thể tới mức làm xuất hiện cách li sinh sản và hình thành nên loài mới. Đây là ví dụ về hình thành loài mới",
+          "options": [
+            [
+              "Bằng lai xa và đa bội hóa."
+            ],
+            [
+              "Bằng cách li địa lí."
+            ],
+            [
+              "Bằng cách li sinh thái."
+            ],
+            [
+              "Bằng tự đa bội."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q16",
+          "type": "single_choice",
+          "content": "Có 1 bệnh nhân bị đột biến số lượng nhiễm sắc thể. Khi sử dụng phương pháp tế bào học để xác định số lượng nhiễm sắc thể có trong mỗi tế bào sinh dưỡng thì thấy rằng khi tế bào đang ở kỳ giữa thì trong mỗi tế bào có 47 NST đang ở dạng kép. Khả năng bệnh nhân này thuộc loại thể đột biến nào sau đây?",
+          "options": [
+            [
+              "Hội chứng Klinefelter, Turner, Siêu nữ."
+            ],
+            [
+              "Ung thư máu, hội chứng Down."
+            ],
+            [
+              "Hội chứng Down, Turner, Klinefelter."
+            ],
+            [
+              "Hội chứng Down, Klinefelter, Siêu nữ."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q17",
+          "type": "single_choice",
+          "content": "Trên đồng cỏ, các con bò đang ăn cỏ. Bò tiêu hóa được cỏ nhờ các vi sinh vật sống trong dạ cỏ. Các con chim sáo đang tìm ăn các con rận sống trên da bò. Khi nói về quan hệ giữa các sinh vật trên, phát biểu nào sau đây đúng?",
+          "options": [
+            [
+              "Quan hệ giữa chim sáo và rận là quan hệ hội sinh."
+            ],
+            [
+              "Quan hệ giữa rận và bò là quan hệ sinh vật này ăn sinh vật khác."
+            ],
+            [
+              "Quan hệ giữa bò và vi sinh vật là quan hệ cộng sinh."
+            ],
+            [
+              "Quan hệ giữa vi sinh vật và rận là quan hệ cạnh tranh."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q18",
+          "type": "single_choice",
+          "content": [
+            "Vùng nhân của vi khuẩn ",
+            {
+              "math": "Helicobacter pylori"
+            },
+            " có một phân tử DNA và DNA chỉ chứa ",
+            {
+              "math": "N^{14}"
+            },
+            ". Đưa một vi khuẩn ",
+            {
+              "math": "Helicobacter pylori"
+            },
+            " vào trong môi trường dinh dưỡng chỉ chứa ",
+            {
+              "math": "N^{15}"
+            },
+            " phóng xạ và vi khuẩn sinh sản theo hình thức phân đôi tạo ra 16 vi khuẩn con. Khẳng định nào sau đây đúng?"
+          ],
+          "options": [
+            [
+              "Trong 16 phân tử DNA con tạo ra ở vùng nhân, có 15 mạch được tổng hợp liên tục, 15 mạch được tổng hợp gián đoạn."
+            ],
+            [
+              "Trong 16 phân tử DNA con tạo ra ở vùng nhân, có 16 mạch được tổng hợp liên tục, 16 mạch được tổng hợp gián đoạn."
+            ],
+            [
+              "Trong quá trình tái bản DNA, enzyme nối ligase chỉ tác động lên một trong hai mạch đơn DNA mới được tổng hợp từ một phân tử DNA mẹ."
+            ],
+            [
+              "Tất cả phân tử DNA ở vùng nhân của các vi khuẩn con đều có những đơn phân chứa ",
+              {
+                "math": "N^{15}"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "true_false",
+          "content": [
+            "Một hệ sinh thái có hai loài sên biển Ba và Cc là 2 loài động vật ăn tảo cùng sinh sống. Một thí nghiệm được tiến hành để tìm hiểu tác động của mật độ sên biển (tổng cộng cả hai loài) lên khả năng sinh trưởng (g/g sinh khối ban đầu) của chúng và mật độ của tảo (",
+            {
+              "math": "\\mu m^2"
+            },
+            " bề mặt tảo / ",
+            {
+              "math": "\\mu m^2"
+            },
+            " diện tích đáy). Số liệu được trình bày ở hình bên. Mỗi nhận định sau đây là Đúng hay Sai?",
+            {
+              "image": "6.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "statements": [
+            {
+              "id": "q1a",
+              "content": "Loài Cc có ưu thế cạnh tranh cao hơn loài Ba khi nguồn thức ăn trong môi trường suy giảm.",
+              "correct": null
+            },
+            {
+              "id": "q1b",
+              "content": "Tốc độ sinh trưởng của loài Ba giảm nhanh hơn so với loài Cc khi độ phong phú của sên biển trong môi trường tăng.",
+              "correct": null
+            },
+            {
+              "id": "q1c",
+              "content": "Để bảo tồn các loài sên biển cần khống chế mật độ sên biển ở mức độ phù hợp.",
+              "correct": null
+            },
+            {
+              "id": "q1d",
+              "content": "Khi các quần thể mới hình thành, quần thể Ba có khả năng sinh trưởng kém hơn quần thể Cc.",
+              "correct": null
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "content": "Ở thực vật, xét hai cặp gene: A, a và B, b quy định hai tính trạng, các allele trội là trội hoàn toàn. Theo lí thuyết:",
+          "statements": [
+            {
+              "id": "q2a",
+              "content": [
+                "Giao phấn giữa hai cây dị hợp hai cặp gene ",
+                {
+                  "math": "(P)"
+                },
+                " có kiểu gene khác nhau thì có thể tạo ra ",
+                {
+                  "math": "F_1"
+                },
+                " có 10 loại kiểu gene."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q2b",
+              "content": [
+                "Giao phấn giữa hai cây dị hợp hai cặp gene ",
+                {
+                  "math": "(P)"
+                },
+                " tạo ra ",
+                {
+                  "math": "F_1"
+                },
+                ". Cho các cây chứa hai tính trạng trội ở ",
+                {
+                  "math": "F_1"
+                },
+                " giao phấn ngẫu nhiên tạo ra ",
+                {
+                  "math": "F_2"
+                },
+                " có loại kiểu gene chứa hai allele lặn chiếm tối đa là 50%."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q2c",
+              "content": [
+                "Giao phấn giữa hai cây dị hợp hai cặp gene ",
+                {
+                  "math": "(P)"
+                },
+                " tạo ra ",
+                {
+                  "math": "F_1"
+                },
+                ". Ở ",
+                {
+                  "math": "F_1"
+                },
+                ", các cây chứa một tính trạng trội có tỉ lệ tối đa là 50%."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q2d",
+              "content": [
+                "Giao phấn giữa hai cây dị hợp hai cặp gene ",
+                {
+                  "math": "(P)"
+                },
+                " tạo ra ",
+                {
+                  "math": "F_1"
+                },
+                ". Ở ",
+                {
+                  "math": "F_1"
+                },
+                ", các cây chứa hai tính trạng trội có kiểu gene dị hợp luôn chiếm tỉ lệ 50%."
+              ],
+              "correct": null
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "true_false",
+          "content": [
+            "Hình dưới đây mô tả các đáp ứng miễn dịch khi cơ thể nhiễm mầm bệnh lần 1 và lần 2 (cùng loại kháng nguyên). Phân tích hình và cho biết phát biểu sau đúng hay sai?",
+            {
+              "image": "7.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "statements": [
+            {
+              "id": "q3a",
+              "content": "Đáp ứng miễn dịch lần 2 có sự tham gia của tế bào lympho B nhớ.",
+              "correct": null
+            },
+            {
+              "id": "q3b",
+              "content": "Các đáp ứng miễn dịch trên thuộc miễn dịch không đặc hiệu.",
+              "correct": null
+            },
+            {
+              "id": "q3c",
+              "content": "Tốc độ hình thành kháng thể trong đáp ứng miễn dịch lần 2 lớn hơn lần 1.",
+              "correct": null
+            },
+            {
+              "id": "q3d",
+              "content": "Việc tiêm vaccine giúp cơ thể kháng bệnh nhanh hơn do bỏ qua giai đoạn đáp ứng miễn dịch lần 1.",
+              "correct": null
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "true_false",
+          "content": [
+            "Ở một loài vi khuẩn, operon A gồm 3 gene cấu trúc mã hóa 3 enzyme X, Y, Z. 3 enzyme này cùng tham gia quá trình chuyển hóa chất A. Trình tự các vùng của operon A lần lượt là P-O-X-Y-Z (vùng khởi động - vùng vận hành - gene X - gene Y - gene Z). Người ta nuôi cấy 3 chủng vi khuẩn này ở môi trường dinh dưỡng không có chất A và đo lượng enzyme có hoạt tính được thể hiện ở bảng dưới đây. Biết rằng gene điều hòa của mỗi chủng đều hoạt động bình thường.",
+            {
+              "image": "8.jpg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Chú thích:",
+              "\nP+, O+, X+, Y+, Z+ : các vùng trình tự DNA bình thường",
+              "\nP-, O-, X-, Y-, Z- : các vùng trình tự DNA mất chức năng",
+              "\n(+) có; (-) không; (?) chưa cho biết"
+            ]
+          ],
+          "statements": [
+            {
+              "id": "q4a",
+              "content": "Nếu bổ sung chất A vào môi trường nuôi cấy của 3 chủng, chất A sẽ liên kết với protein của gene điều hòa.",
+              "correct": null
+            },
+            {
+              "id": "q4b",
+              "content": "Nếu bổ sung chất A vào môi trường nuôi cấy của chủng 1, kết quả có thể thu được enzyme X, Y, Z.",
+              "correct": null
+            },
+            {
+              "id": "q4c",
+              "content": "Ở chủng 2, kết quả thu được enzyme X, Y, Z lần lượt là (+), (-), (-).",
+              "correct": null
+            },
+            {
+              "id": "q4d",
+              "content": "Ở chủng 3, kết quả thu được enzyme X, Y, Z lần lượt là (+), (+), (+).",
+              "correct": null
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "short_answer",
+          "content": [
+            "Sơ đồ phả hệ dưới đây mô tả hai bệnh di truyền ở người, bệnh P do một gene có 2 allele trên NST thường quy định, bệnh M do một gene có 2 allele trên NST X tại vùng không tương đồng với NST Y quy định. Biết rằng không xảy ra đột biến ở tất cả các cá thể trong phả hệ. Theo lý thuyết nếu người số 11 kết hôn với người dị hợp về cả hai cặp gene thì xác suất để cặp vợ chồng này sinh được một đứa con trai bình thường là bao nhiêu? (tính làm tròn đến 2 chữ số sau dấu phẩy).",
+            {
+              "image": "9.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        },
+        {
+          "id": "q2",
+          "type": "short_answer",
+          "content": [
+            "Biểu đồ bên thể hiện tốc độ sinh trưởng của các quần thể vi khuẩn I, II và III đã biến đổi qua nhiều thế hệ ở những điều kiện về nhiệt độ nuôi cấy khác nhau. Biết rằng tốc độ sinh trưởng được coi là một trong những chỉ tiêu quan trọng đánh giá khả năng thích nghi của vi khuẩn. Nếu ba quần thể vi khuẩn trên được trộn lẫn vào nhau và nuôi ở ",
+            {
+              "math": "37^\\circ C"
+            },
+            " thì có bao nhiêu loại vi khuẩn bị chết bởi nhiệt độ?",
+            {
+              "image": "10.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        },
+        {
+          "id": "q3",
+          "type": "short_answer",
+          "content": [
+            "Nhiệt độ làm tách hai mạch của phân tử DNA được gọi là nhiệt độ nóng chảy. Dưới đây là nhiệt độ nóng chảy của 4 phân tử DNA có khối lượng bằng nhau. Phân tử DNA nào trong 4 phân tử trên có tỉ lệ nucleotide loại Guanine cao nhất?",
+            {
+              "image": "11.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        },
+        {
+          "id": "q4",
+          "type": "short_answer",
+          "content": [
+            "Một quần thể bao gồm 300 cá thể có kiểu gene ",
+            {
+              "math": "AA"
+            },
+            ", 500 cá thể có kiểu gene ",
+            {
+              "math": "Aa"
+            },
+            ", 200 cá thể có kiểu gene ",
+            {
+              "math": "aa"
+            },
+            ". Hãy xác định tần số allele ",
+            {
+              "math": "a"
+            },
+            " trong quần thể trên?"
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        },
+        {
+          "id": "q5",
+          "type": "short_answer",
+          "content": [
+            "Quan sát các sơ đồ chuyển hóa các chất tạo ra sản phẩm quy định tính trạng màu sắc hoa của các loài thực vật dưới đây, biết các allele trội ",
+            {
+              "math": "(A, B)"
+            },
+            " tạo ra các enzyme có hoạt tính, các allele lặn tương ứng ",
+            {
+              "math": "(a, b)"
+            },
+            " tạo ra các enzyme không có hoạt tính.",
+            [
+              "1. Chất màu trắng 1 ",
+              {
+                "math": "\\xrightarrow{\\text{Enzyme A}}"
+              },
+              " chất màu trắng 2 ",
+              {
+                "math": "\\xrightarrow{\\text{Enzyme B}}"
+              },
+              " chất màu đỏ."
+            ],
+            [
+              "2. Chất màu trắng ",
+              {
+                "math": "\\xrightarrow{\\text{Enzyme A}}"
+              },
+              " chất màu vàng ",
+              {
+                "math": "\\xrightarrow{\\text{Enzyme B}}"
+              },
+              " chất màu đỏ."
+            ],
+            [
+              "3. Chất trắng ",
+              {
+                "math": "\\xrightarrow{\\text{Enzyme A + Enzyme B}}"
+              },
+              " chất màu đỏ."
+            ],
+            [
+              {
+                "math": "\\downarrow\\ \\text{Enzyme B}"
+              }
+            ],
+            [
+              "Chất màu vàng"
+            ],
+            [
+              "Nếu cho 2 cây có kiểu gene ",
+              {
+                "math": "AaBb"
+              },
+              " giao phấn, sơ đồ nào cho đời con có tỉ lệ kiểu hình ",
+              {
+                "math": "9:7"
+              },
+              "? (Viết liền các số theo thứ tự nếu có từ 2 sơ đồ trở lên)."
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        },
+        {
+          "id": "q6",
+          "type": "short_answer",
+          "content": [
+            "Khảo sát 4 quần thể cá mè giống thu được kết quả như sau. Cho biết điều kiện sinh thái ao nuôi của 4 quần thể giống nhau, không có hiện tượng xuất cư và nhập cư. Quần thể số mấy có thể xuất hiện cạnh tranh cùng loài cao nhất?",
+            {
+              "image": "12.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        }
+      ]
+    }
+  ]
+}

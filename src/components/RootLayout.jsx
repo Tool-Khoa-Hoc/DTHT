@@ -18,17 +18,25 @@ export default function RootLayout() {
   }
 
   const isActive = (path) => location.pathname === path;
+  const isExamTakingRoute = /^\/exam\/[^/]+\/[^/]+$/.test(location.pathname);
+
+  if (isExamTakingRoute) {
+    return (
+      <div className="bg-[#f8f6f6] dark:bg-[#201216] font-display text-slate-900 dark:text-slate-100 h-screen overflow-hidden">
+        <main className="h-screen overflow-hidden">
+          <Outlet />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f8f6f6] dark:bg-[#201216] font-display text-slate-900 dark:text-slate-100 min-h-screen selection:bg-[#e36488]/30 flex flex-col md:flex-row">
 
       {/* --- MOBILE TOP HEADER --- */}
       <header className="md:hidden sticky top-0 left-0 right-0 z-40 bg-white/80 dark:bg-[#201216]/80 backdrop-blur-xl border-b border-[#e36488]/10 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#e36488]/20 rounded-lg flex items-center justify-center border border-[#e36488]/30">
-            <span className="material-symbols-outlined text-[#e36488] text-xl">school</span>
-          </div>
-          <h2 className="text-[#e36488] font-bold tracking-widest uppercase text-sm">Đấu Trường Học Tập</h2>
+        <div className="flex items-center">
+          <h2 className="text-[#e36488] font-[900] tracking-tighter uppercase text-base">Đấu Trường <span className="text-slate-800 dark:text-white font-medium opacity-80">Học Tập</span></h2>
         </div>
         <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
           <span className="material-symbols-outlined">menu</span>
@@ -43,11 +51,9 @@ export default function RootLayout() {
       {/* --- SIDEBAR (DESKTOP & MOBILE DRAWER) --- */}
       <aside className={`flex flex-col w-64 h-screen fixed left-0 top-0 bg-white dark:bg-[#1a0f12] md:bg-white/50 md:dark:bg-[#1a0f12]/80 backdrop-blur-2xl border-r border-[#e36488]/10 z-[100] p-6 transition-transform duration-300 md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#e36488]/20 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(227,100,136,0.3)] border border-[#e36488]/30">
-              <span className="material-symbols-outlined text-[#e36488] text-2xl">school</span>
-            </div>
-            <h2 className="text-[#e36488] font-bold tracking-widest uppercase truncate leading-none">Đấu Trường<br/><span className="text-[10px] tracking-normal">Học Tập</span></h2>
+          <div className="flex flex-col">
+            <h2 className="text-[#e36488] font-[1000] tracking-tighter uppercase text-xl leading-none">Đấu Trường</h2>
+            <span className="text-[10px] tracking-[0.2em] font-bold uppercase text-slate-400 dark:text-slate-500 mt-1">Học Tập</span>
           </div>
           <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden p-2 text-slate-500 hover:text-white bg-slate-100 dark:bg-white/5 rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
             <span className="material-symbols-outlined">close</span>

@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { sanitizeExternalUrl } from '../utils/urlSecurity';
 
 const CATEGORIES = [
   { label: 'Tất cả', value: '' },
@@ -25,6 +26,26 @@ const REPORT_REASONS = [
   'Lý do khác',
 ];
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div className="p-10 text-white"><h1 className="text-red-500 font-bold">Something went wrong.</h1><pre className="text-xs bg-black p-4 mt-4">{this.state.error?.toString()}</pre></div>;
+    }
+    return this.props.children;
+  }
+}
+
+
 export default function Library() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -46,8 +67,39 @@ export default function Library() {
   const [showNotifs, setShowNotifs] = useState(false);
   const notifRef = useRef(null);
 
-  useEffect(() => { fetchDocuments(); }, []);
-  useEffect(() => { if (user) fetchNotifications(); }, [user]);
+  const fetchDocuments = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .select('id, title, description, file_url, category, education_level, uploaded_by, author_name, created_at, is_featured, publish_date, major')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setDocuments(data || []);
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchNotifications = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const { data } = await supabase
+        .from('notifications')
+        .select('id, title, message, link, is_read, created_at, user_id')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      setNotifications(data || []);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  }, [user]);
+
+  useEffect(() => { fetchDocuments(); }, [fetchDocuments]);
+  useEffect(() => { fetchNotifications(); }, [fetchNotifications]);
 
   // Close notif dropdown on outside click
   useEffect(() => {
@@ -62,7 +114,12 @@ export default function Library() {
 
   const categoriesList = useMemo(() => {
     if (educationLevel === 'thpt') {
-      const dynamicCats = Array.from(new Set(documents.filter(d => d.education_level === 'thpt').map(d => d.category).filter(c => c && !CATEGORIES.some(cat => cat.value === c))));
+      const dynamicCats = Array.from(new Set(
+        documents
+          .filter(d => (d.education_level || 'thpt') === 'thpt')
+          .map(d => d.category)
+          .filter(c => c && !CATEGORIES.some(cat => cat.value === c))
+      ));
       return [
         ...CATEGORIES,
         ...dynamicCats.map(c => ({ label: c, value: c }))
@@ -76,35 +133,6 @@ export default function Library() {
       ];
     }
   }, [documents, educationLevel]);
-
-  const fetchDocuments = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('documents')
-        .select('id, title, file_url, category, education_level, uploaded_by, author_name, created_at, is_featured, publish_date, major')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      setDocuments(data || []);
-    } catch (error) {
-      console.error('Error fetching documents:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchNotifications = async () => {
-    try {
-      const { data } = await supabase
-        .from('notifications')
-        .select('id, title, message, link, is_read, created_at, user_id')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
-      setNotifications(data || []);
-    } catch (err) {
-      console.error('Error fetching notifications:', err);
-    }
-  };
 
   const markAllRead = async () => {
     if (!user) return;
@@ -149,16 +177,6 @@ export default function Library() {
         throw reportError;
       }
 
-      // Gửi notification cho người upload (nếu có)
-      if (reportTarget.uploaded_by) {
-        await supabase.from('notifications').insert({
-          user_id: reportTarget.uploaded_by,
-          title: '⚠️ Tài liệu của bạn bị báo cáo',
-          message: `Tài liệu "${reportTarget.title}" vừa bị báo cáo với lý do: ${reportReason}`,
-          link: '/library',
-        });
-      }
-
       setReportSuccess(true);
       setTimeout(() => setReportTarget(null), 2000);
     } catch (err) {
@@ -179,16 +197,36 @@ export default function Library() {
         matchCat = doc.major === activeCategory;
       }
     }
-    const matchSearch = !searchQuery
-      || doc.title?.toLowerCase().includes(searchQuery.toLowerCase())
-      || doc.author_name?.toLowerCase().includes(searchQuery.toLowerCase());
+    const titleMatch = (doc.title || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const authorMatch = (doc.author_name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSearch = !searchQuery || titleMatch || authorMatch;
     return matchEduLevel && matchCat && matchSearch;
   });
 
+  const getDisplayCategory = (doc) => {
+    if ((doc.education_level || 'thpt') === 'thpt') {
+      const found = categoriesList.find(c => c.value === doc.category);
+      return found?.label || doc.category;
+    }
+    return doc.category;
+  };
+
+  const getSafeDate = (dateString) => {
+    try {
+      if (!dateString) return null;
+      const d = new Date(dateString);
+      if (isNaN(d.getTime())) return null;
+      return d.toLocaleDateString('vi-VN');
+    } catch {
+      return null;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0c14] text-white font-display pb-24">
-      {/* Background Mesh */}
-      <div className="fixed inset-0 bg-[radial-gradient(at_0%_0%,#4f46e5_0px,transparent_50%),radial-gradient(at_100%_0%,#7e22ce_0px,transparent_50%),radial-gradient(at_100%_100%,#3b82f6_0px,transparent_50%),radial-gradient(at_0%_100%,#ec4899_0px,transparent_50%)] opacity-30 pointer-events-none"></div>
+    <ErrorBoundary>
+      <div className="min-h-screen flex flex-col bg-[#0a0c14] text-white font-display pb-24">
+        {/* Background Mesh */}
+        <div className="fixed inset-0 bg-[radial-gradient(at_0%_0%,#4f46e5_0px,transparent_50%),radial-gradient(at_100%_0%,#7e22ce_0px,transparent_50%),radial-gradient(at_100%_100%,#3b82f6_0px,transparent_50%),radial-gradient(at_0%_100%,#ec4899_0px,transparent_50%)] opacity-30 pointer-events-none"></div>
 
       <div className="w-full max-w-6xl mx-auto flex flex-col flex-1 relative z-10">
         <header className="relative z-50 px-4 pt-6 pb-4 bg-[#0f172a]/80 backdrop-blur-xl border-b border-white/5 mt-0 md:mt-4 md:rounded-2xl">
@@ -313,7 +351,10 @@ export default function Library() {
                   <h2 className="text-sm font-bold uppercase tracking-widest text-amber-400">Tài liệu nổi bật</h2>
                 </div>
                 <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
-                  {featured.map(doc => (
+                  {featured.map(doc => {
+                    const safeFileUrl = sanitizeExternalUrl(doc.file_url);
+
+                    return (
                     <div key={doc.id} className="shrink-0 w-56 bg-gradient-to-br from-amber-500/15 to-orange-600/10 border border-amber-500/30 rounded-2xl p-3 flex flex-col gap-2 relative">
                       <span className="absolute top-2 right-2 material-symbols-outlined text-amber-400 text-base">star</span>
                       <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
@@ -328,8 +369,8 @@ export default function Library() {
                         ) : (
                           <p className="text-[10px] text-slate-400 mt-0.5">{doc.author_name}</p>
                         )}
-                        {doc.publish_date && (
-                          <p className="text-[10px] text-slate-400 mt-0.5"><span className="material-symbols-outlined text-[10px] align-middle">calendar_month</span> {new Date(doc.publish_date).toLocaleDateString('vi-VN')}</p>
+                        {getSafeDate(doc.publish_date) && (
+                          <p className="text-[10px] text-slate-400 mt-0.5"><span className="material-symbols-outlined text-[10px] align-middle">calendar_month</span> {getSafeDate(doc.publish_date)}</p>
                         )}
                         <div className="flex flex-wrap gap-1 mt-1">
                           {doc.major && doc.education_level === 'university' && (
@@ -339,21 +380,27 @@ export default function Library() {
                           )}
                           {doc.category && (
                             <span className="text-[9px] font-semibold uppercase tracking-wide text-amber-400/70 bg-amber-500/10 rounded px-1.5 py-0.5 inline-block">
-                              {(doc.education_level === 'thpt' && categoriesList.find(c => c.value === doc.category)?.label) ? categoriesList.find(c => c.value === doc.category).label : doc.category}
+                              {getDisplayCategory(doc)}
                             </span>
                           )}
                         </div>
                       </div>
-                      <a
-                        href={doc.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-auto w-full py-1.5 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-colors border border-amber-500/20"
-                      >
-                        <span className="material-symbols-outlined text-[14px]">download</span> Tải về
-                      </a>
+                      {safeFileUrl ? (
+                        <a
+                          href={safeFileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-auto w-full py-1.5 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-colors border border-amber-500/20"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">download</span> Tải về
+                        </a>
+                      ) : (
+                        <div className="mt-auto w-full py-1.5 bg-red-500/10 text-red-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1 border border-red-500/20">
+                          <span className="material-symbols-outlined text-[14px]">link_off</span> Link lỗi
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  )})}
                 </div>
               </div>
             );
@@ -372,7 +419,10 @@ export default function Library() {
                 <p>{documents.length === 0 ? 'Chưa có tài liệu nào trong thư viện.' : 'Không tìm thấy tài liệu phù hợp.'}</p>
               </div>
             ) : (
-              filteredDocs.map(doc => (
+              filteredDocs.map(doc => {
+                const safeFileUrl = sanitizeExternalUrl(doc.file_url);
+
+                return (
                 <div key={doc.id} className="bg-white/5 backdrop-blur-md border border-white/10 p-2.5 sm:p-3 rounded-2xl flex flex-col gap-2.5 sm:gap-3 hover:bg-white/10 transition-colors cursor-pointer group relative">
                   {/* Report button */}
                   {user && doc.uploaded_by !== user.id && (
@@ -398,8 +448,8 @@ export default function Library() {
                     ) : (
                       <p className="text-[11px] text-slate-400">{doc.author_name}</p>
                     )}
-                    {doc.publish_date && (
-                      <p className="text-[10px] text-slate-400"><span className="material-symbols-outlined text-[10px] align-middle">calendar_month</span> {new Date(doc.publish_date).toLocaleDateString('vi-VN')}</p>
+                    {getSafeDate(doc.publish_date) && (
+                      <p className="text-[10px] text-slate-400"><span className="material-symbols-outlined text-[10px] align-middle">calendar_month</span> {getSafeDate(doc.publish_date)}</p>
                     )}
                     <div className="flex flex-wrap gap-1 mt-0.5">
                       {doc.major && doc.education_level === 'university' && (
@@ -409,22 +459,28 @@ export default function Library() {
                       )}
                       {doc.category && (
                         <span className={`text-[10px] font-semibold uppercase tracking-wide ${doc.education_level === 'university' ? 'text-[#7f13ec]/80 bg-[#7f13ec]/10' : 'text-[#306ee8]/80 bg-[#306ee8]/10'} rounded px-1.5 py-0.5 inline-block`}>
-                          {(doc.education_level === 'thpt' && categoriesList.find(c => c.value === doc.category)?.label) ? categoriesList.find(c => c.value === doc.category).label : doc.category}
+                          {getDisplayCategory(doc)}
                         </span>
                       )}
                     </div>
                     <p className="text-[11px] text-slate-500 line-clamp-1 mt-1">{doc.description}</p>
                   </div>
-                  <a
-                    href={doc.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-1.5 sm:py-2 bg-[#306ee8]/20 hover:bg-[#306ee8]/40 text-blue-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-colors border border-[#306ee8]/20 mt-auto"
-                  >
-                    <span className="material-symbols-outlined text-[14px] sm:text-[16px]">download</span> Tải về
-                  </a>
+                  {safeFileUrl ? (
+                    <a
+                      href={safeFileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-1.5 sm:py-2 bg-[#306ee8]/20 hover:bg-[#306ee8]/40 text-blue-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-colors border border-[#306ee8]/20 mt-auto"
+                    >
+                      <span className="material-symbols-outlined text-[14px] sm:text-[16px]">download</span> Tải về
+                    </a>
+                  ) : (
+                    <div className="w-full py-1.5 sm:py-2 bg-red-500/10 text-red-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1 border border-red-500/20 mt-auto">
+                      <span className="material-symbols-outlined text-[14px] sm:text-[16px]">link_off</span> Link lỗi
+                    </div>
+                  )}
                 </div>
-              ))
+              )})
             )}
           </div>
         </main>
@@ -507,6 +563,7 @@ export default function Library() {
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

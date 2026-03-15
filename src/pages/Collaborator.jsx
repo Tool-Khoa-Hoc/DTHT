@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Navigate } from 'react-router-dom';
+import { assertSafeExternalUrl } from '../utils/urlSecurity';
 
 const CATEGORIES = [
     { label: 'Toán', value: 'toan', icon: 'calculate', color: 'from-blue-500 to-indigo-600' },
@@ -23,6 +24,7 @@ const CATEGORIES = [
 
 export default function Collaborator() {
     const { user, profile } = useAuth();
+    const canManageDocuments = profile?.role === 'collaborator' || profile?.role === 'admin';
 
     // Library Form State
     const [docId, setDocId] = useState(null); // null means adding new
@@ -42,16 +44,7 @@ export default function Collaborator() {
     const [documents, setDocuments] = useState([]);
     const [loadingDocs, setLoadingDocs] = useState(true);
 
-    // Security Check: Kick out non-collaborators AND non-admins
-    if (profile?.role !== 'collaborator' && profile?.role !== 'admin') {
-        return <Navigate to="/home" />;
-    }
-
-    useEffect(() => {
-        fetchMyDocuments();
-    }, [user]);
-
-    const fetchMyDocuments = async () => {
+    const fetchMyDocuments = useCallback(async () => {
         setLoadingDocs(true);
         try {
             if (!user) return;
@@ -68,7 +61,17 @@ export default function Collaborator() {
         } finally {
             setLoadingDocs(false);
         }
-    };
+    }, [user]);
+
+    useEffect(() => {
+        if (!canManageDocuments) return;
+        fetchMyDocuments();
+    }, [canManageDocuments, fetchMyDocuments]);
+
+    // Security Check: Kick out non-collaborators AND non-admins
+    if (!canManageDocuments) {
+        return <Navigate to="/home" />;
+    }
 
     const handleLibrarySubmit = async (e) => {
         e.preventDefault();
@@ -78,6 +81,8 @@ export default function Collaborator() {
         const finalCategory = category === 'khac' && customCategory.trim() !== '' ? customCategory.trim() : category;
 
         try {
+            const safeFileUrl = assertSafeExternalUrl(fileUrl);
+
             if (docId) {
                 // Update existing document (RLS ensures they can only update their own)
                 const { error } = await supabase
@@ -85,7 +90,7 @@ export default function Collaborator() {
                     .update({
                         title,
                         description,
-                        file_url: fileUrl,
+                        file_url: safeFileUrl,
                         author_name: authorName || profile?.display_name || 'Khuyết danh',
                         category: educationLevel === 'university' ? (category || 'Chuyên ngành') : finalCategory,
                         major: educationLevel === 'university' ? major : null,
@@ -104,7 +109,7 @@ export default function Collaborator() {
                         {
                             title,
                             description,
-                            file_url: fileUrl,
+                            file_url: safeFileUrl,
                             author_name: authorName || profile?.display_name || 'Khuyết danh',
                             uploaded_by: user.id,
                             is_public: true,

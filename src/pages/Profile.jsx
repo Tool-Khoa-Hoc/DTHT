@@ -1,12 +1,38 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { getUserRank } from '../utils/rankHelper';
 
+// Helper: đếm ngược VIP
+function useVipCountdown(vipExpiredAt) {
+    const [timeStr, setTimeStr] = useState('');
+    useEffect(() => {
+        if (!vipExpiredAt) return;
+        const update = () => {
+            const diff = new Date(vipExpiredAt) - new Date();
+            if (diff <= 0) { setTimeStr('Đã hết hạn'); return; }
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            setTimeStr(d > 0 ? `${d} ngày ${h} giờ ${m} phút` : `${h} giờ ${m} phút`);
+        };
+        update();
+        const id = setInterval(update, 60000);
+        return () => clearInterval(id);
+    }, [vipExpiredAt]);
+    return timeStr;
+}
+
 export default function Profile() {
     const { user, profile } = useAuth();
+    const navigate = useNavigate();
     const [subjects, setSubjects] = useState([]);
     const [loadingSubjects, setLoadingSubjects] = useState(true);
+    const [examResults, setExamResults] = useState([]);
+    const [loadingExams, setLoadingExams] = useState(true);
+    const [examRouteMap, setExamRouteMap] = useState({});
+    const vipCountdown = useVipCountdown(profile?.vip_expired_at);
 
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({
@@ -26,6 +52,8 @@ export default function Profile() {
         if (user) {
             fetchSubjects();
             fetchCampaignsCount();
+            fetchExamResults();
+            fetchExamRoutes();
         }
         if (profile) {
             setEditData({
@@ -55,6 +83,53 @@ export default function Profile() {
         } catch (error) {
             console.error('Lỗi lấy số tài liệu:', error);
         }
+    };
+
+    const fetchExamResults = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('exam_results')
+                .select('id, exam_id, subject_folder, exam_title, score, max_score, correct_count, total_questions, submitted_at')
+                .eq('user_id', user.id)
+                .order('submitted_at', { ascending: false })
+                .limit(20);
+            if (error) throw error;
+            setExamResults(data || []);
+        } catch (error) {
+            console.error('Lỗi tải kết quả thi:', error);
+        } finally {
+            setLoadingExams(false);
+        }
+    };
+
+    const fetchExamRoutes = async () => {
+        try {
+            const res = await fetch('/data/exams/index.json');
+            if (!res.ok) throw new Error('Exam index not found');
+            const data = await res.json();
+            const nextMap = {};
+            data.forEach((exam) => {
+                nextMap[`${exam.subjectFolder}:${exam.id}`] = exam.examPath || exam.id;
+            });
+            setExamRouteMap(nextMap);
+        } catch (error) {
+            console.error('Lỗi tải route đề thi:', error);
+        }
+    };
+
+    const getExamRoutePath = (subjectFolder, examId) => (
+        examRouteMap[`${subjectFolder}:${examId}`] || examId
+    );
+
+    const handleRedo = async (result) => {
+        // Xóa session in_progress cũ (nếu có) để bắt đầu lại
+        await supabase
+            .from('exam_progress')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('exam_id', result.exam_id)
+            .eq('status', 'in_progress');
+        navigate(`/exam/${result.subject_folder}/${getExamRoutePath(result.subject_folder, result.exam_id)}`);
     };
 
     const fetchSubjects = async () => {
@@ -359,6 +434,45 @@ export default function Profile() {
                     )}
                 </section>
 
+                {/* ── VIP Status Section ─────────────────────────── */}
+                <section className="px-6 py-4">
+                    {profile?.is_vip ? (
+                        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/30 p-5 shadow-lg">
+                            <div className="absolute -right-6 -top-6 text-[80px] opacity-10 pointer-events-none">👑</div>
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                                    <span className="material-symbols-outlined text-white text-[20px]">workspace_premium</span>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-amber-400 font-bold uppercase tracking-widest">Thành viên VIP</p>
+                                    <p className="text-white font-black text-base">Đang hoạt động</p>
+                                </div>
+                            </div>
+                            <div className="bg-black/20 rounded-2xl px-4 py-3">
+                                <p className="text-xs text-slate-400 mb-1">Hết hạn sau</p>
+                                <p className="font-mono font-black text-lg text-amber-300">{vipCountdown}</p>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    {new Date(profile.vip_expired_at).toLocaleDateString('vi-VN', { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}
+                                </p>
+                            </div>
+                            <Link to="/pricing" className="mt-3 block text-center text-xs text-amber-400/70 hover:text-amber-400 transition-colors">
+                                Gia hạn sớm →
+                            </Link>
+                        </div>
+                    ) : (
+                        <Link to="/pricing" className="flex items-center gap-4 p-5 rounded-3xl bg-gradient-to-r from-[#fe5f36]/10 to-[#7f13ec]/10 border border-[#fe5f36]/20 hover:border-[#fe5f36]/50 transition-all group">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#fe5f36]/30 to-[#7f13ec]/30 flex items-center justify-center border border-white/10">
+                                <span className="material-symbols-outlined text-[#fe5f36] text-[24px]">workspace_premium</span>
+                            </div>
+                            <div className="flex-1">
+                                <p className="font-black text-white text-sm">Nâng cấp lên VIP</p>
+                                <p className="text-slate-400 text-xs mt-0.5">Không giới hạn đề • Video chữa bài • Từ 39k/tháng</p>
+                            </div>
+                            <span className="material-symbols-outlined text-slate-400 group-hover:text-[#fe5f36] transition-colors text-[20px]">arrow_forward_ios</span>
+                        </Link>
+                    )}
+                </section>
+
                 <section className="px-6 py-4">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold">Đang học kỳ này</h3>
@@ -400,6 +514,67 @@ export default function Profile() {
                             ))
                         )}
                     </div>
+                </section>
+
+                {/* ── Lịch sử thi ──────────────────────────────── */}
+                <section className="px-6 py-4">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-bold">Đề đã làm</h3>
+                        <Link to="/exam-room" className="text-[#fe5f36] text-sm font-medium">Vào Phòng thi →</Link>
+                    </div>
+                    {loadingExams ? (
+                        <div className="py-6 flex justify-center">
+                            <span className="material-symbols-outlined animate-spin text-slate-400">sync</span>
+                        </div>
+                    ) : examResults.length === 0 ? (
+                        <div className="text-center py-8 text-slate-500 text-sm border-2 border-dashed border-white/10 rounded-2xl">
+                            <span className="material-symbols-outlined text-3xl text-slate-600 mb-2">quiz</span>
+                            <p>Bạn chưa làm đề nào.</p>
+                            <Link to="/exam-room" className="text-[#fe5f36] text-sm mt-2 inline-block">Vào thử ngay →</Link>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            {examResults.map(result => {
+                                const pct = result.max_score ? Math.round((result.score / result.max_score) * 100) : 0;
+                                return (
+                                    <div key={result.id} className="bg-[#7f13ec]/10 backdrop-blur-md border border-white/10 rounded-2xl p-4">
+                                        <div className="flex items-start justify-between gap-3 mb-3">
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-bold text-white text-sm line-clamp-1">{result.exam_title || result.exam_id}</h4>
+                                                <p className="text-xs text-slate-400 mt-0.5">
+                                                    {new Date(result.submitted_at).toLocaleDateString('vi-VN')}
+                                                    {result.total_questions && ` • ${result.correct_count}/${result.total_questions} câu đúng`}
+                                                </p>
+                                            </div>
+                                            <div className="shrink-0 text-right">
+                                                <p className={`text-2xl font-black ${pct >= 80 ? 'text-green-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                                                    {result.score ?? '–'}
+                                                    <span className="text-sm text-slate-500 font-medium">/{result.max_score ?? 10}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => handleRedo(result)}
+                                                className="flex-1 py-2 rounded-xl bg-[#7f13ec]/20 border border-[#7f13ec]/30 text-[#c88df3] text-xs font-bold hover:bg-[#7f13ec]/30 transition-colors flex items-center justify-center gap-1"
+                                            >
+                                                <span className="material-symbols-outlined text-[14px]">refresh</span>
+                                                Làm lại
+                                            </button>
+                                            <Link
+                                                to={`/exam/${result.subject_folder}/${getExamRoutePath(result.subject_folder, result.exam_id)}/result`}
+                                                state={{ resultId: result.id, examId: result.exam_id, examPath: getExamRoutePath(result.subject_folder, result.exam_id), subjectFolder: result.subject_folder }}
+                                                className="flex-1 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-xs font-bold hover:bg-white/10 transition-colors flex items-center justify-center gap-1"
+                                            >
+                                                <span className="material-symbols-outlined text-[14px]">visibility</span>
+                                                Xem lại
+                                            </Link>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </section>
 
                 <section className="px-6 py-8 flex flex-col items-center gap-6">

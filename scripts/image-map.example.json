@@ -1,0 +1,11 @@
+{
+  "imageStartAt": 1,
+  "width": 100,
+  "align": "center",
+  "position": "end",
+  "parts": {
+    "part1": ["q1", "q4", "q8", "q9", "q12"],
+    "part2": ["q1", "q3", "q4"],
+    "part3": ["q1", "q2", "q3", "q6"]
+  }
+}

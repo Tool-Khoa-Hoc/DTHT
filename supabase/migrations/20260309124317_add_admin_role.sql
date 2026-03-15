@@ -7,6 +7,11 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS role text DEFAULT 'user' NO
 -- Ensure RLS is enabled on documents
 ALTER TABLE public.documents ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Allow public read access for documents" ON public.documents;
+DROP POLICY IF EXISTS "Allow admins to insert documents" ON public.documents;
+DROP POLICY IF EXISTS "Allow admins to update documents" ON public.documents;
+DROP POLICY IF EXISTS "Allow admins to delete documents" ON public.documents;
+
 -- Allow public read access (if the document is public, or we just allow all for now)
 CREATE POLICY "Allow public read access for documents" ON public.documents
     FOR SELECT USING (true);

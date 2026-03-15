@@ -1,0 +1,1187 @@
+{
+  "id": "bac-ninh-2026-lan-1",
+  "title": "Đề khảo sát Toán 12 lần 1 năm 2025 – 2026 cụm các trường THPT – Bắc Ninh",
+  "subject": "Toán học",
+  "time": 90,
+  "description": "Đề khảo sát Toán 12 lần 1 năm 2025 – 2026 cụm các trường THPT – Bắc Ninh",
+  "answer_key": {
+    "part1.q1": 0,
+    "part1.q2": 2,
+    "part1.q3": 3,
+    "part1.q4": 0,
+    "part1.q5": 3,
+    "part1.q6": 2,
+    "part1.q7": 1,
+    "part1.q8": 0,
+    "part1.q9": 2,
+    "part1.q10": 3,
+    "part1.q11": 1,
+    "part1.q12": 2,
+    "part2.q13": {
+      "q13a": true,
+      "q13b": true,
+      "q13c": true,
+      "q13d": false
+    },
+    "part2.q14": {
+      "q14a": true,
+      "q14b": false,
+      "q14c": true,
+      "q14d": false
+    },
+    "part2.q15": {
+      "q15a": true,
+      "q15b": false,
+      "q15c": false,
+      "q15d": true
+    },
+    "part2.q16": {
+      "q16a": true,
+      "q16b": false,
+      "q16c": true,
+      "q16d": false
+    },
+    "part3.q17": 3,
+    "part3.q18": 1,
+    "part3.q19": 0.25,
+    "part3.q20": 0.31,
+    "part3.q21": 607,
+    "part3.q22": 87
+  },
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 12. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": [
+            "Một khối chóp có đường cao ",
+            {
+              "math": "h = 2a"
+            },
+            " và diện tích đáy ",
+            {
+              "math": "B = a^2"
+            },
+            ". Thể tích của khối chóp bằng"
+          ],
+          "options": [
+            [
+              {
+                "math": "\\frac{2a^3}{3}"
+              }
+            ],
+            [
+              {
+                "math": "\\frac{4a^3}{3}"
+              }
+            ],
+            [
+              {
+                "math": "2a^3"
+              }
+            ],
+            [
+              {
+                "math": "4a^3"
+              }
+            ]
+          ],
+          "correct_answer": 0,
+          "points": 0.25
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": [
+            "Tập nghiệm của bất phương trình ",
+            {
+              "math": "(\\frac{1}{3})^x > 81"
+            },
+            " là:"
+          ],
+          "options": [
+            [
+              {
+                "math": "(4; +\\infty)"
+              }
+            ],
+            [
+              {
+                "math": "(-\\infty; 4)"
+              }
+            ],
+            [
+              {
+                "math": "(-\\infty; -4)"
+              }
+            ],
+            [
+              {
+                "math": "(-4; +\\infty)"
+              }
+            ]
+          ],
+          "correct_answer": 2,
+          "points": 0.25
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": [
+            "Thống kê điểm trung bình môn Toán của một số học sinh lớp 12 được mẫu số liệu sau:",
+            {
+              "image": "2.jpg",
+              "align": "center",
+              "width": 100
+            },
+            "Độ lệch chuẩn (kết quả làm tròn đến hàng phần nghìn) của bảng số liệu trên là"
+          ],
+          "options": [
+            [
+              "0,609"
+            ],
+            [
+              "0,785"
+            ],
+            [
+              "0,616"
+            ],
+            [
+              "0,780"
+            ]
+          ],
+          "correct_answer": 3,
+          "points": 0.25
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": [
+            "Cho hình chóp tứ giác đều ",
+            {
+              "math": "S.ABCD"
+            },
+            " có đáy ",
+            {
+              "math": "ABCD"
+            },
+            " là hình vuông tâm ",
+            {
+              "math": "O"
+            },
+            ", góc giữa ",
+            {
+              "math": "SC"
+            },
+            " và mặt phẳng ",
+            {
+              "math": "(SBD)"
+            },
+            " là"
+          ],
+          "options": [
+            [
+              {
+                "math": "\\widehat{CSO}"
+              }
+            ],
+            [
+              {
+                "math": "\\widehat{CSA}"
+              }
+            ],
+            [
+              {
+                "math": "\\widehat{CSD}"
+              }
+            ],
+            [
+              {
+                "math": "\\widehat{SCO}"
+              }
+            ]
+          ],
+          "correct_answer": 0,
+          "points": 0.25
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": [
+            "Trong không gian ",
+            {
+              "math": "Oxyz"
+            },
+            ", cho hai điểm ",
+            {
+              "math": "A(1;4;-3), B(1;1;3)"
+            },
+            ". Điểm ",
+            {
+              "math": "M"
+            },
+            " thuộc đoạn ",
+            {
+              "math": "AB"
+            },
+            " sao cho ",
+            {
+              "math": "MA = 2MB"
+            },
+            ", tọa độ điểm ",
+            {
+              "math": "M"
+            },
+            " là"
+          ],
+          "options": [
+            [
+              {
+                "math": "M(1;3;-1)"
+              }
+            ],
+            [
+              {
+                "math": "M(1;7;-9)"
+              }
+            ],
+            [
+              {
+                "math": "M(1;-2;9)"
+              }
+            ],
+            [
+              {
+                "math": "M(1;2;1)"
+              }
+            ]
+          ],
+          "correct_answer": 3,
+          "points": 0.25
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": [
+            "Gọi ",
+            {
+              "math": "F(x)"
+            },
+            " là nguyên hàm của hàm số ",
+            {
+              "math": "f(x) = \\sin x"
+            },
+            ", biết ",
+            {
+              "math": "F(0) = 1"
+            },
+            ". Khi đó tích phân ",
+            {
+              "math": "\\int_{0}^{\\pi} F(x) dx"
+            },
+            " có kết quả là"
+          ],
+          "options": [
+            [
+              {
+                "math": "\\pi"
+              }
+            ],
+            [
+              {
+                "math": "0"
+              }
+            ],
+            [
+              {
+                "math": "2\\pi"
+              }
+            ],
+            [
+              {
+                "math": "2"
+              }
+            ]
+          ],
+          "correct_answer": 2,
+          "points": 0.25
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": [
+            [
+              "Cho hàm số ",
+              {
+                "math": "y = f(x)"
+              },
+              " xác định trên ",
+              {
+                "math": "\\mathbb{R} \\setminus \\{-1\\}"
+              },
+              ", liên tục trên mỗi khoảng xác định và có bảng biến thiên như sau:"
+            ],
+            {
+              "image": "1.jpg",
+              "align": "center",
+              "width": 100
+            },
+            "Hỏi đồ thị hàm số có tổng tất cả bao nhiêu đường tiệm cận đứng và tiệm cận ngang?"
+          ],
+          "options": [
+            [
+              "0"
+            ],
+            [
+              "3"
+            ],
+            [
+              "1"
+            ],
+            [
+              "2"
+            ]
+          ],
+          "correct_answer": 1,
+          "points": 0.25
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": [
+            "Tập xác định của hàm số ",
+            {
+              "math": "y = \\tan x"
+            },
+            " là"
+          ],
+          "options": [
+            [
+              {
+                "math": "D = \\mathbb{R} \\setminus \\left\\{ \\frac{\\pi}{2} + k\\pi \\mid k \\in \\mathbb{Z} \\right\\}"
+              }
+            ],
+            [
+              {
+                "math": "D = \\mathbb{R} \\setminus \\left\\{ k2\\pi \\mid k \\in \\mathbb{Z} \\right\\}"
+              }
+            ],
+            [
+              {
+                "math": "D = \\mathbb{R} \\setminus \\left\\{ \\frac{\\pi}{2} + k2\\pi \\mid k \\in \\mathbb{Z} \\right\\}"
+              }
+            ],
+            [
+              {
+                "math": "D = \\mathbb{R} \\setminus \\left\\{ k\\pi \\mid k \\in \\mathbb{Z} \\right\\}"
+              }
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": [
+            "Cấp số cộng ",
+            {
+              "math": "(u_n)"
+            },
+            " có ",
+            {
+              "math": "u_3 = 8,\\ u_{11} = 32"
+            },
+            " có công sai ",
+            {
+              "math": "d"
+            },
+            " là"
+          ],
+          "options": [
+            [
+              {
+                "math": "d = 4"
+              }
+            ],
+            [
+              {
+                "math": "d = 2"
+              }
+            ],
+            [
+              {
+                "math": "d = 3"
+              }
+            ],
+            [
+              {
+                "math": "d = 1"
+              }
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": [
+            "Trong không gian ",
+            {
+              "math": "Oxyz"
+            },
+            ", điểm nào sau đây thuộc đường thẳng ",
+            {
+              "math": "d : \\frac{x-1}{1} = \\frac{y}{2} = \\frac{z+1}{-2}"
+            },
+            "?"
+          ],
+          "options": [
+            [
+              {
+                "math": "N(1;2;-2)"
+              }
+            ],
+            [
+              {
+                "math": "P(-1;0;1)"
+              }
+            ],
+            [
+              {
+                "math": "Q(2;1;-2)"
+              }
+            ],
+            [
+              {
+                "math": "M(1;0;-1)"
+              }
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": [
+            "Họ nguyên hàm của hàm số ",
+            {
+              "math": "f(x) = 2025^x"
+            },
+            " là"
+          ],
+          "options": [
+            [
+              {
+                "math": "\\frac{2025^{x+1}}{x+1} + C"
+              }
+            ],
+            [
+              {
+                "math": "\\frac{2025^x}{2\\ln 45} + C"
+              }
+            ],
+            [
+              {
+                "math": "2026^x + C"
+              }
+            ],
+            [
+              {
+                "math": "2025^x \\cdot \\ln 2025 + C"
+              }
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": [
+            "Trong không gian ",
+            {
+              "math": "Oxyz"
+            },
+            ", vectơ nào sau đây là một vectơ pháp tuyến của mặt phẳng ",
+            {
+              "math": "(P): 11x - 3y - 2026 = 0"
+            },
+            "?"
+          ],
+          "options": [
+            [
+              {
+                "math": "\\vec{n} = (11; -3; 2026)"
+              }
+            ],
+            [
+              {
+                "math": "\\vec{n} = (11; -3; -2026)"
+              }
+            ],
+            [
+              {
+                "math": "\\vec{n} = (11; -3; 0)"
+              }
+            ],
+            [
+              {
+                "math": "\\vec{n} = (11; 3; 0)"
+              }
+            ]
+          ],
+          "correct_answer": null,
+          "points": 0.25
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q13",
+          "type": "true_false",
+          "content": [
+            [
+              "Nhân dịp 8/3, bạn An tặng bạn Bình một sợi dây chuyền có mặt là khối tròn xoay hình giọt nước làm bằng đá Moissanite (tham khảo hình 1). Gắn hệ tọa độ ",
+              {
+                "math": "Oxy"
+              },
+              " (đơn vị trên mỗi trục là ",
+              {
+                "math": "5\\,\\text{mm}"
+              },
+              ") ta có các số liệu như hình 2. Gọi ",
+              {
+                "math": "f(x)"
+              },
+              " là hàm số có đồ thị gồm đoạn thẳng ",
+              {
+                "math": "CD"
+              },
+              " và một phần đường tròn tâm ",
+              {
+                "math": "O"
+              },
+              ", bán kính bằng 1 đi qua 3 điểm ",
+              {
+                "math": "A, B, C"
+              },
+              "."
+            ],
+            {
+              "image": "3.jpg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "statements": [
+            {
+              "id": "q13a",
+              "content": [
+                "Đường cong qua 3 điểm ",
+                {
+                  "math": "A, B, C"
+                },
+                " có phương trình là ",
+                {
+                  "math": "y = \\sqrt{1-x^2}"
+                },
+                " ",
+                {
+                  "math": "\\left(-1 \\le x \\le \\frac{1}{3}\\right)"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q13b",
+              "content": [
+                "Biết khối lượng riêng của đá Moissanite là ",
+                {
+                  "math": "\\rho = 3,2\\,g/cm^3"
+                },
+                ", khi đó khối lượng của mặt dây chuyền là ",
+                {
+                  "math": "2,2\\,g"
+                },
+                " (làm tròn kết quả đến hàng phần chục)."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q13c",
+              "content": [
+                "Đoạn thẳng ",
+                {
+                  "math": "CD"
+                },
+                " có phương trình là ",
+                {
+                  "math": "y = -\\frac{\\sqrt{2}}{4}x + \\frac{3\\sqrt{2}}{4}"
+                },
+                " ",
+                {
+                  "math": "\\left(\\frac{1}{3} \\le x \\le 3\\right)"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q13d",
+              "content": [
+                "Thể tích mặt dây chuyền lớn hơn ",
+                {
+                  "math": "5,5\\,cm^3"
+                },
+                "."
+              ],
+              "correct": null
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "q14",
+          "type": "true_false",
+          "content": [
+            "Một túi chứa ba quả bóng được đánh số 1, 2 và 3. Bạn An chọn ngẫu nhiên một trong các quả bóng này và ghi lại số trên quả bóng được chọn. Sau đó, An tung một số đồng xu cân đối đồng chất bằng với số trên quả bóng đã chọn."
+          ],
+          "statements": [
+            {
+              "id": "q14a",
+              "content": [
+                "Xác suất để không có mặt ngửa nào xuất hiện là ",
+                {
+                  "math": "\\frac{7}{24}"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q14b",
+              "content": [
+                "Xác suất để 2 đồng xu xuất hiện mặt ngửa và 1 đồng xu xuất hiện mặt sấp là ",
+                {
+                  "math": "\\frac{3}{8}"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q14c",
+              "content": [
+                "Biết rằng không có mặt ngửa nào xuất hiện, xác suất An tung 2 đồng xu là ",
+                {
+                  "math": "\\frac{2}{7}"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q14d",
+              "content": [
+                "Biết rằng luôn có ít nhất một đồng xu xuất hiện mặt ngửa, xác suất để An bốc được quả bóng đánh số 3 là ",
+                {
+                  "math": "\\frac{10}{17}"
+                },
+                "."
+              ],
+              "correct": null
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "q15",
+          "type": "true_false",
+          "content": [
+            "Trong không gian với hệ tọa độ ",
+            {
+              "math": "Oxyz"
+            },
+            ", cho hai đoạn thẳng ",
+            {
+              "math": "AB"
+            },
+            " và ",
+            {
+              "math": "CD"
+            },
+            ". Biết tọa độ các điểm ",
+            {
+              "math": "A(1;1;1), B(2;3;1), C(3;1;3), D(3;2;4)"
+            },
+            ". Hai điểm ",
+            {
+              "math": "M, N"
+            },
+            " thay đổi và lần lượt thuộc các đoạn thẳng ",
+            {
+              "math": "AB, CD"
+            },
+            "."
+          ],
+          "statements": [
+            {
+              "id": "q15a",
+              "content": [
+                "Giá trị nhỏ nhất của độ dài đoạn ",
+                {
+                  "math": "MN"
+                },
+                " bằng ",
+                {
+                  "math": "\\frac{6\\sqrt{5}}{5}"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q15b",
+              "content": [
+                "Phương trình mặt phẳng chứa ",
+                {
+                  "math": "CD"
+                },
+                " và song song với ",
+                {
+                  "math": "AB"
+                },
+                " là ",
+                {
+                  "math": "2x + y - z - 4 = 0"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q15c",
+              "content": [
+                "Điều kiện cần và đủ để điểm ",
+                {
+                  "math": "M"
+                },
+                " thuộc đoạn ",
+                {
+                  "math": "AB"
+                },
+                " là ",
+                {
+                  "math": "M(1+t, 1+2t, 1)"
+                },
+                " (với ",
+                {
+                  "math": "t"
+                },
+                " là một số thực bất kỳ)."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q15d",
+              "content": [
+                "Côsin góc giữa hai vectơ ",
+                {
+                  "math": "\\overrightarrow{AB}"
+                },
+                " và ",
+                {
+                  "math": "\\overrightarrow{CD}"
+                },
+                " bằng ",
+                {
+                  "math": "\\frac{\\sqrt{10}}{5}"
+                },
+                "."
+              ],
+              "correct": null
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "q16",
+          "type": "true_false",
+          "content": [
+            "Cho hàm số ",
+            {
+              "math": "y = f(x) = x^3 + bx^2 + cx + 2"
+            },
+            " đạt cực trị bằng 0 tại ",
+            {
+              "math": "x = 1"
+            },
+            " (với ",
+            {
+              "math": "b"
+            },
+            " và ",
+            {
+              "math": "c"
+            },
+            " là hằng số)."
+          ],
+          "statements": [
+            {
+              "id": "q16a",
+              "content": [
+                "Đồ thị hàm số đi qua điểm ",
+                {
+                  "math": "I(2;4)"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q16b",
+              "content": [
+                "Điểm ",
+                {
+                  "math": "M"
+                },
+                " thay đổi trên đường thẳng nối 2 điểm cực trị của đồ thị hàm số. Với ",
+                {
+                  "math": "O"
+                },
+                " là gốc tọa độ thì độ dài ",
+                {
+                  "math": "OM"
+                },
+                " nhỏ nhất bằng ",
+                {
+                  "math": "\\frac{4}{5}"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q16c",
+              "content": [
+                {
+                  "math": "f'(x) = 3x^2 + 2bx + c,\\ \\forall x \\in \\mathbb{R}"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q16d",
+              "content": [
+                "Đồ thị hàm số có hai điểm cực trị là ",
+                {
+                  "math": "A, B"
+                },
+                ". Độ dài ",
+                {
+                  "math": "AB = 5\\sqrt{2}"
+                },
+                "."
+              ],
+              "correct": null
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 6.",
+      "questions": [
+        {
+          "id": "q17",
+          "type": "short_answer",
+          "content": [
+            "Trong một cuộc thi về \"bữa ăn dinh dưỡng\", ban tổ chức yêu cầu để đảm bảo lượng dinh dưỡng hằng ngày thì mỗi gia đình có 4 thành viên cần ít nhất ",
+            {
+              "math": "900"
+            },
+            " đơn vị prôtêin và ",
+            {
+              "math": "400"
+            },
+            " đơn vị lipít. Mỗi kg thịt bò chứa ",
+            {
+              "math": "800"
+            },
+            " đơn vị prôtêin và ",
+            {
+              "math": "200"
+            },
+            " đơn vị lipít, mỗi kg thịt heo chứa ",
+            {
+              "math": "600"
+            },
+            " đơn vị prôtêin và ",
+            {
+              "math": "400"
+            },
+            " đơn vị lipít. Biết rằng người nội trợ chỉ được chi tối đa ",
+            {
+              "math": "200"
+            },
+            " nghìn đồng để mua thịt, thịt bò giá ",
+            {
+              "math": "200"
+            },
+            " nghìn đồng/kg, thịt heo giá ",
+            {
+              "math": "100"
+            },
+            " nghìn đồng/kg. Người nội trợ nên mua ",
+            {
+              "math": "x"
+            },
+            " (kg) thịt bò và ",
+            {
+              "math": "y"
+            },
+            " (kg) thịt heo để chi phí thấp nhất cho khẩu phần thức ăn mà vẫn đảm bảo chất dinh dưỡng, khi đó hãy tìm ",
+            {
+              "math": "x + 2y"
+            },
+            "."
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        },
+        {
+          "id": "q18",
+          "type": "short_answer",
+          "content": [
+            "Cho hình chóp ",
+            {
+              "math": "S.ABCD"
+            },
+            " có đáy ",
+            {
+              "math": "ABCD"
+            },
+            " là hình thang vuông tại hai đỉnh ",
+            {
+              "math": "A"
+            },
+            " và ",
+            {
+              "math": "B"
+            },
+            ", đồng thời ",
+            {
+              "math": "AB = AD = 2BC = 2\\,\\text{cm}"
+            },
+            ". Biết rằng tam giác ",
+            {
+              "math": "SAB"
+            },
+            " cân tại ",
+            {
+              "math": "S"
+            },
+            ", tam giác ",
+            {
+              "math": "SCD"
+            },
+            " vuông tại ",
+            {
+              "math": "C"
+            },
+            " và số đo góc nhị diện ",
+            {
+              "math": "[S, AB, D]"
+            },
+            " bằng ",
+            {
+              "math": "135^\\circ"
+            },
+            ". Tính thể tích của khối chóp ",
+            {
+              "math": "S.ABCD"
+            },
+            " (đơn vị ",
+            {
+              "math": "\\text{cm}^3"
+            },
+            ")."
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        },
+        {
+          "id": "q19",
+          "type": "short_answer",
+          "content": [
+            "Để trang bị hệ thống làm mát cho nhà thi đấu đa năng mới khánh thành, ban quản lý dự kiến lắp đặt một mạng lưới vòi phun nước thông minh. Hệ thống sử dụng hai loại vòi:",
+            [
+              "- Vòi phun áp lực (loại X): Công suất tiêu thụ ",
+              {
+                "math": "5"
+              },
+              " lít/giờ."
+            ],
+            [
+              "- Vòi phun sương (loại Y): Công suất tiêu thụ ",
+              {
+                "math": "11"
+              },
+              " lít/giờ."
+            ],
+            "Theo yêu cầu vận hành của máy bơm trung tâm, tổng lượng nước tiêu thụ của toàn hệ thống phải đạt đúng 3300 lít/giờ và mỗi loại đều có ít nhất 1 vòi. Để đồng bộ với các module điều khiển tự động, các vòi phun được lắp đặt theo từng cụm kỹ thuật, mỗi cụm yêu cầu đúng 8 vòi (không phân biệt loại). Một phương án lắp đặt được coi là tối ưu về kỹ thuật nếu tổng số vòi của toàn hệ thống là một số chia hết cho 8 để khớp hoàn toàn với các cụm điều khiển. Người ta chọn ngẫu nhiên một phương án lắp đặt thỏa mãn tổng công suất tiêu thụ. Tính xác suất để phương án được chọn là phương án tối ưu về kỹ thuật (kết quả làm tròn đến hàng phần trăm)."
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        },
+        {
+          "id": "q20",
+          "type": "short_answer",
+          "content": [
+            "Trong giờ thực hành, một học sinh được giao một thanh gỗ thẳng dài ",
+            {
+              "math": "15\\,\\text{cm}"
+            },
+            " (có ",
+            {
+              "math": "14"
+            },
+            " vạch chia đều trên thanh gỗ). Học sinh đó thực hiện ngẫu nhiên hai nhát cắt tại các vạch chia cm để chia thanh gỗ thành ",
+            {
+              "math": "3"
+            },
+            " đoạn. Tính xác suất để ",
+            {
+              "math": "3"
+            },
+            " đoạn gỗ thu được có thể ghép thành ",
+            {
+              "math": "3"
+            },
+            " cạnh của một tam giác (kết quả làm tròn đến hàng phần trăm)."
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        },
+        {
+          "id": "q21",
+          "type": "short_answer",
+          "content": [
+            "Nhà máy ",
+            {
+              "math": "A"
+            },
+            " chuyên sản xuất một loại sản phẩm để cung cấp ra thị trường với khối lượng tối đa ",
+            {
+              "math": "100"
+            },
+            " tấn mỗi tháng. Nếu số lượng đặt hàng là ",
+            {
+              "math": "x"
+            },
+            " tấn sản phẩm thì giá bán cho mỗi tấn sản phẩm là ",
+            {
+              "math": "P(x) = 45 - 0{,}001x^2"
+            },
+            " (triệu đồng). Chi phí để nhà máy ",
+            {
+              "math": "A"
+            },
+            " sản xuất ",
+            {
+              "math": "x"
+            },
+            " tấn sản phẩm trong một tháng bao gồm: chi phí cố định ",
+            {
+              "math": "100"
+            },
+            " triệu đồng; chi phí cho mỗi tấn sản phẩm làm ra ",
+            {
+              "math": "30"
+            },
+            " triệu đồng. Hỏi mỗi tháng lợi nhuận tối đa mà nhà máy ",
+            {
+              "math": "A"
+            },
+            " thu về là bao nhiêu triệu đồng (kết quả làm tròn đến hàng đơn vị)?"
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        },
+        {
+          "id": "q22",
+          "type": "short_answer",
+          "content": [
+            "Những ngày giáp Tết Nguyên Đán cũng là dịp bước vào vụ Đông Xuân, cây lúa sau khi được cấy trải qua quá trình tăng trưởng để nhánh và phát triển chiều cao trước khi làm đòng, trổ bông. Qua nghiên cứu một giống lúa mới, các nhà khoa học nhận thấy một cây lúa tính từ lúc được cấy bằng một cây mạ với chiều cao ",
+            {
+              "math": "15\\,\\text{cm}"
+            },
+            " có tốc độ tăng trưởng chiều cao cho bởi hàm số ",
+            {
+              "math": "v(t) = -0{,}3t^3 + 2{,}2t^2"
+            },
+            ", trong đó ",
+            {
+              "math": "t"
+            },
+            " tính theo tuần, ",
+            {
+              "math": "v(t)"
+            },
+            " tính bằng cm/tuần. Gọi ",
+            {
+              "math": "h(t)"
+            },
+            " là chiều cao của cây lúa ở tuần thứ ",
+            {
+              "math": "t"
+            },
+            " ",
+            {
+              "math": "(t \\ge 0, t \\in \\mathbb{R})"
+            },
+            ". Biết rằng khi đạt chiều cao lớn nhất cây lúa sẽ dừng phát triển chiều cao để tập trung dinh dưỡng nuôi bông. Tính chiều cao lớn nhất của cây lúa (đơn vị cm, kết quả làm tròn đến hàng đơn vị)."
+          ],
+          "correct_answer": null,
+          "points": 0.5
+        }
+      ]
+    }
+  ]
+}
