@@ -19,14 +19,14 @@ export default function PaymentSuccess() {
                 </div>
 
                 <h1 className="text-3xl font-black mb-3">
-                    Chào mừng VIP! 🎉
+                    Mở khóa thành công
                 </h1>
                 <p className="text-slate-400 mb-2">
-                    Tài khoản <strong className="text-white">{profile?.display_name || 'của bạn'}</strong> đã được nâng cấp thành công.
+                    Tài khoản <strong className="text-white">{profile?.display_name || 'của bạn'}</strong> đã được xác nhận thanh toán thành công.
                 </p>
                 {profile?.vip_expired_at && (
                     <p className="text-amber-400 text-sm font-semibold mb-8">
-                        VIP có hiệu lực đến: {new Date(profile.vip_expired_at).toLocaleDateString('vi-VN', {
+                        Quyền truy cập hiện có hiệu lực đến: {new Date(profile.vip_expired_at).toLocaleDateString('vi-VN', {
                             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                         })}
                     </p>
@@ -37,7 +37,7 @@ export default function PaymentSuccess() {
                     {[
                         { icon: 'all_inclusive', text: 'Không giới hạn đề mới mỗi ngày' },
                         { icon: 'play_circle', text: 'Truy cập toàn bộ video chữa bài' },
-                        { icon: 'bolt', text: 'VIP đã được kích hoạt ngay lập tức' },
+                        { icon: 'bolt', text: 'Mở khóa được kích hoạt ngay sau khi xác nhận' },
                     ].map(b => (
                         <div key={b.icon} className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center shrink-0">

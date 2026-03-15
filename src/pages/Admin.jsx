@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Navigate } from 'react-router-dom';
-import AdmissionsAdmin from './AdmissionsAdmin';
 import { assertSafeExternalUrl } from '../utils/urlSecurity';
 
 const CATEGORIES = [
@@ -23,16 +22,22 @@ const CATEGORIES = [
   { label: 'Khác', value: 'khac', icon: 'folder', color: 'from-gray-400 to-slate-500' },
 ];
 
+const VIP_PRESET_DAYS = [7, 30, 90, 365];
+const ADMIN_USER_DIRECTORY_SELECT_LIMIT = 200;
+
 export default function Admin() {
   const { user, profile } = useAuth();
   const isAdmin = profile?.role === 'admin';
 
-  const [mainTab, setMainTab] = useState('library'); // 'library' | 'vip' | 'admissions'
+  const [mainTab, setMainTab] = useState('library'); // 'library' | 'vip' | 'thongsoai' | 'collaborators'
 
   // VIP Management State
   const [vipSearch, setVipSearch] = useState('');
+  const [vipGrantEmail, setVipGrantEmail] = useState('');
+  const [vipGrantDays, setVipGrantDays] = useState(30);
   const [vipUsers, setVipUsers] = useState([]);
   const [vipLoading, setVipLoading] = useState(false);
+  const [vipGrantLoading, setVipGrantLoading] = useState(false);
   const [paymentLogs, setPaymentLogs] = useState([]);
   const [paymentLogsLoading, setPaymentLogsLoading] = useState(false);
   const [vipMsg, setVipMsg] = useState({ type: '', text: '' });
@@ -85,52 +90,138 @@ export default function Admin() {
   }
 
   // VIP Management Functions
-  const searchVipUsers = async () => {
-    if (!vipSearch.trim()) return;
+  const showVipMessage = (type, text) => {
+    setVipMsg({ type, text });
+    window.setTimeout(() => setVipMsg({ type: '', text: '' }), 3000);
+  };
+
+  const adminUserDirectory = async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
+    const { data, error } = await supabase.rpc('admin_user_directory', {
+      p_search: search,
+      p_role: role,
+      p_ids: ids,
+      p_limit: limit,
+    });
+
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  };
+
+  const searchVipUsers = async (searchValue = vipSearch) => {
+    const keyword = searchValue.trim();
+    if (!keyword) {
+      setVipUsers([]);
+      return;
+    }
+
     setVipLoading(true);
     try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('id, display_name, avatar_url, is_vip, vip_expired_at')
-        .or(`display_name.ilike.%${vipSearch}%`)
-        .limit(10);
-      setVipUsers(data || []);
+      const data = await adminUserDirectory({ search: keyword, limit: 10 });
+      setVipUsers(data);
+
+      if (data.length === 0) {
+        showVipMessage('error', 'Không tìm thấy người dùng phù hợp với từ khóa này.');
+      }
     } catch (err) {
       console.error(err);
+      showVipMessage('error', 'Không tìm thấy người dùng phù hợp hoặc truy vấn bị lỗi.');
     } finally {
       setVipLoading(false);
     }
   };
 
-  const addVipDays = async (userId, days) => {
-    if (!days || days <= 0) return;
-    try {
-      const { data: p } = await supabase.from('profiles').select('is_vip, vip_expired_at').eq('id', userId).single();
-      const base = (p.vip_expired_at && new Date(p.vip_expired_at) > new Date())
-        ? new Date(p.vip_expired_at)
-        : new Date();
-      const newExpiry = new Date(base.getTime() + days * 86400000);
-      await supabase.from('profiles').update({ is_vip: true, vip_expired_at: newExpiry.toISOString() }).eq('id', userId);
-      setVipMsg({ type: 'success', text: `Đã cộng ${days} ngày VIP!` });
-      searchVipUsers();
-    } catch (err) {
-      setVipMsg({ type: 'error', text: 'Lỗi: ' + err.message });
+  const extendVipMembership = async (userId, days) => {
+    if (!days || days <= 0) {
+      throw new Error('Số ngày VIP phải lớn hơn 0.');
     }
-    setTimeout(() => setVipMsg({ type: '', text: '' }), 3000);
+
+    const { data: p, error: profileError } = await supabase
+      .from('profiles')
+      .select('vip_expired_at')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) throw profileError;
+
+    const base = (p?.vip_expired_at && new Date(p.vip_expired_at) > new Date())
+      ? new Date(p.vip_expired_at)
+      : new Date();
+    const newExpiry = new Date(base.getTime() + days * 86400000);
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ is_vip: true, vip_expired_at: newExpiry.toISOString() })
+      .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    return newExpiry;
+  };
+
+  const addVipDays = async (userId, days) => {
+    try {
+      await extendVipMembership(userId, days);
+      showVipMessage('success', `Đã cộng ${days} ngày VIP!`);
+      await searchVipUsers();
+    } catch (err) {
+      showVipMessage('error', 'Lỗi: ' + err.message);
+    }
   };
 
   const toggleVip = async (userId, currentState) => {
     try {
-      await supabase.from('profiles').update({
+      const { error } = await supabase.from('profiles').update({
         is_vip: !currentState,
         vip_expired_at: !currentState ? new Date(Date.now() + 30 * 86400000).toISOString() : null,
       }).eq('id', userId);
-      setVipMsg({ type: 'success', text: currentState ? 'Đã tắt VIP.' : 'Đã bật VIP 30 ngày.' });
-      searchVipUsers();
+
+      if (error) throw error;
+
+      showVipMessage('success', currentState ? 'Đã tắt VIP.' : 'Đã bật VIP 30 ngày.');
+      await searchVipUsers();
     } catch (err) {
-      setVipMsg({ type: 'error', text: 'Lỗi: ' + err.message });
+      showVipMessage('error', 'Lỗi: ' + err.message);
     }
-    setTimeout(() => setVipMsg({ type: '', text: '' }), 3000);
+  };
+
+  const grantVipByEmail = async (e) => {
+    e.preventDefault();
+
+    const normalizedEmail = vipGrantEmail.trim().toLowerCase();
+    if (!normalizedEmail) {
+      showVipMessage('error', 'Vui lòng nhập gmail hoặc email tài khoản cần cấp VIP.');
+      return;
+    }
+
+    if (!vipGrantDays || vipGrantDays <= 0) {
+      showVipMessage('error', 'Số ngày VIP phải lớn hơn 0.');
+      return;
+    }
+
+    setVipGrantLoading(true);
+    try {
+      const matches = await adminUserDirectory({ search: normalizedEmail, limit: 20 });
+      const targetUser = matches.find(candidate => candidate.email?.toLowerCase() === normalizedEmail);
+
+      if (!targetUser) {
+        throw new Error('Không tìm thấy tài khoản với email này.');
+      }
+
+      await extendVipMembership(targetUser.id, vipGrantDays);
+
+      setVipGrantEmail(targetUser.email || normalizedEmail);
+      setVipSearch(targetUser.email || normalizedEmail);
+      await searchVipUsers(targetUser.email || normalizedEmail);
+
+      showVipMessage(
+        'success',
+        `Đã cấp ${vipGrantDays} ngày VIP cho ${targetUser.display_name || targetUser.full_name || targetUser.email || 'người dùng'}.`
+      );
+    } catch (err) {
+      showVipMessage('error', 'Lỗi: ' + err.message);
+    } finally {
+      setVipGrantLoading(false);
+    }
   };
 
   const fetchPaymentLogs = async () => {
@@ -169,9 +260,17 @@ export default function Admin() {
         const eligibleIds = Object.keys(counts).filter(id => counts[id] >= 50);
 
         if (eligibleIds.length > 0) {
-          const { data: profiles } = await supabase.from('profiles').select('id, display_name, email, role, avatar_url, created_at').in('id', eligibleIds);
-          if (profiles) {
-            setCandidates(profiles.map(p => ({ ...p, completedCount: counts[p.id] })).sort((a, b) => b.completedCount - a.completedCount));
+          const profiles = await adminUserDirectory({
+            ids: eligibleIds,
+            limit: Math.min(eligibleIds.length, ADMIN_USER_DIRECTORY_SELECT_LIMIT),
+          });
+
+          if (profiles.length > 0) {
+            setCandidates(
+              profiles
+                .map(candidate => ({ ...candidate, completedCount: counts[candidate.id] || 0 }))
+                .sort((a, b) => b.completedCount - a.completedCount)
+            );
           }
         } else {
           setCandidates([]);
@@ -197,12 +296,11 @@ export default function Admin() {
   const fetchCollaborators = async () => {
     setLoadingCollabs(true);
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', 'collaborator');
-      if (error) throw error;
-      setCollaborators(data || []);
+      const data = await adminUserDirectory({
+        role: 'collaborator',
+        limit: ADMIN_USER_DIRECTORY_SELECT_LIMIT,
+      });
+      setCollaborators(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -215,14 +313,8 @@ export default function Admin() {
     if (!collabSearchTerm.trim()) return;
     setLoadingCollabs(true);
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, email, display_name, full_name, role, avatar_url')
-        .or(`email.ilike.%${collabSearchTerm}%,display_name.ilike.%${collabSearchTerm}%,full_name.ilike.%${collabSearchTerm}%`)
-        .neq('role', 'admin') // don't show admins
-        .limit(10);
-      if (error) throw error;
-      setSearchResults(data || []);
+      const data = await adminUserDirectory({ search: collabSearchTerm.trim(), limit: 10 });
+      setSearchResults(data.filter(candidate => candidate.role !== 'admin'));
     } catch (err) {
       console.error(err);
     } finally {
@@ -404,9 +496,6 @@ export default function Admin() {
           <button onClick={() => setMainTab('collaborators')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'collaborators' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-[#10b981]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
             <span className="material-symbols-outlined text-[18px]">group_add</span> Truyền Đạo Sư
           </button>
-          <button onClick={() => setMainTab('admissions')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'admissions' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-[#7f13ec]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
-            <span className="material-symbols-outlined text-[18px]">school</span> Hệ thống Tuyển sinh
-          </button>
           <button onClick={() => setMainTab('thongsoai')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'thongsoai' ? 'bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/40 dark:to-orange-900/20 border-red-200 dark:border-red-900/50 shadow-sm text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
             <span className="material-symbols-outlined text-[18px]">local_fire_department</span> Sắc phong Bang Chủ
           </button>
@@ -431,76 +520,129 @@ export default function Admin() {
             )}
 
             {/* User search */}
-            <div className="bg-white dark:bg-[#201216] border border-white/10 rounded-2xl p-5 shadow-xl">
-              <h2 className="text-base font-black text-amber-400 flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-[18px]">manage_accounts</span> Tìm kiếm & cấp VIP
-              </h2>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Nhập tên hoặc email..."
-                  value={vipSearch}
-                  onChange={e => setVipSearch(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && searchVipUsers()}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-amber-500/50"
-                />
-                <button
-                  onClick={searchVipUsers}
-                  disabled={vipLoading}
-                  className="px-4 py-2.5 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors flex items-center gap-2 disabled:opacity-70"
-                >
-                  {vipLoading ? <span className="material-symbols-outlined animate-spin text-[16px]">sync</span> : <span className="material-symbols-outlined text-[16px]">search</span>}
-                  Tìm
-                </button>
-              </div>
+            <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-xl space-y-6">
+              <div>
+                <h2 className="text-base font-black text-amber-500 flex items-center gap-2 mb-2">
+                  <span className="material-symbols-outlined text-[18px]">alternate_email</span> Cấp VIP trực tiếp qua Gmail
+                </h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                  Nhập đúng gmail/email tài khoản và số ngày cần cấp để nâng user lên VIP ngay.
+                </p>
 
-              {/* Results */}
-              {vipUsers.length > 0 && (
-                <div className="mt-4 space-y-3">
-                  {vipUsers.map(u => (
-                    <div key={u.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-white text-sm">{u.display_name || u.id}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                            u.is_vip ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-500/20 text-slate-400'
-                          }`}>
-                            {u.is_vip ? '⭐ VIP' : 'Free'}
-                          </span>
-                          {u.vip_expired_at && (
-                            <span className="text-xs text-slate-500">
-                              Hết: {new Date(u.vip_expired_at).toLocaleDateString('vi-VN')}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {/* Quick day buttons */}
-                        {[7, 30, 90, 365].map(d => (
-                          <button
-                            key={d}
-                            onClick={() => addVipDays(u.id, d)}
-                            className="px-3 py-1.5 text-xs font-black rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-colors"
-                          >
-                            +{d}d
-                          </button>
-                        ))}
-                        {/* Toggle VIP */}
-                        <button
-                          onClick={() => toggleVip(u.id, u.is_vip)}
-                          className={`px-3 py-1.5 text-xs font-black rounded-lg border transition-colors ${
-                            u.is_vip
-                              ? 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'
-                              : 'bg-green-500/10 border-green-500/20 text-green-400 hover:bg-green-500/20'
-                          }`}
-                        >
-                          {u.is_vip ? 'Tắt VIP' : 'Bật VIP'}
-                        </button>
-                      </div>
-                    </div>
+                <form onSubmit={grantVipByEmail} className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px_auto] gap-3">
+                  <input
+                    type="email"
+                    placeholder="gmail@example.com"
+                    value={vipGrantEmail}
+                    onChange={e => setVipGrantEmail(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm placeholder:text-slate-400 focus:outline-none focus:border-amber-500/50"
+                  />
+                  <input
+                    type="number"
+                    min="1"
+                    value={vipGrantDays}
+                    onChange={e => setVipGrantDays(Number(e.target.value) || 0)}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-amber-500/50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={vipGrantLoading}
+                    className="px-5 py-3 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                  >
+                    {vipGrantLoading ? <span className="material-symbols-outlined animate-spin text-[16px]">sync</span> : <span className="material-symbols-outlined text-[16px]">workspace_premium</span>}
+                    Cấp VIP
+                  </button>
+                </form>
+
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {VIP_PRESET_DAYS.map(days => (
+                    <button
+                      key={`vip-preset-${days}`}
+                      type="button"
+                      onClick={() => setVipGrantDays(days)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
+                        vipGrantDays === days
+                          ? 'bg-amber-500 text-white border-amber-500'
+                          : 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/20'
+                      }`}
+                    >
+                      {days} ngày
+                    </button>
                   ))}
                 </div>
-              )}
+              </div>
+
+              <div className="border-t border-slate-200 dark:border-white/10 pt-6">
+                <h2 className="text-base font-black text-amber-500 flex items-center gap-2 mb-4">
+                  <span className="material-symbols-outlined text-[18px]">manage_accounts</span> Tìm kiếm & quản lý VIP
+                </h2>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Nhập tên hoặc email..."
+                    value={vipSearch}
+                    onChange={e => setVipSearch(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && searchVipUsers()}
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm placeholder:text-slate-400 focus:outline-none focus:border-amber-500/50"
+                  />
+                  <button
+                    onClick={() => searchVipUsers()}
+                    disabled={vipLoading}
+                    className="px-4 py-2.5 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors flex items-center gap-2 disabled:opacity-70"
+                  >
+                    {vipLoading ? <span className="material-symbols-outlined animate-spin text-[16px]">sync</span> : <span className="material-symbols-outlined text-[16px]">search</span>}
+                    Tìm
+                  </button>
+                </div>
+
+                {vipUsers.length > 0 && (
+                  <div className="mt-4 space-y-3">
+                    {vipUsers.map(u => (
+                      <div key={u.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-slate-900 dark:text-white text-sm">{u.display_name || u.full_name || u.email || u.id}</p>
+                          {u.email && (
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{u.email}</p>
+                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                              u.is_vip ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-500/20 text-slate-400'
+                            }`}>
+                              {u.is_vip ? 'VIP' : 'Free'}
+                            </span>
+                            {u.vip_expired_at && (
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                                Hết: {new Date(u.vip_expired_at).toLocaleDateString('vi-VN')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {VIP_PRESET_DAYS.map(d => (
+                            <button
+                              key={d}
+                              onClick={() => addVipDays(u.id, d)}
+                              className="px-3 py-1.5 text-xs font-black rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-500 hover:bg-amber-500/20 transition-colors"
+                            >
+                              +{d}d
+                            </button>
+                          ))}
+                          <button
+                            onClick={() => toggleVip(u.id, u.is_vip)}
+                            className={`px-3 py-1.5 text-xs font-black rounded-lg border transition-colors ${
+                              u.is_vip
+                                ? 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20'
+                                : 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400 hover:bg-green-500/20'
+                            }`}
+                          >
+                            {u.is_vip ? 'Tắt VIP' : 'Bật VIP'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Payment Logs */}
@@ -704,11 +846,6 @@ export default function Admin() {
               )}
             </div>
           </div>
-        )}
-
-        {/* New Admissions System Tab Content */}
-        {mainTab === 'admissions' && (
-          <AdmissionsAdmin />
         )}
 
         {/* Thong Soai Tab */}

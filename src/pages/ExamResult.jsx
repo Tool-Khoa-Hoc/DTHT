@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Link, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import RichTextRenderer from '../components/exam/RichTextRenderer';
+import { sanitizeExternalUrl } from '../utils/urlSecurity';
 import {
     formatTrueFalseValue,
     hasKnownTrueFalseValue,
@@ -13,6 +14,43 @@ import {
 const getQuestionKey = (partId, questionId) => `${partId}.${questionId}`;
 const CHOICE_LABELS = ['A', 'B', 'C', 'D'];
 const TRUE_FALSE_LABELS = ['a', 'b', 'c', 'd'];
+
+const EXAM_RESOURCE_FIELD_PATHS = {
+    answerFileUrl: [
+        ['answer_file_url'],
+        ['answerFileUrl'],
+        ['answer_file'],
+        ['answerFile'],
+        ['resources', 'answer_file_url'],
+        ['resources', 'answerFileUrl'],
+        ['resources', 'answer_file'],
+        ['resources', 'answerFile']
+    ],
+    answerFileName: [
+        ['answer_file_name'],
+        ['answerFileName'],
+        ['answer_download_name'],
+        ['answerDownloadName'],
+        ['resources', 'answer_file_name'],
+        ['resources', 'answerFileName'],
+        ['resources', 'answer_download_name'],
+        ['resources', 'answerDownloadName']
+    ],
+    editLinkUrl: [
+        ['edit_link'],
+        ['editLink'],
+        ['edit_url'],
+        ['editUrl'],
+        ['edit_exam_url'],
+        ['editExamUrl'],
+        ['resources', 'edit_link'],
+        ['resources', 'editLink'],
+        ['resources', 'edit_url'],
+        ['resources', 'editUrl'],
+        ['resources', 'edit_exam_url'],
+        ['resources', 'editExamUrl']
+    ]
+};
 
 const getExamBasePath = (subjectFolder, examPath) => `/data/exams/${subjectFolder}/${examPath}`;
 
@@ -70,16 +108,160 @@ const resolveExamMeta = async (subjectFolder, routePath, examId = null) => {
     };
 };
 
+const getNestedValue = (source, fieldPath) => fieldPath.reduce((current, segment) => (
+    current && typeof current === 'object' ? current[segment] : undefined
+), source);
+
+const pickFirstDefinedValue = (sources, fieldPaths) => {
+    for (const source of sources) {
+        if (!source || typeof source !== 'object') {
+            continue;
+        }
+
+        for (const fieldPath of fieldPaths) {
+            const value = getNestedValue(source, fieldPath);
+            if (value !== undefined && value !== null && value !== '') {
+                return value;
+            }
+        }
+    }
+
+    return null;
+};
+
+const resolveExamResourceUrl = (rawValue, basePath) => {
+    if (typeof rawValue !== 'string') {
+        return null;
+    }
+
+    const trimmed = rawValue.trim();
+    if (!trimmed) {
+        return null;
+    }
+
+    if (/^https?:\/\//i.test(trimmed)) {
+        return sanitizeExternalUrl(trimmed);
+    }
+
+    if (/^\/(?!\/)/.test(trimmed)) {
+        return trimmed;
+    }
+
+    if (/^[a-z]+:/i.test(trimmed)) {
+        return null;
+    }
+
+    if (!basePath) {
+        return null;
+    }
+
+    return `${basePath}/${trimmed.replace(/\\/g, '/').replace(/^\.?\//, '')}`;
+};
+
+const inferDownloadFileName = (fileUrl, preferredName) => {
+    if (typeof preferredName === 'string' && preferredName.trim()) {
+        return preferredName.trim();
+    }
+
+    if (!fileUrl) {
+        return 'dap-an';
+    }
+
+    try {
+        const url = new URL(fileUrl, window.location.origin);
+        const lastSegment = url.pathname.split('/').filter(Boolean).pop();
+        return lastSegment ? decodeURIComponent(lastSegment) : 'dap-an';
+    } catch {
+        return 'dap-an';
+    }
+};
+
+function ResultResourceActions({
+    answerFileUrl,
+    editExamUrl,
+    onDownloadAnswerFile,
+    canOpenEditLink = false,
+    showLockedEditLink = false,
+    compact = false
+}) {
+    if (!answerFileUrl && !editExamUrl) {
+        return null;
+    }
+
+    const layoutClass = compact
+        ? 'flex flex-wrap items-center gap-3'
+        : 'flex flex-wrap justify-center gap-4';
+    const downloadButtonClass = compact
+        ? 'inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-100'
+        : 'inline-flex items-center gap-2 rounded-2xl border-2 border-emerald-600 bg-emerald-600 px-8 py-4 font-bold text-white transition-colors shadow-xl shadow-emerald-600/20 hover:bg-emerald-500';
+    const editLinkClass = compact
+        ? 'inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-bold text-amber-700 transition-colors hover:bg-amber-100'
+        : 'inline-flex items-center gap-2 rounded-2xl border-2 border-amber-200 bg-amber-50 px-8 py-4 font-bold text-amber-700 transition-colors shadow-sm hover:bg-amber-100';
+    const lockedEditLinkClass = compact
+        ? 'inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200'
+        : 'inline-flex items-center gap-2 rounded-2xl border-2 border-slate-200 bg-slate-100 px-8 py-4 font-bold text-slate-700 transition-colors shadow-sm hover:bg-slate-200';
+
+    return (
+        <div className={layoutClass}>
+            {answerFileUrl && (
+                <button type="button" onClick={onDownloadAnswerFile} className={downloadButtonClass}>
+                    <span className="material-symbols-outlined text-[20px]">download</span>
+                    Tải file đáp án
+                </button>
+            )}
+
+            {canOpenEditLink && editExamUrl && (
+                <a href={editExamUrl} target="_blank" rel="noreferrer" className={editLinkClass}>
+                    <span className="material-symbols-outlined text-[20px]">edit_square</span>
+                    Link sửa đề
+                </a>
+            )}
+
+            {!canOpenEditLink && showLockedEditLink && editExamUrl && (
+                <Link to="/pricing" className={lockedEditLinkClass}>
+                    <span className="material-symbols-outlined text-[20px]">lock</span>
+                    Link sửa đề VIP
+                </Link>
+            )}
+        </div>
+    );
+}
+
 export default function ExamResult() {
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const { subjectFolder: routeSubjectFolder, examPath: routeExamPath } = useParams();
     const [examData, setExamData] = useState(location.state?.examData || null);
     const [answers, setAnswers] = useState(location.state?.answers || {});
+    const [examMeta, setExamMeta] = useState(null);
     const [loading, setLoading] = useState(!location.state?.examData || !location.state?.answers);
     const [loadError, setLoadError] = useState('');
     const [showReview, setShowReview] = useState(false);
+
+    useEffect(() => {
+        const subjectFolder = routeSubjectFolder || location.state?.subjectFolder;
+        const routePath = location.state?.examPath || routeExamPath;
+
+        if (!subjectFolder || !routePath) {
+            return;
+        }
+
+        let cancelled = false;
+
+        const loadExamMeta = async () => {
+            const resolvedExamMeta = await resolveExamMeta(subjectFolder, routePath, location.state?.examId);
+            if (!cancelled) {
+                setExamMeta(resolvedExamMeta);
+            }
+        };
+
+        loadExamMeta();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [location.state?.examId, location.state?.examPath, location.state?.subjectFolder, routeExamPath, routeSubjectFolder]);
 
     useEffect(() => {
         if (location.state?.examData && location.state?.answers) {
@@ -97,6 +279,7 @@ export default function ExamResult() {
             try {
                 const resultId = location.state?.resultId;
                 const routeExamMeta = await resolveExamMeta(routeSubjectFolder, routeExamPath, location.state?.examId);
+                setExamMeta(routeExamMeta);
                 let resultQuery = supabase
                     .from('exam_results')
                     .select('id, exam_id, subject_folder, answers_snapshot')
@@ -140,6 +323,58 @@ export default function ExamResult() {
 
         loadReviewData();
     }, [location.state, routeExamPath, routeSubjectFolder, user]);
+
+    const resolvedSubjectFolder = examMeta?.subjectFolder || routeSubjectFolder || location.state?.subjectFolder;
+    const resolvedExamPath = examMeta?.examPath || location.state?.examPath || routeExamPath;
+    const examBasePath = resolvedSubjectFolder && resolvedExamPath
+        ? getExamBasePath(resolvedSubjectFolder, resolvedExamPath)
+        : null;
+    const resourceSources = [examData, examMeta];
+    const answerFileUrl = resolveExamResourceUrl(
+        pickFirstDefinedValue(resourceSources, EXAM_RESOURCE_FIELD_PATHS.answerFileUrl),
+        examBasePath
+    );
+    const answerFileName = pickFirstDefinedValue(resourceSources, EXAM_RESOURCE_FIELD_PATHS.answerFileName);
+    const editExamUrl = resolveExamResourceUrl(
+        pickFirstDefinedValue(resourceSources, EXAM_RESOURCE_FIELD_PATHS.editLinkUrl),
+        examBasePath
+    );
+    const canOpenEditLink = Boolean(profile?.is_vip);
+    const showLockedEditLink = Boolean(editExamUrl) && !canOpenEditLink;
+
+    const handleDownloadAnswerFile = async () => {
+        if (!answerFileUrl) {
+            return;
+        }
+
+        const downloadName = inferDownloadFileName(answerFileUrl, answerFileName);
+
+        try {
+            const response = await fetch(answerFileUrl);
+            if (!response.ok) {
+                throw new Error('Download failed');
+            }
+
+            const blob = await response.blob();
+            const objectUrl = window.URL.createObjectURL(blob);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = objectUrl;
+            downloadLink.download = downloadName;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            downloadLink.remove();
+            window.URL.revokeObjectURL(objectUrl);
+        } catch {
+            const fallbackLink = document.createElement('a');
+            fallbackLink.href = answerFileUrl;
+            fallbackLink.target = '_blank';
+            fallbackLink.rel = 'noreferrer';
+            fallbackLink.download = downloadName;
+            document.body.appendChild(fallbackLink);
+            fallbackLink.click();
+            fallbackLink.remove();
+        }
+    };
 
     if (loading) {
          return (
@@ -234,6 +469,15 @@ export default function ExamResult() {
 
                 <div className="flex-1 overflow-y-auto w-full">
                     <div className="max-w-4xl mx-auto bg-white p-6 md:p-12 shadow-sm border-x border-slate-200 min-h-full space-y-12 pb-24">
+                        <ResultResourceActions
+                            answerFileUrl={answerFileUrl}
+                            editExamUrl={editExamUrl}
+                            onDownloadAnswerFile={handleDownloadAnswerFile}
+                            canOpenEditLink={canOpenEditLink}
+                            showLockedEditLink={showLockedEditLink}
+                            compact
+                        />
+
                         {examData.parts.map((part) => (
                             <div key={part.id}>
                                 <div className="mb-6 pb-4 border-b border-slate-100">
@@ -434,13 +678,20 @@ export default function ExamResult() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-4 justify-center">
+                <div className="flex flex-wrap gap-4 justify-center">
                     <button onClick={() => navigate('/exam-room')} className="px-8 py-4 rounded-2xl bg-white border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors shadow-sm">
                         Quay lại danh sách đề
                     </button>
                     <button onClick={() => setShowReview(true)} className="px-8 py-4 rounded-2xl bg-slate-900 border-2 border-slate-900 text-white font-bold hover:bg-slate-800 transition-colors shadow-xl shadow-slate-900/20">
                         Xem chi tiết đáp án
                     </button>
+                    <ResultResourceActions
+                        answerFileUrl={answerFileUrl}
+                        editExamUrl={editExamUrl}
+                        onDownloadAnswerFile={handleDownloadAnswerFile}
+                        canOpenEditLink={canOpenEditLink}
+                        showLockedEditLink={showLockedEditLink}
+                    />
                 </div>
             </div>
         </div>
