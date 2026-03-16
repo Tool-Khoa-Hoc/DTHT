@@ -4,6 +4,13 @@
   "subject": "Toán học",
   "time": 90,
   "description": "Đề khảo sát Toán 12 lần 1 năm 2025 – 2026 cụm các trường THPT – Bắc Ninh",
+  "resources": {
+    "exam_file_url": null,
+    "answer_file_url": "https://drive.google.com/file/d/1TF7uDQ1ot-YV_Q_6Kf5Y5Uvw2DX_5T_f/view?usp=drive_link",
+    "answer_file_name": "Đáp Án",
+    "video_url": null,
+    "edit_link": null
+  },
   "answer_key": {
     "part1.q1": 0,
     "part1.q2": 2,

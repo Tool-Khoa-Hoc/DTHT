@@ -57,6 +57,21 @@ function getSubjectUiMeta(subject = '') {
     return { icon: 'quiz', color: 'from-slate-500 to-slate-600' };
 }
 
+function pickMeaningfulResources(resources) {
+    if (!resources || typeof resources !== 'object' || Array.isArray(resources)) {
+        return undefined;
+    }
+
+    const next = {};
+    for (const [key, value] of Object.entries(resources)) {
+        if (value !== undefined && value !== null && value !== '') {
+            next[key] = value;
+        }
+    }
+
+    return Object.keys(next).length > 0 ? next : undefined;
+}
+
 async function buildIndex() {
     try {
         const indexData = [];
@@ -89,7 +104,8 @@ async function buildIndex() {
                             participants: json.participants ?? Math.floor(Math.random() * 2000) + 100,
                             status: json.status || 'ongoing',
                             color: json.color || uiMeta.color,
-                            icon: json.icon || uiMeta.icon
+                            icon: json.icon || uiMeta.icon,
+                            resources: pickMeaningfulResources(json.resources)
                         });
                     } catch {
                         // Skip invalid exam files so one bad file does not break the index build.

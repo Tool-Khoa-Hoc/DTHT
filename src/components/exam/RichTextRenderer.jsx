@@ -38,6 +38,48 @@ export default function RichTextRenderer({ content }) {
         return false;
     };
 
+    const isTopLevelInlineLike = (node) => {
+        if (typeof node === 'string') return true;
+        if (!node) return false;
+        if (Array.isArray(node)) return false;
+
+        return (
+            node.math !== undefined ||
+            node.blank !== undefined ||
+            node.type === 'text' ||
+            node.type === 'math' ||
+            node.type === 'blank'
+        );
+    };
+
+    const normalizeTopLevelBlocks = (blocks) => {
+        const normalized = [];
+        let inlineBuffer = [];
+
+        const flushInlineBuffer = () => {
+            if (!inlineBuffer.length) return;
+            if (inlineBuffer.every(isEmptyInlineNode)) {
+                inlineBuffer = [];
+                return;
+            }
+            normalized.push(inlineBuffer);
+            inlineBuffer = [];
+        };
+
+        blocks.forEach((block) => {
+            if (isTopLevelInlineLike(block)) {
+                inlineBuffer.push(block);
+                return;
+            }
+
+            flushInlineBuffer();
+            normalized.push(block);
+        });
+
+        flushInlineBuffer();
+        return normalized;
+    };
+
     // Helper to render inline nodes like Text and Math
     const renderInlineNode = (node, index) => {
         // Shorthand for simple string
@@ -170,9 +212,11 @@ export default function RichTextRenderer({ content }) {
             );
         }
 
+        const normalizedBlocks = normalizeTopLevelBlocks(content);
+
         return (
             <div className="rich-text font-medium leading-relaxed">
-                {content.map((block, index) => renderBlock(block, index))}
+                {normalizedBlocks.map((block, index) => renderBlock(block, index))}
             </div>
         );
     }

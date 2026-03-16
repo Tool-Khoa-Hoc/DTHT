@@ -68,6 +68,14 @@ const getExpectedAnswer = (examData, partId, question) => {
     return undefined;
 };
 
+const getVideoReviewUrl = (examData) => (
+    examData?.resources?.video_url ||
+    examData?.resources?.videoUrl ||
+    examData?.video_url ||
+    examData?.videoUrl ||
+    null
+);
+
 const resolveExamMeta = async (subjectFolder, routePath) => {
     try {
         const res = await fetch('/data/exams/index.json', { cache: 'no-store' });
@@ -462,6 +470,7 @@ export default function ExamTaking() {
     const answeredQuestionsCount = allQuestions.filter(({ partId, question }) => (
         isQuestionAnswered(question, answers[getQuestionKey(partId, question.id)])
     )).length;
+    const videoReviewUrl = getVideoReviewUrl(examData);
 
     return (
         <div className="h-screen overflow-hidden bg-[#f8f6f6] text-slate-800 font-display flex flex-col">
@@ -605,7 +614,7 @@ export default function ExamTaking() {
                         ))}
 
                         {/* VIP Video Section Lock */}
-                        {examData?.video_url && (
+                        {videoReviewUrl && (
                             <div className="rounded-3xl border-2 border-dashed border-slate-200 overflow-hidden relative">
                                 {profile?.is_vip ? (
                                     <div className="p-6">
@@ -613,7 +622,7 @@ export default function ExamTaking() {
                                             <span className="material-symbols-outlined text-amber-500">play_circle</span>
                                             Video chữa bài
                                         </h3>
-                                        <video src={examData.video_url} controls className="w-full rounded-2xl" />
+                                        <video src={videoReviewUrl} controls className="w-full rounded-2xl" />
                                     </div>
                                 ) : (
                                     <div className="p-8 bg-gradient-to-br from-[#0f080a] to-[#1a0f12] text-white text-center">

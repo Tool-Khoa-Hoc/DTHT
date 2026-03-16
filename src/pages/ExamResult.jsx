@@ -16,39 +16,75 @@ const CHOICE_LABELS = ['A', 'B', 'C', 'D'];
 const TRUE_FALSE_LABELS = ['a', 'b', 'c', 'd'];
 
 const EXAM_RESOURCE_FIELD_PATHS = {
+    examFileUrl: [
+        ['resources', 'exam_file_url'],
+        ['resources', 'examFileUrl'],
+        ['resources', 'exam_url'],
+        ['resources', 'examUrl'],
+        ['resources', 'exam_link'],
+        ['resources', 'examLink'],
+        ['resources', 'original_exam_url'],
+        ['resources', 'originalExamUrl'],
+        ['exam_file_url'],
+        ['examFileUrl'],
+        ['exam_url'],
+        ['examUrl'],
+        ['exam_link'],
+        ['examLink'],
+        ['original_exam_url'],
+        ['originalExamUrl']
+    ],
     answerFileUrl: [
-        ['answer_file_url'],
-        ['answerFileUrl'],
-        ['answer_file'],
-        ['answerFile'],
         ['resources', 'answer_file_url'],
         ['resources', 'answerFileUrl'],
         ['resources', 'answer_file'],
-        ['resources', 'answerFile']
+        ['resources', 'answerFile'],
+        ['answer_file_url'],
+        ['answerFileUrl'],
+        ['answer_file'],
+        ['answerFile']
     ],
     answerFileName: [
-        ['answer_file_name'],
-        ['answerFileName'],
-        ['answer_download_name'],
-        ['answerDownloadName'],
         ['resources', 'answer_file_name'],
         ['resources', 'answerFileName'],
         ['resources', 'answer_download_name'],
-        ['resources', 'answerDownloadName']
+        ['resources', 'answerDownloadName'],
+        ['answer_file_name'],
+        ['answerFileName'],
+        ['answer_download_name'],
+        ['answerDownloadName']
     ],
     editLinkUrl: [
-        ['edit_link'],
-        ['editLink'],
-        ['edit_url'],
-        ['editUrl'],
-        ['edit_exam_url'],
-        ['editExamUrl'],
         ['resources', 'edit_link'],
         ['resources', 'editLink'],
         ['resources', 'edit_url'],
         ['resources', 'editUrl'],
         ['resources', 'edit_exam_url'],
-        ['resources', 'editExamUrl']
+        ['resources', 'editExamUrl'],
+        ['edit_link'],
+        ['editLink'],
+        ['edit_url'],
+        ['editUrl'],
+        ['edit_exam_url'],
+        ['editExamUrl']
+    ],
+    videoReviewUrl: [
+        ['resources', 'video_url'],
+        ['resources', 'videoUrl'],
+        ['resources', 'solution_video_url'],
+        ['resources', 'solutionVideoUrl'],
+        ['resources', 'review_video_url'],
+        ['resources', 'reviewVideoUrl'],
+        ['resources', 'video_review_url'],
+        ['resources', 'videoReviewUrl'],
+        ['video_url'],
+        ['videoUrl'],
+        ['solution_video_url'],
+        ['solutionVideoUrl'],
+        ['review_video_url'],
+        ['reviewVideoUrl'],
+        ['video_review_url'],
+        ['videoReviewUrl']
     ]
 };
 
@@ -158,42 +194,19 @@ const resolveExamResourceUrl = (rawValue, basePath) => {
     return `${basePath}/${trimmed.replace(/\\/g, '/').replace(/^\.?\//, '')}`;
 };
 
-const inferDownloadFileName = (fileUrl, preferredName) => {
-    if (typeof preferredName === 'string' && preferredName.trim()) {
-        return preferredName.trim();
-    }
-
-    if (!fileUrl) {
-        return 'dap-an';
-    }
-
-    try {
-        const url = new URL(fileUrl, window.location.origin);
-        const lastSegment = url.pathname.split('/').filter(Boolean).pop();
-        return lastSegment ? decodeURIComponent(lastSegment) : 'dap-an';
-    } catch {
-        return 'dap-an';
-    }
-};
-
 function ResultResourceActions({
-    answerFileUrl,
     editExamUrl,
-    onDownloadAnswerFile,
     canOpenEditLink = false,
     showLockedEditLink = false,
     compact = false
 }) {
-    if (!answerFileUrl && !editExamUrl) {
+    if (!editExamUrl) {
         return null;
     }
 
     const layoutClass = compact
         ? 'flex flex-wrap items-center gap-3'
         : 'flex flex-wrap justify-center gap-4';
-    const downloadButtonClass = compact
-        ? 'inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-100'
-        : 'inline-flex items-center gap-2 rounded-2xl border-2 border-emerald-600 bg-emerald-600 px-8 py-4 font-bold text-white transition-colors shadow-xl shadow-emerald-600/20 hover:bg-emerald-500';
     const editLinkClass = compact
         ? 'inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-bold text-amber-700 transition-colors hover:bg-amber-100'
         : 'inline-flex items-center gap-2 rounded-2xl border-2 border-amber-200 bg-amber-50 px-8 py-4 font-bold text-amber-700 transition-colors shadow-sm hover:bg-amber-100';
@@ -203,13 +216,6 @@ function ResultResourceActions({
 
     return (
         <div className={layoutClass}>
-            {answerFileUrl && (
-                <button type="button" onClick={onDownloadAnswerFile} className={downloadButtonClass}>
-                    <span className="material-symbols-outlined text-[20px]">download</span>
-                    Tải file đáp án
-                </button>
-            )}
-
             {canOpenEditLink && editExamUrl && (
                 <a href={editExamUrl} target="_blank" rel="noreferrer" className={editLinkClass}>
                     <span className="material-symbols-outlined text-[20px]">edit_square</span>
@@ -223,6 +229,80 @@ function ResultResourceActions({
                     Link sửa đề VIP
                 </Link>
             )}
+        </div>
+    );
+}
+
+function VipResourcePanel({
+    documentResourceUrl,
+    documentResourceLabel,
+    videoReviewUrl,
+    isVip = false
+}) {
+    const hasAnyVipResource = Boolean(documentResourceUrl || videoReviewUrl);
+
+    const panelClass = 'w-full lg:w-[18rem] rounded-3xl border border-slate-200 bg-white/90 p-4 text-left shadow-lg shadow-slate-200/60 backdrop-blur';
+    const itemBaseClass = 'flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-bold transition-colors';
+    const activeClass = `${itemBaseClass} border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100`;
+    const videoClass = `${itemBaseClass} border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100`;
+    const disabledClass = `${itemBaseClass} border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed`;
+    const lockedClass = `${itemBaseClass} border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200`;
+
+    const renderVipItem = (label, icon, href, className) => {
+        if (!isVip) {
+            return (
+                <Link to="/pricing" className={lockedClass}>
+                    <span className="material-symbols-outlined text-[20px]">lock</span>
+                    {label}
+                </Link>
+            );
+        }
+
+        if (!href) {
+            return (
+                <div className={disabledClass}>
+                    <span className="material-symbols-outlined text-[20px]">{icon}</span>
+                    {label}
+                    <span className="ml-auto text-xs font-semibold uppercase tracking-wide">Sắp cập nhật</span>
+                </div>
+            );
+        }
+
+        return (
+            <a href={href} target="_blank" rel="noreferrer" className={className}>
+                <span className="material-symbols-outlined text-[20px]">{icon}</span>
+                {label}
+                <span className="material-symbols-outlined ml-auto text-[18px]">open_in_new</span>
+            </a>
+        );
+    };
+
+    if (!hasAnyVipResource && isVip) {
+        return (
+            <div className={panelClass}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Tài nguyên VIP</p>
+                <h3 className="mt-2 text-lg font-black text-slate-900">Đề gốc và video chữa đề</h3>
+                <div className="mt-4 space-y-3">
+                    {renderVipItem(documentResourceLabel, 'description', null, activeClass)}
+                    {renderVipItem('Video chữa đề', 'play_circle', null, videoClass)}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className={panelClass}>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Tài nguyên VIP</p>
+            <h3 className="mt-2 text-lg font-black text-slate-900">Đề gốc và video chữa đề</h3>
+            <p className="mt-1 text-xs font-medium leading-relaxed text-slate-500">
+                {isVip
+                    ? 'Mở nhanh tài liệu đề và video giải chi tiết cho bài vừa làm.'
+                    : 'Nâng cấp VIP để mở tài liệu đề và video chữa đề.'}
+            </p>
+            <div className="mt-4 space-y-3">
+                {renderVipItem(documentResourceLabel, 'description', documentResourceUrl, activeClass)}
+                {renderVipItem('Video chữa đề', 'play_circle', videoReviewUrl, videoClass)}
+            </div>
         </div>
     );
 }
@@ -334,47 +414,27 @@ export default function ExamResult() {
         pickFirstDefinedValue(resourceSources, EXAM_RESOURCE_FIELD_PATHS.answerFileUrl),
         examBasePath
     );
-    const answerFileName = pickFirstDefinedValue(resourceSources, EXAM_RESOURCE_FIELD_PATHS.answerFileName);
+    const examFileUrl = resolveExamResourceUrl(
+        pickFirstDefinedValue(resourceSources, EXAM_RESOURCE_FIELD_PATHS.examFileUrl),
+        examBasePath
+    );
     const editExamUrl = resolveExamResourceUrl(
         pickFirstDefinedValue(resourceSources, EXAM_RESOURCE_FIELD_PATHS.editLinkUrl),
         examBasePath
     );
+    const videoReviewUrl = resolveExamResourceUrl(
+        pickFirstDefinedValue(resourceSources, EXAM_RESOURCE_FIELD_PATHS.videoReviewUrl),
+        examBasePath
+    );
+    const documentResourceUrl = examFileUrl || answerFileUrl;
+    const documentResourceLabel = examFileUrl && answerFileUrl
+        ? 'Đề và đáp án'
+        : examFileUrl
+            ? 'Tài liệu đề'
+            : 'File đáp án';
     const canOpenEditLink = Boolean(profile?.is_vip);
     const showLockedEditLink = Boolean(editExamUrl) && !canOpenEditLink;
-
-    const handleDownloadAnswerFile = async () => {
-        if (!answerFileUrl) {
-            return;
-        }
-
-        const downloadName = inferDownloadFileName(answerFileUrl, answerFileName);
-
-        try {
-            const response = await fetch(answerFileUrl);
-            if (!response.ok) {
-                throw new Error('Download failed');
-            }
-
-            const blob = await response.blob();
-            const objectUrl = window.URL.createObjectURL(blob);
-            const downloadLink = document.createElement('a');
-            downloadLink.href = objectUrl;
-            downloadLink.download = downloadName;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            downloadLink.remove();
-            window.URL.revokeObjectURL(objectUrl);
-        } catch {
-            const fallbackLink = document.createElement('a');
-            fallbackLink.href = answerFileUrl;
-            fallbackLink.target = '_blank';
-            fallbackLink.rel = 'noreferrer';
-            fallbackLink.download = downloadName;
-            document.body.appendChild(fallbackLink);
-            fallbackLink.click();
-            fallbackLink.remove();
-        }
-    };
+    const isVip = Boolean(profile?.is_vip);
 
     if (loading) {
          return (
@@ -470,9 +530,7 @@ export default function ExamResult() {
                 <div className="flex-1 overflow-y-auto w-full">
                     <div className="max-w-4xl mx-auto bg-white p-6 md:p-12 shadow-sm border-x border-slate-200 min-h-full space-y-12 pb-24">
                         <ResultResourceActions
-                            answerFileUrl={answerFileUrl}
                             editExamUrl={editExamUrl}
-                            onDownloadAnswerFile={handleDownloadAnswerFile}
                             canOpenEditLink={canOpenEditLink}
                             showLockedEditLink={showLockedEditLink}
                             compact
@@ -640,7 +698,15 @@ export default function ExamResult() {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 blur-3xl rounded-full" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 blur-3xl rounded-full" />
                     
-                    <div className="relative z-10">
+                    <div className="relative z-10 lg:pr-[20rem]">
+                        <div className="mb-6 lg:absolute lg:top-0 lg:right-0 lg:mb-0">
+                            <VipResourcePanel
+                                documentResourceUrl={documentResourceUrl}
+                                documentResourceLabel={documentResourceLabel}
+                                videoReviewUrl={videoReviewUrl}
+                                isVip={isVip}
+                            />
+                        </div>
                         <span className="material-symbols-outlined text-6xl text-[#fe5f36] mb-4">gpp_good</span>
                         <h1 className="text-3xl font-black text-slate-900 mb-2">Hoàn thành bài thi!</h1>
                         <p className="text-slate-500 font-medium mb-8">{examData.title}</p>
@@ -686,9 +752,7 @@ export default function ExamResult() {
                         Xem chi tiết đáp án
                     </button>
                     <ResultResourceActions
-                        answerFileUrl={answerFileUrl}
                         editExamUrl={editExamUrl}
-                        onDownloadAnswerFile={handleDownloadAnswerFile}
                         canOpenEditLink={canOpenEditLink}
                         showLockedEditLink={showLockedEditLink}
                     />

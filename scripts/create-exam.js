@@ -4,6 +4,7 @@ import path from 'path';
 import {
     DEFAULT_PART_DESCRIPTIONS,
     buildAnswerKeyFromParts,
+    createDefaultExamResources,
     createShortAnswerQuestion,
     createSingleChoiceQuestion,
     createTrueFalseQuestion,
@@ -104,6 +105,7 @@ async function main() {
         subject: subjectLabel,
         time: toPositiveInteger(flags.time, 50),
         description: flags.description || '',
+        resources: createDefaultExamResources(),
         answer_key: buildAnswerKeyFromParts(parts),
         parts
     };

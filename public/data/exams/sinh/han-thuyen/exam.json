@@ -4,6 +4,13 @@
   "subject": "Sinh học",
   "time": 50,
   "description": "Đề thi thử tốt nghiệp THPT lần 1 năm học 2025-2026 - Trường THPT Hàn Thuyên - Bắc Ninh",
+  "resources": {
+    "exam_file_url": null,
+    "answer_file_url": "https://drive.google.com/drive/folders/1BN654c95hjSma3cHRJ8Qzs_vB9kOjA0z",
+    "answer_file_name": "Đáp Án",
+    "video_url": null,
+    "edit_link": null
+  },
   "answer_key": {
     "part1.q1": 2,
     "part1.q2": 2,

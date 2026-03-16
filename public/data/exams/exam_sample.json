@@ -4,6 +4,13 @@
   "subject": "Toán học",
   "time": 90,
   "description": "Nguồn gốc: PDF đề thi thử TN THPT 2026 môn Toán - Trường Lê Thánh Tông TP.HCM",
+  "resources": {
+    "exam_file_url": null,
+    "answer_file_url": null,
+    "answer_file_name": null,
+    "video_url": null,
+    "edit_link": null
+  },
   "answer_key": {
     "part1.q1": null,
     "part1.q2": null,

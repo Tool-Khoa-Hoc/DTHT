@@ -1,0 +1,601 @@
+{
+  "id": "son-la-2026-lan-1",
+  "title": "Đề thi thử tốt nghiệp THPT 2026 môn Toán lần 1 - Sở GD&ĐT Sơn La",
+  "subject": "Toán học",
+  "time": 90,
+  "description": "Chuyển từ PDF đề gốc, giữ phần đề; đáp án được nhập theo bảng người dùng cung cấp.",
+  "resources": {
+    "exam_file_url": null,
+    "answer_file_url": null,
+    "answer_file_name": null,
+    "video_url": null,
+    "edit_link": null
+  },
+  "answer_key": {
+    "part1.q1": 3,
+    "part1.q2": 3,
+    "part1.q3": 1,
+    "part1.q4": 1,
+    "part1.q5": 3,
+    "part1.q6": 3,
+    "part1.q7": 1,
+    "part1.q8": 0,
+    "part1.q9": 1,
+    "part1.q10": 0,
+    "part1.q11": 1,
+    "part1.q12": 2,
+    "part2.q13": {
+      "q13a": true,
+      "q13b": false,
+      "q13c": true,
+      "q13d": true
+    },
+    "part2.q14": {
+      "q14a": true,
+      "q14b": true,
+      "q14c": false,
+      "q14d": false
+    },
+    "part2.q15": {
+      "q15a": false,
+      "q15b": true,
+      "q15c": false,
+      "q15d": false
+    },
+    "part2.q16": {
+      "q16a": false,
+      "q16b": true,
+      "q16c": true,
+      "q16d": false
+    },
+    "part3.q17": 0.42,
+    "part3.q18": 0.83,
+    "part3.q19": 116,
+    "part3.q20": 760,
+    "part3.q21": 2.72,
+    "part3.q22": 3360
+  },
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 12. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": [
+            "Mỗi ngày bác Sơn đều đi bộ để rèn luyện sức khỏe. Quãng đường đi bộ mỗi ngày (đơn vị: km) của bác Sơn được thống kê ở bảng sau:",
+            {
+              "image": "part1-q1-table.png",
+              "alt": "Bảng số liệu câu 1 phần 1",
+              "align": "center",
+              "width": 100
+            },
+            "Khoảng tứ phân vị của mẫu số liệu ghép nhóm trên là"
+          ],
+          "options": [["0,975"], ["0,5"], ["0,9"], ["0,575"]],
+          "correct_answer": 3,
+          "points": 0.25
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": [
+            "Trong không gian ",
+            { "math": "Oxyz" },
+            ", cho vectơ ",
+            { "math": "\\vec{u}=2\\vec{i}-5\\vec{k}" },
+            ". Tọa độ của vectơ ",
+            { "math": "\\vec{u}" },
+            " là"
+          ],
+          "options": [
+            [{ "math": "(2;-5;0)" }],
+            [{ "math": "(0;2;-5)" }],
+            [{ "math": "(2;0;5)" }],
+            [{ "math": "(2;0;-5)" }]
+          ],
+          "correct_answer": 3,
+          "points": 0.25
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": [
+            "Cho cấp số nhân ",
+            { "math": "(u_n)" },
+            " có ",
+            { "math": "u_1=2" },
+            " và ",
+            { "math": "u_2=6" },
+            ". Số hạng ",
+            { "math": "u_4" },
+            " của cấp số nhân đó là"
+          ],
+          "options": [["27"], ["54"], ["162"], ["11"]],
+          "correct_answer": 1,
+          "points": 0.25
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": [
+            "Cho hình lập phương ",
+            { "math": "ABCD.A_1B_1C_1D_1" },
+            " (tham khảo hình vẽ bên). Phát biểu nào sau đây đúng?",
+            {
+              "image": "part1-q4-cube.png",
+              "alt": "Hình lập phương câu 4 phần 1",
+              "align": "center",
+              "width": 70
+            }
+          ],
+          "options": [
+            [{ "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{AB}" }],
+            [{ "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{AB}+\\overrightarrow{AD}" }],
+            [{ "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{AC}" }],
+            [{ "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{CA}" }]
+          ],
+          "correct_answer": 1,
+          "points": 0.25
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": [
+            "Cho hàm số ",
+            { "math": "y=f(x)" },
+            " thỏa mãn ",
+            { "math": "f(1)=-2" },
+            ", ",
+            { "math": "f(2)=1" },
+            " và có đạo hàm liên tục trên đoạn ",
+            { "math": "[1;2]" },
+            ". Giá trị của tích phân ",
+            { "math": "I=\\int_1^2 f'(x)\\,dx" },
+            " là"
+          ],
+          "options": [[{ "math": "I=-1" }], [{ "math": "I=2" }], [{ "math": "I=-3" }], [{ "math": "I=3" }]],
+          "correct_answer": 3,
+          "points": 0.25
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": [
+            "Họ tất cả các nguyên hàm của hàm số ",
+            { "math": "y=\\sin x+\\cos x" },
+            " là"
+          ],
+          "options": [
+            [{ "math": "\\int(\\sin x+\\cos x)\\,dx=\\sin x+\\cos x+C" }],
+            [{ "math": "\\int(\\sin x+\\cos x)\\,dx=-\\sin x-\\cos x+C" }],
+            [{ "math": "\\int(\\sin x+\\cos x)\\,dx=-\\sin x+\\cos x+C" }],
+            [{ "math": "\\int(\\sin x+\\cos x)\\,dx=\\sin x-\\cos x+C" }]
+          ],
+          "correct_answer": 3,
+          "points": 0.25
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": [
+            "Tiệm cận đứng của đồ thị hàm số ",
+            { "math": "y=\\dfrac{2x-1}{x-1}" },
+            " là đường thẳng có phương trình"
+          ],
+          "options": [[{ "math": "y=1" }], [{ "math": "x=1" }], [{ "math": "y=2" }], [{ "math": "x=2" }]],
+          "correct_answer": 1,
+          "points": 0.25
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": [
+            "Cho mặt phẳng ",
+            { "math": "(P): 3x-y+z-2=0" },
+            ". Vectơ nào trong các vectơ dưới đây là một vectơ pháp tuyến của mặt phẳng ",
+            { "math": "(P)" },
+            "?"
+          ],
+          "options": [
+            [{ "math": "\\vec{n}=(3;-1;1)" }],
+            [{ "math": "\\vec{n}=(3;-1;2)" }],
+            [{ "math": "\\vec{n}=(3;-1;-2)" }],
+            [{ "math": "\\vec{n}=(3;-1;0)" }]
+          ],
+          "correct_answer": 0,
+          "points": 0.25
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": [
+            "Nghiệm của phương trình ",
+            { "math": "\\log_2(x+1)=3" },
+            " là"
+          ],
+          "options": [[{ "math": "x=9" }], [{ "math": "x=7" }], [{ "math": "x=8" }], [{ "math": "x=5" }]],
+          "correct_answer": 1,
+          "points": 0.25
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": [
+            "Tập nghiệm của phương trình ",
+            { "math": "\\cos x=1" },
+            " là"
+          ],
+          "options": [
+            [{ "math": "S=\\{2k\\pi\\mid k\\in\\mathbb{Z}\\}" }],
+            [{ "math": "S=\\left\\{\\dfrac{\\pi}{2}+2k\\pi\\mid k\\in\\mathbb{Z}\\right\\}" }],
+            [{ "math": "S=\\left\\{\\dfrac{\\pi}{2}+k\\pi\\mid k\\in\\mathbb{Z}\\right\\}" }],
+            [{ "math": "S=\\{k\\pi\\mid k\\in\\mathbb{Z}\\}" }]
+          ],
+          "correct_answer": 0,
+          "points": 0.25
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": [
+            "Cho hình lăng trụ ",
+            { "math": "ABC.A'B'C'" },
+            " như hình vẽ. Đường thẳng nào sau đây song song với mặt phẳng ",
+            { "math": "(ACC'A')" },
+            "?",
+            {
+              "image": "part1-q11-prism.png",
+              "alt": "Hình lăng trụ câu 11 phần 1",
+              "align": "center",
+              "width": 70
+            }
+          ],
+          "options": [[{ "math": "AA'" }], [{ "math": "BB'" }], [{ "math": "AC" }], [{ "math": "AB" }]],
+          "correct_answer": 1,
+          "points": 0.25
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": [
+            "Cho hình chóp ",
+            { "math": "S.ABC" },
+            " có ",
+            { "math": "SA\\perp(ABC)" },
+            ", ",
+            { "math": "SA=3" },
+            "; ",
+            { "math": "\\triangle ABC" },
+            " vuông cân tại ",
+            { "math": "A" },
+            " với ",
+            { "math": "AB=4" },
+            ". Thể tích khối chóp ",
+            { "math": "S.ABC" },
+            " bằng"
+          ],
+          "options": [["48"], ["16"], ["8"], ["24"]],
+          "correct_answer": 2,
+          "points": 0.25
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q13",
+          "type": "true_false",
+          "content": [
+            "Cho hàm số ",
+            { "math": "f(x)=x^3+3x^2-4" },
+            ".",
+            {
+              "image": "part2-q13-graph.png",
+              "alt": "Đồ thị minh họa câu 1 phần 2",
+              "align": "center",
+              "width": 60
+            }
+          ],
+          "statements": [
+            {
+              "id": "q13a",
+              "content": ["Hàm số đã cho có đạo hàm là ", { "math": "f'(x)=3x^2+6x" }, "."],
+              "correct": true
+            },
+            {
+              "id": "q13b",
+              "content": ["Hàm số đã cho đồng biến trên khoảng ", { "math": "(-1;+\\infty)" }, "."],
+              "correct": false
+            },
+            {
+              "id": "q13c",
+              "content": ["Hàm số đã cho đạt cực đại tại ", { "math": "x=-2" }, "."],
+              "correct": true
+            },
+            {
+              "id": "q13d",
+              "content": ["Đồ thị của hàm số đã cho có dạng như hình vẽ."],
+              "correct": true
+            }
+          ],
+          "points": [0.1, 0.25, 0.5, 1]
+        },
+        {
+          "id": "q14",
+          "type": "true_false",
+          "content": [
+            "Tại tỉnh X, 20% dân số thường xuyên chơi thể thao. Trong số những người thường xuyên chơi thể thao, có 70% người có thể lực tốt. Trong số những người không thường xuyên chơi thể thao, có 15% có thể lực tốt. Chọn ngẫu nhiên một người dân tỉnh X."
+          ],
+          "statements": [
+            {
+              "id": "q14a",
+              "content": ["Xác suất người đó có thể lực tốt và thường xuyên chơi thể thao là 0,14."],
+              "correct": true
+            },
+            {
+              "id": "q14b",
+              "content": ["Xác suất người đó có thể lực tốt, biết rằng người đó không thường xuyên chơi thể thao là 0,15."],
+              "correct": true
+            },
+            {
+              "id": "q14c",
+              "content": ["Tỉ lệ người có thể lực tốt trong toàn tỉnh X là 36%."],
+              "correct": false
+            },
+            {
+              "id": "q14d",
+              "content": ["Xác suất người đó thường xuyên chơi thể thao, biết rằng họ có thể lực tốt là ", { "math": "\\dfrac{8}{13}" }, "."],
+              "correct": false
+            }
+          ],
+          "points": [0.1, 0.25, 0.5, 1]
+        },
+        {
+          "id": "q15",
+          "type": "true_false",
+          "content": [
+            "Giả sử lợi nhuận biên (tính bằng triệu đồng) của một sản phẩm được mô hình hóa bằng công thức ",
+            { "math": "P'(x)=-0{,}0008x+10{,}4" },
+            ". Ở đây ",
+            { "math": "P(x)" },
+            " là lợi nhuận (tính bằng triệu đồng) khi bán được ",
+            { "math": "x" },
+            " đơn vị sản phẩm."
+          ],
+          "statements": [
+            {
+              "id": "q15a",
+              "content": ["Lợi nhuận khi bán được ", { "math": "x" }, " đơn vị sản phẩm được tính bằng công thức ", { "math": "P(x)=-0{,}0008x^2+10{,}4x" }, "."],
+              "correct": false
+            },
+            {
+              "id": "q15b",
+              "content": ["Lợi nhuận khi bán được 50 sản phẩm đầu tiên là 519 triệu đồng."],
+              "correct": true
+            },
+            {
+              "id": "q15c",
+              "content": ["Sự thay đổi của lợi nhuận khi doanh số tăng từ 50 lên 55 đơn vị sản phẩm là 49,79 triệu đồng."],
+              "correct": false
+            },
+            {
+              "id": "q15d",
+              "content": ["Biết sự thay đổi của lợi nhuận khi doanh số tăng từ 50 lên ", { "math": "a" }, " đơn vị sản phẩm lớn hơn 517 triệu đồng, khi đó giá trị nhỏ nhất của ", { "math": "a" }, " là 100."],
+              "correct": false
+            }
+          ],
+          "points": [0.1, 0.25, 0.5, 1]
+        },
+        {
+          "id": "q16",
+          "type": "true_false",
+          "content": [
+            "Một chiếc máy bay thương mại Vietnam Airlines đang bay trên bầu trời theo một đường thẳng từ ",
+            { "math": "D" },
+            " đến ",
+            { "math": "E" },
+            " có hình chiếu trên mặt đất là đoạn ",
+            { "math": "CB" },
+            ". Tại vị trí ",
+            { "math": "D" },
+            " thì máy bay bay cách mặt đất 9000 m, tại vị trí ",
+            { "math": "E" },
+            " thì máy bay bay cách mặt đất 12000 m. Một ra đa được đặt trên mặt đất tại vị trí ",
+            { "math": "O" },
+            " cách ",
+            { "math": "C" },
+            " khoảng 20000 m, cách ",
+            { "math": "B" },
+            " khoảng 16000 m và góc ",
+            { "math": "\\widehat{BOC}=90^\\circ" },
+            "; phạm vi theo dõi của ra đa là 20 km. Xét hệ trục tọa độ ",
+            { "math": "Oxyz" },
+            " (đơn vị trên mỗi trục là 1000 m) với ",
+            { "math": "O" },
+            " là vị trí đặt ra đa, ",
+            { "math": "B" },
+            " thuộc tia ",
+            { "math": "Oy" },
+            ", ",
+            { "math": "C" },
+            " thuộc tia ",
+            { "math": "Ox" },
+            ".",
+            {
+              "image": "part2-q16-plane.png",
+              "alt": "Hình máy bay và ra đa câu 4 phần 2",
+              "align": "center",
+              "width": 80
+            }
+          ],
+          "statements": [
+            {
+              "id": "q16a",
+              "content": ["Tại ", { "math": "D" }, ", máy bay cách ra đa 21000 m (làm tròn đến hàng nghìn theo đơn vị mét)."],
+              "correct": false
+            },
+            {
+              "id": "q16b",
+              "content": ["Khi máy bay bay đến điểm ", { "math": "I" }, " thỏa mãn ", { "math": "\\overrightarrow{DI}=\\dfrac{1}{4}\\overrightarrow{DE}" }, ", máy bay cách mặt đất 9750 m."],
+              "correct": true
+            },
+            {
+              "id": "q16c",
+              "content": ["Trên hành trình bay từ ", { "math": "D" }, " đến ", { "math": "E" }, ", máy bay sẽ đi qua điểm có tọa độ ", { "math": "P(16;3{,}2;9{,}6)" }, "."],
+              "correct": true
+            },
+            {
+              "id": "q16d",
+              "content": ["Khoảng cách giữa vị trí đầu tiên và vị trí cuối cùng mà máy bay bay trong phạm vi theo dõi của ra đa là 22500 m (làm tròn đến hàng trăm theo đơn vị mét)."],
+              "correct": false
+            }
+          ],
+          "points": [0.1, 0.25, 0.5, 1]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III",
+      "description": "Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 1 đến câu 6.",
+      "questions": [
+        {
+          "id": "q17",
+          "type": "short_answer",
+          "content": [
+            "Trong một cuộc thi đấu Robotics, sân đấu được thiết kế dạng lưới ô vuông như hình vẽ. Các robot xuất phát từ vị trí điểm ",
+            { "math": "A" },
+            ", di chuyển ngẫu nhiên theo cạnh của các ô vuông theo hướng xuống dưới hoặc sang phải đến vị trí điểm ",
+            { "math": "B" },
+            ". Tính xác suất robot đi từ ",
+            { "math": "A" },
+            " đến ",
+            { "math": "B" },
+            " mà không đi qua cả ",
+            { "math": "M" },
+            " và ",
+            { "math": "N" },
+            " (kết quả làm tròn đến hàng phần trăm).",
+            {
+              "image": "part3-q17-grid.png",
+              "alt": "Lưới ô vuông câu 1 phần 3",
+              "align": "center",
+              "width": 80
+            }
+          ],
+          "correct_answer": 0.42,
+          "points": 0.5
+        },
+        {
+          "id": "q18",
+          "type": "short_answer",
+          "content": [
+            "Cho hình chóp ",
+            { "math": "S.ABCD" },
+            " có đáy ",
+            { "math": "ABCD" },
+            " là hình thoi tâm ",
+            { "math": "O" },
+            ", cạnh bằng 1, góc ",
+            { "math": "\\widehat{ABC}=60^\\circ" },
+            ". Biết rằng ",
+            { "math": "SO\\perp(ABCD)" },
+            ", ",
+            { "math": "SO=\\dfrac{3}{2}" },
+            ". Tính khoảng cách từ ",
+            { "math": "A" },
+            " đến mặt phẳng ",
+            { "math": "(SCD)" },
+            " (không làm tròn kết quả ở các bước trung gian, làm tròn kết quả ở bước cuối cùng đến hàng phần trăm)."
+          ],
+          "correct_answer": 0.83,
+          "points": 0.5
+        },
+        {
+          "id": "q19",
+          "type": "short_answer",
+          "content": [
+            "Một nhà địa chất học đang ở địa điểm ",
+            { "math": "A" },
+            " trên sa mạc. Anh ta muốn đến điểm ",
+            { "math": "B" },
+            " (cũng ở trên sa mạc) và cách ",
+            { "math": "A" },
+            " một khoảng bằng 70 km. Trong sa mạc, xe anh ta chỉ có thể di chuyển với vận tốc 30 km/h. Nhà địa chất phải đến được điểm ",
+            { "math": "B" },
+            " sau 2 giờ, vì vậy nếu anh ta đi thẳng từ ",
+            { "math": "A" },
+            " đến ",
+            { "math": "B" },
+            " sẽ không thể đến đúng giờ được. Rất may, có một con đường nhựa song song với đường nối ",
+            { "math": "A" },
+            " và ",
+            { "math": "B" },
+            " và cách ",
+            { "math": "AB" },
+            " một đoạn 10 km (tham khảo hình vẽ). Trên đường nhựa đó, xe nhà địa chất có thể di chuyển với vận tốc 50 km/h. Thời gian ngắn nhất để nhà địa chất di chuyển từ ",
+            { "math": "A" },
+            " đến ",
+            { "math": "B" },
+            " là bao nhiêu phút?",
+            {
+              "image": "part3-q19-road.png",
+              "alt": "Hình đường nhựa câu 3 phần 3",
+              "align": "center",
+              "width": 90
+            }
+          ],
+          "correct_answer": 116,
+          "points": 0.5
+        },
+        {
+          "id": "q20",
+          "type": "short_answer",
+          "content": [
+            "Trong một cuộc thi làm bánh, mỗi đội chỉ được sử dụng tối đa 6 kg bột mì và 4 kg đậu để làm ra bánh loại I và bánh loại II. Để làm ra một chiếc bánh loại I cần 0,06 kg bột mì và 0,08 kg đậu, để làm ra một chiếc bánh loại II cần 0,08 kg bột mì và 0,04 kg đậu. Mỗi chiếc bánh loại I được 8 điểm, mỗi chiếc bánh loại II được 10 điểm. Số điểm tối đa có thể đạt được của mỗi đội bằng bao nhiêu?"
+          ],
+          "correct_answer": 760,
+          "points": 0.5
+        },
+        {
+          "id": "q21",
+          "type": "short_answer",
+          "content": [
+            "Từ một quả cầu bằng đá trắng bán kính bằng 1 dm người ta khoan rút lõi ngay chính giữa quả cầu (trục đối xứng của lõi và quả cầu trùng nhau) như hình minh họa, đường kính lõi là 1 dm. Thể tích còn lại của quả cầu bằng bao nhiêu dm3? (không làm tròn kết quả ở các bước trung gian, làm tròn kết quả ở bước cuối cùng đến hàng phần trăm).",
+            {
+              "image": "part3-q21-core.png",
+              "alt": "Hình quả cầu và lõi câu 5 phần 3",
+              "align": "center",
+              "width": 90
+            }
+          ],
+          "correct_answer": 2.72,
+          "points": 0.5
+        },
+        {
+          "id": "q22",
+          "type": "short_answer",
+          "content": [
+            "Cho hình vẽ bên gồm 4 tam giác. Người ta chọn 3 số phân biệt từ tập hợp ",
+            { "math": "S=\\{1;2;\\ldots;26\\}" },
+            " để xếp vào 3 tam giác ở 3 góc. Sau đó, tính tổng bình phương của 3 số đó rồi ghi kết quả vào tam giác còn lại ở giữa. Hỏi có bao nhiêu cách xếp sao cho số ghi ở tam giác giữa là một số chia hết cho 5?",
+            {
+              "image": "part3-q22-triangles.png",
+              "alt": "Hình tam giác câu 6 phần 3",
+              "align": "center",
+              "width": 70
+            }
+          ],
+          "correct_answer": 3360,
+          "points": 0.5
+        }
+      ]
+    }
+  ]
+}

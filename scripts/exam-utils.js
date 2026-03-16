@@ -10,12 +10,24 @@ export const DEFAULT_PART_DESCRIPTIONS = {
     part3: 'Câu trả lời ngắn. Thí sinh điền kết quả vào ô trả lời tương ứng.'
 };
 
+export const DEFAULT_EXAM_RESOURCES = {
+    exam_file_url: null,
+    answer_file_url: null,
+    answer_file_name: null,
+    video_url: null,
+    edit_link: null
+};
+
 export function resolveExamDir(subjectFolder, examPath) {
     return path.join(EXAMS_ROOT, subjectFolder, examPath);
 }
 
 export function resolveExamJsonPath(subjectFolder, examPath) {
     return path.join(resolveExamDir(subjectFolder, examPath), 'exam.json');
+}
+
+export function createDefaultExamResources() {
+    return { ...DEFAULT_EXAM_RESOURCES };
 }
 
 export async function loadExamJson(subjectFolder, examPath) {

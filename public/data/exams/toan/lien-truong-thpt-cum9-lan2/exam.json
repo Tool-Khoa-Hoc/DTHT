@@ -1,0 +1,1087 @@
+{
+  "id": "lien-truong-thpt-cum9-lan2",
+  "title": "Đề thi thử Toán 12 lần 2 năm 2025 – 2026 liên trường cụm 9 – Hà Nội",
+  "subject": "Toán học",
+  "time": 90,
+  "description": "Chuyển từ PDF đáp án chi tiết; chỉ giữ phần đề, bỏ toàn bộ lời giải.",
+  "resources": {
+    "exam_file_url": null,
+    "answer_file_url": null,
+    "answer_file_name": null,
+    "video_url": null,
+    "edit_link": null
+  },
+  "answer_key": {
+    "part1.q1": 1,
+    "part1.q2": 1,
+    "part1.q3": 2,
+    "part1.q4": 3,
+    "part1.q5": 3,
+    "part1.q6": 3,
+    "part1.q7": 0,
+    "part1.q8": 0,
+    "part1.q9": 1,
+    "part1.q10": 1,
+    "part1.q11": 3,
+    "part1.q12": 0,
+    "part2.q13": {
+      "q13a": true,
+      "q13b": true,
+      "q13c": true,
+      "q13d": false
+    },
+    "part2.q14": {
+      "q14a": true,
+      "q14b": false,
+      "q14c": true,
+      "q14d": false
+    },
+    "part2.q15": {
+      "q15a": true,
+      "q15b": true,
+      "q15c": false,
+      "q15d": false
+    },
+    "part2.q16": {
+      "q16a": false,
+      "q16b": true,
+      "q16c": false,
+      "q16d": false
+    },
+    "part3.q17": 20,
+    "part3.q18": 1225,
+    "part3.q19": 16,
+    "part3.q20": 1.22,
+    "part3.q21": 294,
+    "part3.q22": -240
+  },
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 12. Mỗi câu hỏi chỉ chọn 1 phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": [
+            "Tập xác định của hàm số ",
+            {
+              "math": "y=\\dfrac{x^3+\\sin x}{\\cos x}"
+            },
+            " là"
+          ],
+          "options": [
+            [
+              {
+                "math": "D=\\mathbb{R}"
+              }
+            ],
+            [
+              {
+                "math": "D=\\mathbb{R}\\setminus\\left\\{\\dfrac{\\pi}{2}+k\\pi,\\ k\\in\\mathbb{Z}\\right\\}"
+              }
+            ],
+            [
+              {
+                "math": "D=\\mathbb{R}\\setminus\\left\\{k\\pi,\\ k\\in\\mathbb{Z}\\right\\}"
+              }
+            ],
+            [
+              {
+                "math": "D=\\mathbb{R}\\setminus\\left\\{2k\\pi,\\ k\\in\\mathbb{Z}\\right\\}"
+              }
+            ]
+          ],
+          "correct_answer": 1,
+          "points": 0.25
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": [
+            "Cấp số cộng ",
+            {
+              "math": "(u_n): -10; -7; -4; -1; \\ldots"
+            },
+            " có công sai bằng"
+          ],
+          "options": [
+            [
+              "7"
+            ],
+            [
+              "3"
+            ],
+            [
+              "-3"
+            ],
+            [
+              "0"
+            ]
+          ],
+          "correct_answer": 1,
+          "points": 0.25
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": [
+            "Cho các hàm số: ",
+            {
+              "math": "y=0{,}25^x"
+            },
+            ", ",
+            {
+              "math": "y=13^x"
+            },
+            ", ",
+            {
+              "math": "y=\\log_{0{,}11}x"
+            },
+            ", ",
+            {
+              "math": "y=\\log_2 x"
+            },
+            ". Có bao nhiêu hàm số đồng biến trên tập xác định?"
+          ],
+          "options": [
+            [
+              "0"
+            ],
+            [
+              "1"
+            ],
+            [
+              "2"
+            ],
+            [
+              "3"
+            ]
+          ],
+          "correct_answer": 2,
+          "points": 0.25
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": [
+            "Khối chóp ",
+            {
+              "math": "S.ABC"
+            },
+            " có chiều cao bằng ",
+            {
+              "math": "3"
+            },
+            ", diện tích đáy bằng ",
+            {
+              "math": "10"
+            },
+            ". Thể tích khối chóp ",
+            {
+              "math": "S.ABC"
+            },
+            " bằng"
+          ],
+          "options": [
+            [
+              "2"
+            ],
+            [
+              "15"
+            ],
+            [
+              "30"
+            ],
+            [
+              "10"
+            ]
+          ],
+          "correct_answer": 3,
+          "points": 0.25
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": [
+            "Cho hàm số ",
+            {
+              "math": "y=f(x)"
+            },
+            " có bảng biến thiên như sau:",
+            {
+              "image": "q11-variation-table.svg",
+              "alt": "Bảng biến thiên câu 5",
+              "align": "center",
+              "width": 100
+            },
+            "Tiệm cận ngang của đồ thị hàm số ",
+            {
+              "math": "y=f(x)"
+            },
+            " có phương trình là"
+          ],
+          "options": [
+            [
+              {
+                "math": "y=1"
+              }
+            ],
+            [
+              {
+                "math": "x=1"
+              }
+            ],
+            [
+              {
+                "math": "x=0"
+              }
+            ],
+            [
+              {
+                "math": "y=0"
+              }
+            ]
+          ],
+          "correct_answer": 3,
+          "points": 0.25
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": [
+            "Cho hàm số ",
+            {
+              "math": "f(x)"
+            },
+            " xác định trên ",
+            {
+              "math": "\\mathbb{R}"
+            },
+            ", có ",
+            {
+              "math": "f'(x)=x(x-1)(x+2)^2"
+            },
+            ". Số điểm cực trị của hàm số ",
+            {
+              "math": "f(x)"
+            },
+            " là"
+          ],
+          "options": [
+            [
+              "3"
+            ],
+            [
+              "1"
+            ],
+            [
+              "4"
+            ],
+            [
+              "2"
+            ]
+          ],
+          "correct_answer": 3,
+          "points": 0.25
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": [
+            "Trong không gian với hệ tọa độ ",
+            {
+              "math": "Oxyz"
+            },
+            ", cho hình bình hành ",
+            {
+              "math": "ABCD"
+            },
+            " với ",
+            {
+              "math": "A(1;2;-1),\\ B(2;-1;3),\\ C(-3;5;1)"
+            },
+            ". Tọa độ điểm ",
+            {
+              "math": "D"
+            },
+            " là"
+          ],
+          "options": [
+            [
+              {
+                "math": "D(-4;8;-3)"
+              }
+            ],
+            [
+              {
+                "math": "D(-2;2;5)"
+              }
+            ],
+            [
+              {
+                "math": "D(-4;8;3)"
+              }
+            ],
+            [
+              {
+                "math": "D(0;2;5)"
+              }
+            ]
+          ],
+          "correct_answer": 0,
+          "points": 0.25
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": [
+            "Họ tất cả các nguyên hàm của hàm số ",
+            {
+              "math": "f(x)=\\cos x + 6x"
+            },
+            " là"
+          ],
+          "options": [
+            [
+              {
+                "math": "\\sin x + 3x^2 + C"
+              }
+            ],
+            [
+              {
+                "math": "-\\sin x + 3x^2 + C"
+              }
+            ],
+            [
+              {
+                "math": "\\sin x + 6x^2 + C"
+              }
+            ],
+            [
+              {
+                "math": "-\\sin x + C"
+              }
+            ]
+          ],
+          "correct_answer": 0,
+          "points": 0.25
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": [
+            "Cho hàm số ",
+            {
+              "math": "f(x)"
+            },
+            " liên tục trên đoạn ",
+            {
+              "math": "[1;5]"
+            },
+            ". Biết ",
+            {
+              "math": "\\int_1^3 f(x)dx=4"
+            },
+            " và ",
+            {
+              "math": "\\int_3^5 f(x)dx=-2"
+            },
+            ". Giá trị của ",
+            {
+              "math": "I=\\int_1^5 f(x)dx"
+            },
+            " bằng"
+          ],
+          "options": [
+            [
+              {
+                "math": "6"
+              }
+            ],
+            [
+              {
+                "math": "2"
+              }
+            ],
+            [
+              {
+                "math": "-8"
+              }
+            ],
+            [
+              {
+                "math": "-2"
+              }
+            ]
+          ],
+          "correct_answer": 1,
+          "points": 0.25
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": [
+            "Thống kê điểm thi tốt nghiệp môn Toán THPT năm 2024 của một lớp 12 thu được kết quả như sau:",
+            {
+              "image": "q9-stat-table.svg",
+              "alt": "Bảng tần số câu 10",
+              "align": "center",
+              "width": 100
+            },
+            "Khoảng biến thiên của mẫu số liệu thống kê trên bằng"
+          ],
+          "options": [
+            [
+              "7"
+            ],
+            [
+              "6"
+            ],
+            [
+              "8"
+            ],
+            [
+              "10"
+            ]
+          ],
+          "correct_answer": 1,
+          "points": 0.25
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": [
+            "Trong không gian với hệ tọa độ ",
+            {
+              "math": "Oxyz"
+            },
+            ", khoảng cách từ điểm ",
+            {
+              "math": "A(1;0;0)"
+            },
+            " tới mặt phẳng ",
+            {
+              "math": "(P): 2x+2y-z+1=0"
+            },
+            " bằng"
+          ],
+          "options": [
+            [
+              "3"
+            ],
+            [
+              {
+                "math": "\\sqrt{3}"
+              }
+            ],
+            [
+              "9"
+            ],
+            [
+              "1"
+            ]
+          ],
+          "correct_answer": 3,
+          "points": 0.25
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": [
+            "Trong không gian với hệ tọa độ ",
+            {
+              "math": "Oxyz"
+            },
+            ", điểm nào dưới đây nằm trên mặt phẳng ",
+            {
+              "math": "(\\alpha): x+2y-3z+2=0"
+            },
+            "?"
+          ],
+          "options": [
+            [
+              {
+                "math": "K(1;0;1)"
+              }
+            ],
+            [
+              {
+                "math": "N(3;4;-2)"
+              }
+            ],
+            [
+              {
+                "math": "M(-1;3;0)"
+              }
+            ],
+            [
+              {
+                "math": "P(2;-3;1)"
+              }
+            ]
+          ],
+          "correct_answer": 0,
+          "points": 0.25
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q13",
+          "type": "true_false",
+          "content": [
+            "Hộp thứ nhất có 8 viên bi gồm màu xanh và màu đỏ, hộp thứ hai có 2 viên bi màu xanh và một số viên bi màu đỏ. Chọn ngẫu nhiên từ mỗi hộp 2 viên bi. Gọi ",
+            {
+              "math": "A"
+            },
+            " là biến cố “Chọn được 2 viên bi màu xanh ở hộp thứ nhất” và ",
+            {
+              "math": "B"
+            },
+            " là biến cố “Chọn được 2 viên bi màu xanh ở hộp thứ hai”. Biết ",
+            {
+              "math": "P(A)=\\dfrac{3}{28}"
+            },
+            " và ",
+            {
+              "math": "P(B)=\\dfrac{1}{15}"
+            },
+            ". Khi đó:"
+          ],
+          "statements": [
+            {
+              "id": "q13a",
+              "content": [
+                {
+                  "math": "A"
+                },
+                " và ",
+                {
+                  "math": "B"
+                },
+                " là 2 biến cố độc lập với nhau."
+              ],
+              "correct": true
+            },
+            {
+              "id": "q13b",
+              "content": [
+                "Xác suất để đồng thời cả hai hộp đều lấy được 2 viên bi màu xanh bằng ",
+                {
+                  "math": "\\dfrac{1}{140}"
+                },
+                "."
+              ],
+              "correct": true
+            },
+            {
+              "id": "q13c",
+              "content": [
+                "Xác suất để chọn được ít nhất 1 viên bi màu đỏ ở hộp thứ nhất bằng ",
+                {
+                  "math": "\\dfrac{25}{28}"
+                },
+                "."
+              ],
+              "correct": true
+            },
+            {
+              "id": "q13d",
+              "content": [
+                "Tổng số viên bi màu đỏ ở hai hộp bằng 8."
+              ],
+              "correct": false
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "q14",
+          "type": "true_false",
+          "content": [
+            "Trong buổi tổng duyệt văn nghệ tại sân trường, một drone được sử dụng để ghi hình toàn cảnh. Trong 15 giây đầu kể từ khi cất cánh, độ cao của drone (tính bằng mét) tại thời điểm ",
+            {
+              "math": "t"
+            },
+            " giây được mô tả gần đúng bởi ",
+            {
+              "math": "h(t)=-0{,}05t^3+0{,}6t^2+3t\\quad (0\\le t\\le 15)"
+            },
+            ". Cùng thời điểm đó, một thang nâng sân khấu bắt đầu nâng thẳng đứng từ mặt sân với vận tốc không đổi ",
+            {
+              "math": "1m/s"
+            },
+            "."
+          ],
+          "statements": [
+            {
+              "id": "q14a",
+              "content": [
+                "Vận tốc của drone tại thời điểm ",
+                {
+                  "math": "t"
+                },
+                " là ",
+                {
+                  "math": "v(t)=-0{,}15t^2+1{,}2t+3"
+                },
+                "."
+              ],
+              "correct": true
+            },
+            {
+              "id": "q14b",
+              "content": [
+                "Drone luôn bay lên trong 12 giây đầu."
+              ],
+              "correct": false
+            },
+            {
+              "id": "q14c",
+              "content": [
+                "Trong khoảng ",
+                {
+                  "math": "0<t\\le 15"
+                },
+                ", drone và thang nâng ở cùng độ cao đúng 1 lần."
+              ],
+              "correct": true
+            },
+            {
+              "id": "q14d",
+              "content": [
+                "Độ cao lớn nhất mà drone đạt được trong 15 giây đầu không vượt quá ",
+                {
+                  "math": "39m"
+                },
+                "."
+              ],
+              "correct": false
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "q15",
+          "type": "true_false",
+          "content": [
+            "Để đảm bảo an toàn khi lưu thông trên đường, các xe ô tô khi dừng đèn đỏ phải cách nhau tối thiểu ",
+            {
+              "math": "1m"
+            },
+            ". Ô tô ",
+            {
+              "math": "A"
+            },
+            " đang chạy với vận tốc ",
+            {
+              "math": "15m/s"
+            },
+            " thì gặp ô tô ",
+            {
+              "math": "B"
+            },
+            " đang dừng đèn đỏ phía trước. Người lái xe ",
+            {
+              "math": "A"
+            },
+            " đạp phanh và ô tô ",
+            {
+              "math": "A"
+            },
+            " chuyển động chậm dần đều với vận tốc ",
+            {
+              "math": "v(t)=15-3t\\ (m/s)"
+            },
+            ", trong đó ",
+            {
+              "math": "t"
+            },
+            " là khoảng thời gian tính bằng giây kể từ thời điểm ô tô ",
+            {
+              "math": "A"
+            },
+            " bắt đầu đạp phanh."
+          ],
+          "statements": [
+            {
+              "id": "q15a",
+              "content": [
+                "Quãng đường ô tô ",
+                {
+                  "math": "A"
+                },
+                " đi được sau khi đạp phanh 2 giây là ",
+                {
+                  "math": "24m"
+                },
+                "."
+              ],
+              "correct": true
+            },
+            {
+              "id": "q15b",
+              "content": [
+                "Kể từ lúc đạp phanh, sau thời gian ",
+                {
+                  "math": "t=5"
+                },
+                " giây thì ô tô ",
+                {
+                  "math": "A"
+                },
+                " dừng lại."
+              ],
+              "correct": true
+            },
+            {
+              "id": "q15c",
+              "content": [
+                "Quãng đường ô tô ",
+                {
+                  "math": "A"
+                },
+                " đi được từ lúc bắt đầu đạp phanh đến khi dừng hẳn được tính bởi công thức ",
+                {
+                  "math": "s=\\int_0^4(15-3t)dt"
+                },
+                "."
+              ],
+              "correct": false
+            },
+            {
+              "id": "q15d",
+              "content": [
+                "Để đảm bảo khoảng cách an toàn tối thiểu ",
+                {
+                  "math": "1m"
+                },
+                " với ô tô ",
+                {
+                  "math": "B"
+                },
+                " khi dừng lại, ô tô ",
+                {
+                  "math": "A"
+                },
+                " phải bắt đầu đạp phanh khi còn cách ô tô ",
+                {
+                  "math": "B"
+                },
+                " một khoảng tối thiểu là ",
+                {
+                  "math": "37{,}5m"
+                },
+                "."
+              ],
+              "correct": false
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "q16",
+          "type": "true_false",
+          "content": [
+            "Trong không gian với hệ tọa độ ",
+            {
+              "math": "Oxyz"
+            },
+            ", cho hai điểm ",
+            {
+              "math": "A(1;-3;2),\\ B(-2;1;-3)"
+            },
+            "."
+          ],
+          "statements": [
+            {
+              "id": "q16a",
+              "content": [
+                "Mặt phẳng ",
+                {
+                  "math": "(P)"
+                },
+                " đi qua ",
+                {
+                  "math": "A"
+                },
+                " và song song với mặt phẳng ",
+                {
+                  "math": "(Oxy)"
+                },
+                " có phương trình là ",
+                {
+                  "math": "z+2=0"
+                },
+                "."
+              ],
+              "correct": false
+            },
+            {
+              "id": "q16b",
+              "content": [
+                "Điểm đối xứng của ",
+                {
+                  "math": "B"
+                },
+                " qua mặt phẳng ",
+                {
+                  "math": "(Oxy)"
+                },
+                " là ",
+                {
+                  "math": "B'(-2;1;3)"
+                },
+                "."
+              ],
+              "correct": true
+            },
+            {
+              "id": "q16c",
+              "content": [
+                "Gọi ",
+                {
+                  "math": "H"
+                },
+                " là hình chiếu của ",
+                {
+                  "math": "B"
+                },
+                " lên mặt phẳng ",
+                {
+                  "math": "(P)"
+                },
+                ", khi đó độ dài đoạn thẳng ",
+                {
+                  "math": "AH"
+                },
+                " bằng 6."
+              ],
+              "correct": false
+            },
+            {
+              "id": "q16d",
+              "content": [
+                "Xét hai điểm ",
+                {
+                  "math": "M,N"
+                },
+                " thay đổi thuộc mặt phẳng ",
+                {
+                  "math": "(Oxy)"
+                },
+                " sao cho ",
+                {
+                  "math": "MN=1"
+                },
+                ". Giá trị lớn nhất của ",
+                {
+                  "math": "AM-BN"
+                },
+                " bằng 7."
+              ],
+              "correct": false
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 6.",
+      "questions": [
+        {
+          "id": "q17",
+          "type": "short_answer",
+          "content": [
+            "Lớp 10C có 45 học sinh trong đó có 25 em thích môn Văn, 20 em thích môn Toán, 18 em thích môn Sử, 6 em không thích môn nào, 5 em thích cả ba môn. Có bao nhiêu học sinh thích chỉ một trong ba môn học trên?"
+          ],
+          "correct_answer": 20,
+          "points": 0.5
+        },
+        {
+          "id": "q18",
+          "type": "short_answer",
+          "content": [
+            "Một hộp chứa 100 cái thẻ được đánh số thứ tự liên tiếp từ 1 đến 100. Hai thẻ khác nhau thì đánh số thứ tự khác nhau. Chọn ngẫu nhiên 3 thẻ trong hộp. Có bao nhiêu cách chọn 3 thẻ có số thứ tự lập thành cấp số cộng, đồng thời có tổng không vượt quá 150?"
+          ],
+          "correct_answer": 1225,
+          "points": 0.5
+        },
+        {
+          "id": "q19",
+          "type": "short_answer",
+          "content": [
+            "Hằng năm, trường THPT M tổ chức các đoàn đi thăm hỏi và chúc Tết tứ thân phụ mẫu cao tuổi của cán bộ, giáo viên và nhân viên trong trường. Đoàn số 1 có nhiệm vụ đến thăm 4 gia đình tại các địa điểm A, B, C, D. Đoàn xuất phát từ trường THPT M, đến thăm đủ 4 gia đình (mỗi gia đình đúng một lần). Sau khi thăm xong gia đình cuối cùng, đoàn kết thúc hành trình tại đó (không quay về trường). Do điều kiện giao thông dịp cuối năm, đoạn đường AB chỉ có thể đi theo chiều từ A đến B, không đi được theo chiều ngược lại (hình vẽ). Đoàn số 1 đã chọn được lộ trình di chuyển có tổng quãng đường ngắn nhất. Tổng quãng đường ngắn nhất đó dài bao nhiêu km?",
+            {
+              "image": "3.jpg",
+              "alt": "Hình vẽ phần 3 câu 3",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "correct_answer": 16,
+          "points": 0.5
+        },
+        {
+          "id": "q20",
+          "type": "short_answer",
+          "content": [
+            "Cho hình lăng trụ ",
+            {
+              "math": "ABC.A'B'C'"
+            },
+            " có đáy là tam giác đều cạnh ",
+            {
+              "math": "2\\sqrt{2}"
+            },
+            ". Hình chiếu của ",
+            {
+              "math": "A'"
+            },
+            " lên mặt phẳng ",
+            {
+              "math": "(ABC)"
+            },
+            " trùng với trung điểm của ",
+            {
+              "math": "BC"
+            },
+            " và biết rằng góc nhị diện ",
+            {
+              "math": "[C',BC,A]=135^\\circ"
+            },
+            ". Tính khoảng cách giữa hai đường thẳng ",
+            {
+              "math": "A'B"
+            },
+            " và ",
+            {
+              "math": "AC'"
+            },
+            " (kết quả làm tròn đến hàng phần trăm)."
+          ],
+          "correct_answer": 1.22,
+          "points": 0.5
+        },
+        {
+          "id": "q21",
+          "type": "short_answer",
+          "content": [
+            "Một doanh nghiệp sản xuất độc quyền một loại sản phẩm. Giả sử khi sản xuất và bán hết ",
+            {
+              "math": "x"
+            },
+            " sản phẩm ",
+            {
+              "math": "(0<x\\le 2500)"
+            },
+            ", tổng số tiền doanh nghiệp thu được là ",
+            {
+              "math": "f(x)=2026x-x^2"
+            },
+            " và tổng chi phí là ",
+            {
+              "math": "g(x)=x^2+1438x-1209"
+            },
+            " (đơn vị: nghìn đồng). Giả sử mức thuế phụ thu trên một đơn vị sản phẩm bán được là ",
+            {
+              "math": "t"
+            },
+            " (nghìn đồng) ",
+            {
+              "math": "(0<t<320)"
+            },
+            ". Giá trị của ",
+            {
+              "math": "t"
+            },
+            " bằng bao nhiêu nghìn đồng để nhà nước nhận được số tiền thuế phụ thu lớn nhất và doanh nghiệp cũng nhận được lợi nhuận lớn nhất theo mức thuế phụ thu đó?"
+          ],
+          "correct_answer": 294,
+          "points": 0.5
+        },
+        {
+          "id": "q22",
+          "type": "short_answer",
+          "content": [
+            "Trong giờ thể dục học về kỹ thuật chuyền bóng hơi, Bình và An tập chuyền bóng cho nhau. Ở một động tác Bình chuyền bóng cho An, quả bóng bay lên cao nhưng lại lệch sang bên trái của An và rơi xuống vị trí cách chỗ An đứng ",
+            {
+              "math": "0{,}5m"
+            },
+            " và cách chỗ Bình ",
+            {
+              "math": "4{,}5m"
+            },
+            ". Chọn hệ trục tọa độ ",
+            {
+              "math": "Oxyz"
+            },
+            " sao cho gốc tọa độ ",
+            {
+              "math": "O"
+            },
+            " tại vị trí của Bình, vị trí của An nằm trên tia ",
+            {
+              "math": "Ox"
+            },
+            " và mặt phẳng ",
+            {
+              "math": "(Oxy)"
+            },
+            " là mặt đất (tham khảo hình vẽ).",
+            {
+              "image": "4.jpg",
+              "alt": "Hình vẽ phần 3 câu 6",
+              "align": "center",
+              "width": 100
+            },
+            "Biết rằng quỹ đạo của quả bóng nằm trong mặt phẳng ",
+            {
+              "math": "(\\alpha): x+by+cz+d=0"
+            },
+            " và ",
+            {
+              "math": "(\\alpha)"
+            },
+            " vuông góc với mặt đất. Khi đó, giá trị của ",
+            {
+              "math": "-3b^2-c^2+2d^2"
+            },
+            " bằng bao nhiêu?"
+          ],
+          "correct_answer": -240,
+          "points": 0.5
+        }
+      ]
+    }
+  ]
+}
