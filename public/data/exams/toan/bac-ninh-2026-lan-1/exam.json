@@ -4,57 +4,6 @@
   "subject": "Toán học",
   "time": 90,
   "description": "Đề khảo sát Toán 12 lần 1 năm 2025 – 2026 cụm các trường THPT – Bắc Ninh",
-  "resources": {
-    "exam_file_url": null,
-    "answer_file_url": "https://drive.google.com/file/d/1TF7uDQ1ot-YV_Q_6Kf5Y5Uvw2DX_5T_f/view?usp=drive_link",
-    "answer_file_name": "Đáp Án",
-    "video_url": null,
-    "edit_link": null
-  },
-  "answer_key": {
-    "part1.q1": 0,
-    "part1.q2": 2,
-    "part1.q3": 3,
-    "part1.q4": 0,
-    "part1.q5": 3,
-    "part1.q6": 2,
-    "part1.q7": 1,
-    "part1.q8": 0,
-    "part1.q9": 2,
-    "part1.q10": 3,
-    "part1.q11": 1,
-    "part1.q12": 2,
-    "part2.q13": {
-      "q13a": true,
-      "q13b": true,
-      "q13c": true,
-      "q13d": false
-    },
-    "part2.q14": {
-      "q14a": true,
-      "q14b": false,
-      "q14c": true,
-      "q14d": false
-    },
-    "part2.q15": {
-      "q15a": true,
-      "q15b": false,
-      "q15c": false,
-      "q15d": true
-    },
-    "part2.q16": {
-      "q16a": true,
-      "q16b": false,
-      "q16c": true,
-      "q16d": false
-    },
-    "part3.q17": 3,
-    "part3.q18": 1,
-    "part3.q19": 0.25,
-    "part3.q20": 0.31,
-    "part3.q21": 607,
-    "part3.q22": 87
-  },
   "parts": [
     {
       "id": "part1",
@@ -97,7 +46,6 @@
               }
             ]
           ],
-          "correct_answer": 0,
           "points": 0.25
         },
         {
@@ -132,7 +80,6 @@
               }
             ]
           ],
-          "correct_answer": 2,
           "points": 0.25
         },
         {
@@ -161,7 +108,6 @@
               "0,780"
             ]
           ],
-          "correct_answer": 3,
           "points": 0.25
         },
         {
@@ -212,7 +158,6 @@
               }
             ]
           ],
-          "correct_answer": 0,
           "points": 0.25
         },
         {
@@ -267,7 +212,6 @@
               }
             ]
           ],
-          "correct_answer": 3,
           "points": 0.25
         },
         {
@@ -314,7 +258,6 @@
               }
             ]
           ],
-          "correct_answer": 2,
           "points": 0.25
         },
         {
@@ -353,7 +296,6 @@
               "2"
             ]
           ],
-          "correct_answer": 1,
           "points": 0.25
         },
         {
@@ -388,7 +330,6 @@
               }
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -431,7 +372,6 @@
               }
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -470,7 +410,6 @@
               }
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -505,7 +444,6 @@
               }
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -544,7 +482,6 @@
               }
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         }
       ]
@@ -608,8 +545,7 @@
                   "math": "\\left(-1 \\le x \\le \\frac{1}{3}\\right)"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q13b",
@@ -623,8 +559,7 @@
                   "math": "2,2\\,g"
                 },
                 " (làm tròn kết quả đến hàng phần chục)."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q13c",
@@ -642,8 +577,7 @@
                   "math": "\\left(\\frac{1}{3} \\le x \\le 3\\right)"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q13d",
@@ -653,8 +587,7 @@
                   "math": "5,5\\,cm^3"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             }
           ],
           "points": [
@@ -679,8 +612,7 @@
                   "math": "\\frac{7}{24}"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q14b",
@@ -690,8 +622,7 @@
                   "math": "\\frac{3}{8}"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q14c",
@@ -701,8 +632,7 @@
                   "math": "\\frac{2}{7}"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q14d",
@@ -712,8 +642,7 @@
                   "math": "\\frac{10}{17}"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             }
           ],
           "points": [
@@ -766,8 +695,7 @@
                   "math": "\\frac{6\\sqrt{5}}{5}"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q15b",
@@ -785,8 +713,7 @@
                   "math": "2x + y - z - 4 = 0"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q15c",
@@ -808,8 +735,7 @@
                   "math": "t"
                 },
                 " là một số thực bất kỳ)."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q15d",
@@ -827,8 +753,7 @@
                   "math": "\\frac{\\sqrt{10}}{5}"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             }
           ],
           "points": [
@@ -869,8 +794,7 @@
                   "math": "I(2;4)"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q16b",
@@ -892,8 +816,7 @@
                   "math": "\\frac{4}{5}"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q16c",
@@ -902,8 +825,7 @@
                   "math": "f'(x) = 3x^2 + 2bx + c,\\ \\forall x \\in \\mathbb{R}"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q16d",
@@ -917,8 +839,7 @@
                   "math": "AB = 5\\sqrt{2}"
                 },
                 "."
-              ],
-              "correct": null
+              ]
             }
           ],
           "points": [
@@ -989,7 +910,6 @@
             },
             "."
           ],
-          "correct_answer": null,
           "points": 0.5
         },
         {
@@ -1050,7 +970,6 @@
             },
             ")."
           ],
-          "correct_answer": null,
           "points": 0.5
         },
         {
@@ -1074,7 +993,6 @@
             ],
             "Theo yêu cầu vận hành của máy bơm trung tâm, tổng lượng nước tiêu thụ của toàn hệ thống phải đạt đúng 3300 lít/giờ và mỗi loại đều có ít nhất 1 vòi. Để đồng bộ với các module điều khiển tự động, các vòi phun được lắp đặt theo từng cụm kỹ thuật, mỗi cụm yêu cầu đúng 8 vòi (không phân biệt loại). Một phương án lắp đặt được coi là tối ưu về kỹ thuật nếu tổng số vòi của toàn hệ thống là một số chia hết cho 8 để khớp hoàn toàn với các cụm điều khiển. Người ta chọn ngẫu nhiên một phương án lắp đặt thỏa mãn tổng công suất tiêu thụ. Tính xác suất để phương án được chọn là phương án tối ưu về kỹ thuật (kết quả làm tròn đến hàng phần trăm)."
           ],
-          "correct_answer": null,
           "points": 0.5
         },
         {
@@ -1103,7 +1021,6 @@
             },
             " cạnh của một tam giác (kết quả làm tròn đến hàng phần trăm)."
           ],
-          "correct_answer": null,
           "points": 0.5
         },
         {
@@ -1148,7 +1065,6 @@
             },
             " thu về là bao nhiêu triệu đồng (kết quả làm tròn đến hàng đơn vị)?"
           ],
-          "correct_answer": null,
           "points": 0.5
         },
         {
@@ -1185,7 +1101,6 @@
             },
             ". Biết rằng khi đạt chiều cao lớn nhất cây lúa sẽ dừng phát triển chiều cao để tập trung dinh dưỡng nuôi bông. Tính chiều cao lớn nhất của cây lúa (đơn vị cm, kết quả làm tròn đến hàng đơn vị)."
           ],
-          "correct_answer": null,
           "points": 0.5
         }
       ]

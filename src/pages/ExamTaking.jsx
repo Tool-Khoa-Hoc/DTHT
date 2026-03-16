@@ -321,42 +321,36 @@ export default function ExamTaking() {
         clearInterval(autoSaveIntervalRef.current);
         await saveProgress();
 
-        const { correct, total } = calculateScore(examData, answersRef.current);
-        const score = Math.round((correct / Math.max(total, 1)) * 10 * 100) / 100;
-
         try {
-            // Ghi kết quả vào exam_results
-            const { data: result } = await supabase
-                .from('exam_results')
-                .insert({
-                    user_id: user.id,
-                    exam_id: examId,
-                    subject_folder: subjectFolder,
-                    exam_title: examData.title,
-                    score,
-                    max_score: 10,
-                    correct_count: correct,
-                    total_questions: total,
-                    answers_snapshot: answersRef.current,
-                })
-                .select('id')
-                .single();
+            // Nộp bài bảo mật qua RPC (Tính điểm và ghi kết quả trên Server)
+            const { data: resultData, error: rpcError } = await supabase.rpc('submit_exam_securely', {
+                p_exam_id: examId,
+                p_subject_folder: subjectFolder,
+                p_exam_title: examData.title,
+                p_answers: answersRef.current
+            });
 
-            // Đánh dấu progress là đã nộp
-            if (progressIdRef.current) {
-                await supabase
-                    .from('exam_progress')
-                    .update({ status: 'submitted' })
-                    .eq('id', progressIdRef.current);
-            }
+            if (rpcError) throw rpcError;
+
+            const { result_id, score, correct, total } = resultData;
 
             setSubmitted(true);
             navigate(`/exam/${subjectFolder}/${normalizedExamPath}/result`, {
-                state: { examData, answers: answersRef.current, score, correct, total, resultId: result?.id, examId, examPath: normalizedExamPath, subjectFolder },
+                state: { 
+                    examData, 
+                    answers: answersRef.current, 
+                    score, 
+                    correct, 
+                    total, 
+                    resultId: result_id, 
+                    examId, 
+                    examPath: normalizedExamPath, 
+                    subjectFolder 
+                },
             });
         } catch (err) {
             console.error('[ExamTaking] Submit error:', err);
-            alert('Có lỗi khi nộp bài. Vui lòng thử lại!');
+            alert(err.message || 'Có lỗi khi nộp bài. Vui lòng thử lại!');
         } finally {
             setIsSubmitting(false);
         }

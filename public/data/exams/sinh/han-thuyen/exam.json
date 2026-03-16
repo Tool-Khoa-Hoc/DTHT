@@ -4,63 +4,6 @@
   "subject": "Sinh học",
   "time": 50,
   "description": "Đề thi thử tốt nghiệp THPT lần 1 năm học 2025-2026 - Trường THPT Hàn Thuyên - Bắc Ninh",
-  "resources": {
-    "exam_file_url": null,
-    "answer_file_url": "https://drive.google.com/drive/folders/1BN654c95hjSma3cHRJ8Qzs_vB9kOjA0z",
-    "answer_file_name": "Đáp Án",
-    "video_url": null,
-    "edit_link": null
-  },
-  "answer_key": {
-    "part1.q1": 2,
-    "part1.q2": 2,
-    "part1.q3": 0,
-    "part1.q4": 2,
-    "part1.q5": 2,
-    "part1.q6": 2,
-    "part1.q7": 2,
-    "part1.q8": 0,
-    "part1.q9": 2,
-    "part1.q10": 2,
-    "part1.q11": 0,
-    "part1.q12": 1,
-    "part1.q13": 3,
-    "part1.q14": 0,
-    "part1.q15": 2,
-    "part1.q16": 3,
-    "part1.q17": 2,
-    "part1.q18": 3,
-    "part2.q1": {
-      "q1a": false,
-      "q1b": false,
-      "q1c": true,
-      "q1d": true
-    },
-    "part2.q2": {
-      "q2a": true,
-      "q2b": false,
-      "q2c": true,
-      "q2d": true
-    },
-    "part2.q3": {
-      "q3a": true,
-      "q3b": false,
-      "q3c": true,
-      "q3d": true
-    },
-    "part2.q4": {
-      "q4a": true,
-      "q4b": true,
-      "q4c": false,
-      "q4d": false
-    },
-    "part3.q1": 0.19,
-    "part3.q2": 2,
-    "part3.q3": 3,
-    "part3.q4": 0.45,
-    "part3.q5": 1,
-    "part3.q6": 3
-  },
   "parts": [
     {
       "id": "part1",
@@ -96,7 +39,6 @@
               "Số 3"
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -117,7 +59,6 @@
               "Rau cải"
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -138,7 +79,6 @@
               "Tỉ lệ giới tính"
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -166,7 +106,6 @@
               "Ribosome"
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -187,7 +126,6 @@
               "Trong đàn hươu cổ ngắn có thể xuất hiện một ít con cổ dài, con cổ dài lấy thức ăn tốt hơn nên sống sót và sinh sản."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -214,7 +152,6 @@
               "Lai hai tế bào xoma"
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -235,7 +172,6 @@
               "Đột biến"
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -263,7 +199,6 @@
               "Quần thể 3 ổn định nhất."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -298,7 +233,6 @@
               "(1) đúng, (2) đúng, (3) sai, (4) sai."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -319,7 +253,6 @@
               "Biểu bì thân và rễ."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -340,7 +273,6 @@
               "DNA của tinh tinh giống với DNA của người tới 97,6%."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -368,7 +300,6 @@
               "Glycerol."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -389,7 +320,6 @@
               "Kỉ Jurassic thuộc đại Trung sinh."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -410,7 +340,6 @@
               "Bậc 2."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -431,7 +360,6 @@
               "Bằng tự đa bội."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -452,7 +380,6 @@
               "Hội chứng Down, Klinefelter, Siêu nữ."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -473,7 +400,6 @@
               "Quan hệ giữa vi sinh vật và rận là quan hệ cạnh tranh."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         },
         {
@@ -516,7 +442,6 @@
               "."
             ]
           ],
-          "correct_answer": null,
           "points": 0.25
         }
       ]
@@ -548,23 +473,19 @@
           "statements": [
             {
               "id": "q1a",
-              "content": "Loài Cc có ưu thế cạnh tranh cao hơn loài Ba khi nguồn thức ăn trong môi trường suy giảm.",
-              "correct": null
+              "content": "Loài Cc có ưu thế cạnh tranh cao hơn loài Ba khi nguồn thức ăn trong môi trường suy giảm."
             },
             {
               "id": "q1b",
-              "content": "Tốc độ sinh trưởng của loài Ba giảm nhanh hơn so với loài Cc khi độ phong phú của sên biển trong môi trường tăng.",
-              "correct": null
+              "content": "Tốc độ sinh trưởng của loài Ba giảm nhanh hơn so với loài Cc khi độ phong phú của sên biển trong môi trường tăng."
             },
             {
               "id": "q1c",
-              "content": "Để bảo tồn các loài sên biển cần khống chế mật độ sên biển ở mức độ phù hợp.",
-              "correct": null
+              "content": "Để bảo tồn các loài sên biển cần khống chế mật độ sên biển ở mức độ phù hợp."
             },
             {
               "id": "q1d",
-              "content": "Khi các quần thể mới hình thành, quần thể Ba có khả năng sinh trưởng kém hơn quần thể Cc.",
-              "correct": null
+              "content": "Khi các quần thể mới hình thành, quần thể Ba có khả năng sinh trưởng kém hơn quần thể Cc."
             }
           ],
           "points": [
@@ -591,8 +512,7 @@
                   "math": "F_1"
                 },
                 " có 10 loại kiểu gene."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q2b",
@@ -614,8 +534,7 @@
                   "math": "F_2"
                 },
                 " có loại kiểu gene chứa hai allele lặn chiếm tối đa là 50%."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q2c",
@@ -633,8 +552,7 @@
                   "math": "F_1"
                 },
                 ", các cây chứa một tính trạng trội có tỉ lệ tối đa là 50%."
-              ],
-              "correct": null
+              ]
             },
             {
               "id": "q2d",
@@ -652,8 +570,7 @@
                   "math": "F_1"
                 },
                 ", các cây chứa hai tính trạng trội có kiểu gene dị hợp luôn chiếm tỉ lệ 50%."
-              ],
-              "correct": null
+              ]
             }
           ],
           "points": [
@@ -677,23 +594,19 @@
           "statements": [
             {
               "id": "q3a",
-              "content": "Đáp ứng miễn dịch lần 2 có sự tham gia của tế bào lympho B nhớ.",
-              "correct": null
+              "content": "Đáp ứng miễn dịch lần 2 có sự tham gia của tế bào lympho B nhớ."
             },
             {
               "id": "q3b",
-              "content": "Các đáp ứng miễn dịch trên thuộc miễn dịch không đặc hiệu.",
-              "correct": null
+              "content": "Các đáp ứng miễn dịch trên thuộc miễn dịch không đặc hiệu."
             },
             {
               "id": "q3c",
-              "content": "Tốc độ hình thành kháng thể trong đáp ứng miễn dịch lần 2 lớn hơn lần 1.",
-              "correct": null
+              "content": "Tốc độ hình thành kháng thể trong đáp ứng miễn dịch lần 2 lớn hơn lần 1."
             },
             {
               "id": "q3d",
-              "content": "Việc tiêm vaccine giúp cơ thể kháng bệnh nhanh hơn do bỏ qua giai đoạn đáp ứng miễn dịch lần 1.",
-              "correct": null
+              "content": "Việc tiêm vaccine giúp cơ thể kháng bệnh nhanh hơn do bỏ qua giai đoạn đáp ứng miễn dịch lần 1."
             }
           ],
           "points": [
@@ -723,23 +636,19 @@
           "statements": [
             {
               "id": "q4a",
-              "content": "Nếu bổ sung chất A vào môi trường nuôi cấy của 3 chủng, chất A sẽ liên kết với protein của gene điều hòa.",
-              "correct": null
+              "content": "Nếu bổ sung chất A vào môi trường nuôi cấy của 3 chủng, chất A sẽ liên kết với protein của gene điều hòa."
             },
             {
               "id": "q4b",
-              "content": "Nếu bổ sung chất A vào môi trường nuôi cấy của chủng 1, kết quả có thể thu được enzyme X, Y, Z.",
-              "correct": null
+              "content": "Nếu bổ sung chất A vào môi trường nuôi cấy của chủng 1, kết quả có thể thu được enzyme X, Y, Z."
             },
             {
               "id": "q4c",
-              "content": "Ở chủng 2, kết quả thu được enzyme X, Y, Z lần lượt là (+), (-), (-).",
-              "correct": null
+              "content": "Ở chủng 2, kết quả thu được enzyme X, Y, Z lần lượt là (+), (-), (-)."
             },
             {
               "id": "q4d",
-              "content": "Ở chủng 3, kết quả thu được enzyme X, Y, Z lần lượt là (+), (+), (+).",
-              "correct": null
+              "content": "Ở chủng 3, kết quả thu được enzyme X, Y, Z lần lượt là (+), (+), (+)."
             }
           ],
           "points": [
@@ -767,7 +676,6 @@
               "width": 100
             }
           ],
-          "correct_answer": null,
           "points": 0.5
         },
         {
@@ -785,7 +693,6 @@
               "width": 100
             }
           ],
-          "correct_answer": null,
           "points": 0.5
         },
         {
@@ -799,7 +706,6 @@
               "width": 100
             }
           ],
-          "correct_answer": null,
           "points": 0.5
         },
         {
@@ -824,7 +730,6 @@
             },
             " trong quần thể trên?"
           ],
-          "correct_answer": null,
           "points": 0.5
         },
         {
@@ -889,7 +794,6 @@
               "? (Viết liền các số theo thứ tự nếu có từ 2 sơ đồ trở lên)."
             ]
           ],
-          "correct_answer": null,
           "points": 0.5
         },
         {
@@ -903,7 +807,6 @@
               "width": 100
             }
           ],
-          "correct_answer": null,
           "points": 0.5
         }
       ]

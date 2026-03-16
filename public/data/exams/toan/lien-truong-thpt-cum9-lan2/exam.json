@@ -3,58 +3,7 @@
   "title": "Đề thi thử Toán 12 lần 2 năm 2025 – 2026 liên trường cụm 9 – Hà Nội",
   "subject": "Toán học",
   "time": 90,
-  "description": "Đề thi",
-  "resources": {
-    "exam_file_url": null,
-    "answer_file_url": "https://drive.google.com/file/d/1W407kS39JX7i631l6oaslixge84rX4MP/view?usp=drive_link",
-    "answer_file_name": null,
-    "video_url": null,
-    "edit_link": null
-  },
-  "answer_key": {
-    "part1.q1": 1,
-    "part1.q2": 1,
-    "part1.q3": 2,
-    "part1.q4": 3,
-    "part1.q5": 3,
-    "part1.q6": 3,
-    "part1.q7": 0,
-    "part1.q8": 0,
-    "part1.q9": 1,
-    "part1.q10": 1,
-    "part1.q11": 3,
-    "part1.q12": 0,
-    "part2.q13": {
-      "q13a": true,
-      "q13b": true,
-      "q13c": true,
-      "q13d": false
-    },
-    "part2.q14": {
-      "q14a": true,
-      "q14b": false,
-      "q14c": true,
-      "q14d": false
-    },
-    "part2.q15": {
-      "q15a": true,
-      "q15b": true,
-      "q15c": false,
-      "q15d": false
-    },
-    "part2.q16": {
-      "q16a": false,
-      "q16b": true,
-      "q16c": false,
-      "q16d": false
-    },
-    "part3.q17": 20,
-    "part3.q18": 1225,
-    "part3.q19": 16,
-    "part3.q20": 1.22,
-    "part3.q21": 294,
-    "part3.q22": -240
-  },
+  "description": "Chuyển từ PDF đáp án chi tiết; chỉ giữ phần đề, bỏ toàn bộ lời giải.",
   "parts": [
     {
       "id": "part1",
@@ -93,7 +42,6 @@
               }
             ]
           ],
-          "correct_answer": 1,
           "points": 0.25
         },
         {
@@ -120,7 +68,6 @@
               "0"
             ]
           ],
-          "correct_answer": 1,
           "points": 0.25
         },
         {
@@ -159,7 +106,6 @@
               "3"
             ]
           ],
-          "correct_answer": 2,
           "points": 0.25
         },
         {
@@ -198,7 +144,6 @@
               "10"
             ]
           ],
-          "correct_answer": 3,
           "points": 0.25
         },
         {
@@ -244,7 +189,6 @@
               }
             ]
           ],
-          "correct_answer": 3,
           "points": 0.25
         },
         {
@@ -283,7 +227,6 @@
               "2"
             ]
           ],
-          "correct_answer": 3,
           "points": 0.25
         },
         {
@@ -330,7 +273,6 @@
               }
             ]
           ],
-          "correct_answer": 0,
           "points": 0.25
         },
         {
@@ -365,7 +307,6 @@
               }
             ]
           ],
-          "correct_answer": 0,
           "points": 0.25
         },
         {
@@ -416,7 +357,6 @@
               }
             ]
           ],
-          "correct_answer": 1,
           "points": 0.25
         },
         {
@@ -446,7 +386,6 @@
               "10"
             ]
           ],
-          "correct_answer": 1,
           "points": 0.25
         },
         {
@@ -483,7 +422,6 @@
               "1"
             ]
           ],
-          "correct_answer": 3,
           "points": 0.25
         },
         {
@@ -522,7 +460,6 @@
               }
             ]
           ],
-          "correct_answer": 0,
           "points": 0.25
         }
       ]
@@ -566,8 +503,7 @@
                   "math": "B"
                 },
                 " là 2 biến cố độc lập với nhau."
-              ],
-              "correct": true
+              ]
             },
             {
               "id": "q13b",
@@ -577,8 +513,7 @@
                   "math": "\\dfrac{1}{140}"
                 },
                 "."
-              ],
-              "correct": true
+              ]
             },
             {
               "id": "q13c",
@@ -588,15 +523,13 @@
                   "math": "\\dfrac{25}{28}"
                 },
                 "."
-              ],
-              "correct": true
+              ]
             },
             {
               "id": "q13d",
               "content": [
                 "Tổng số viên bi màu đỏ ở hai hộp bằng 8."
-              ],
-              "correct": false
+              ]
             }
           ],
           "points": [
@@ -637,15 +570,13 @@
                   "math": "v(t)=-0{,}15t^2+1{,}2t+3"
                 },
                 "."
-              ],
-              "correct": true
+              ]
             },
             {
               "id": "q14b",
               "content": [
                 "Drone luôn bay lên trong 12 giây đầu."
-              ],
-              "correct": false
+              ]
             },
             {
               "id": "q14c",
@@ -655,8 +586,7 @@
                   "math": "0<t\\le 15"
                 },
                 ", drone và thang nâng ở cùng độ cao đúng 1 lần."
-              ],
-              "correct": true
+              ]
             },
             {
               "id": "q14d",
@@ -666,8 +596,7 @@
                   "math": "39m"
                 },
                 "."
-              ],
-              "correct": false
+              ]
             }
           ],
           "points": [
@@ -732,8 +661,7 @@
                   "math": "24m"
                 },
                 "."
-              ],
-              "correct": true
+              ]
             },
             {
               "id": "q15b",
@@ -747,8 +675,7 @@
                   "math": "A"
                 },
                 " dừng lại."
-              ],
-              "correct": true
+              ]
             },
             {
               "id": "q15c",
@@ -762,8 +689,7 @@
                   "math": "s=\\int_0^4(15-3t)dt"
                 },
                 "."
-              ],
-              "correct": false
+              ]
             },
             {
               "id": "q15d",
@@ -789,8 +715,7 @@
                   "math": "37{,}5m"
                 },
                 "."
-              ],
-              "correct": false
+              ]
             }
           ],
           "points": [
@@ -835,8 +760,7 @@
                   "math": "z+2=0"
                 },
                 "."
-              ],
-              "correct": false
+              ]
             },
             {
               "id": "q16b",
@@ -854,8 +778,7 @@
                   "math": "B'(-2;1;3)"
                 },
                 "."
-              ],
-              "correct": true
+              ]
             },
             {
               "id": "q16c",
@@ -877,8 +800,7 @@
                   "math": "AH"
                 },
                 " bằng 6."
-              ],
-              "correct": false
+              ]
             },
             {
               "id": "q16d",
@@ -900,8 +822,7 @@
                   "math": "AM-BN"
                 },
                 " bằng 7."
-              ],
-              "correct": false
+              ]
             }
           ],
           "points": [
@@ -924,7 +845,6 @@
           "content": [
             "Lớp 10C có 45 học sinh trong đó có 25 em thích môn Văn, 20 em thích môn Toán, 18 em thích môn Sử, 6 em không thích môn nào, 5 em thích cả ba môn. Có bao nhiêu học sinh thích chỉ một trong ba môn học trên?"
           ],
-          "correct_answer": 20,
           "points": 0.5
         },
         {
@@ -933,7 +853,6 @@
           "content": [
             "Một hộp chứa 100 cái thẻ được đánh số thứ tự liên tiếp từ 1 đến 100. Hai thẻ khác nhau thì đánh số thứ tự khác nhau. Chọn ngẫu nhiên 3 thẻ trong hộp. Có bao nhiêu cách chọn 3 thẻ có số thứ tự lập thành cấp số cộng, đồng thời có tổng không vượt quá 150?"
           ],
-          "correct_answer": 1225,
           "points": 0.5
         },
         {
@@ -948,7 +867,6 @@
               "width": 100
             }
           ],
-          "correct_answer": 16,
           "points": 0.5
         },
         {
@@ -989,7 +907,6 @@
             },
             " (kết quả làm tròn đến hàng phần trăm)."
           ],
-          "correct_answer": 1.22,
           "points": 0.5
         },
         {
@@ -1026,7 +943,6 @@
             },
             " bằng bao nhiêu nghìn đồng để nhà nước nhận được số tiền thuế phụ thu lớn nhất và doanh nghiệp cũng nhận được lợi nhuận lớn nhất theo mức thuế phụ thu đó?"
           ],
-          "correct_answer": 294,
           "points": 0.5
         },
         {
@@ -1078,7 +994,6 @@
             },
             " bằng bao nhiêu?"
           ],
-          "correct_answer": -240,
           "points": 0.5
         }
       ]

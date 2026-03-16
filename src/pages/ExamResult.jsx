@@ -307,17 +307,40 @@ function VipResourcePanel({
     );
 }
 
+const hasPopulatedAnswerKey = (answerKey) => (
+    Boolean(answerKey && typeof answerKey === 'object' && Object.keys(answerKey).length > 0)
+);
+
 export default function ExamResult() {
     const { user, profile } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const { subjectFolder: routeSubjectFolder, examPath: routeExamPath } = useParams();
-    const [examData, setExamData] = useState(location.state?.examData || null);
+    const initialAnswerKey = location.state?.answerKey || location.state?.examData?.answer_key || null;
+    const hasInitialReviewData = Boolean(
+        location.state?.examData &&
+        location.state?.answers &&
+        hasPopulatedAnswerKey(initialAnswerKey)
+    );
+    const [examData, setExamData] = useState(() => (
+        location.state?.examData
+            ? {
+                ...location.state.examData,
+                ...(hasPopulatedAnswerKey(initialAnswerKey) ? { answer_key: initialAnswerKey } : {})
+            }
+            : null
+    ));
     const [answers, setAnswers] = useState(location.state?.answers || {});
     const [examMeta, setExamMeta] = useState(null);
-    const [loading, setLoading] = useState(!location.state?.examData || !location.state?.answers);
+    const [resultMetrics, setResultMetrics] = useState(() => ({
+        score: location.state?.score ?? null,
+        correct: location.state?.correct ?? null,
+        total: location.state?.total ?? null
+    }));
+    const [loading, setLoading] = useState(!hasInitialReviewData);
     const [loadError, setLoadError] = useState('');
     const [showReview, setShowReview] = useState(false);
+    const [vipResources, setVipResources] = useState(null); // Loaded from DB for VIP only
 
     useEffect(() => {
         const subjectFolder = routeSubjectFolder || location.state?.subjectFolder;
@@ -344,7 +367,7 @@ export default function ExamResult() {
     }, [location.state?.examId, location.state?.examPath, location.state?.subjectFolder, routeExamPath, routeSubjectFolder]);
 
     useEffect(() => {
-        if (location.state?.examData && location.state?.answers) {
+        if (hasInitialReviewData) {
             setLoading(false);
             return;
         }
@@ -362,7 +385,7 @@ export default function ExamResult() {
                 setExamMeta(routeExamMeta);
                 let resultQuery = supabase
                     .from('exam_results')
-                    .select('id, exam_id, subject_folder, answers_snapshot')
+                    .select('id, exam_id, subject_folder, answers_snapshot, score, correct_count, total_questions')
                     .eq('user_id', user.id);
 
                 if (resultId) {
@@ -390,9 +413,23 @@ export default function ExamResult() {
                 const examRes = await fetch(`${examBasePath}/exam.json`);
                 if (!examRes.ok) throw new Error('Exam not found');
                 const rawExamData = await examRes.json();
+                const { data: reviewPayload, error: reviewError } = await supabase.rpc('get_exam_review_payload', {
+                    p_result_id: result.id
+                });
+                if (reviewError) throw reviewError;
 
-                setExamData(normalizeExamMediaPaths(rawExamData, examBasePath));
-                setAnswers(result.answers_snapshot || {});
+                const mergedAnswerKey = reviewPayload?.answer_key || rawExamData.answer_key || {};
+
+                setExamData(normalizeExamMediaPaths({
+                    ...rawExamData,
+                    answer_key: mergedAnswerKey
+                }, examBasePath));
+                setAnswers(reviewPayload?.answers_snapshot || result.answers_snapshot || {});
+                setResultMetrics({
+                    score: reviewPayload?.score ?? result.score ?? null,
+                    correct: reviewPayload?.correct_count ?? result.correct_count ?? null,
+                    total: reviewPayload?.total_questions ?? result.total_questions ?? null
+                });
             } catch (error) {
                 console.error('[ExamResult] Load review failed:', error);
                 setLoadError('Không thể tải dữ liệu xem lại bài thi.');
@@ -402,14 +439,26 @@ export default function ExamResult() {
         };
 
         loadReviewData();
-    }, [location.state, routeExamPath, routeSubjectFolder, user]);
+    }, [hasInitialReviewData, location.state, routeExamPath, routeSubjectFolder, user]);
+
+    // Load VIP resources from DB (only returned for VIP/Admin by server)
+    useEffect(() => {
+        const examId = location.state?.examId || examMeta?.id;
+        if (!examId || !user) return;
+
+        supabase.rpc('get_exam_resources', { p_exam_id: examId })
+            .then(({ data }) => {
+                if (data) setVipResources(data);
+            });
+    }, [location.state?.examId, examMeta?.id, user]);
 
     const resolvedSubjectFolder = examMeta?.subjectFolder || routeSubjectFolder || location.state?.subjectFolder;
     const resolvedExamPath = examMeta?.examPath || location.state?.examPath || routeExamPath;
     const examBasePath = resolvedSubjectFolder && resolvedExamPath
         ? getExamBasePath(resolvedSubjectFolder, resolvedExamPath)
         : null;
-    const resourceSources = [examData, examMeta];
+    // vipResources from DB takes priority; fallback to examData/examMeta (which won't have sensitive URLs after sync)
+    const resourceSources = [vipResources ? { resources: vipResources } : null, examData, examMeta].filter(Boolean);
     const answerFileUrl = resolveExamResourceUrl(
         pickFirstDefinedValue(resourceSources, EXAM_RESOURCE_FIELD_PATHS.answerFileUrl),
         examBasePath
@@ -508,6 +557,11 @@ export default function ExamResult() {
              }
         });
     });
+
+    const hasReviewAnswerKey = hasPopulatedAnswerKey(examData.answer_key);
+    const displayScore = hasReviewAnswerKey ? totalScore : Number(resultMetrics.score ?? 0);
+    const fallbackCorrectCount = Number(resultMetrics.correct ?? 0);
+    const fallbackTotalQuestions = Number(resultMetrics.total ?? 0);
 
     if (showReview) {
         return (
@@ -660,7 +714,9 @@ export default function ExamResult() {
                                                             <span className="material-symbols-outlined hidden sm:block text-slate-300">arrow_right_alt</span>
                                                             <div className="bg-blue-50 border border-blue-200 px-4 py-3 rounded-xl min-w-[120px]">
                                                                 <p className="text-xs font-bold text-blue-500 mb-1 uppercase tracking-wider">Đáp án đúng</p>
-                                                                <p className="font-mono text-lg font-black text-blue-700">{expectedAnswer}</p>
+                                                                <p className="font-mono text-lg font-black text-blue-700">
+                                                                    {expectedAnswer ?? <span className="text-slate-400 italic font-normal text-sm">Chưa có đáp án</span>}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                     )}
@@ -715,29 +771,40 @@ export default function ExamResult() {
                             <div className="bg-white rounded-[1.8rem] px-12 py-8">
                                 <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Điểm tổng kết</p>
                                 <div className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#fe5f36] to-pink-600">
-                                    {totalScore.toFixed(2).replace(/\.00$/, '')}<span className="text-3xl text-slate-300 ml-2">/10</span>
+                                    {displayScore.toFixed(2).replace(/\.00$/, '')}<span className="text-3xl text-slate-300 ml-2">/10</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex flex-wrap justify-center gap-4">
-                            {details.part1.total > 0 && (
-                                <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-40">
-                                    <p className="text-xs font-bold text-slate-400 uppercase mb-1">P.I: Trắc nghiệm</p>
-                                    <p className="text-xl font-black text-blue-600">{details.part1.correct}/{details.part1.total} <span className="text-sm text-slate-500 font-medium">câu đúng</span></p>
-                                </div>
-                            )}
-                            {details.part2.total > 0 && (
-                                <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-40">
-                                    <p className="text-xs font-bold text-slate-400 uppercase mb-1">P.II: Đúng/Sai</p>
-                                    <p className="text-xl font-black text-amber-600">{details.part2.correct}/{details.part2.total} <span className="text-sm text-slate-500 font-medium">câu đúng hết</span></p>
-                                </div>
-                            )}
-                            {details.part3.total > 0 && (
-                                <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-40">
-                                    <p className="text-xs font-bold text-slate-400 uppercase mb-1">P.III: Trả lời ngắn</p>
-                                    <p className="text-xl font-black text-emerald-600">{details.part3.correct}/{details.part3.total} <span className="text-sm text-slate-500 font-medium">câu đúng</span></p>
-                                </div>
+                            {hasReviewAnswerKey ? (
+                                <>
+                                    {details.part1.total > 0 && (
+                                        <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-40">
+                                            <p className="text-xs font-bold text-slate-400 uppercase mb-1">P.I: Trắc nghiệm</p>
+                                            <p className="text-xl font-black text-blue-600">{details.part1.correct}/{details.part1.total} <span className="text-sm text-slate-500 font-medium">câu đúng</span></p>
+                                        </div>
+                                    )}
+                                    {details.part2.total > 0 && (
+                                        <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-40">
+                                            <p className="text-xs font-bold text-slate-400 uppercase mb-1">P.II: Đúng/Sai</p>
+                                            <p className="text-xl font-black text-amber-600">{details.part2.correct}/{details.part2.total} <span className="text-sm text-slate-500 font-medium">câu đúng hết</span></p>
+                                        </div>
+                                    )}
+                                    {details.part3.total > 0 && (
+                                        <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-40">
+                                            <p className="text-xs font-bold text-slate-400 uppercase mb-1">P.III: Trả lời ngắn</p>
+                                            <p className="text-xl font-black text-emerald-600">{details.part3.correct}/{details.part3.total} <span className="text-sm text-slate-500 font-medium">câu đúng</span></p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                fallbackTotalQuestions > 0 && (
+                                    <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl min-w-[12rem]">
+                                        <p className="text-xs font-bold text-slate-400 uppercase mb-1">Kết quả lưu</p>
+                                        <p className="text-xl font-black text-blue-600">{fallbackCorrectCount}/{fallbackTotalQuestions} <span className="text-sm text-slate-500 font-medium">câu đúng</span></p>
+                                    </div>
+                                )
                             )}
                         </div>
                     </div>

@@ -4,57 +4,6 @@
   "subject": "Toán học",
   "time": 90,
   "description": "Chuyển từ PDF đề gốc. Các câu có hình dùng placeholder ảnh từ 1.png đến 12.png để người dùng tự bổ sung vào thư mục đề.",
-  "resources": {
-    "exam_file_url": null,
-    "answer_file_url": "https://drive.google.com/file/d/1UICVKNK4c24GCQulKmXA6KzX-p9McolD/view?usp=drive_link",
-    "answer_file_name": null,
-    "video_url": null,
-    "edit_link": null
-  },
-  "answer_key": {
-    "part1.q1": 3,
-    "part1.q2": 2,
-    "part1.q3": 3,
-    "part1.q4": 3,
-    "part1.q5": 1,
-    "part1.q6": 1,
-    "part1.q7": 0,
-    "part1.q8": 2,
-    "part1.q9": 1,
-    "part1.q10": 2,
-    "part1.q11": 3,
-    "part1.q12": 1,
-    "part2.q13": {
-      "q13a": false,
-      "q13b": false,
-      "q13c": true,
-      "q13d": false
-    },
-    "part2.q14": {
-      "q14a": true,
-      "q14b": false,
-      "q14c": false,
-      "q14d": false
-    },
-    "part2.q15": {
-      "q15a": false,
-      "q15b": false,
-      "q15c": false,
-      "q15d": true
-    },
-    "part2.q16": {
-      "q16a": true,
-      "q16b": false,
-      "q16c": false,
-      "q16d": true
-    },
-    "part3.q17": 10.4,
-    "part3.q18": 7,
-    "part3.q19": 44,
-    "part3.q20": 41.6,
-    "part3.q21": 1167,
-    "part3.q22": 9900
-  },
   "parts": [
     {
       "id": "part1",
@@ -66,9 +15,13 @@
           "type": "single_choice",
           "content": [
             "Cho hàm số ",
-            { "math": "y=f(x)" },
+            {
+              "math": "y=f(x)"
+            },
             " liên tục trên ",
-            { "math": "\\mathbb{R}" },
+            {
+              "math": "\\mathbb{R}"
+            },
             " và có bảng xét dấu đạo hàm như hình vẽ bên dưới. Hàm số đã cho có bao nhiêu điểm cực đại?",
             {
               "image": "1.png",
@@ -77,8 +30,20 @@
               "width": 100
             }
           ],
-          "options": [["3"], ["2"], ["0"], ["1"]],
-          "correct_answer": 3,
+          "options": [
+            [
+              "3"
+            ],
+            [
+              "2"
+            ],
+            [
+              "0"
+            ],
+            [
+              "1"
+            ]
+          ],
           "points": 0.25
         },
         {
@@ -86,16 +51,33 @@
           "type": "single_choice",
           "content": [
             "Tập nghiệm của bất phương trình ",
-            { "math": "\\log_2(1-2x)\\ge \\log_2 3" },
+            {
+              "math": "\\log_2(1-2x)\\ge \\log_2 3"
+            },
             " là"
           ],
           "options": [
-            [{ "math": "\\left(\\dfrac{1}{2};1\\right]" }],
-            [{ "math": "(-\\infty;-1)" }],
-            [{ "math": "(-\\infty;-1]" }],
-            [{ "math": "\\left[-1;\\dfrac{1}{2}\\right)" }]
+            [
+              {
+                "math": "\\left(\\dfrac{1}{2};1\\right]"
+              }
+            ],
+            [
+              {
+                "math": "(-\\infty;-1)"
+              }
+            ],
+            [
+              {
+                "math": "(-\\infty;-1]"
+              }
+            ],
+            [
+              {
+                "math": "\\left[-1;\\dfrac{1}{2}\\right)"
+              }
+            ]
           ],
-          "correct_answer": 2,
           "points": 0.25
         },
         {
@@ -110,8 +92,20 @@
               "width": 100
             }
           ],
-          "options": [["3,39"], ["11,62"], ["0,36"], ["0,1314"]],
-          "correct_answer": 3,
+          "options": [
+            [
+              "3,39"
+            ],
+            [
+              "11,62"
+            ],
+            [
+              "0,36"
+            ],
+            [
+              "0,1314"
+            ]
+          ],
           "points": 0.25
         },
         {
@@ -119,13 +113,21 @@
           "type": "single_choice",
           "content": [
             "Cho hàm số ",
-            { "math": "y=f(x)" },
+            {
+              "math": "y=f(x)"
+            },
             " liên tục trên ",
-            { "math": "[-1;+\\infty)" },
+            {
+              "math": "[-1;+\\infty)"
+            },
             " và có đồ thị như hình vẽ. Tìm giá trị lớn nhất của hàm số ",
-            { "math": "y=f(x)" },
+            {
+              "math": "y=f(x)"
+            },
             " trên ",
-            { "math": "[1;4]" },
+            {
+              "math": "[1;4]"
+            },
             ".",
             {
               "image": "3.png",
@@ -134,8 +136,20 @@
               "width": 80
             }
           ],
-          "options": [["0"], ["1"], ["4"], ["3"]],
-          "correct_answer": 3,
+          "options": [
+            [
+              "0"
+            ],
+            [
+              "1"
+            ],
+            [
+              "4"
+            ],
+            [
+              "3"
+            ]
+          ],
           "points": 0.25
         },
         {
@@ -143,20 +157,41 @@
           "type": "single_choice",
           "content": [
             "Thể tích ",
-            { "math": "V" },
+            {
+              "math": "V"
+            },
             " của khối lăng trụ có diện tích đáy ",
-            { "math": "S" },
+            {
+              "math": "S"
+            },
             ", chiều cao ",
-            { "math": "h" },
+            {
+              "math": "h"
+            },
             " là"
           ],
           "options": [
-            [{ "math": "V=\\dfrac{1}{3}Sh" }],
-            [{ "math": "V=Sh" }],
-            [{ "math": "V=S^2h" }],
-            [{ "math": "V=\\dfrac{1}{3}S^2h" }]
+            [
+              {
+                "math": "V=\\dfrac{1}{3}Sh"
+              }
+            ],
+            [
+              {
+                "math": "V=Sh"
+              }
+            ],
+            [
+              {
+                "math": "V=S^2h"
+              }
+            ],
+            [
+              {
+                "math": "V=\\dfrac{1}{3}S^2h"
+              }
+            ]
           ],
-          "correct_answer": 1,
           "points": 0.25
         },
         {
@@ -164,15 +199,41 @@
           "type": "single_choice",
           "content": [
             "Cho hình hộp ",
-            { "math": "ABCD.A'B'C'D'" },
+            {
+              "math": "ABCD.A'B'C'D'"
+            },
             ". Tìm giá trị của ",
-            { "math": "k" },
+            {
+              "math": "k"
+            },
             " thích hợp điền vào đẳng thức vectơ ",
-            { "math": "\\overrightarrow{BD}-\\overrightarrow{D'D'}-\\overrightarrow{B'D}=k\\overrightarrow{BB'}" },
+            {
+              "math": "\\overrightarrow{BD}-\\overrightarrow{D'D'}-\\overrightarrow{B'D}=k\\overrightarrow{BB'}"
+            },
             "."
           ],
-          "options": [[{ "math": "k=4" }], [{ "math": "k=1" }], [{ "math": "k=0" }], [{ "math": "k=2" }]],
-          "correct_answer": 1,
+          "options": [
+            [
+              {
+                "math": "k=4"
+              }
+            ],
+            [
+              {
+                "math": "k=1"
+              }
+            ],
+            [
+              {
+                "math": "k=0"
+              }
+            ],
+            [
+              {
+                "math": "k=2"
+              }
+            ]
+          ],
           "points": 0.25
         },
         {
@@ -180,15 +241,35 @@
           "type": "single_choice",
           "content": [
             "Cho ",
-            { "math": "\\int_0^2 e^{x^2-1}\\,dx=m\\left(e^p-e^q\\right)" },
+            {
+              "math": "\\int_0^2 e^{x^2-1}\\,dx=m\\left(e^p-e^q\\right)"
+            },
             " với ",
-            { "math": "m,p,q\\in\\mathbb{Q}" },
+            {
+              "math": "m,p,q\\in\\mathbb{Q}"
+            },
             " và là các phân số tối giản. Giá trị ",
-            { "math": "m+p+q" },
+            {
+              "math": "m+p+q"
+            },
             " bằng"
           ],
-          "options": [[{ "math": "\\dfrac{22}{3}" }], ["6"], ["8"], ["10"]],
-          "correct_answer": 0,
+          "options": [
+            [
+              {
+                "math": "\\dfrac{22}{3}"
+              }
+            ],
+            [
+              "6"
+            ],
+            [
+              "8"
+            ],
+            [
+              "10"
+            ]
+          ],
           "points": 0.25
         },
         {
@@ -196,18 +277,37 @@
           "type": "single_choice",
           "content": [
             "Cho hàm số ",
-            { "math": "y=f(x)=\\log_x(x^2+1)" },
+            {
+              "math": "y=f(x)=\\log_x(x^2+1)"
+            },
             ". Tính giá trị ",
-            { "math": "S=f'(0)+f'(1)" },
+            {
+              "math": "S=f'(0)+f'(1)"
+            },
             "."
           ],
           "options": [
-            [{ "math": "S=\\dfrac{5}{6}" }],
-            [{ "math": "S=\\dfrac{8}{7}" }],
-            [{ "math": "S=\\dfrac{6}{7}" }],
-            [{ "math": "S=\\dfrac{5}{7}" }]
+            [
+              {
+                "math": "S=\\dfrac{5}{6}"
+              }
+            ],
+            [
+              {
+                "math": "S=\\dfrac{8}{7}"
+              }
+            ],
+            [
+              {
+                "math": "S=\\dfrac{6}{7}"
+              }
+            ],
+            [
+              {
+                "math": "S=\\dfrac{5}{7}"
+              }
+            ]
           ],
-          "correct_answer": 2,
           "points": 0.25
         },
         {
@@ -215,23 +315,55 @@
           "type": "single_choice",
           "content": [
             "Trong không gian ",
-            { "math": "Oxyz" },
+            {
+              "math": "Oxyz"
+            },
             ", cho mặt phẳng ",
-            { "math": "(P):16x-12y-15z-4=0" },
+            {
+              "math": "(P):16x-12y-15z-4=0"
+            },
             " và điểm ",
-            { "math": "A(2;-1;-1)" },
+            {
+              "math": "A(2;-1;-1)"
+            },
             ". Gọi ",
-            { "math": "H" },
+            {
+              "math": "H"
+            },
             " là hình chiếu của điểm ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " trên mặt phẳng ",
-            { "math": "(P)" },
+            {
+              "math": "(P)"
+            },
             ". Tính độ dài đoạn thẳng ",
-            { "math": "AH" },
+            {
+              "math": "AH"
+            },
             "."
           ],
-          "options": [["5"], [{ "math": "\\dfrac{11}{5}" }], [{ "math": "\\dfrac{11}{25}" }], [{ "math": "\\dfrac{22}{5}" }]],
-          "correct_answer": 1,
+          "options": [
+            [
+              "5"
+            ],
+            [
+              {
+                "math": "\\dfrac{11}{5}"
+              }
+            ],
+            [
+              {
+                "math": "\\dfrac{11}{25}"
+              }
+            ],
+            [
+              {
+                "math": "\\dfrac{22}{5}"
+              }
+            ]
+          ],
           "points": 0.25
         },
         {
@@ -239,17 +371,37 @@
           "type": "single_choice",
           "content": [
             "Biết rằng đồ thị hàm số ",
-            { "math": "y=\\dfrac{ax+1}{bx-2}" },
+            {
+              "math": "y=\\dfrac{ax+1}{bx-2}"
+            },
             " có tiệm cận đứng là ",
-            { "math": "x=2" },
+            {
+              "math": "x=2"
+            },
             " và tiệm cận ngang là ",
-            { "math": "y=3" },
+            {
+              "math": "y=3"
+            },
             ". Hiệu ",
-            { "math": "a-b^2" },
+            {
+              "math": "a-b^2"
+            },
             " có giá trị là"
           ],
-          "options": [["4"], ["0"], ["1"], ["5"]],
-          "correct_answer": 2,
+          "options": [
+            [
+              "4"
+            ],
+            [
+              "0"
+            ],
+            [
+              "1"
+            ],
+            [
+              "5"
+            ]
+          ],
           "points": 0.25
         },
         {
@@ -257,27 +409,65 @@
           "type": "single_choice",
           "content": [
             "Trong không gian ",
-            { "math": "Oxyz" },
+            {
+              "math": "Oxyz"
+            },
             ", cho mặt phẳng ",
-            { "math": "(P):3x+4y+5z+8=0" },
+            {
+              "math": "(P):3x+4y+5z+8=0"
+            },
             ". Đường thẳng ",
-            { "math": "d" },
+            {
+              "math": "d"
+            },
             " là giao tuyến của hai mặt phẳng ",
-            { "math": "(\\alpha):x-2y+1=0" },
+            {
+              "math": "(\\alpha):x-2y+1=0"
+            },
             " và ",
-            { "math": "(\\beta):x-2z-3=0" },
+            {
+              "math": "(\\beta):x-2z-3=0"
+            },
             ". Góc ",
-            { "math": "\\varphi" },
+            {
+              "math": "\\varphi"
+            },
             " là góc giữa ",
-            { "math": "d" },
+            {
+              "math": "d"
+            },
             " và ",
-            { "math": "(P)" },
+            {
+              "math": "(P)"
+            },
             ", tính ",
-            { "math": "\\varphi" },
+            {
+              "math": "\\varphi"
+            },
             "."
           ],
-          "options": [[{ "math": "45^\\circ" }], [{ "math": "30^\\circ" }], [{ "math": "90^\\circ" }], [{ "math": "60^\\circ" }]],
-          "correct_answer": 3,
+          "options": [
+            [
+              {
+                "math": "45^\\circ"
+              }
+            ],
+            [
+              {
+                "math": "30^\\circ"
+              }
+            ],
+            [
+              {
+                "math": "90^\\circ"
+              }
+            ],
+            [
+              {
+                "math": "60^\\circ"
+              }
+            ]
+          ],
           "points": 0.25
         },
         {
@@ -285,7 +475,9 @@
           "type": "single_choice",
           "content": [
             "Mặt cắt của một tổ ong có hình lưới được tạo bởi các ô hình lục giác đều. Từ một ô lục giác đầu tiên, các ong thợ tạo ra vòng 1 gồm 6 ô lục giác bao quanh; tiếp theo các ong thợ sẽ tạo ra vòng 2 có 12 ô lục giác bao quanh vòng 1; vòng 3 gồm 18 ô lục giác bao quanh vòng 2; cứ tiếp tục theo quy luật đó tổ ong được hình thành. Số ô trên các vòng theo thứ tự tạo thành cấp số cộng có công sai ",
-            { "math": "d" },
+            {
+              "math": "d"
+            },
             " bằng",
             {
               "image": "4.png",
@@ -294,8 +486,20 @@
               "width": 60
             }
           ],
-          "options": [["5"], ["6"], ["2"], ["4"]],
-          "correct_answer": 1,
+          "options": [
+            [
+              "5"
+            ],
+            [
+              "6"
+            ],
+            [
+              "2"
+            ],
+            [
+              "4"
+            ]
+          ],
           "points": 0.25
         }
       ]
@@ -310,59 +514,112 @@
           "type": "true_false",
           "content": [
             "Cho hai hàm số ",
-            { "math": "f(x)=2\\sin x-1" },
+            {
+              "math": "f(x)=2\\sin x-1"
+            },
             ", ",
-            { "math": "g(x)=2\\cos\\left(x-\\dfrac{\\pi}{4}\\right)" },
+            {
+              "math": "g(x)=2\\cos\\left(x-\\dfrac{\\pi}{4}\\right)"
+            },
             ". Xét tính đúng sai các mệnh đề sau:"
           ],
           "statements": [
             {
               "id": "q13a",
-              "content": ["Phương trình ", { "math": "f(x)=0\\Leftrightarrow x=\\dfrac{\\pi}{6}+k2\\pi,\\ k\\in\\mathbb{R}" }, "."],
-              "correct": false
+              "content": [
+                "Phương trình ",
+                {
+                  "math": "f(x)=0\\Leftrightarrow x=\\dfrac{\\pi}{6}+k2\\pi,\\ k\\in\\mathbb{R}"
+                },
+                "."
+              ]
             },
             {
               "id": "q13b",
-              "content": ["Phương trình ", { "math": "g(x)=0" }, " có hai nghiệm thuộc ", { "math": "[0;\\pi]" }, "."],
-              "correct": false
+              "content": [
+                "Phương trình ",
+                {
+                  "math": "g(x)=0"
+                },
+                " có hai nghiệm thuộc ",
+                {
+                  "math": "[0;\\pi]"
+                },
+                "."
+              ]
             },
             {
               "id": "q13c",
-              "content": ["Phương trình ", { "math": "f(x)g(x)=0\\Leftrightarrow x\\in\\left\\{\\dfrac{\\pi}{6}+k2\\pi,\\ \\dfrac{5\\pi}{6}+k2\\pi,\\ \\dfrac{3\\pi}{4}+k\\pi\\right\\},\\ k\\in\\mathbb{R}" }, "."],
-              "correct": true
+              "content": [
+                "Phương trình ",
+                {
+                  "math": "f(x)g(x)=0\\Leftrightarrow x\\in\\left\\{\\dfrac{\\pi}{6}+k2\\pi,\\ \\dfrac{5\\pi}{6}+k2\\pi,\\ \\dfrac{3\\pi}{4}+k\\pi\\right\\},\\ k\\in\\mathbb{R}"
+                },
+                "."
+              ]
             },
             {
               "id": "q13d",
-              "content": ["Phương trình ", { "math": "f(x)=g(x)\\Leftrightarrow x=\\dfrac{\\pi}{2}+k\\pi,\\ k\\in\\mathbb{R}" }, "."],
-              "correct": false
+              "content": [
+                "Phương trình ",
+                {
+                  "math": "f(x)=g(x)\\Leftrightarrow x=\\dfrac{\\pi}{2}+k\\pi,\\ k\\in\\mathbb{R}"
+                },
+                "."
+              ]
             }
           ],
-          "points": [0.1, 0.25, 0.5, 1]
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
         },
         {
           "id": "q14",
           "type": "true_false",
           "content": [
             "Trong không gian ",
-            { "math": "Oxyz" },
+            {
+              "math": "Oxyz"
+            },
             ", đơn vị trên mỗi trục là km, một con tàu vũ trụ bay theo đường thẳng ",
-            { "math": "d_1" },
+            {
+              "math": "d_1"
+            },
             " đi qua điểm ",
-            { "math": "A(-1;3;4)" },
+            {
+              "math": "A(-1;3;4)"
+            },
             " với vectơ vận tốc ",
-            { "math": "\\vec{v_1}=(2;-1;3)" },
+            {
+              "math": "\\vec{v_1}=(2;-1;3)"
+            },
             " km/s. Một tiểu hành tinh bay theo đường thẳng ",
-            { "math": "d_2" },
+            {
+              "math": "d_2"
+            },
             " đi qua điểm ",
-            { "math": "B(3;-4;5)" },
+            {
+              "math": "B(3;-4;5)"
+            },
             " với vectơ vận tốc ",
-            { "math": "\\vec{v_2}=(1;2;-1)" },
+            {
+              "math": "\\vec{v_2}=(1;2;-1)"
+            },
             " km/s. Chọn mốc thời gian ",
-            { "math": "t=0" },
+            {
+              "math": "t=0"
+            },
             " khi tàu vũ trụ ở vị trí ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " và tiểu hành tinh ở vị trí ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             ". Xét tính đúng sai các mệnh đề sau:",
             {
               "image": "5.png",
@@ -374,26 +631,51 @@
           "statements": [
             {
               "id": "q14a",
-              "content": ["Hai quỹ đạo chuyển động ", { "math": "d_1" }, " và ", { "math": "d_2" }, " là hai đường thẳng chéo nhau."],
-              "correct": true
+              "content": [
+                "Hai quỹ đạo chuyển động ",
+                {
+                  "math": "d_1"
+                },
+                " và ",
+                {
+                  "math": "d_2"
+                },
+                " là hai đường thẳng chéo nhau."
+              ]
             },
             {
               "id": "q14b",
-              "content": ["Góc giữa hai quỹ đạo chuyển động của tàu vũ trụ và tiểu hành tinh bằng ", { "math": "60^\\circ" }, "."],
-              "correct": false
+              "content": [
+                "Góc giữa hai quỹ đạo chuyển động của tàu vũ trụ và tiểu hành tinh bằng ",
+                {
+                  "math": "60^\\circ"
+                },
+                "."
+              ]
             },
             {
               "id": "q14c",
-              "content": ["Đúng 10 giây sau thì khoảng cách giữa chúng bằng 48,31 km (làm tròn đến hàng phần trăm)."],
-              "correct": false
+              "content": [
+                "Đúng 10 giây sau thì khoảng cách giữa chúng bằng 48,31 km (làm tròn đến hàng phần trăm)."
+              ]
             },
             {
               "id": "q14d",
-              "content": ["Khoảng cách ngắn nhất giữa tàu vũ trụ và tiểu hành tinh trong quá trình chuyển động là ", { "math": "\\dfrac{42}{4}" }, " km."],
-              "correct": false
+              "content": [
+                "Khoảng cách ngắn nhất giữa tàu vũ trụ và tiểu hành tinh trong quá trình chuyển động là ",
+                {
+                  "math": "\\dfrac{42}{4}"
+                },
+                " km."
+              ]
             }
           ],
-          "points": [0.1, 0.25, 0.5, 1]
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
         },
         {
           "id": "q15",
@@ -410,41 +692,64 @@
           "statements": [
             {
               "id": "q15a",
-              "content": ["Biết hộ được chọn không có người trưởng thành đi làm, xác suất hộ đó có thu nhập lớn hơn 200000 DKK/năm là 15%."],
-              "correct": false
+              "content": [
+                "Biết hộ được chọn không có người trưởng thành đi làm, xác suất hộ đó có thu nhập lớn hơn 200000 DKK/năm là 15%."
+              ]
             },
             {
               "id": "q15b",
-              "content": ["Tỉ lệ hộ vừa có người trưởng thành đi làm vừa có thu nhập hộ lớn hơn 200000 DKK/năm là 30%."],
-              "correct": false
+              "content": [
+                "Tỉ lệ hộ vừa có người trưởng thành đi làm vừa có thu nhập hộ lớn hơn 200000 DKK/năm là 30%."
+              ]
             },
             {
               "id": "q15c",
-              "content": ["Tỉ lệ hộ có thu nhập lớn hơn 200000 DKK/năm là 29%."],
-              "correct": false
+              "content": [
+                "Tỉ lệ hộ có thu nhập lớn hơn 200000 DKK/năm là 29%."
+              ]
             },
             {
               "id": "q15d",
-              "content": ["Biết hộ có thu nhập lớn hơn 200000 DKK/năm, xác suất hộ đó có người trưởng thành đi làm bằng ", { "math": "\\dfrac{28}{31}" }, "."],
-              "correct": true
+              "content": [
+                "Biết hộ có thu nhập lớn hơn 200000 DKK/năm, xác suất hộ đó có người trưởng thành đi làm bằng ",
+                {
+                  "math": "\\dfrac{28}{31}"
+                },
+                "."
+              ]
             }
           ],
-          "points": [0.1, 0.25, 0.5, 1]
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
         },
         {
           "id": "q16",
           "type": "true_false",
           "content": [
             "Tháp giải nhiệt tại nhà máy Nhiệt điện Phả Lại (Tỉnh Hải Dương, Việt Nam) có mặt cắt qua trục theo phương thẳng đứng là một hình hypebol ",
-            { "math": "(H)" },
+            {
+              "math": "(H)"
+            },
             ". Tháp có chiều cao là 120 mét, bán kính đáy dưới bằng 40 mét. Một nhóm kỹ sư đã thiết lập hệ trục tọa độ ",
-            { "math": "Oxy" },
+            {
+              "math": "Oxy"
+            },
             " như hình vẽ sao cho mặt cắt dạng hypebol của tháp nhận ",
-            { "math": "Ox,Oy" },
+            {
+              "math": "Ox,Oy"
+            },
             " làm các trục đối xứng; lấy đơn vị trên mỗi trục là mét. Biết rằng đoạn giao nhau giữa trục ",
-            { "math": "Ox" },
+            {
+              "math": "Ox"
+            },
             " với tháp bằng 30 mét và gốc ",
-            { "math": "O" },
+            {
+              "math": "O"
+            },
             " ở vị trí có độ cao 80 mét so với mặt đất. Xét tính đúng sai các mệnh đề sau:",
             {
               "image": "7.png",
@@ -456,26 +761,59 @@
           "statements": [
             {
               "id": "q16a",
-              "content": ["Diện tích đáy dưới của tháp bằng 5027 ", { "math": "m^2" }, " (làm tròn đến hàng đơn vị)."],
-              "correct": true
+              "content": [
+                "Diện tích đáy dưới của tháp bằng 5027 ",
+                {
+                  "math": "m^2"
+                },
+                " (làm tròn đến hàng đơn vị)."
+              ]
             },
             {
               "id": "q16b",
-              "content": ["Các điểm ", { "math": "(-20;0),(20;0)" }, " thuộc hypebol ", { "math": "(H)" }, "."],
-              "correct": false
+              "content": [
+                "Các điểm ",
+                {
+                  "math": "(-20;0),(20;0)"
+                },
+                " thuộc hypebol ",
+                {
+                  "math": "(H)"
+                },
+                "."
+              ]
             },
             {
               "id": "q16c",
-              "content": ["Phương trình ", { "math": "(H)" }, " là ", { "math": "\\dfrac{x^2}{15^2}-\\dfrac{y^2}{11520}=1" }, "."],
-              "correct": false
+              "content": [
+                "Phương trình ",
+                {
+                  "math": "(H)"
+                },
+                " là ",
+                {
+                  "math": "\\dfrac{x^2}{15^2}-\\dfrac{y^2}{11520}=1"
+                },
+                "."
+              ]
             },
             {
               "id": "q16d",
-              "content": ["Thể tích của tháp giải nhiệt này bằng 214414 ", { "math": "m^3" }, " (làm tròn đến hàng đơn vị)."],
-              "correct": true
+              "content": [
+                "Thể tích của tháp giải nhiệt này bằng 214414 ",
+                {
+                  "math": "m^3"
+                },
+                " (làm tròn đến hàng đơn vị)."
+              ]
             }
           ],
-          "points": [0.1, 0.25, 0.5, 1]
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
         }
       ]
     },
@@ -489,27 +827,49 @@
           "type": "short_answer",
           "content": [
             "Cho hình chóp ",
-            { "math": "S.ABCD" },
+            {
+              "math": "S.ABCD"
+            },
             " có thể tích bằng ",
-            { "math": "3a^3" },
+            {
+              "math": "3a^3"
+            },
             " và mặt đáy ",
-            { "math": "ABCD" },
+            {
+              "math": "ABCD"
+            },
             " là hình bình hành. Biết diện tích tam giác ",
-            { "math": "SAB" },
+            {
+              "math": "SAB"
+            },
             " bằng ",
-            { "math": "\\dfrac{a^2\\sqrt{3}}{4}" },
+            {
+              "math": "\\dfrac{a^2\\sqrt{3}}{4}"
+            },
             ", khoảng cách giữa ",
-            { "math": "SB" },
+            {
+              "math": "SB"
+            },
             " và ",
-            { "math": "CD" },
+            {
+              "math": "CD"
+            },
             " bằng ",
-            { "math": "m" },
+            {
+              "math": "m"
+            },
             " nhân ",
-            { "math": "a" },
+            {
+              "math": "a"
+            },
             " với ",
-            { "math": "m\\in\\mathbb{R}" },
+            {
+              "math": "m\\in\\mathbb{R}"
+            },
             ". Tính giá trị ",
-            { "math": "m" },
+            {
+              "math": "m"
+            },
             " và làm tròn đến hàng phần chục.",
             {
               "image": "8.png",
@@ -518,7 +878,6 @@
               "width": 70
             }
           ],
-          "correct_answer": 10.4,
           "points": 0.5
         },
         {
@@ -526,20 +885,31 @@
           "type": "short_answer",
           "content": [
             "Một nhà mạng cần phủ sóng 5G dọc theo một tuyến đường thẳng dài 100 km nối hai thành phố ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " và ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " (tại ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " và ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " đã có trạm phát chính). Họ cần xây thêm các trạm thu phát sóng phụ ở giữa với khoảng cách đều nhau. Chi phí xây dựng mỗi trạm phụ là 320 triệu đồng. Chi phí kéo cáp quang nối giữa hai trạm liền kề với khoảng cách ",
-            { "math": "x" },
+            {
+              "math": "x"
+            },
             " km là ",
-            { "math": "x(5+2x)" },
+            {
+              "math": "x(5+2x)"
+            },
             " triệu đồng. Hỏi nhà mạng cần xây thêm bao nhiêu trạm phụ để tổng chi phí thi công là thấp nhất?"
           ],
-          "correct_answer": 7,
           "points": 0.5
         },
         {
@@ -547,17 +917,29 @@
           "type": "short_answer",
           "content": [
             "Từ một tấm nhôm hình vuông có cạnh bằng 8 dm, người ta cắt bỏ bốn tứ giác bằng nhau (cùng bằng tứ giác ",
-            { "math": "AMNP" },
+            {
+              "math": "AMNP"
+            },
             ") ở bốn góc tấm nhôm đó, biết ",
-            { "math": "AM=AP=1" },
+            {
+              "math": "AM=AP=1"
+            },
             " dm và điểm ",
-            { "math": "N" },
+            {
+              "math": "N"
+            },
             " thuộc đường chéo ",
-            { "math": "AC" },
+            {
+              "math": "AC"
+            },
             ". Với phần còn lại của tấm nhôm sau khi đã bỏ đi 4 tứ giác nói trên, người ta đã gập các đoạn ",
-            { "math": "MN" },
+            {
+              "math": "MN"
+            },
             " trùng với ",
-            { "math": "PN" },
+            {
+              "math": "PN"
+            },
             " rồi dán kỹ bằng keo, làm tương tự cho 3 cặp đoạn còn lại, người ta thu được chậu nước hình chóp cụt tứ giác đều. Sức chứa lớn nhất của chậu nước hình chóp cụt tứ giác đều này là bao nhiêu lít (làm tròn đến hàng đơn vị, bỏ qua độ dày tấm nhôm)?",
             {
               "image": "9.png",
@@ -566,7 +948,6 @@
               "width": 90
             }
           ],
-          "correct_answer": 44,
           "points": 0.5
         },
         {
@@ -574,23 +955,41 @@
           "type": "short_answer",
           "content": [
             "Một quả bóng được phát lên từ vị trí gốc tọa độ ",
-            { "math": "O" },
+            {
+              "math": "O"
+            },
             " trong hệ trục ",
-            { "math": "Oxyz" },
+            {
+              "math": "Oxyz"
+            },
             " như hình vẽ (đơn vị mét). Quả bóng bay theo quỹ đạo parabol nằm trong mặt phẳng vuông góc với mặt sân bóng ",
-            { "math": "(Oxy)" },
+            {
+              "math": "(Oxy)"
+            },
             " và rơi xuống vị trí cách ",
-            { "math": "Ox" },
+            {
+              "math": "Ox"
+            },
             " 5 m, cách ",
-            { "math": "Oy" },
+            {
+              "math": "Oy"
+            },
             " 12 m. Trong các lần nảy tiếp theo, đường đi của quả bóng luôn là parabol với độ cao cực đại bằng 75% độ cao cực đại của lần nảy ngay trước đó; bề rộng (khoảng cách hai lần chạm đất liên tiếp) bằng 60% bề rộng của lần nảy ngay trước đó. Biết độ cao cực đại của lần nảy đầu tiên là 4 m. Sau lần nảy thứ ",
-            { "math": "n" },
+            {
+              "math": "n"
+            },
             " thì tổng độ dài hình chiếu vuông góc đường đi quả bóng lên mặt sân bằng 31,590208 m. Trong lần nảy thứ ",
-            { "math": "n" },
+            {
+              "math": "n"
+            },
             " đó, bóng đạt chiều cao cực đại tại ",
-            { "math": "M(a;b;c)" },
+            {
+              "math": "M(a;b;c)"
+            },
             ". Tính ",
-            { "math": "a+b+c" },
+            {
+              "math": "a+b+c"
+            },
             " và làm tròn kết quả đến hàng phần chục.",
             {
               "image": "10.png",
@@ -599,7 +998,6 @@
               "width": 90
             }
           ],
-          "correct_answer": 41.6,
           "points": 0.5
         },
         {
@@ -607,55 +1005,105 @@
           "type": "short_answer",
           "content": [
             "Một đường hầm hiện đại được thiết kế với mặt đáy là hình thang ",
-            { "math": "ACDF" },
+            {
+              "math": "ACDF"
+            },
             " vuông tại ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " và ",
-            { "math": "C" },
+            {
+              "math": "C"
+            },
             " với ",
-            { "math": "AF\\parallel CD" },
+            {
+              "math": "AF\\parallel CD"
+            },
             ". Xét một thiết diện bất kì của đường hầm vuông góc với ",
-            { "math": "AC" },
+            {
+              "math": "AC"
+            },
             " là một hình phẳng giới hạn bởi đường cong ",
-            { "math": "(P)" },
+            {
+              "math": "(P)"
+            },
             ", đoạn ",
-            { "math": "BE" },
+            {
+              "math": "BE"
+            },
             " và đoạn ",
-            { "math": "BG" },
+            {
+              "math": "BG"
+            },
             " như hình vẽ, trong đó ",
-            { "math": "G\\in(P)" },
+            {
+              "math": "G\\in(P)"
+            },
             ". Giả sử ",
-            { "math": "(P)" },
+            {
+              "math": "(P)"
+            },
             " là một nhánh của parabol có đỉnh ",
-            { "math": "S" },
+            {
+              "math": "S"
+            },
             " và hình chiếu của ",
-            { "math": "S" },
+            {
+              "math": "S"
+            },
             " trên mặt nền là ",
-            { "math": "H" },
+            {
+              "math": "H"
+            },
             "; ",
-            { "math": "E" },
+            {
+              "math": "E"
+            },
             " là chân của parabol với ",
-            { "math": "E\\in(P)" },
+            {
+              "math": "E\\in(P)"
+            },
             " và thuộc mặt đáy thì ",
-            { "math": "SH=2EH" },
+            {
+              "math": "SH=2EH"
+            },
             ". Một mặt bên đường hầm có dạng mặt phẳng vuông góc với mặt đáy chứa đường thẳng ",
-            { "math": "AC" },
+            {
+              "math": "AC"
+            },
             ", gọi ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " là hình chiếu vuông góc của ",
-            { "math": "G" },
+            {
+              "math": "G"
+            },
             " xuống mặt phẳng đáy thì ",
-            { "math": "BE=BG" },
+            {
+              "math": "BE=BG"
+            },
             " và ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " thuộc đoạn ",
-            { "math": "AC" },
+            {
+              "math": "AC"
+            },
             ". Biết ",
-            { "math": "AC=20" },
+            {
+              "math": "AC=20"
+            },
             " mét, ",
-            { "math": "AF=2CD=10" },
+            {
+              "math": "AF=2CD=10"
+            },
             " m, tìm thể tích đường hầm trên và làm tròn đến hàng đơn vị của ",
-            { "math": "m^3" },
+            {
+              "math": "m^3"
+            },
             ".",
             {
               "image": "11.png",
@@ -664,7 +1112,6 @@
               "width": 90
             }
           ],
-          "correct_answer": 1167,
           "points": 0.5
         },
         {
@@ -672,9 +1119,13 @@
           "type": "short_answer",
           "content": [
             "Có 15 quả bóng được đánh số từ 1 tới 15 được bỏ vào 3 chiếc hộp mất nhãn (giống nhau), mỗi hộp có 6 ngăn được đánh số từ 1 tới 6 như hình vẽ, mỗi ngăn chứa tối đa 1 quả bóng. Biết rằng sau khi các quả bóng này được bỏ ngẫu nhiên vào các ngăn của mỗi hộp thì còn 3 ngăn trống (ngăn nào cũng có thể trống); gọi ",
-            { "math": "N" },
+            {
+              "math": "N"
+            },
             " là số cách thực hiện sao cho có đúng một hộp mà các quả bóng được bỏ vào có số tăng dần theo thứ tự trên xuống, đồng thời hộp đó chứa đủ 6 quả bóng, tính giá trị ",
-            { "math": "\\dfrac{N}{20175064}" },
+            {
+              "math": "\\dfrac{N}{20175064}"
+            },
             ".",
             {
               "image": "12.png",
@@ -683,7 +1134,6 @@
               "width": 90
             }
           ],
-          "correct_answer": 9900,
           "points": 0.5
         }
       ]
