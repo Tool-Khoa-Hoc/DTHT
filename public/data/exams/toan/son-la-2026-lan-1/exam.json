@@ -6,7 +6,7 @@
   "description": "Chuyển từ PDF đề gốc, giữ phần đề; đáp án được nhập theo bảng người dùng cung cấp.",
   "resources": {
     "exam_file_url": null,
-    "answer_file_url": null,
+    "answer_file_url": "https://drive.google.com/file/d/1t8cgCxDBGGmX6yrC51DCYhMKAHA3mjcK/view?usp=drive_link",
     "answer_file_name": null,
     "video_url": null,
     "edit_link": null
@@ -74,7 +74,20 @@
             },
             "Khoảng tứ phân vị của mẫu số liệu ghép nhóm trên là"
           ],
-          "options": [["0,975"], ["0,5"], ["0,9"], ["0,575"]],
+          "options": [
+            [
+              "0,975"
+            ],
+            [
+              "0,5"
+            ],
+            [
+              "0,9"
+            ],
+            [
+              "0,575"
+            ]
+          ],
           "correct_answer": 3,
           "points": 0.25
         },
@@ -83,18 +96,40 @@
           "type": "single_choice",
           "content": [
             "Trong không gian ",
-            { "math": "Oxyz" },
+            {
+              "math": "Oxyz"
+            },
             ", cho vectơ ",
-            { "math": "\\vec{u}=2\\vec{i}-5\\vec{k}" },
+            {
+              "math": "\\vec{u}=2\\vec{i}-5\\vec{k}"
+            },
             ". Tọa độ của vectơ ",
-            { "math": "\\vec{u}" },
+            {
+              "math": "\\vec{u}"
+            },
             " là"
           ],
           "options": [
-            [{ "math": "(2;-5;0)" }],
-            [{ "math": "(0;2;-5)" }],
-            [{ "math": "(2;0;5)" }],
-            [{ "math": "(2;0;-5)" }]
+            [
+              {
+                "math": "(2;-5;0)"
+              }
+            ],
+            [
+              {
+                "math": "(0;2;-5)"
+              }
+            ],
+            [
+              {
+                "math": "(2;0;5)"
+              }
+            ],
+            [
+              {
+                "math": "(2;0;-5)"
+              }
+            ]
           ],
           "correct_answer": 3,
           "points": 0.25
@@ -104,16 +139,37 @@
           "type": "single_choice",
           "content": [
             "Cho cấp số nhân ",
-            { "math": "(u_n)" },
+            {
+              "math": "(u_n)"
+            },
             " có ",
-            { "math": "u_1=2" },
+            {
+              "math": "u_1=2"
+            },
             " và ",
-            { "math": "u_2=6" },
+            {
+              "math": "u_2=6"
+            },
             ". Số hạng ",
-            { "math": "u_4" },
+            {
+              "math": "u_4"
+            },
             " của cấp số nhân đó là"
           ],
-          "options": [["27"], ["54"], ["162"], ["11"]],
+          "options": [
+            [
+              "27"
+            ],
+            [
+              "54"
+            ],
+            [
+              "162"
+            ],
+            [
+              "11"
+            ]
+          ],
           "correct_answer": 1,
           "points": 0.25
         },
@@ -122,7 +178,9 @@
           "type": "single_choice",
           "content": [
             "Cho hình lập phương ",
-            { "math": "ABCD.A_1B_1C_1D_1" },
+            {
+              "math": "ABCD.A_1B_1C_1D_1"
+            },
             " (tham khảo hình vẽ bên). Phát biểu nào sau đây đúng?",
             {
               "image": "part1-q4-cube.png",
@@ -132,10 +190,26 @@
             }
           ],
           "options": [
-            [{ "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{AB}" }],
-            [{ "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{AB}+\\overrightarrow{AD}" }],
-            [{ "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{AC}" }],
-            [{ "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{CA}" }]
+            [
+              {
+                "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{AB}"
+              }
+            ],
+            [
+              {
+                "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{AB}+\\overrightarrow{AD}"
+              }
+            ],
+            [
+              {
+                "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{AC}"
+              }
+            ],
+            [
+              {
+                "math": "\\overrightarrow{AC_1}=\\overrightarrow{AA_1}+\\overrightarrow{CA}"
+              }
+            ]
           ],
           "correct_answer": 1,
           "points": 0.25
@@ -145,18 +219,49 @@
           "type": "single_choice",
           "content": [
             "Cho hàm số ",
-            { "math": "y=f(x)" },
+            {
+              "math": "y=f(x)"
+            },
             " thỏa mãn ",
-            { "math": "f(1)=-2" },
+            {
+              "math": "f(1)=-2"
+            },
             ", ",
-            { "math": "f(2)=1" },
+            {
+              "math": "f(2)=1"
+            },
             " và có đạo hàm liên tục trên đoạn ",
-            { "math": "[1;2]" },
+            {
+              "math": "[1;2]"
+            },
             ". Giá trị của tích phân ",
-            { "math": "I=\\int_1^2 f'(x)\\,dx" },
+            {
+              "math": "I=\\int_1^2 f'(x)\\,dx"
+            },
             " là"
           ],
-          "options": [[{ "math": "I=-1" }], [{ "math": "I=2" }], [{ "math": "I=-3" }], [{ "math": "I=3" }]],
+          "options": [
+            [
+              {
+                "math": "I=-1"
+              }
+            ],
+            [
+              {
+                "math": "I=2"
+              }
+            ],
+            [
+              {
+                "math": "I=-3"
+              }
+            ],
+            [
+              {
+                "math": "I=3"
+              }
+            ]
+          ],
           "correct_answer": 3,
           "points": 0.25
         },
@@ -165,14 +270,32 @@
           "type": "single_choice",
           "content": [
             "Họ tất cả các nguyên hàm của hàm số ",
-            { "math": "y=\\sin x+\\cos x" },
+            {
+              "math": "y=\\sin x+\\cos x"
+            },
             " là"
           ],
           "options": [
-            [{ "math": "\\int(\\sin x+\\cos x)\\,dx=\\sin x+\\cos x+C" }],
-            [{ "math": "\\int(\\sin x+\\cos x)\\,dx=-\\sin x-\\cos x+C" }],
-            [{ "math": "\\int(\\sin x+\\cos x)\\,dx=-\\sin x+\\cos x+C" }],
-            [{ "math": "\\int(\\sin x+\\cos x)\\,dx=\\sin x-\\cos x+C" }]
+            [
+              {
+                "math": "\\int(\\sin x+\\cos x)\\,dx=\\sin x+\\cos x+C"
+              }
+            ],
+            [
+              {
+                "math": "\\int(\\sin x+\\cos x)\\,dx=-\\sin x-\\cos x+C"
+              }
+            ],
+            [
+              {
+                "math": "\\int(\\sin x+\\cos x)\\,dx=-\\sin x+\\cos x+C"
+              }
+            ],
+            [
+              {
+                "math": "\\int(\\sin x+\\cos x)\\,dx=\\sin x-\\cos x+C"
+              }
+            ]
           ],
           "correct_answer": 3,
           "points": 0.25
@@ -182,10 +305,33 @@
           "type": "single_choice",
           "content": [
             "Tiệm cận đứng của đồ thị hàm số ",
-            { "math": "y=\\dfrac{2x-1}{x-1}" },
+            {
+              "math": "y=\\dfrac{2x-1}{x-1}"
+            },
             " là đường thẳng có phương trình"
           ],
-          "options": [[{ "math": "y=1" }], [{ "math": "x=1" }], [{ "math": "y=2" }], [{ "math": "x=2" }]],
+          "options": [
+            [
+              {
+                "math": "y=1"
+              }
+            ],
+            [
+              {
+                "math": "x=1"
+              }
+            ],
+            [
+              {
+                "math": "y=2"
+              }
+            ],
+            [
+              {
+                "math": "x=2"
+              }
+            ]
+          ],
           "correct_answer": 1,
           "points": 0.25
         },
@@ -194,16 +340,36 @@
           "type": "single_choice",
           "content": [
             "Cho mặt phẳng ",
-            { "math": "(P): 3x-y+z-2=0" },
+            {
+              "math": "(P): 3x-y+z-2=0"
+            },
             ". Vectơ nào trong các vectơ dưới đây là một vectơ pháp tuyến của mặt phẳng ",
-            { "math": "(P)" },
+            {
+              "math": "(P)"
+            },
             "?"
           ],
           "options": [
-            [{ "math": "\\vec{n}=(3;-1;1)" }],
-            [{ "math": "\\vec{n}=(3;-1;2)" }],
-            [{ "math": "\\vec{n}=(3;-1;-2)" }],
-            [{ "math": "\\vec{n}=(3;-1;0)" }]
+            [
+              {
+                "math": "\\vec{n}=(3;-1;1)"
+              }
+            ],
+            [
+              {
+                "math": "\\vec{n}=(3;-1;2)"
+              }
+            ],
+            [
+              {
+                "math": "\\vec{n}=(3;-1;-2)"
+              }
+            ],
+            [
+              {
+                "math": "\\vec{n}=(3;-1;0)"
+              }
+            ]
           ],
           "correct_answer": 0,
           "points": 0.25
@@ -213,10 +379,33 @@
           "type": "single_choice",
           "content": [
             "Nghiệm của phương trình ",
-            { "math": "\\log_2(x+1)=3" },
+            {
+              "math": "\\log_2(x+1)=3"
+            },
             " là"
           ],
-          "options": [[{ "math": "x=9" }], [{ "math": "x=7" }], [{ "math": "x=8" }], [{ "math": "x=5" }]],
+          "options": [
+            [
+              {
+                "math": "x=9"
+              }
+            ],
+            [
+              {
+                "math": "x=7"
+              }
+            ],
+            [
+              {
+                "math": "x=8"
+              }
+            ],
+            [
+              {
+                "math": "x=5"
+              }
+            ]
+          ],
           "correct_answer": 1,
           "points": 0.25
         },
@@ -225,14 +414,32 @@
           "type": "single_choice",
           "content": [
             "Tập nghiệm của phương trình ",
-            { "math": "\\cos x=1" },
+            {
+              "math": "\\cos x=1"
+            },
             " là"
           ],
           "options": [
-            [{ "math": "S=\\{2k\\pi\\mid k\\in\\mathbb{Z}\\}" }],
-            [{ "math": "S=\\left\\{\\dfrac{\\pi}{2}+2k\\pi\\mid k\\in\\mathbb{Z}\\right\\}" }],
-            [{ "math": "S=\\left\\{\\dfrac{\\pi}{2}+k\\pi\\mid k\\in\\mathbb{Z}\\right\\}" }],
-            [{ "math": "S=\\{k\\pi\\mid k\\in\\mathbb{Z}\\}" }]
+            [
+              {
+                "math": "S=\\{2k\\pi\\mid k\\in\\mathbb{Z}\\}"
+              }
+            ],
+            [
+              {
+                "math": "S=\\left\\{\\dfrac{\\pi}{2}+2k\\pi\\mid k\\in\\mathbb{Z}\\right\\}"
+              }
+            ],
+            [
+              {
+                "math": "S=\\left\\{\\dfrac{\\pi}{2}+k\\pi\\mid k\\in\\mathbb{Z}\\right\\}"
+              }
+            ],
+            [
+              {
+                "math": "S=\\{k\\pi\\mid k\\in\\mathbb{Z}\\}"
+              }
+            ]
           ],
           "correct_answer": 0,
           "points": 0.25
@@ -242,9 +449,13 @@
           "type": "single_choice",
           "content": [
             "Cho hình lăng trụ ",
-            { "math": "ABC.A'B'C'" },
+            {
+              "math": "ABC.A'B'C'"
+            },
             " như hình vẽ. Đường thẳng nào sau đây song song với mặt phẳng ",
-            { "math": "(ACC'A')" },
+            {
+              "math": "(ACC'A')"
+            },
             "?",
             {
               "image": "part1-q11-prism.png",
@@ -253,7 +464,28 @@
               "width": 70
             }
           ],
-          "options": [[{ "math": "AA'" }], [{ "math": "BB'" }], [{ "math": "AC" }], [{ "math": "AB" }]],
+          "options": [
+            [
+              {
+                "math": "AA'"
+              }
+            ],
+            [
+              {
+                "math": "BB'"
+              }
+            ],
+            [
+              {
+                "math": "AC"
+              }
+            ],
+            [
+              {
+                "math": "AB"
+              }
+            ]
+          ],
           "correct_answer": 1,
           "points": 0.25
         },
@@ -262,22 +494,49 @@
           "type": "single_choice",
           "content": [
             "Cho hình chóp ",
-            { "math": "S.ABC" },
+            {
+              "math": "S.ABC"
+            },
             " có ",
-            { "math": "SA\\perp(ABC)" },
+            {
+              "math": "SA\\perp(ABC)"
+            },
             ", ",
-            { "math": "SA=3" },
+            {
+              "math": "SA=3"
+            },
             "; ",
-            { "math": "\\triangle ABC" },
+            {
+              "math": "\\triangle ABC"
+            },
             " vuông cân tại ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " với ",
-            { "math": "AB=4" },
+            {
+              "math": "AB=4"
+            },
             ". Thể tích khối chóp ",
-            { "math": "S.ABC" },
+            {
+              "math": "S.ABC"
+            },
             " bằng"
           ],
-          "options": [["48"], ["16"], ["8"], ["24"]],
+          "options": [
+            [
+              "48"
+            ],
+            [
+              "16"
+            ],
+            [
+              "8"
+            ],
+            [
+              "24"
+            ]
+          ],
           "correct_answer": 2,
           "points": 0.25
         }
@@ -293,7 +552,9 @@
           "type": "true_false",
           "content": [
             "Cho hàm số ",
-            { "math": "f(x)=x^3+3x^2-4" },
+            {
+              "math": "f(x)=x^3+3x^2-4"
+            },
             ".",
             {
               "image": "part2-q13-graph.png",
@@ -305,26 +566,51 @@
           "statements": [
             {
               "id": "q13a",
-              "content": ["Hàm số đã cho có đạo hàm là ", { "math": "f'(x)=3x^2+6x" }, "."],
+              "content": [
+                "Hàm số đã cho có đạo hàm là ",
+                {
+                  "math": "f'(x)=3x^2+6x"
+                },
+                "."
+              ],
               "correct": true
             },
             {
               "id": "q13b",
-              "content": ["Hàm số đã cho đồng biến trên khoảng ", { "math": "(-1;+\\infty)" }, "."],
+              "content": [
+                "Hàm số đã cho đồng biến trên khoảng ",
+                {
+                  "math": "(-1;+\\infty)"
+                },
+                "."
+              ],
               "correct": false
             },
             {
               "id": "q13c",
-              "content": ["Hàm số đã cho đạt cực đại tại ", { "math": "x=-2" }, "."],
+              "content": [
+                "Hàm số đã cho đạt cực đại tại ",
+                {
+                  "math": "x=-2"
+                },
+                "."
+              ],
               "correct": true
             },
             {
               "id": "q13d",
-              "content": ["Đồ thị của hàm số đã cho có dạng như hình vẽ."],
+              "content": [
+                "Đồ thị của hàm số đã cho có dạng như hình vẽ."
+              ],
               "correct": true
             }
           ],
-          "points": [0.1, 0.25, 0.5, 1]
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
         },
         {
           "id": "q14",
@@ -335,97 +621,179 @@
           "statements": [
             {
               "id": "q14a",
-              "content": ["Xác suất người đó có thể lực tốt và thường xuyên chơi thể thao là 0,14."],
+              "content": [
+                "Xác suất người đó có thể lực tốt và thường xuyên chơi thể thao là 0,14."
+              ],
               "correct": true
             },
             {
               "id": "q14b",
-              "content": ["Xác suất người đó có thể lực tốt, biết rằng người đó không thường xuyên chơi thể thao là 0,15."],
+              "content": [
+                "Xác suất người đó có thể lực tốt, biết rằng người đó không thường xuyên chơi thể thao là 0,15."
+              ],
               "correct": true
             },
             {
               "id": "q14c",
-              "content": ["Tỉ lệ người có thể lực tốt trong toàn tỉnh X là 36%."],
+              "content": [
+                "Tỉ lệ người có thể lực tốt trong toàn tỉnh X là 36%."
+              ],
               "correct": false
             },
             {
               "id": "q14d",
-              "content": ["Xác suất người đó thường xuyên chơi thể thao, biết rằng họ có thể lực tốt là ", { "math": "\\dfrac{8}{13}" }, "."],
+              "content": [
+                "Xác suất người đó thường xuyên chơi thể thao, biết rằng họ có thể lực tốt là ",
+                {
+                  "math": "\\dfrac{8}{13}"
+                },
+                "."
+              ],
               "correct": false
             }
           ],
-          "points": [0.1, 0.25, 0.5, 1]
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
         },
         {
           "id": "q15",
           "type": "true_false",
           "content": [
             "Giả sử lợi nhuận biên (tính bằng triệu đồng) của một sản phẩm được mô hình hóa bằng công thức ",
-            { "math": "P'(x)=-0{,}0008x+10{,}4" },
+            {
+              "math": "P'(x)=-0{,}0008x+10{,}4"
+            },
             ". Ở đây ",
-            { "math": "P(x)" },
+            {
+              "math": "P(x)"
+            },
             " là lợi nhuận (tính bằng triệu đồng) khi bán được ",
-            { "math": "x" },
+            {
+              "math": "x"
+            },
             " đơn vị sản phẩm."
           ],
           "statements": [
             {
               "id": "q15a",
-              "content": ["Lợi nhuận khi bán được ", { "math": "x" }, " đơn vị sản phẩm được tính bằng công thức ", { "math": "P(x)=-0{,}0008x^2+10{,}4x" }, "."],
+              "content": [
+                "Lợi nhuận khi bán được ",
+                {
+                  "math": "x"
+                },
+                " đơn vị sản phẩm được tính bằng công thức ",
+                {
+                  "math": "P(x)=-0{,}0008x^2+10{,}4x"
+                },
+                "."
+              ],
               "correct": false
             },
             {
               "id": "q15b",
-              "content": ["Lợi nhuận khi bán được 50 sản phẩm đầu tiên là 519 triệu đồng."],
+              "content": [
+                "Lợi nhuận khi bán được 50 sản phẩm đầu tiên là 519 triệu đồng."
+              ],
               "correct": true
             },
             {
               "id": "q15c",
-              "content": ["Sự thay đổi của lợi nhuận khi doanh số tăng từ 50 lên 55 đơn vị sản phẩm là 49,79 triệu đồng."],
+              "content": [
+                "Sự thay đổi của lợi nhuận khi doanh số tăng từ 50 lên 55 đơn vị sản phẩm là 49,79 triệu đồng."
+              ],
               "correct": false
             },
             {
               "id": "q15d",
-              "content": ["Biết sự thay đổi của lợi nhuận khi doanh số tăng từ 50 lên ", { "math": "a" }, " đơn vị sản phẩm lớn hơn 517 triệu đồng, khi đó giá trị nhỏ nhất của ", { "math": "a" }, " là 100."],
+              "content": [
+                "Biết sự thay đổi của lợi nhuận khi doanh số tăng từ 50 lên ",
+                {
+                  "math": "a"
+                },
+                " đơn vị sản phẩm lớn hơn 517 triệu đồng, khi đó giá trị nhỏ nhất của ",
+                {
+                  "math": "a"
+                },
+                " là 100."
+              ],
               "correct": false
             }
           ],
-          "points": [0.1, 0.25, 0.5, 1]
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
         },
         {
           "id": "q16",
           "type": "true_false",
           "content": [
             "Một chiếc máy bay thương mại Vietnam Airlines đang bay trên bầu trời theo một đường thẳng từ ",
-            { "math": "D" },
+            {
+              "math": "D"
+            },
             " đến ",
-            { "math": "E" },
+            {
+              "math": "E"
+            },
             " có hình chiếu trên mặt đất là đoạn ",
-            { "math": "CB" },
+            {
+              "math": "CB"
+            },
             ". Tại vị trí ",
-            { "math": "D" },
+            {
+              "math": "D"
+            },
             " thì máy bay bay cách mặt đất 9000 m, tại vị trí ",
-            { "math": "E" },
+            {
+              "math": "E"
+            },
             " thì máy bay bay cách mặt đất 12000 m. Một ra đa được đặt trên mặt đất tại vị trí ",
-            { "math": "O" },
+            {
+              "math": "O"
+            },
             " cách ",
-            { "math": "C" },
+            {
+              "math": "C"
+            },
             " khoảng 20000 m, cách ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " khoảng 16000 m và góc ",
-            { "math": "\\widehat{BOC}=90^\\circ" },
+            {
+              "math": "\\widehat{BOC}=90^\\circ"
+            },
             "; phạm vi theo dõi của ra đa là 20 km. Xét hệ trục tọa độ ",
-            { "math": "Oxyz" },
+            {
+              "math": "Oxyz"
+            },
             " (đơn vị trên mỗi trục là 1000 m) với ",
-            { "math": "O" },
+            {
+              "math": "O"
+            },
             " là vị trí đặt ra đa, ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " thuộc tia ",
-            { "math": "Oy" },
+            {
+              "math": "Oy"
+            },
             ", ",
-            { "math": "C" },
+            {
+              "math": "C"
+            },
             " thuộc tia ",
-            { "math": "Ox" },
+            {
+              "math": "Ox"
+            },
             ".",
             {
               "image": "part2-q16-plane.png",
@@ -437,26 +805,63 @@
           "statements": [
             {
               "id": "q16a",
-              "content": ["Tại ", { "math": "D" }, ", máy bay cách ra đa 21000 m (làm tròn đến hàng nghìn theo đơn vị mét)."],
+              "content": [
+                "Tại ",
+                {
+                  "math": "D"
+                },
+                ", máy bay cách ra đa 21000 m (làm tròn đến hàng nghìn theo đơn vị mét)."
+              ],
               "correct": false
             },
             {
               "id": "q16b",
-              "content": ["Khi máy bay bay đến điểm ", { "math": "I" }, " thỏa mãn ", { "math": "\\overrightarrow{DI}=\\dfrac{1}{4}\\overrightarrow{DE}" }, ", máy bay cách mặt đất 9750 m."],
+              "content": [
+                "Khi máy bay bay đến điểm ",
+                {
+                  "math": "I"
+                },
+                " thỏa mãn ",
+                {
+                  "math": "\\overrightarrow{DI}=\\dfrac{1}{4}\\overrightarrow{DE}"
+                },
+                ", máy bay cách mặt đất 9750 m."
+              ],
               "correct": true
             },
             {
               "id": "q16c",
-              "content": ["Trên hành trình bay từ ", { "math": "D" }, " đến ", { "math": "E" }, ", máy bay sẽ đi qua điểm có tọa độ ", { "math": "P(16;3{,}2;9{,}6)" }, "."],
+              "content": [
+                "Trên hành trình bay từ ",
+                {
+                  "math": "D"
+                },
+                " đến ",
+                {
+                  "math": "E"
+                },
+                ", máy bay sẽ đi qua điểm có tọa độ ",
+                {
+                  "math": "P(16;3{,}2;9{,}6)"
+                },
+                "."
+              ],
               "correct": true
             },
             {
               "id": "q16d",
-              "content": ["Khoảng cách giữa vị trí đầu tiên và vị trí cuối cùng mà máy bay bay trong phạm vi theo dõi của ra đa là 22500 m (làm tròn đến hàng trăm theo đơn vị mét)."],
+              "content": [
+                "Khoảng cách giữa vị trí đầu tiên và vị trí cuối cùng mà máy bay bay trong phạm vi theo dõi của ra đa là 22500 m (làm tròn đến hàng trăm theo đơn vị mét)."
+              ],
               "correct": false
             }
           ],
-          "points": [0.1, 0.25, 0.5, 1]
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ]
         }
       ]
     },
@@ -470,17 +875,29 @@
           "type": "short_answer",
           "content": [
             "Trong một cuộc thi đấu Robotics, sân đấu được thiết kế dạng lưới ô vuông như hình vẽ. Các robot xuất phát từ vị trí điểm ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             ", di chuyển ngẫu nhiên theo cạnh của các ô vuông theo hướng xuống dưới hoặc sang phải đến vị trí điểm ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             ". Tính xác suất robot đi từ ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " đến ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " mà không đi qua cả ",
-            { "math": "M" },
+            {
+              "math": "M"
+            },
             " và ",
-            { "math": "N" },
+            {
+              "math": "N"
+            },
             " (kết quả làm tròn đến hàng phần trăm).",
             {
               "image": "part3-q17-grid.png",
@@ -497,21 +914,37 @@
           "type": "short_answer",
           "content": [
             "Cho hình chóp ",
-            { "math": "S.ABCD" },
+            {
+              "math": "S.ABCD"
+            },
             " có đáy ",
-            { "math": "ABCD" },
+            {
+              "math": "ABCD"
+            },
             " là hình thoi tâm ",
-            { "math": "O" },
+            {
+              "math": "O"
+            },
             ", cạnh bằng 1, góc ",
-            { "math": "\\widehat{ABC}=60^\\circ" },
+            {
+              "math": "\\widehat{ABC}=60^\\circ"
+            },
             ". Biết rằng ",
-            { "math": "SO\\perp(ABCD)" },
+            {
+              "math": "SO\\perp(ABCD)"
+            },
             ", ",
-            { "math": "SO=\\dfrac{3}{2}" },
+            {
+              "math": "SO=\\dfrac{3}{2}"
+            },
             ". Tính khoảng cách từ ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " đến mặt phẳng ",
-            { "math": "(SCD)" },
+            {
+              "math": "(SCD)"
+            },
             " (không làm tròn kết quả ở các bước trung gian, làm tròn kết quả ở bước cuối cùng đến hàng phần trăm)."
           ],
           "correct_answer": 0.83,
@@ -522,27 +955,49 @@
           "type": "short_answer",
           "content": [
             "Một nhà địa chất học đang ở địa điểm ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " trên sa mạc. Anh ta muốn đến điểm ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " (cũng ở trên sa mạc) và cách ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " một khoảng bằng 70 km. Trong sa mạc, xe anh ta chỉ có thể di chuyển với vận tốc 30 km/h. Nhà địa chất phải đến được điểm ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " sau 2 giờ, vì vậy nếu anh ta đi thẳng từ ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " đến ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " sẽ không thể đến đúng giờ được. Rất may, có một con đường nhựa song song với đường nối ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " và ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " và cách ",
-            { "math": "AB" },
+            {
+              "math": "AB"
+            },
             " một đoạn 10 km (tham khảo hình vẽ). Trên đường nhựa đó, xe nhà địa chất có thể di chuyển với vận tốc 50 km/h. Thời gian ngắn nhất để nhà địa chất di chuyển từ ",
-            { "math": "A" },
+            {
+              "math": "A"
+            },
             " đến ",
-            { "math": "B" },
+            {
+              "math": "B"
+            },
             " là bao nhiêu phút?",
             {
               "image": "part3-q19-road.png",
@@ -583,7 +1038,9 @@
           "type": "short_answer",
           "content": [
             "Cho hình vẽ bên gồm 4 tam giác. Người ta chọn 3 số phân biệt từ tập hợp ",
-            { "math": "S=\\{1;2;\\ldots;26\\}" },
+            {
+              "math": "S=\\{1;2;\\ldots;26\\}"
+            },
             " để xếp vào 3 tam giác ở 3 góc. Sau đó, tính tổng bình phương của 3 số đó rồi ghi kết quả vào tam giác còn lại ở giữa. Hỏi có bao nhiêu cách xếp sao cho số ghi ở tam giác giữa là một số chia hết cho 5?",
             {
               "image": "part3-q22-triangles.png",
