@@ -105,7 +105,7 @@ export default function ExamRoom() {
                 </div>
 
                 {/* Exam Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                     {loading ? (
                          <div className="col-span-full py-12 text-center text-slate-400">Đang tải danh sách đề thi...</div>
                     ) : exams
@@ -114,100 +114,105 @@ export default function ExamRoom() {
                         .map((exam) => {
                         const examMeta = { ...DEFAULT_EXAM_META, ...exam };
                         const examHref = getExamHref(examMeta);
+                        const isOngoing = examMeta.status === 'ongoing';
+                        
+                        // Fix for the title where it shouldn't just be uppercase THPT
+                        let displayTitle = examMeta.title;
+                        if (examMeta.subject) {
+                            displayTitle = displayTitle.replace(/TSA/gi, `${examMeta.subject.toUpperCase()} THPT`);
+                        }
+                        const displayBadge = examMeta.subject ? `${examMeta.subject.toUpperCase()} THPT` : 'ĐÁNH GIÁ NĂNG LỰC';
+
+                        // Specific background image for Biology
+                        const bgImage = (examMeta.subject && examMeta.subject.toLowerCase() === 'sinh học') ? '/y.png' : '/bk.png';
+
+                        // Calculate generic status properties equivalent to old statusMeta
+                        let actionLabel = 'XEM LẠI';
+                        let actionClass = 'bg-transparent border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/5 focus:ring-white/15';
+                        if (examMeta.status === 'ongoing') {
+                            actionLabel = 'Bắt đầu thi';
+                            actionClass = 'bg-[#4f46e5] hover:bg-[#4338ca] text-white shadow-lg shadow-[#4f46e5]/30 border border-[#4f46e5]/50';
+                        } else if (examMeta.status === 'upcoming') {
+                            actionLabel = 'ĐẶT LỊCH';
+                            actionClass = 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white focus:ring-white/20';
+                        }
 
                         return (
-                        <div key={examMeta.id} className="group relative bg-[#1a0f12]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-[#fe5f36]/10 hover:-translate-y-1 overflow-hidden flex flex-col sm:flex-row gap-6">
-                            
-                            {/* Colorful background accent */}
-                            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${examMeta.color} opacity-10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-500`} />
-                            
-                            {/* Icon column */}
-                            <div className="shrink-0 flex sm:flex-col items-center gap-4 sm:border-r border-white/10 sm:pr-6">
-                                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br ${examMeta.color} shadow-lg text-white`}>
-                                    <span className="material-symbols-outlined text-3xl">{examMeta.icon}</span>
-                                </div>
-                                
-                                {examMeta.status === 'ongoing' && (
-                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/10 text-green-400 text-xs font-bold rounded-lg border border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.2)]">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                        LIVE
-                                    </div>
-                                )}
-                                {examMeta.status === 'upcoming' && (
-                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-400 text-xs font-bold rounded-lg border border-amber-500/20">
-                                        <span className="material-symbols-outlined text-[14px]">schedule</span>
-                                        Sắp diễn ra
-                                    </div>
-                                )}
-                                {examMeta.status === 'ended' && (
-                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-500/10 text-slate-400 text-xs font-bold rounded-lg border border-slate-500/20">
-                                        Đã kết thúc
-                                    </div>
-                                )}
+                        <article
+                            key={examMeta.id}
+                            className="group relative bg-[#1a0f12]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 transition-all duration-300 hover:shadow-2xl hover:shadow-[#4f46e5]/10 hover:-translate-y-1 overflow-hidden min-h-[260px] flex flex-col"
+                        >
+                            {/* Image Section */}
+                            <div className="relative -mx-4 -mt-4 mb-3 shrink-0 h-[35%] overflow-hidden">
+                                <img src={bgImage} alt="Background" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                             </div>
 
-                            {/* Info column */}
-                            <div className="flex-1 flex flex-col justify-between">
-                                <div>
-                                    <h3 className="text-xl font-bold mb-2 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-colors line-clamp-2">
-                                        {examMeta.title}
-                                    </h3>
-                                    
-                                    <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-400 mb-4">
-                                        <span className="flex items-center gap-1">
-                                            <span className="material-symbols-outlined text-[16px]">menu_book</span>
-                                            {examMeta.subject}
-                                        </span>
-                                        <span className="w-1 h-1 rounded-full bg-slate-600" />
-                                        <span className="flex items-center gap-1">
-                                            <span className="material-symbols-outlined text-[16px]">timer</span>
-                                            {typeof examMeta.time === 'number' ? `${examMeta.time} phút` : examMeta.time}
-                                        </span>
-                                        <span className="w-1 h-1 rounded-full bg-slate-600" />
-                                        <span className="flex items-center gap-1">
-                                            <span className="material-symbols-outlined text-[16px]">format_list_numbered</span>
-                                            {examMeta.questions} câu
-                                        </span>
+                            {/* Content Section */}
+                            <div className="flex flex-col flex-1 min-h-0">
+                                {/* Badge & Rating */}
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-1 text-[#4f46e5] bg-[#4f46e5]/10 px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold border border-[#4f46e5]/20">
+                                        <span className="material-symbols-outlined text-[12px]">description</span>
+                                        <span className="truncate max-w-[120px]">{displayBadge}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-amber-400 text-[10px] font-bold shrink-0">
+                                        <span className="material-symbols-outlined text-[12px]">star</span>
+                                        4.8
                                     </div>
                                 </div>
 
-                                <div className="mt-4 pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex -space-x-2">
-                                            {[1,2,3].map(i => (
-                                              <img key={i} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${examMeta.id}${i}`} className="w-7 h-7 rounded-full border border-[#1a0f12] bg-slate-800" alt="avatar" />
-                                            ))}
-                                        </div>
-                                        <span className="text-xs font-medium text-slate-400">+{examMeta.participants} thí sinh</span>
-                                    </div>
+                                {/* Title */}
+                                <h3
+                                    className="text-[13px] md:text-sm font-bold text-white leading-snug group-hover:text-[#4f46e5] transition-colors mb-2 line-clamp-3 min-h-[2.5rem]"
+                                    title={displayTitle}
+                                >
+                                    {displayTitle}
+                                </h3>
 
-                                    {examMeta.status === 'ongoing' && examHref ? (
+                                {/* Meta Stats */}
+                                <div className="flex items-center justify-between bg-white/5 rounded-xl p-2 mb-3 mt-auto border border-white/5">
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                                            <span className="material-symbols-outlined text-[12px]">help</span>
+                                        </div>
+                                        <div className="leading-tight">
+                                            <div className="text-[9px] text-slate-400">Câu hỏi</div>
+                                            <div className="font-bold text-[10px] text-slate-200">{examMeta.questions} câu</div>
+                                        </div>
+                                    </div>
+                                    <div className="w-px h-6 bg-white/10"></div>
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 shrink-0">
+                                            <span className="material-symbols-outlined text-[12px]">schedule</span>
+                                        </div>
+                                        <div className="leading-tight">
+                                            <div className="text-[9px] text-slate-400">Thời gian</div>
+                                            <div className="font-bold text-[10px] text-slate-200">{typeof examMeta.time === 'number' ? `${examMeta.time} phút` : examMeta.time}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex items-center gap-2 mt-auto">
+                                    {isOngoing && examHref ? (
                                         <Link
                                             to={examHref}
-                                            className="shrink-0 px-6 py-2.5 rounded-xl font-bold text-sm transition-all focus:ring-2 focus:outline-none flex items-center justify-center gap-2 bg-gradient-to-r from-[#fe5f36] to-pink-600 text-white hover:shadow-lg hover:shadow-[#fe5f36]/30 hover:scale-[1.02] active:scale-95 focus:ring-[#fe5f36]/50"
+                                            className={`flex-1 h-9 rounded-xl font-bold text-xs transition-all flex items-center justify-center ${actionClass}`}
                                         >
-                                            VÀO THI NGAY
-                                            <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                                            {actionLabel}
                                         </Link>
                                     ) : (
-                                        <button 
-                                        onClick={() => handleJoin(examMeta)}
-                                        className={`shrink-0 px-6 py-2.5 rounded-xl font-bold text-sm transition-all focus:ring-2 focus:outline-none flex items-center justify-center gap-2 ${
-                                            examMeta.status === 'ongoing' 
-                                                ? 'bg-gradient-to-r from-[#fe5f36] to-pink-600 text-white hover:shadow-lg hover:shadow-[#fe5f36]/30 hover:scale-[1.02] active:scale-95 focus:ring-[#fe5f36]/50' 
-                                                : examMeta.status === 'upcoming'
-                                                    ? 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white focus:ring-white/20'
-                                                    : 'bg-transparent text-slate-500 hover:text-slate-300 border border-white/5 hover:bg-white/5 focus:ring-white/10'
-                                        }`}
-                                    >
-                                        {examMeta.status === 'ongoing' ? 'VÀO THI NGAY' : examMeta.status === 'upcoming' ? 'ĐẶT LỊCH' : 'XEM LẠI'}
-                                        {examMeta.status === 'ongoing' && <span className="material-symbols-outlined text-[18px]">arrow_forward</span>}
-                                    </button>
+                                        <button
+                                            onClick={() => handleJoin(examMeta)}
+                                            className={`flex-1 h-9 rounded-xl font-bold text-xs transition-all flex items-center justify-center ${actionClass}`}
+                                        >
+                                            {actionLabel}
+                                        </button>
                                     )}
                                 </div>
                             </div>
-                        </div>
-                    )})}
+                        </article>
+                        )})}
                 </div>
             </main>
         </div>
