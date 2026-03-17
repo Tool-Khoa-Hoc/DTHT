@@ -50,6 +50,27 @@ export default function Roadmap() {
         loadMilestones();
     }, [user, mode]);
 
+    const mapMilestoneRow = (row) => ({
+        id: row.id,
+        title: row.title,
+        subtitle: row.subtitle || '',
+        status: row.status || 'locked',
+        progress: typeof row.progress === 'number' ? row.progress : 0,
+    });
+
+    const normalizeStatus = (value) => {
+        if (value === 'done' || value === 'active' || value === 'locked') return value;
+        return 'locked';
+    };
+
+    const normalizeProgress = (value) => {
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return 0;
+        if (parsed < 0) return 0;
+        if (parsed > 100) return 100;
+        return Math.round(parsed);
+    };
+
     const loadMilestones = async () => {
         setMilestonesLoading(true);
         try {
@@ -63,13 +84,7 @@ export default function Roadmap() {
             if (error) throw error;
 
             if (data && data.length > 0) {
-                setMilestones(data.map(r => ({
-                    id: r.id,
-                    title: r.title,
-                    subtitle: r.subtitle || '',
-                    status: r.status,
-                    progress: r.progress,
-                })));
+                setMilestones(data.map(mapMilestoneRow));
             } else {
                 // No data in DB: try migrating from localStorage
                 const storageKey = `roadmap_${user.id}_${mode}`;
@@ -81,23 +96,31 @@ export default function Roadmap() {
                     defaults = mode === 'student' ? defaultStudentMilestones : defaultUniversityMilestones;
                 }
                 setMilestones(defaults);
-                // Seed the DB silently
+                // Seed DB once. If seed fails, keep local defaults and avoid retry loops.
                 if (defaults.length > 0) {
-                    await supabase.from('roadmap_milestones').insert(
+                    const { data: insertedRows, error: seedError } = await supabase.from('roadmap_milestones').insert(
                         defaults.map((m, idx) => ({
-                            id: undefined,
                             user_id: user.id,
                             mode,
                             sort_order: idx,
-                            title: m.title,
+                            title: (m.title || '').trim(),
                             subtitle: m.subtitle || '',
-                            status: m.status,
-                            progress: m.progress || 0,
+                            status: normalizeStatus(m.status),
+                            progress: normalizeProgress(m.progress),
                         }))
-                    );
+                    ).select('*');
+
+                    if (seedError) {
+                        console.error('roadmap_milestones seed failed:', seedError);
+                        return;
+                    }
+
+                    if (insertedRows && insertedRows.length > 0) {
+                        const orderedRows = [...insertedRows].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+                        setMilestones(orderedRows.map(mapMilestoneRow));
+                    }
+
                     localStorage.removeItem(storageKey);
-                    // reload to get real UUIDs from DB
-                    await loadMilestones();
                 }
             }
         } catch (err) {
@@ -153,6 +176,12 @@ export default function Roadmap() {
 
         const index = milestones.findIndex(m => m.id === editingMilestone.id);
         const isNew = index < 0;
+        const normalizedMilestone = {
+            title: editingMilestone.title.trim(),
+            subtitle: editingMilestone.subtitle || '',
+            status: normalizeStatus(editingMilestone.status),
+            progress: normalizeProgress(editingMilestone.progress),
+        };
 
         if (isNew) {
             // INSERT new milestone
@@ -162,10 +191,7 @@ export default function Roadmap() {
                     user_id: user.id,
                     mode,
                     sort_order: milestones.length,
-                    title: editingMilestone.title,
-                    subtitle: editingMilestone.subtitle || '',
-                    status: editingMilestone.status,
-                    progress: editingMilestone.progress || 0,
+                    ...normalizedMilestone,
                 })
                 .select('*')
                 .single();
@@ -181,15 +207,10 @@ export default function Roadmap() {
             // UPDATE existing milestone
             const { error } = await supabase
                 .from('roadmap_milestones')
-                .update({
-                    title: editingMilestone.title,
-                    subtitle: editingMilestone.subtitle || '',
-                    status: editingMilestone.status,
-                    progress: editingMilestone.progress || 0,
-                })
+                .update(normalizedMilestone)
                 .eq('id', editingMilestone.id);
             if (error) { alert('Lỗi lưu: ' + error.message); return; }
-            setMilestones(prev => prev.map(m => m.id === editingMilestone.id ? { ...m, ...editingMilestone } : m));
+            setMilestones(prev => prev.map(m => m.id === editingMilestone.id ? { ...m, ...normalizedMilestone } : m));
         }
         setIsEditModalOpen(false);
     };
@@ -553,4 +574,3 @@ export default function Roadmap() {
         </div>
     );
 }
-
