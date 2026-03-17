@@ -50,11 +50,42 @@ function buildAnswerEntry(question, existingEntry) {
         const existingObject = existingEntry && typeof existingEntry === 'object' && !Array.isArray(existingEntry)
             ? existingEntry
             : {};
+        const existingArray = Array.isArray(existingEntry) ? existingEntry : null;
 
-        for (const statement of question.statements || []) {
-            nextEntry[statement.id] = Object.prototype.hasOwnProperty.call(existingObject, statement.id)
-                ? existingObject[statement.id]
-                : (statement.correct ?? null);
+        const normalizeBoolean = (value) => {
+            if (value === true || value === false || value === null) return value;
+            if (value === 1) return true;
+            if (value === 0) return false;
+
+            if (typeof value === 'string') {
+                const normalized = value.trim().toLowerCase();
+
+                if (!normalized || normalized === 'null') return null;
+                if (['true', 't', '1', 'd', 'dung', 'yes', 'y'].includes(normalized)) return true;
+                if (['false', 'f', '0', 's', 'sai', 'khong', 'no', 'n'].includes(normalized)) return false;
+            }
+
+            return undefined;
+        };
+
+        for (const [index, statement] of (question.statements || []).entries()) {
+            const objectValue = Object.prototype.hasOwnProperty.call(existingObject, statement.id)
+                ? normalizeBoolean(existingObject[statement.id])
+                : undefined;
+            const arrayValue = existingArray && index < existingArray.length
+                ? normalizeBoolean(existingArray[index])
+                : undefined;
+            const statementValue = normalizeBoolean(statement.correct);
+
+            if (objectValue !== undefined) {
+                nextEntry[statement.id] = objectValue;
+            } else if (arrayValue !== undefined) {
+                nextEntry[statement.id] = arrayValue;
+            } else if (statementValue !== undefined) {
+                nextEntry[statement.id] = statementValue;
+            } else {
+                nextEntry[statement.id] = null;
+            }
         }
 
         return nextEntry;
