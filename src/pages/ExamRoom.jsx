@@ -21,8 +21,7 @@ function getExamHref(exam) {
 
 export default function ExamRoom() {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('all');
-    const [activeSubject, setActiveSubject] = useState('all');
+  const [activeSubject, setActiveSubject] = useState('all');
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -69,37 +68,31 @@ export default function ExamRoom() {
             <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#7f13ec]/10 blur-[120px] rounded-full pointer-events-none" />
 
             {/* Header */}
-            <div className="relative z-10 px-6 py-10 md:py-14 text-center border-b border-white/5 bg-gradient-to-b from-white/5 to-transparent">
-                <div className="inline-flex items-center justify-center p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#fe5f36]/20 to-[#7f13ec]/20 border border-white/10 mb-4 sm:mb-6 shadow-2xl shadow-[#fe5f36]/20">
-                    <span className="material-symbols-outlined text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-[#fe5f36] to-[#7f13ec]">
+            <div className="relative z-10 px-6 py-6 text-center border-b border-white/5 bg-gradient-to-b from-white/5 to-transparent">
+                <div className="inline-flex items-center justify-center p-2 rounded-2xl bg-gradient-to-br from-[#fe5f36]/20 to-[#7f13ec]/20 border border-white/10 mb-3 shadow-2xl shadow-[#fe5f36]/20">
+                    <span className="material-symbols-outlined text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#fe5f36] to-[#7f13ec]">
                         quiz
                     </span>
                 </div>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 tracking-tight drop-shadow-md">
+                <h1 className="text-xl sm:text-2xl font-black mb-2 tracking-tight drop-shadow-md">
                     Phòng Thi <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fe5f36] to-pink-500">Trực Tuyến</span>
                 </h1>
-                <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto font-medium px-4">
+                <p className="text-[11px] sm:text-xs text-slate-400 max-w-xl mx-auto font-medium px-4">
                     Thử sức với các đề thi bám sát cấu trúc thật. Rèn luyện tâm lý phòng thi và đánh giá năng lực bản thân.
                 </p>
             </div>
 
             <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 relative z-10">
                 {/* Filters */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
-                    <div className="flex bg-white/5 p-1.5 rounded-2xl w-full sm:w-auto overflow-x-auto scrollbar-hide border border-white/5 backdrop-blur-sm shadow-inner">
-                        <button onClick={() => setActiveTab('all')} className={`whitespace-nowrap flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'all' ? 'bg-[#fe5f36] text-white shadow-lg shadow-[#fe5f36]/30 px-6' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>Tất cả trạng thái</button>
-                        <button onClick={() => setActiveTab('ongoing')} className={`whitespace-nowrap flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'ongoing' ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>Đang diễn ra</button>
-                        <button onClick={() => setActiveTab('upcoming')} className={`whitespace-nowrap flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'upcoming' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>Sắp tới</button>
-                    </div>
-
+                <div className="flex items-center justify-end mb-8">
                     <select
                         value={activeSubject}
                         onChange={(e) => setActiveSubject(e.target.value)}
-                        className="w-full sm:w-auto bg-[#1a0f12]/80 border border-white/10 text-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:border-[#fe5f36] focus:ring-1 focus:ring-[#fe5f36] transition-colors"
+                        className="w-full sm:w-auto bg-[#1a0f12]/80 border border-white/10 text-slate-300 rounded-xl px-4 py-2 text-sm font-bold focus:outline-none focus:border-[#fe5f36] focus:ring-1 focus:ring-[#fe5f36] transition-colors"
                     >
                         {uniqueSubjects.map(subject => (
                             <option key={subject} value={subject}>
-                                {subject === 'all' ? 'Tất cả môn học' : subject}
+                                {subject === 'all' ? 'Tất cả môn học' : subject.toUpperCase()}
                             </option>
                         ))}
                     </select>
@@ -110,7 +103,6 @@ export default function ExamRoom() {
                     {loading ? (
                         <div className="col-span-full py-12 text-center text-slate-400">Đang tải danh sách đề thi...</div>
                     ) : exams
-                        .filter(e => activeTab === 'all' || e.status === activeTab)
                         .filter(e => activeSubject === 'all' || e.subject === activeSubject)
                         .map((exam) => {
                             const examMeta = { ...DEFAULT_EXAM_META, ...exam };
