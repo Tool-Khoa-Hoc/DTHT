@@ -8,7 +8,7 @@ import { questionHasOptionContent, questionHasStatementContent } from '../utils/
 
 const AUTOSAVE_DEBOUNCE_MS = 2000; // 2s sau khi chọn đáp án
 const AUTOSAVE_INTERVAL_MS = 30000; // 30s định kỳ
-const FREE_DAILY_LIMIT = 2;
+const FREE_DAILY_LIMIT = 3;
 const CHOICE_LABELS = ['A', 'B', 'C', 'D'];
 const TRUE_FALSE_LABELS = ['a', 'b', 'c', 'd'];
 
@@ -336,16 +336,16 @@ export default function ExamTaking() {
 
             setSubmitted(true);
             navigate(`/exam/${subjectFolder}/${normalizedExamPath}/result`, {
-                state: { 
-                    examData, 
-                    answers: answersRef.current, 
-                    score, 
-                    correct, 
-                    total, 
-                    resultId: result_id, 
-                    examId, 
-                    examPath: normalizedExamPath, 
-                    subjectFolder 
+                state: {
+                    examData,
+                    answers: answersRef.current,
+                    score,
+                    correct,
+                    total,
+                    resultId: result_id,
+                    examId,
+                    examPath: normalizedExamPath,
+                    subjectFolder
                 },
             });
         } catch (err) {
@@ -509,100 +509,101 @@ export default function ExamTaking() {
                                         const hasStatementContent = questionHasStatementContent(q);
 
                                         return (
-                                        <div key={questionKey} id={`q-${questionKey}`} className="scroll-mt-24">
-                                            <div className="flex gap-4">
-                                                <div className="w-10 h-10 shrink-0 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black text-lg border border-blue-100">
-                                                    {qIndex + 1}
-                                                </div>
-                                                <div className="flex-1">
-                                                    <div className="text-base font-medium leading-relaxed mb-4">
-                                                        <RichTextRenderer content={q.content} />
+                                            <div key={questionKey} id={`q-${questionKey}`} className="scroll-mt-24">
+                                                <div className="flex gap-4">
+                                                    <div className="w-10 h-10 shrink-0 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black text-lg border border-blue-100">
+                                                        {qIndex + 1}
                                                     </div>
-
-                                                    {/* Single choice */}
-                                                    {q.type === 'single_choice' && (
-                                                        hasOptionContent ? (
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                                {q.options.map((opt, optIdx) => {
-                                                                    const isChecked = answers[questionKey] === optIdx;
-                                                                    return (
-                                                                        <label key={optIdx} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${isChecked ? 'bg-blue-50 border-blue-500 text-blue-800 font-bold' : 'bg-white border-slate-200 hover:border-blue-300'}`}>
-                                                                            <input type="radio" name={questionKey} className="hidden" onChange={() => handleAnswerChange(questionKey, optIdx)} checked={isChecked} />
-                                                                            <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm transition-colors ${isChecked ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-600'}`}>{CHOICE_LABELS[optIdx]}</span>
-                                                                            <span><RichTextRenderer content={opt} /></span>
-                                                                        </label>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        ) : (
-                                                            <div className="flex flex-wrap gap-3">
-                                                                {CHOICE_LABELS.map((label, optIdx) => {
-                                                                    const isChecked = answers[questionKey] === optIdx;
-                                                                    return (
-                                                                        <label key={label} className={`min-w-[5rem] px-4 py-3 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-center font-black ${isChecked ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300'}`}>
-                                                                            <input type="radio" name={questionKey} className="hidden" onChange={() => handleAnswerChange(questionKey, optIdx)} checked={isChecked} />
-                                                                            {label}
-                                                                        </label>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        )
-                                                    )}
-
-                                                    {/* True/False */}
-                                                    {q.type === 'true_false' && (
-                                                        hasStatementContent ? (
-                                                            <div className="space-y-3">
-                                                                {q.statements?.map((stmt, stmtIdx) => {
-                                                                    const currentAns = answers[questionKey]?.[stmt.id];
-                                                                    return (
-                                                                        <div key={stmt.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50">
-                                                                            <div className="flex gap-3">
-                                                                                <span className="font-bold text-slate-500">{TRUE_FALSE_LABELS[stmtIdx]})</span>
-                                                                                <span className="font-medium text-slate-800"><RichTextRenderer content={stmt.content} /></span>
-                                                                            </div>
-                                                                            <div className="flex items-center gap-2 shrink-0">
-                                                                                <button onClick={() => handleAnswerChange(questionKey, true, stmt.id)} className={`px-4 py-1.5 rounded-lg text-sm font-bold border transition-colors ${currentAns === true ? 'bg-green-500 text-white border-green-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}`}>Đúng</button>
-                                                                                <button onClick={() => handleAnswerChange(questionKey, false, stmt.id)} className={`px-4 py-1.5 rounded-lg text-sm font-bold border transition-colors ${currentAns === false ? 'bg-red-500 text-white border-red-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}`}>Sai</button>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        ) : (
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                                {q.statements?.map((stmt, stmtIdx) => {
-                                                                    const currentAns = answers[questionKey]?.[stmt.id];
-                                                                    return (
-                                                                        <div key={stmt.id} className="flex items-center justify-between gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50">
-                                                                            <span className="font-bold text-slate-700">Mệnh đề {TRUE_FALSE_LABELS[stmtIdx]})</span>
-                                                                            <div className="flex items-center gap-2 shrink-0">
-                                                                                <button onClick={() => handleAnswerChange(questionKey, true, stmt.id)} className={`px-4 py-1.5 rounded-lg text-sm font-bold border transition-colors ${currentAns === true ? 'bg-green-500 text-white border-green-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}`}>Đúng</button>
-                                                                                <button onClick={() => handleAnswerChange(questionKey, false, stmt.id)} className={`px-4 py-1.5 rounded-lg text-sm font-bold border transition-colors ${currentAns === false ? 'bg-red-500 text-white border-red-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}`}>Sai</button>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        )
-                                                    )}
-
-                                                    {/* Short answer */}
-                                                    {q.type === 'short_answer' && (
-                                                        <div className="mt-2">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Nhập đáp án..."
-                                                                value={answers[questionKey] || ''}
-                                                                onChange={(e) => handleAnswerChange(questionKey, e.target.value)}
-                                                                className="w-full md:w-1/2 p-3 border-b-2 border-slate-300 bg-slate-50 rounded-t-lg font-bold text-lg text-center focus:outline-none focus:border-[#fe5f36] transition-colors"
-                                                            />
+                                                    <div className="flex-1">
+                                                        <div className="text-base font-medium leading-relaxed mb-4">
+                                                            <RichTextRenderer content={q.content} />
                                                         </div>
-                                                    )}
+
+                                                        {/* Single choice */}
+                                                        {q.type === 'single_choice' && (
+                                                            hasOptionContent ? (
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                                    {q.options.map((opt, optIdx) => {
+                                                                        const isChecked = answers[questionKey] === optIdx;
+                                                                        return (
+                                                                            <label key={optIdx} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${isChecked ? 'bg-blue-50 border-blue-500 text-blue-800 font-bold' : 'bg-white border-slate-200 hover:border-blue-300'}`}>
+                                                                                <input type="radio" name={questionKey} className="hidden" onChange={() => handleAnswerChange(questionKey, optIdx)} checked={isChecked} />
+                                                                                <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm transition-colors ${isChecked ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-600'}`}>{CHOICE_LABELS[optIdx]}</span>
+                                                                                <span><RichTextRenderer content={opt} /></span>
+                                                                            </label>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex flex-wrap gap-3">
+                                                                    {CHOICE_LABELS.map((label, optIdx) => {
+                                                                        const isChecked = answers[questionKey] === optIdx;
+                                                                        return (
+                                                                            <label key={label} className={`min-w-[5rem] px-4 py-3 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-center font-black ${isChecked ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300'}`}>
+                                                                                <input type="radio" name={questionKey} className="hidden" onChange={() => handleAnswerChange(questionKey, optIdx)} checked={isChecked} />
+                                                                                {label}
+                                                                            </label>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            )
+                                                        )}
+
+                                                        {/* True/False */}
+                                                        {q.type === 'true_false' && (
+                                                            hasStatementContent ? (
+                                                                <div className="space-y-3">
+                                                                    {q.statements?.map((stmt, stmtIdx) => {
+                                                                        const currentAns = answers[questionKey]?.[stmt.id];
+                                                                        return (
+                                                                            <div key={stmt.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                                                                                <div className="flex gap-3">
+                                                                                    <span className="font-bold text-slate-500">{TRUE_FALSE_LABELS[stmtIdx]})</span>
+                                                                                    <span className="font-medium text-slate-800"><RichTextRenderer content={stmt.content} /></span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-2 shrink-0">
+                                                                                    <button onClick={() => handleAnswerChange(questionKey, true, stmt.id)} className={`px-4 py-1.5 rounded-lg text-sm font-bold border transition-colors ${currentAns === true ? 'bg-green-500 text-white border-green-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}`}>Đúng</button>
+                                                                                    <button onClick={() => handleAnswerChange(questionKey, false, stmt.id)} className={`px-4 py-1.5 rounded-lg text-sm font-bold border transition-colors ${currentAns === false ? 'bg-red-500 text-white border-red-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}`}>Sai</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            ) : (
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                                    {q.statements?.map((stmt, stmtIdx) => {
+                                                                        const currentAns = answers[questionKey]?.[stmt.id];
+                                                                        return (
+                                                                            <div key={stmt.id} className="flex items-center justify-between gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                                                                                <span className="font-bold text-slate-700">Mệnh đề {TRUE_FALSE_LABELS[stmtIdx]})</span>
+                                                                                <div className="flex items-center gap-2 shrink-0">
+                                                                                    <button onClick={() => handleAnswerChange(questionKey, true, stmt.id)} className={`px-4 py-1.5 rounded-lg text-sm font-bold border transition-colors ${currentAns === true ? 'bg-green-500 text-white border-green-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}`}>Đúng</button>
+                                                                                    <button onClick={() => handleAnswerChange(questionKey, false, stmt.id)} className={`px-4 py-1.5 rounded-lg text-sm font-bold border transition-colors ${currentAns === false ? 'bg-red-500 text-white border-red-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}`}>Sai</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            )
+                                                        )}
+
+                                                        {/* Short answer */}
+                                                        {q.type === 'short_answer' && (
+                                                            <div className="mt-2">
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Nhập đáp án..."
+                                                                    value={answers[questionKey] || ''}
+                                                                    onChange={(e) => handleAnswerChange(questionKey, e.target.value)}
+                                                                    className="w-full md:w-1/2 p-3 border-b-2 border-slate-300 bg-slate-50 rounded-t-lg font-bold text-lg text-center focus:outline-none focus:border-[#fe5f36] transition-colors"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    )})}
+                                        )
+                                    })}
                                 </div>
                             </div>
                         ))}
