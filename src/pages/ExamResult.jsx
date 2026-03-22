@@ -547,8 +547,8 @@ export default function ExamResult() {
                  }
              } else if (q.type === 'short_answer') {
                  details.part3.total += 1;
-                 const userAns = String(answers[qKey] || '').trim().toLowerCase();
-                 const expectAns = String(expectedAnswer ?? '').trim().toLowerCase();
+                 const userAns = String(answers[qKey] || '').replace(',', '.').trim().toLowerCase();
+                 const expectAns = String(expectedAnswer ?? '').replace(',', '.').trim().toLowerCase();
                  
                  if (userAns && userAns === expectAns) {
                      totalScore += q.points ?? 0.5;
@@ -707,15 +707,15 @@ export default function ExamResult() {
                                                         <div className="mt-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                                                             <div className="bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl min-w-[120px]">
                                                                 <p className="text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Trl của bạn</p>
-                                                                <p className={`font-mono text-lg font-black ${String(userAns || '').trim().toLowerCase() === String(expectedAnswer ?? '').trim().toLowerCase() ? 'text-green-600' : 'text-red-500'}`}>
-                                                                    {userAns || <span className="text-slate-400 italic font-normal text-sm">Trống</span>}
+                                                                <p className={`font-mono text-lg font-black ${String(userAns || '').replace(',', '.').trim().toLowerCase() === String(expectedAnswer ?? '').replace(',', '.').trim().toLowerCase() ? 'text-green-600' : 'text-red-500'}`}>
+                                                                    {userAns ? String(userAns).replace('.', ',') : <span className="text-slate-400 italic font-normal text-sm">Trống</span>}
                                                                 </p>
                                                             </div>
                                                             <span className="material-symbols-outlined hidden sm:block text-slate-300">arrow_right_alt</span>
                                                             <div className="bg-blue-50 border border-blue-200 px-4 py-3 rounded-xl min-w-[120px]">
                                                                 <p className="text-xs font-bold text-blue-500 mb-1 uppercase tracking-wider">Đáp án đúng</p>
                                                                 <p className="font-mono text-lg font-black text-blue-700">
-                                                                    {expectedAnswer ?? <span className="text-slate-400 italic font-normal text-sm">Chưa có đáp án</span>}
+                                                                    {expectedAnswer ? String(expectedAnswer).replace('.', ',') : <span className="text-slate-400 italic font-normal text-sm">Chưa có đáp án</span>}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -771,7 +771,7 @@ export default function ExamResult() {
                             <div className="bg-white rounded-[1.8rem] px-12 py-8">
                                 <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Điểm tổng kết</p>
                                 <div className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#fe5f36] to-pink-600">
-                                    {displayScore.toFixed(2).replace(/\.00$/, '')}<span className="text-3xl text-slate-300 ml-2">/10</span>
+                                    {displayScore.toFixed(2).replace(/\.00$/, '').replace('.', ',')}<span className="text-3xl text-slate-300 ml-2">/10</span>
                                 </div>
                             </div>
                         </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import WelcomeModal from './WelcomeModal';
+import Avatar from './Avatar';
 
 export default function RootLayout() {
   const { user, profile } = useAuth();
@@ -73,6 +74,10 @@ export default function RootLayout() {
             <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/schools') ? "'FILL' 1" : "'FILL' 0" }}>apartment</span>
             Trường phù hợp
           </Link>
+          <Link to="/exam-room" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/exam-room') ? 'bg-[#3b82f6] text-white shadow-lg shadow-[#3b82f6]/20 font-semibold' : 'text-slate-500 hover:bg-[#3b82f6]/10 hover:text-[#3b82f6]'}`}>
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/exam-room') ? "'FILL' 1" : "'FILL' 0" }}>quiz</span>
+            Phòng thi
+          </Link>
           <Link to="/roadmap" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/roadmap') ? 'bg-[#e36488] text-white shadow-lg shadow-[#e36488]/20 font-semibold' : 'text-slate-500 hover:bg-[#e36488]/10 hover:text-[#e36488]'}`}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/roadmap') ? "'FILL' 1" : "'FILL' 0" }}>timeline</span>
             Lộ trình
@@ -84,10 +89,6 @@ export default function RootLayout() {
           <Link to="/arena" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/arena') ? 'bg-[#fe5f36] text-white shadow-lg shadow-[#fe5f36]/20 font-semibold' : 'text-slate-500 hover:bg-[#fe5f36]/10 hover:text-[#fe5f36]'}`}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/arena') ? "'FILL' 1" : "'FILL' 0" }}>local_fire_department</span>
             Đấu trường
-          </Link>
-          <Link to="/exam-room" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/exam-room') ? 'bg-[#3b82f6] text-white shadow-lg shadow-[#3b82f6]/20 font-semibold' : 'text-slate-500 hover:bg-[#3b82f6]/10 hover:text-[#3b82f6]'}`}>
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/exam-room') ? "'FILL' 1" : "'FILL' 0" }}>quiz</span>
-            Phòng thi
           </Link>
           {profile?.role === 'admin' && (
             <Link to="/admin" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all border border-transparent ${isActive('/admin') ? 'bg-[#7f13ec] text-white shadow-lg shadow-[#7f13ec]/20 font-semibold' : 'text-slate-500 hover:bg-[#7f13ec]/10 hover:text-[#7f13ec] hover:border-[#7f13ec]/20'}`}>
@@ -105,9 +106,13 @@ export default function RootLayout() {
 
         <div className="mt-auto">
           <Link to="/profile" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/profile') ? 'bg-white/10 text-white font-semibold border border-white/20' : 'text-slate-500 hover:bg-white/5'}`}>
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-800">
-              <img className="w-full h-full object-cover" src={profile?.avatar_url || user?.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'} alt="Avatar" />
-            </div>
+            <Avatar 
+              src={profile?.avatar_url || user?.user_metadata?.avatar_url}
+              name={profile?.display_name || user?.user_metadata?.full_name || 'Cá nhân'}
+              id={user?.id}
+              size="w-8 h-8"
+              rounded="rounded-full"
+            />
             <span className="truncate">{profile?.display_name || user?.user_metadata?.full_name || 'Cá nhân'}</span>
           </Link>
         </div>

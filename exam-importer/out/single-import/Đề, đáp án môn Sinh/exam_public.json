@@ -1,0 +1,2481 @@
+{
+  "schema_version": "2026-03-19",
+  "title": "Đề, đáp án môn Sinh",
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I. CÂU HỎI TRẮC NGHIỆM NHIỀU PHƯƠNG ÁN LỰA CHỌN. $. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi, thí sinh chỉ chọn một phương án trả lời đúng nhất.$",
+      "type": "single_choice",
+      "questions": [
+        {
+          "id": "part1.q1",
+          "source_number": 1,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Quá trình đường phân trong hô hấp ở thực vật là phân giải phân tử glucose"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "đến carbon dioxide và nước diễn ra ở tế bào chất."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "đến acid pyruvic diễn ra ở tế bào chất."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "đến acid pyruvic diễn ra ở ti thể."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "để tạo ra acid lactic."
+                    }
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "image",
+                      "image_id": "img_f25387a7a68e"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q2",
+          "source_number": 2,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "[!b:$"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Hình 1$] mô tả thí nghiệm về quá trình quang hợp của bèo"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Elodea (bèo Mỹ). Khi kết thúc thí nghiệm, nồng độ khí nào sau"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "đây trong ống nghiệm tăng?"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Hình 1Hình 1 A. O2."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "SO2."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "CH"
+                    },
+                    {
+                      "type": "text",
+                      "text": "4",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "CO"
+                    },
+                    {
+                      "type": "text",
+                      "text": "2",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q3",
+          "source_number": 3,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Gene là một đoạn trình trự nucleotide trên DNA mang thông tin di truyền"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "mã hóa các amino acid"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "mã hóa cho một chuỗi polypeptide hoặc một phân tử RNA"
+                    },
+                    {
+                      "type": "text",
+                      "text": ".",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "quy định cơ chế di truyền"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "quy định cấu trúc của một phân tử protein."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q4",
+          "source_number": 4,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Trong cơ chế điều hòa hoạt động của gene ở sinh vật nhân sơ, vùng khởi động có chức năng?"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Mang thông tin quy định protein enzyme."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Nơi liên kết với protein ức chế."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Nơi tiếp xúc với enzyme RNA polymerase."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Mang thông tin quy định protein ức chế."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q5",
+          "source_number": 5,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Một đoạn polypeptide gồm 4 amino acid có trình tự lần lượt là Val – Trp – Lys – Pro. Biết rằng các codon mã hóa các amino acid tương ứng như sau: Trp – UGG; Val – GUU; Lys – AAG; Pro – CC A. Đoạn mạch gốc của gene mang thông tin mã hóa cho đoạn polypeptide nói trên có trình tự nucleotide là:"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "5’ GTT – TGG – AAG – CCA 3’."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "5’ TGG – CTT – CCA – AAC 3’"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "5’ CAA – ACC – TTC – GGT 3’"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "5’ GUU – UGG – AAG – CCA 3’"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q6",
+          "source_number": 6,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Ở người, bệnh bạch tạng do gene trên nhiễm sắc thể thường qui định, gene A: bình thường, gene a: bạch tạng. Bệnh mù màu do gene lặn b nằm trên nhiễm sắc thể giới tính X qui định, gene B qui định nhìn màu bình thường. Kiểu gene nào sau đây biểu hiện kiểu hình ở người nữ chỉ bị mù màu?"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "aa X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "B",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "B",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": ", Aa X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "B",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "B",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": ", AA X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "B",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "X[!sup:$b"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "$]Aa X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "b",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "b",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": ", aa X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "b",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "b",
+                      "marks": [
+                        "sup"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Aa X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "B",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "b",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": ", aa X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "B",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "X[!sup:$b"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "$]AA X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "b",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "b",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": ", Aa X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "b",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "X"
+                    },
+                    {
+                      "type": "text",
+                      "text": "b",
+                      "marks": [
+                        "sup"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q7",
+          "source_number": 7,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Phát biểu nào sau đây về đột biến gene là sai?"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Đột biến gene làm xuất hiện các allele khác nhau cung cấp nguyên liệu cho quá trình tiến hoá."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Đột biến thay thế một cặp nucleotide luôn làm thay đổi chức năng của prôtêin."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Đột biến gene có thể có hại, có lợi hoặc trung tính đối với thể đột biến."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Mức độ gây hại của allele đột biến phụ thuộc vào điều kiện môi trường và tổ hợp gene."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q8",
+          "source_number": 8,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Cho phả hệ bên. Theo phả hệ, bệnh gây ra có thể là bệnh gì trong các bệnh sau đây?"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "image",
+                  "image_id": "img_d8a91deadd59"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Bệnh mù màu"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Bệnh bạch tạng"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Bệnh phenylceton niệu"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Bệnh động kinh"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q9",
+          "source_number": 9,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Sơ đồ dưới đây mô tả nguyên lí tạo thực vật mang gene kháng vi khuẩn gây bệnh nhờ công nghệ DNA tái tổ hợp. Số nào của sơ đồ thể hiện DNA tái tổ hợp?"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "image",
+                  "image_id": "img_6f637a749fb8"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "1."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "2. [!b:$"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "4$]. [!b:$"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "6$]."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q10",
+          "source_number": 10,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Xác côn trùng trong hồ phách được phát hiện có từ đại Cổ sinh thuộc bằng chứng tiến hóa nào sau đây?"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Hóa thạch."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Tế bào học."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Sinh học phân tử."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Giải phẫu so sánh."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q11",
+          "source_number": 11,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Cấu tạo khác nhau về chi tiết của cơ quan tương đồng là do"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Sự tiến hóa trong quá trình phát triển loài"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Chọn lọc tự nhiên đã diễn ra theo những hướng khác nhau"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Chúng có nguồn gốc khác nhau nhưng phát triển trong các điều kiện như nhau"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Chúng thực hiện các chức năng khác nhau."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q12",
+          "source_number": 12,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Theo quan niệm của Darwin, nguồn nguyên liệu chủ yếu của quá trình tiến hóa là"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Đột biến cấu trúc NST"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Biến dị cá thể"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Đột biến gene"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Đột biến số lượng NST"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q13",
+          "source_number": 13,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Trong"
+                },
+                {
+                  "type": "text",
+                  "text": " ",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "quá trình nguyên phân, NST kép co xoắn tối đa ở"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "kì giữa."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "kì đầu."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "kì sau."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "kì cuối."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q14",
+          "source_number": 14,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "table",
+              "rows": [
+                {
+                  "type": "table_row",
+                  "cells": [
+                    [
+                      {
+                        "type": "text",
+                        "text": "Dựa trên thí nghiệm trên cây hoa phấn của Correns. Hình sau giải thích cho hiện tượng di truyền liên quan đến màu sắc lá của cây hoa mõm chó (cây hoa phấn, cây hoa mõm sói). Cho biết [3] chỉ vị trí của alelle bình thường tạo ra enzyme chuyển hóa tổng hợp diệp lục tạo sắc tố lá xanh; [4] chỉ vị trí của alelle đột biến không tạo ra enzyme chuyển hóa tổng hợp diệp lục nên lá trắng; tế bào có thể chứa [3] hoặc [4] hoặc cả hai."
+                      },
+                      {
+                        "type": "image",
+                        "image_id": "img_5c5113eeb92f"
+                      },
+                      {
+                        "type": "text",
+                        "text": "Theo lý thuyết, nhận định nào sau đây"
+                      },
+                      {
+                        "type": "text",
+                        "text": "[!b:$Sai",
+                        "marks": [
+                          "italic"
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "text": "$]?"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Màu sắc lá liên quan đến gene nằm trong bào quan (a)."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Trong lục lạp ( a) có thể chứa alelle bình thường [3] (lá xanh) hoặc alelle đột biến [4] (lá trắng) hoặc cả 2 loại alelle [3] và [4]."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Nếu cây (F"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": ") lá xanh thì hợp tử (tế bào hình trên) có lục lạp ( a) chứa gene [3] hoặc chỉ [4]."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Nếu hợp tử có lục lạp ( a) chỉ mang gene [3] thì cây chỉ có lá xanh."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q15",
+          "source_number": 15,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Ở một quần thể đậu Hà Lan, xét một gene có hai allele ( và ), tần số allele là 0,9 . Theo lí thuyết, tần số allele của quần thể này là"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "0,1 ."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "0,01 ."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "0,9 ."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "0,81 ."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q16",
+          "source_number": 16,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Hiện tượng ốc sên bị chết do gia súc giẫm đạp là ví dụ minh họa về tác động của nhân tố tiến hoá nào sau đây?"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Dòng gene."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Phiêu bạt di truyền."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Đột biến."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Giao phối."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q17",
+          "source_number": 17,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Ở ruồi giấm, xét kiểu gene , trong đó allele A quy định thân xám là trội hoàn toàn so với allele a quy định thân đen; allele quy định cánh dài là trội hoàn toàn so với allele b quy định cánh cụt. Có bao nhiêu phát biểu sau đây về hai gene này là đúng?"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "I. Một tế bào sinh tinh giảm phân bình thường tạo ra tối đa hai loại tinh trùng."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "II. Nếu một tế bào sinh trứng xảy ra sự không phân li của cặp NST mang hai gene này trong giảm phân I, giảm phân II bình thường thì có thể tạo ra loại trứng có kiểu gene ab."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "III. Một tế bào sinh trứng giảm phân bình thường tạo ra bốn loại trứng."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "IV. Cơ thể đực giảm phân bình thường tạo tối đa bốn loại tinh trùng."
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "4 ."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "2 ."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "1 ."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "3 ."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part1.q18",
+          "source_number": 18,
+          "type": "single_choice",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Phát biểu nào sau đây đúng về tiêu hoá ở động vật?"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Ruột khoang có ống tiêu hoá và chỉ có tiêu hoá ngoại bào."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Tiêu hoá là quá trình biến đổi thức ăn thành các chất dinh dưỡng và tạo ra năng lượng."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "C",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Ở động vật đơn bào, thức ăn được tiêu hoá trong túi tiêu hoá."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Động vật có xương sống và nhiều loài động vật không xương sống có ống tiêu hoá."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II. CÂU TRẮC NGHIỆM ĐÚNG SAI. $. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.$",
+      "type": "true_false_group",
+      "questions": [
+        {
+          "id": "part2.q1",
+          "source_number": 1,
+          "type": "true_false_group",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Khi nói về đặc điểm của nhân tố tiến hóa chọn lọc tự nhiên, các nhận định dưới đây là đúng hay sai?"
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Thực chất là quá trình phân hóa khả năng sống sót và khả năng sinh sản của các cá thể với các kiểu gene khác nhau trong quần thể."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Tác động trực tiếp lên kiểu gene mà không tác động lên kiểu hình của sinh vật."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "c",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Làm biến đổi tần số allele và thành phần kiểu gene của quần thể không theo hướng xác định."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "d",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Đóng vai trò sàng lọc và giữ lại những cá thể có kiểu gene quy định kiểu hình thích nghi mà không tạo ra các kiểu gene thích nghi."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part2.q2",
+          "source_number": 2,
+          "type": "true_false_group",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Hầu hết các mô, cơ quan trong cơ thể đều có ảnh hưởng đến thành phần nội môi."
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Chế độ ăn nhiều muối trong thời gian dài có thể gây ra sỏi đường tiết niệu."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Cơ quan hô hấp cung cấp CO"
+                    },
+                    {
+                      "type": "text",
+                      "text": "2",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "vào máu và thải O"
+                    },
+                    {
+                      "type": "text",
+                      "text": "2",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "từ máu ra ngoài."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "c",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Gan giúp phân giải hồng cầu và thái sản phẩm phân giải ra ngoài qua dịch mật."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "d",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Da thải nước, các chất hoà tan, chất độc, chất thải từ môi trường trong ra ngoài thông qua quá trình tạo và thải mồ hôi."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part2.q3",
+          "source_number": 3,
+          "type": "true_false_group",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "02468100246810Không thuốcThuốc 1Thuốc 2ProteinmRNAHàm lượng protein trong tế bào (mg/cm"
+                },
+                {
+                  "type": "text",
+                  "text": "3",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ")Hàm lượng mRNA trong tế bào (mg/cm"
+                },
+                {
+                  "type": "text",
+                  "text": "3",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ")Hàm lượng protein và mRNA trong tế bào02468100246810Không thuốcThuốc 1Thuốc 2ProteinmRNAHàm lượng protein trong tế bào (mg/cm"
+                },
+                {
+                  "type": "text",
+                  "text": "3",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ")Hàm lượng mRNA trong tế bào (mg/cm"
+                },
+                {
+                  "type": "text",
+                  "text": "3",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ")Hàm lượng protein và mRNA trong tế bào"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Để nghiên cứu cơ chế tác động của 2 loại thuốc mới điều trị bệnh nhân Covid−19 (thuốc 1 và thuốc 2) người ta tiến hành thử nghiệm tác động của chúng lên quá trình biểu hiện gene của gene virus trong các tế bào người. Hàm lượng mRNA của virus và protein virus trong các mẫu tế bào được thể hiện theo biểu đồ. Biết rằng, các điều kiện thí nghiệm là như nhau."
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Thuốc 1 làm giảm hàm lượng mRNA so với không xử lí thuốc dẫn đến làm giảm hàm lượng protein do protein là sản phẩm sau dịch mã."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Thuốc 1 can thiệp vào quá trình phiên mã tạo ra mRNA của virus hoặc tác động làm phân huỷ mRNA của virus."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "c",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Thuốc 2 can thiệp vào quá trình dịch mã từ mRNA virus hoặc tác động làm phân huỷ một phần protein virus."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "d",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Xử lí thuốc 2 làm ảnh hưởng đến quá trình phiên mã nên ảnh hưởng đến lượng protein được tạo ra, protein giảm một phần có thể do thuốc 2 kìm hãm dịch mã hoặc tác động làm phân huỷ một phần protein của virus."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "part2.q4",
+          "source_number": 4,
+          "type": "true_false_group",
+          "stem_blocks": [
+            {
+              "type": "table",
+              "rows": [
+                {
+                  "type": "table_row",
+                  "cells": [
+                    [
+                      {
+                        "type": "text",
+                        "text": "Ở một loài động vật, xét 2 cặp gene Aa và Bb trong đó mỗi cặp gene quy định một cặp tính trạng, allele trội là trội hoàn toàn. Thực hiện 4 phép lai (P1, P2, P3 và P4) giữa các cặp bố mẹ khác nhau, thu được kết quả F1 được mô tả ở Bảng 2. Biết rằng không xảy ra đột biến; nếu có hoán vị gene thì hoán vị gene có thể xảy ở một bên đực hoặc cái, hoặc xảy ra hoán vị cả hai giới với tần số hoán vị như nhau."
+                      }
+                    ],
+                    [
+                      {
+                        "type": "text",
+                        "text": "Bảng 2."
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Phép lai P"
+                    },
+                    {
+                      "type": "text",
+                      "text": "3",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "và P"
+                    },
+                    {
+                      "type": "text",
+                      "text": "4",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "có thể có kiểu gene giống nhau."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Có 5 sơ đồ lai thỏa mãn dữ kiện của phép lai P"
+                    },
+                    {
+                      "type": "text",
+                      "text": "2",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "c",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Ở phép lai P"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": ", nếu cho F"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "lai phân tích thì F"
+                    },
+                    {
+                      "type": "text",
+                      "text": "2",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "kiểu hình mang hai tính trạng trội chiếm tỉ lệ 24/25."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "d",
+              "content_blocks": [
+                {
+                  "type": "paragraph",
+                  "inlines": [
+                    {
+                      "type": "text",
+                      "text": "Ở phép lai P"
+                    },
+                    {
+                      "type": "text",
+                      "text": "4",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": ", trong số kiểu hình trội về hai tính trạng ở F"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": ", kiểu gene ba allele trội chiếm tỉ lệ 24/59."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III. CÂU TRẮC NGHIỆM TRẢ LỜI NGẮN. $. Thí sinh trả lời từ câu 1 đến câu 6.$",
+      "type": "short_answer",
+      "questions": [
+        {
+          "id": "part3.q1",
+          "source_number": 1,
+          "type": "short_answer",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Bảng dưới đây thể hiện sự có (+) hoặc không có (-) một số đặc điểm ở 5 loài (được kí hiệu từ 0803 đến 0807). Loài nào có quan hệ họ hàng gần nhất với loài 0807?"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "image",
+                  "image_id": "img_c9bafb6c0059"
+                }
+              ]
+            }
+          ],
+          "answer_slot_count": 0
+        },
+        {
+          "id": "part3.q2",
+          "source_number": 2,
+          "type": "short_answer",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Ở một loài thực vật ngẫu phối, tính trạng màu hoa do một gene có 2 allele quy định, A quy định hoa màu vàng trội hoàn toàn so với a quy định hoa trắng. Số liệu thống kê cho thấy 91% các cây trong hòn đảo"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "có hoa màu vàng. Khi không có sự tác động của các nhân tố tiến hóa, theo lý thuyết, cho những cây có cùng màu hoa giao phấn ngẫu nhiên với nhau thì thế hệ F"
+                },
+                {
+                  "type": "text",
+                  "text": "1",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "có hoa vàng chiếm tỉ lệ bao nhiêu? ("
+                },
+                {
+                  "type": "text",
+                  "text": "tính làm tròn đến 2 chữ số sau dấu phẩy)",
+                  "marks": [
+                    "italic"
+                  ]
+                }
+              ]
+            }
+          ],
+          "answer_slot_count": 0
+        },
+        {
+          "id": "part3.q3",
+          "source_number": 3,
+          "type": "short_answer",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Một quần thể người ở một khu dân cư có cấu trúc di truyền như sau:"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "0,64MM + 0,32MN + 0,04NN = 1. Nếu khu dân cư này có 10.000 người thì số lượng người mang nhóm máu có kiểu gene dị hợp là bao nhiêu?"
+                }
+              ]
+            }
+          ],
+          "answer_slot_count": 0
+        },
+        {
+          "id": "part3.q4",
+          "source_number": 4,
+          "type": "short_answer",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Ở một loài thực vật lưỡng bội, tính trạng màu sắc hoa do hai cặp gene (A, a và B, b) quy định; khi có mặt đồng thời hai loại allele trội A và B cho hoa đỏ, các kiểu gene còn lại cho hoa trắng; allele D quy định quả tròn, allele d quy định quả dài. Cho cây hoa đỏ, quả tròn (P) tự thụ phấn đời con thu được 14,0625% cây hoa đỏ, quả dài. Khi cho cây hoa đỏ, quả tròn (P) giao phấn với cây khác (cây M) đời con có 4 kiểu hình với tỉ lệ 3: 3: 1: 1. Biết không phát sinh đột biến mới và các cặp gene này phân li độc lập. Theo lí thuyết, nếu không xét vai trò của bố mẹ thì có bao nhiêu phép lai phù hợp giữa cây hoa đỏ, quả tròn đời P và cây M?"
+                }
+              ]
+            }
+          ],
+          "answer_slot_count": 0
+        },
+        {
+          "id": "part3.q5",
+          "source_number": 5,
+          "type": "short_answer",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Hình dưới đây mô tả mô hình cấu trúc Operon"
+                },
+                {
+                  "type": "text",
+                  "text": "lac",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "của vi khuẩn E. coli."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "image",
+                  "image_id": "img_37f6d3d3e89f"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Hãy cho biết Operon"
+                },
+                {
+                  "type": "text",
+                  "text": "lac",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "tương ứng với vị trí nào trên hình?"
+                }
+              ]
+            }
+          ],
+          "answer_slot_count": 0
+        },
+        {
+          "id": "part3.q6",
+          "source_number": 6,
+          "type": "short_answer",
+          "stem_blocks": [
+            {
+              "type": "paragraph",
+              "inlines": [
+                {
+                  "type": "text",
+                  "text": "Tính trạng màu sắc lông ở một loài động vật do một gene có 5 allele quy định, trong đó A"
+                },
+                {
+                  "type": "text",
+                  "text": "1",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ", A"
+                },
+                {
+                  "type": "text",
+                  "text": "2",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ", A"
+                },
+                {
+                  "type": "text",
+                  "text": "3",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "là đồng trội so với nhau và trội hoàn toàn so với allele A"
+                },
+                {
+                  "type": "text",
+                  "text": "4",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ", A"
+                },
+                {
+                  "type": "text",
+                  "text": "5",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "; allele A"
+                },
+                {
+                  "type": "text",
+                  "text": "4",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "trội hoàn toàn so với allele A"
+                },
+                {
+                  "type": "text",
+                  "text": "5",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ". Tính số loại kiểu gene dị hợp về tính trạng màu lông?"
+                }
+              ]
+            }
+          ],
+          "answer_slot_count": 0
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "part_count": 3,
+    "question_count": 28,
+    "answer_section_detected": true
+  },
+  "assets": {
+    "images": {
+      "img_f25387a7a68e": {
+        "id": "img_f25387a7a68e",
+        "filename": "img_f25387a7a68e.png",
+        "path": "D:\\Web sv\\tram_hs_sv\\exam-importer\\out\\single-import\\Đề, đáp án môn Sinh\\assets\\img_f25387a7a68e.png",
+        "source": "word/media/image1.png",
+        "content_type": "image/png"
+      },
+      "img_d8a91deadd59": {
+        "id": "img_d8a91deadd59",
+        "filename": "img_d8a91deadd59.png",
+        "path": "D:\\Web sv\\tram_hs_sv\\exam-importer\\out\\single-import\\Đề, đáp án môn Sinh\\assets\\img_d8a91deadd59.png",
+        "source": "word/media/image2.png",
+        "content_type": "image/png"
+      },
+      "img_6f637a749fb8": {
+        "id": "img_6f637a749fb8",
+        "filename": "img_6f637a749fb8.png",
+        "path": "D:\\Web sv\\tram_hs_sv\\exam-importer\\out\\single-import\\Đề, đáp án môn Sinh\\assets\\img_6f637a749fb8.png",
+        "source": "word/media/image3.png",
+        "content_type": "image/png"
+      },
+      "img_5c5113eeb92f": {
+        "id": "img_5c5113eeb92f",
+        "filename": "img_5c5113eeb92f.png",
+        "path": "D:\\Web sv\\tram_hs_sv\\exam-importer\\out\\single-import\\Đề, đáp án môn Sinh\\assets\\img_5c5113eeb92f.png",
+        "source": "word/media/image4.png",
+        "content_type": "image/png"
+      },
+      "img_c9bafb6c0059": {
+        "id": "img_c9bafb6c0059",
+        "filename": "img_c9bafb6c0059.png",
+        "path": "D:\\Web sv\\tram_hs_sv\\exam-importer\\out\\single-import\\Đề, đáp án môn Sinh\\assets\\img_c9bafb6c0059.png",
+        "source": "word/media/image5.png",
+        "content_type": "image/png"
+      },
+      "img_37f6d3d3e89f": {
+        "id": "img_37f6d3d3e89f",
+        "filename": "img_37f6d3d3e89f.png",
+        "path": "D:\\Web sv\\tram_hs_sv\\exam-importer\\out\\single-import\\Đề, đáp án môn Sinh\\assets\\img_37f6d3d3e89f.png",
+        "source": "word/media/image6.png",
+        "content_type": "image/png"
+      }
+    }
+  }
+}

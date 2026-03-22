@@ -1,0 +1,15 @@
+{
+  "schema_version": "2026-03-19",
+  "title": "de_thi_mau",
+  "answer_key": {},
+  "answer_key_template": {
+    "part1.q1": null,
+    "part1.q2": null,
+    "part1.q3": null,
+    "part1.q4": null,
+    "part1.q5": null
+  },
+  "meta": {
+    "question_count": 5
+  }
+}

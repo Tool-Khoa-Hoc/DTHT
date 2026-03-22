@@ -1,0 +1,26 @@
+[!b:$$$SỞ GD&ĐT TỈNH X$$$]
+KỲ THI KHẢO SÁT CHẤT LƯỢNG LỚP 11 NĂM HỌC 2024-2025
+MÔN: SINH HỌC - Thời gian làm bài: 50 phút
+Mã đề: 101
+[!b:$$$PHẦN I. $$$]Thí sinh trả lời từ câu 1 đến câu 24. Mỗi câu hỏi thí sinh chỉ chọn một phương án.
+Câu 1: Hình dưới đây mô tả quá trình phân bào ở tế bào động vật có bộ NST lưỡng bội là 2n = 8. Có bao nhiêu nhận định sau đây là đúng?
+Câu 2: Gene [!i:$$$[!b:$lac$$$]$] ở vi khuẩn [!i:$$$[!b:$E. coli$$$]$] kiểm soát tổng hợp enzyme phân giải đường lactose. Trong các nhận định sau, nhận định nào đúng?
+A. Vùng vận hành (O) là nơi enzyme ARN polymerase bám vào để tiến hành phiên mã.
+B. Khi môi trường không có lactose, protein ức chế bám vào vùng vận hành.
+C. Khi môi trường có lactose, lactose tương tác với protein ức chế.
+D. Vùng khởi động (P) là nơi protein ức chế có thể bám vào.
+Câu 3: Bảng dưới đây cho biết số liên kết hydro (H) trong mỗi phân tử DNA ở một loài sinh vật. Hãy xác định số nucleotide loại A trong phân tử DNA 1.
+[* Phân tử DNA | 1 | 2 *]
+[* Số liên kết H | 1801 | 1802 *]
+A. 198
+B. 301
+C. 300
+D. 199
+[!b:$$$PHẦN II. $$$]Thí sinh trả lời từ câu 25 đến câu 34. Trong mỗi ý a), b), c), d), thí sinh chọn đúng hoặc sai.
+Câu 25: Cho biết mỗi gen quy định một tính trạng, các gen phân li độc lập. Xét các nhận định sau:
+a) Khi cho cây hoa đỏ thuần chủng lai với cây hoa trắng thuần chủng, F2 thu được tỉ lệ kiểu hình 9:7.
+b) Kiểu gen AaBb có thể được sinh ra từ phép lai AaBB × aabb.
+c) Quy luật phân li độc lập chỉ nghiệm đúng khi các gen nằm trên các cặp NST tương đồng khác nhau.
+d) Hai tính trạng màu hoa và dạng quả luôn di truyền độc lập với nhau.
+[!b:$$$PHẦN III. $$$]Thí sinh trả lời từ câu 35 đến câu 38. Trả lời ngắn, điền số.
+Câu 35: Một phân tử DNA có tổng số [!i:$$$[!b:$N$$$]$] = 3000 nucleotide. Mạch 1 có số nucleotide loại A là 400, T là 350. Hỏi phân tử DNA có bao nhiêu liên kết H?

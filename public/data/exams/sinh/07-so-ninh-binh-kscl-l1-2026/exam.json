@@ -1,0 +1,779 @@
+{
+  "id": "07-so-ninh-binh-kscl-l1-2026",
+  "title": "7. Sở GD&ĐT Ninh Bình - KSCL Lần 1 - 2026",
+  "subject": "sinh",
+  "time": 50,
+  "description": null,
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn 1 phương án.",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": [
+            "Ở người, bệnh cơ ti thể (",
+            {
+              "type": "text",
+              "text": "Mitochondrial myopathy",
+              "marks": [
+                "italic"
+              ]
+            },
+            ") do đột biến gene ở bào quan ti thể gây ra và di truyền theo quy luật"
+          ],
+          "points": 0.25,
+          "options": [
+            "phân li độc lập.",
+            "liên kết gene.",
+            "gene ngoài nhân.",
+            "liên kết giới tính."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": "Để tạo thành công con la có sức làm việc cao, các nhà tạo giống đã cho lai con ngựa cái với lừa đực. Con la đã được tạo ra bằng phương pháp",
+          "points": 0.25,
+          "options": [
+            "tạo dòng thuần.",
+            "lai xa.",
+            "đa bội hóa.",
+            "lai thuận nghịch."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": [
+            [
+              "Hình dưới đây là sơ đồ mô tả sự di truyền gene ngoài nhân trong thí nghiệm của Correns trên cây hoa phấn (hoa bốn giờ)."
+            ],
+            {
+              "image": "1.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Nhận định nào",
+              {
+                "type": "text",
+                "text": "không ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "đúng về sự di truyền gene ngoài nhân trong thí nghiệm của Correns?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Trong giảm phân, lục lạp được phân chia đồng đều về các tế bào trứng.",
+            "Trong tế bào chất của tế bào trứng có thể chỉ chứa lục lạp mang gene đột biến hoặc gene không đột biến hoặc chứa cả hai loại lục lạp này.",
+            "Lá màu đốm hoặc màu trắng là do gene quy định tổng hợp diệp lục trong lục lạp bị đột biến tạo nên.",
+            "Trong quá trình thụ tinh, gene trong lục lạp ở tế bào chất của hợp tử chủ yếu nhận từ tế bào trứng."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": "Trong quy trình tách chiết DNA, chất tẩy rửa được sử dụng nhằm mục đích",
+          "points": 0.25,
+          "options": [
+            "phân giải protein.",
+            "kết tủa DNA.",
+            "phân giải RN A.",
+            "phá huỷ màng tế bào."
+          ]
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": "Dạng đột biến điểm làm tăng số liên kết hydrogen của gene là",
+          "points": 0.25,
+          "options": [
+            "thêm 1 cặp G – C.",
+            "thay thế 1 cặp nucleotide.",
+            "mất 1 cặp G – C.",
+            "mất 1 cặp A - T."
+          ]
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": [
+            [
+              "Một nhóm nghiên cứu tiến hành trồng các cây có cùng kiểu gene của một giống hoa cẩm tú cầu (",
+              {
+                "type": "text",
+                "text": "Mophead Hydrangea",
+                "marks": [
+                  "italic"
+                ]
+              },
+              ") ở đất có pH khác nhau, thu được kết quả:"
+            ],
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "pH đất"
+                  ],
+                  [
+                    "4,5 – 5,0"
+                  ],
+                  [
+                    "6,5"
+                  ],
+                  [
+                    ">7,0"
+                  ]
+                ],
+                [
+                  [
+                    "Màu sắc hoa"
+                  ],
+                  [
+                    "Màu xanh"
+                  ],
+                  [
+                    "Hồng và đỏ"
+                  ],
+                  [
+                    "Tím"
+                  ]
+                ]
+              ]
+            },
+            [
+              "Nhận định nào sau đây là đúng về giống hoa cẩm tú cầu trên?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Tập hợp các màu sắc hoa khác nhau (xanh, tím, hồng, đỏ) là mức phản ứng của kiểu gene quy định tính trạng màu sắc hoa.",
+            "Độ pH đất thay đổi đã làm cho kiểu gene của giống hoa cẩm tú cầu thay đổi.",
+            "Giống hoa cẩm tú cầu này có nhiều mức phản ứng khác nhau về tính trạng màu sắc hoa.",
+            "Màu sắc hoa của giống hoa cẩm tú cầu này hoàn toàn do độ pH đất quy định."
+          ]
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": "Khi nghiên cứu 1 dòng đột biến ở 1 loài côn trùng được tạo ra từ phòng thí nghiệm, người ta quan sát thấy trên NST số 2 có số lượng gene tăng lên, các NST khác bình thường. Hiện tượng trên là do đột biến",
+          "points": 0.25,
+          "options": [
+            "lặp đoạn.",
+            "đảo đoạn.",
+            "mất đoạn.",
+            "chuyển đoạn trong 1 NST."
+          ]
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": "Phân tử không tham gia trực tiếp vào quá trình dịch mã là",
+          "points": 0.25,
+          "options": [
+            "tRN A.",
+            "DN A.",
+            "mRN A.",
+            "rRNA."
+          ]
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": "Ở ruồi giấm, tính trạng màu mắt do 1 gene có 2 allele nằm trên NST giới tính X không có allele tương ứng trên Y quy định. Sự di truyền tính trạng màu mắt trên tuân theo quy luật",
+          "points": 0.25,
+          "options": [
+            "di truyền liên kết.",
+            "trội lặn hoàn toàn.",
+            "di truyền liên kết với giới tính.",
+            "di truyền giới tính."
+          ]
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": "Các codon UUA, UUG, CUU, CUC, CUA, CUG cùng mã hóa cho amino acid leucine, khi đó mã di truyền có",
+          "points": 0.25,
+          "options": [
+            "tính thoái hóa.",
+            "tính phổ biến.",
+            "tính liên tục.",
+            "tính đặc hiệu."
+          ]
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": "Mendel với công trình nghiên cứu trên đậu Hà lan, ông đã sử dụng phép lai nào sau đây để kiểm tra giả thuyết của mình?",
+          "points": 0.25,
+          "options": [
+            "Cho các cây F1 tự thụ phấn.",
+            "Phép lai phân tích.",
+            "Phép lai thuận nghịch.",
+            "Phép lai khác dòng."
+          ]
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": [
+            "Loài cáo tuyết bắc cực (",
+            {
+              "type": "text",
+              "text": "Vulpes lagopus",
+              "marks": [
+                "italic"
+              ]
+            },
+            ") thường có lông màu trắng vào mùa động lạnh, lông màu sẫm hơn khi ở mùa hè. Sự thay đổi màu sắc lông của cáo tuyết bắc cực theo mùa chủ yếu do yếu tố"
+          ],
+          "points": 0.25,
+          "options": [
+            "nhiệt độ.",
+            "kiểu gene.",
+            "ánh sáng.",
+            "thức ăn."
+          ]
+        },
+        {
+          "id": "q13",
+          "type": "single_choice",
+          "content": "Sinh vật nào sau đây là thành tựu của tạo giống bằng lai hữu tính?",
+          "points": 0.25,
+          "options": [
+            "Bò lai Sind là giống bò lai giữa bò đực Red sindhi thuần chủng với bò cái vàng Việt Nam.",
+            "Chuột mang gene mã hóa albumin huyết thanh của người.",
+            "Giống “lúa vàng” mang gene tổng hợp nên tiền chất của Vitamin A.",
+            "Giống ngô mang gene Bt và gene GT có khả năng kháng sâu đục thân và kháng thuốc diệt cỏ."
+          ]
+        },
+        {
+          "id": "q14",
+          "type": "single_choice",
+          "content": "Gà mái có cặp NST giới tính là",
+          "points": 0.25,
+          "options": [
+            "XX.",
+            "ZW.",
+            "ZZ.",
+            "XY."
+          ]
+        },
+        {
+          "id": "q15",
+          "type": "single_choice",
+          "content": "Quá trình tổng hợp DNA dựa trên mạch khuôn RNA được gọi là",
+          "points": 0.25,
+          "options": [
+            "phiên mã.",
+            "phiên mã ngược.",
+            "tái bản.",
+            "dịch mã."
+          ]
+        },
+        {
+          "id": "q16",
+          "type": "single_choice",
+          "content": [
+            "Trên một cây hoa phù dung (",
+            {
+              "type": "text",
+              "text": "Hibiscusmutabilis",
+              "marks": [
+                "italic"
+              ]
+            },
+            ") có màu sắc hoa thay đổi trong ngày (buổi sáng hoa nở có màu trắng, đến trưa sẽ chuyển sang màu hồng và buổi tối lại đổi thành màu đỏ sẫm). Hiện tượng trên là"
+          ],
+          "points": 0.25,
+          "options": [
+            "thường biến.",
+            "đột biến.",
+            "biến dị tổ hợp.",
+            "mức phản ứng."
+          ]
+        },
+        {
+          "id": "q17",
+          "type": "single_choice",
+          "content": "Mức phản ứng là tập hợp…(1)…của các cá thể có…(2)…trong các điều kiện môi trường khác nhau. (1) và (2) lần lượt là",
+          "points": 0.25,
+          "options": [
+            "kiểu gene và kiểu hình giống nhau.",
+            "kiểu hình và kiểu gene giống nhau.",
+            "kiểu hình và kiểu gene khác nhau.",
+            "kiểu gene và kiểu hình khác nhau."
+          ]
+        },
+        {
+          "id": "q18",
+          "type": "single_choice",
+          "content": "Một số giống cây ăn quả như: nho, dưa hấu... có quả to, không hạt được tạo ra bằng phương pháp đột biến. Trong tế bào sinh dưỡng của những giống cây trên có bộ NST thuộc dạng",
+          "points": 0.25,
+          "options": [
+            "2n + 1.",
+            "2n -1.",
+            "3n.",
+            "4n."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "true_false",
+          "content": [
+            [
+              "Hình bên mô tả khái quát cơ chế truyền thông tin di truyền ở cấp độ phân tử của sinh vật nhân thực."
+            ],
+            {
+              "image": "2.jpeg",
+              "align": "center",
+              "width": 70
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q1a",
+              "content": "Quá trình (1), (2), (3) lần lượt là tự nhân đôi DNA, phiên mã, dịch mã."
+            },
+            {
+              "id": "q1b",
+              "content": "Quá trình (1) được thực hiện theo nguyên tắc bổ sung và nguyên tắc bán bảo toàn."
+            },
+            {
+              "id": "q1c",
+              "content": "Quá trình (1), (2) và (3) diễn ra đồng thời."
+            },
+            {
+              "id": "q1d",
+              "content": "Nếu chuỗi polypeptide trong hình có 15 loại amino acid thì quá trình (3) có 15 loại tRNA tham gia hoạt động."
+            }
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "content": [
+            [
+              "Trong giờ thực hành, một nhóm học sinh của trường THPT A của tỉnh Ninh Bình đã tiến hành quan sát NST trên 2 tiêu bản cố định tế bào của người như sau: Bước 1: Đưa từng tiêu bản lên kính hiển vi điều chỉnh vùng có mẫu vật, quan sát ở độ phóng đại 10x, đến 40x, đến 100x."
+            ],
+            {
+              "image": "3.jpeg",
+              "align": "center",
+              "width": 70
+            },
+            [
+              "Bước 2: Vẽ hình ảnh bộ NST quan sát được ở 2 tiêu bản (hình vẽ được thể hiện trong hình dưới đây H1- tiêu bản 1, H2- tiêu bản 2) Bước 3: So sánh hình ảnh quan sát vẽ được và đưa ra các nhận xét, kết luận."
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q2a",
+              "content": "Tiêu bản 1 là tế bào bình thường, tiêu bản 2 là tế bào đột biến số lượng NST."
+            },
+            {
+              "id": "q2b",
+              "content": "Tiêu bản 2 là tế bào của người mắc hội chứng Klinefelter."
+            },
+            {
+              "id": "q2c",
+              "content": "Nếu 1 tế bào có bộ NST giống tiêu bản 1 phân bào bị rối loạn phân chia ở tất cả các cặp NST thì tạo ra tế bào có bộ NST giống tiêu bản 2."
+            },
+            {
+              "id": "q2d",
+              "content": "Một người nam có bộ NST giống tiêu bản 2 kết hôn với người vợ bình thường có khả năng sinh con bình thường với xác suất cao."
+            }
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "true_false",
+          "content": [
+            [
+              "Dựa trên thí nghiệm của Morgan để nghiên cứu sự di truyền của các tính trạng. Một nhóm nghiên cứu tiến hành các phép lai trên ruồi giấm trong phòng thí nghiệm và thu được kết quả sau:"
+            ],
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Phép lai"
+                  ],
+                  [
+                    "Bố, mẹ"
+                  ],
+                  [
+                    "Kết quả kiểu hình đời con"
+                  ]
+                ],
+                [
+                  [
+                    "1"
+                  ],
+                  [
+                    "♂ thân xám, cánh cụt x ♀ thân đen, cánh dài"
+                  ],
+                  [
+                    "100% thân xám, cánh dài"
+                  ]
+                ],
+                [
+                  [
+                    "2"
+                  ],
+                  [
+                    "♀ F1 của phép lai 1 (F1-1) x ♂ thân đen, cánh cụt"
+                  ],
+                  [
+                    "239 con thân xám, cánh cụt: 242 con thân đen, cánh dài: 59 con thân đen, cánh cụt: 61 thân xám, cánh dài"
+                  ]
+                ],
+                [
+                  [
+                    "3"
+                  ],
+                  [
+                    "♂ F1 của phép lai 1 (F1-1) x ♀ thân đen, cánh cụt"
+                  ],
+                  [
+                    "442 con thân xám, cánh cụt: 439 con thân đen, cánh dài"
+                  ]
+                ],
+                [
+                  [
+                    "4"
+                  ],
+                  [
+                    "♀ F1-1 x ♂ thân xám, cánh dài"
+                  ],
+                  [
+                    "4 loại kiểu hình trong đó kiểu hình thân đen, cánh cụt chiếm tỉ lệ 5%"
+                  ]
+                ]
+              ]
+            },
+            [
+              "Biết rằng mỗi tính trạng do một gene có 2 allele trội lặn hoàn toàn, nằm trên NST thường quy định."
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q3a",
+              "content": "Các phép lai nhằm mục đích xác định quy luật di truyền chi phối các tính trạng."
+            },
+            {
+              "id": "q3b",
+              "content": "Tần số hoán vị gene giữa các gene quy định tính trạng đang xét chỉ xác định được từ kết quả phép lai 4."
+            },
+            {
+              "id": "q3c",
+              "content": "Từ kết quả phép lai 3 cho phép nhận định ở con ♂ F1-1 các gene quy định các tính trạng đang xét liên kết gen."
+            },
+            {
+              "id": "q3d",
+              "content": "Nếu dựa vào kết quả của các phép lai để xây dựng bản đồ di truyền thì khoảng cách giữa gene quy định màu thân và gene quy định dạng cánh là 10cM."
+            }
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "true_false",
+          "content": [
+            "Ở một loài vi khuẩn, trên phân tử DNA nằm ở vùng nhân có các gene E, F, G, H, K, R trong đó các gene cấu trúc E, F, G thuộc cùng 1 operon với vùng P (Promoter) và O (Operator) chịu sự điều khiển của gene R như hình bên.",
+            {
+              "image": "4.jpeg",
+              "align": "center",
+              "width": 20
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q4a",
+              "content": "P là nơi liên kết với Protein ức chế."
+            },
+            {
+              "id": "q4b",
+              "content": "Khi gene K nhân đôi 3 lần thì gene G cũng nhân đôi 3 lần."
+            },
+            {
+              "id": "q4c",
+              "content": "Các gene E, F, G được phiên mã sẽ tạo ra 3 loại mRNA khác nhau để tổng hợp ra 3 loại protein khác nhau."
+            },
+            {
+              "id": "q4d",
+              "content": "Nếu gene R bị đột biến thì sản phẩm protein của gene G tạo ra có thể nhiều hơn."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III. Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào mỗi ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 5. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "short_answer",
+          "content": "Ở đậu Hà Lan, allele A quy định hoa tím trội hoàn toàn so với allele a quy định hoa trắng. Cho cây hoa tím thuần chủng lai với cây hoa trắng thu được F1. Cho cây F1 tự thụ phấn, thu được được 4800 cây F2 với tỉ lệ phân ly kiểu hình 75% hoa tím: 25% hoa trắng. Trong số các cây hoa tím ở F2, số lượng cây khi tự thụ phấn cho F3 không xuất hiện cây hoa trắng là bao nhiêu?",
+          "points": 0.25
+        },
+        {
+          "id": "q2",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 2",
+              "marks": [
+                "bold"
+              ]
+            },
+            ". Ở một loài thực vật lưỡng bội, xét 2 cặp gene A, a; B, b nằm trên 2 cặp NST tương đồng khác nhau. Trong đó, allele A bị đột biến thành allele a, allele b bị đột biến thành allele B. Biết các gene trội là trội hoàn toàn. Cho các cá thể có kiểu gene sau: 1. AABB; 2. AABb; 3. AaBb; 4. Aabb; 5. aabb; 6. AAbb. Những cá thể nào là thể đột biến? (",
+            {
+              "type": "text",
+              "text": "Viết liền các chữ số từ bé dến lớn",
+              "marks": [
+                "italic"
+              ]
+            },
+            ")."
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q3",
+          "type": "short_answer",
+          "content": [
+            [
+              "Bò được chuyển gene tổng hợp r-protein của người, gene này được biểu hiện ở tuyến sữa, có thể cho sản phẩm với số lượng lớn và được dùng để sản xuất ra protein C chữa bệnh máu vón cục gây tắc mạch ở người. Tạo bò chuyển gene được thực hiện dựa trên nguyên lí chung tạo sinh vật biến đổi gene. Cho các bước chính trong quy trình tạo bò chuyển gene trên: Thụ tinh",
+              {
+                "type": "text",
+                "text": "in vitro ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "(trong ống nghiệm). Cấy phôi vào ống dẫn trứng của con bò mẹ. Tiêm gene sản xuất r-protein của người vào hợp tử. Cho hợp tử phát triển thành phôi. Hãy viết trình tự đúng các bước của quy trình tạo bò chuyển gene.",
+              {
+                "type": "text",
+                "text": "(Viết liền các chữ số chỉ bước thực hiện)",
+                "marks": [
+                  "italic"
+                ]
+              },
+              ". Câu 4. Cho 5 hình dưới đây (được đánh số từ 1 đến 5), mỗi hình mô tả 1 cặp NST với các chữ cái X, Y, Z là các gene nằm trên NST. Em hãy chỉ ra những hình mô tả",
+              {
+                "type": "text",
+                "text": "không ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "đúng trình tự các gene nằm trên cặp NST tương đồng của tế bào sinh dưỡng bình thường?",
+              {
+                "type": "text",
+                "text": "(Viết liền các chữ số chỉ hình từ nhỏ đến lớn).",
+                "marks": [
+                  "italic"
+                ]
+              }
+            ],
+            {
+              "image": "5.jpeg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q4",
+          "type": "short_answer",
+          "content": [
+            [
+              "Bảng sau đây cho biết các codon mã hóa các amino acid tương ứng (đánh số từ 1 đến 6)"
+            ],
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Codon"
+                  ],
+                  [
+                    "5’GGG3’"
+                  ],
+                  [
+                    "5’CCC3’"
+                  ],
+                  [
+                    "5’GCU3’"
+                  ],
+                  [
+                    "5’CGA3’"
+                  ],
+                  [
+                    "5’UCG3’"
+                  ],
+                  [
+                    "5’AGC3’"
+                  ]
+                ],
+                [
+                  [
+                    "Amino acid"
+                  ],
+                  [
+                    "1"
+                  ],
+                  [
+                    "2"
+                  ],
+                  [
+                    "3"
+                  ],
+                  [
+                    "4"
+                  ],
+                  [
+                    "5"
+                  ],
+                  [
+                    "6"
+                  ]
+                ]
+              ]
+            },
+            [
+              "Một đoạn mạch khuôn của một gene ở vi khuẩn có trình tự nucleotide là 3’-GGGCCCAGCCGA-5’. Nếu đoạn mạch khuôn này mang thông tin mã hóa cho đoạn polypeptide có 4 amino acid thì trình tự các amino acid đó sẽ như thế nào?",
+              {
+                "type": "text",
+                "text": "(Viết liền các chữ số tương ứng với trình tự các amino acid",
+                "marks": [
+                  "italic"
+                ]
+              },
+              ")."
+            ],
+            {
+              "image": "6.jpeg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q5",
+          "type": "short_answer",
+          "content": [
+            "Một loài thực vật, hình dạng quả là do sự tác động của 2 cặp gene (A, a và B, b) phân li độc lập. Allele A và allele B tác động đến sự hình thành hình dạng quả theo sơ đồ hình bên. Allele a và allele b không tạo được các enzyme tương ứng. Khi cho cây quả dạng dẹt dị hợp 2 cặp gene giao phấn với cây quả dài, đời con thu được tỉ lệ cây quả dạng dẹt là bao nhiêu?",
+            {
+              "type": "text",
+              "text": "(Viết kết quả dưới dạng số thập phân, hai chữ số sau dấu phẩy)",
+              "marks": [
+                "italic"
+              ]
+            }
+          ],
+          "points": 0.25
+        }
+      ]
+    }
+  ],
+  "//answer_key": {
+    "part1.q1": 2,
+    "part1.q2": 1,
+    "part1.q3": 0,
+    "part1.q4": 3,
+    "part1.q5": 0,
+    "part1.q6": 0,
+    "part1.q7": 0,
+    "part1.q8": 1,
+    "part1.q9": 2,
+    "part1.q10": 0,
+    "part1.q11": 1,
+    "part1.q12": 0,
+    "part1.q13": 0,
+    "part1.q14": 1,
+    "part1.q15": 1,
+    "part1.q16": 0,
+    "part1.q17": 1,
+    "part1.q18": 2,
+    "part2.q1": {
+      "q1a": true,
+      "q1b": true,
+      "q1c": false,
+      "q1d": false
+    },
+    "part2.q2": {
+      "q2a": true,
+      "q2b": false,
+      "q2c": false,
+      "q2d": false
+    },
+    "part2.q3": {
+      "q3a": true,
+      "q3b": false,
+      "q3c": true,
+      "q3d": false
+    },
+    "part2.q4": {
+      "q4a": false,
+      "q4b": true,
+      "q4c": false,
+      "q4d": true
+    },
+    "part3.q1": 1200,
+    "part3.q2": 1235,
+    "part3.q3": 1342,
+    "part3.q4": 1235,
+    "part3.q5": 2153,
+    "part3.q6": 0.25
+  },
+  "//resources": {
+    "exam_file_url": null,
+    "answer_file_url": "https://drive.google.com/drive/folders/1xjO7XQhf5pQWL1BzpNo8IvAlHCo7YUvT",
+    "answer_file_name": "Đáp án",
+    "video_url": null,
+    "edit_link": null
+  }
+}

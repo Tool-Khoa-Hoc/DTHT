@@ -1,0 +1,548 @@
+{
+  "id": "04-thpt-yen-my-hung-yen-ks-l1",
+  "title": "YÊN MỸ KHẢO SÁT LẦN 1",
+  "subject": "sinh",
+  "time": 50,
+  "description": "YÊN MỸ KHẢO SÁT LẦN 1",
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": "Loại tế bào thực hiện thoát hơi nước chủ yếu ở thực vật trên cạn là",
+          "points": 0.25,
+          "options": [
+            "tế bào mô giậu",
+            "tế bào lông hút",
+            "tế bào khí khổng",
+            "tế bào mô xốp"
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": "Những cơ thể mang allele đột biến đã được biểu hiện ra kiểu hình được gọi là",
+          "points": 0.25,
+          "options": [
+            "Đột biến gene.",
+            "Allele mới.",
+            "Thể đột biến.",
+            "Đột biến điểm."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": "Sự điều hòa biểu hiện của gene nhằm",
+          "points": 0.25,
+          "options": [
+            "đảm bảo cho hoạt động sống của tế bào trở nên hài hoà.",
+            "cân bằng giữa sự cần tổng hợp và không cần tổng hợp protein.",
+            "tổng hợp ra protein cần thiết cho tế bào.",
+            "ức chế sự tổng hợp protein vào lúc cần thiết."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": "Di truyền y học là ngành khoa học vận dụng những hiểu biết về Di truyền học người vào y học",
+          "points": 0.25,
+          "options": [
+            "giúp bỏ qua giúp công tác xét nghiệm và chẩn đoán để sớm điều trị trong 1 số trường hợp bệnh lí.",
+            "chỉ để phòng ngừa, các bệnh, tật di truyền, hạn chế điều trị trong 1 số trường hợp bệnh lí.",
+            "để giải thích, chẩn đoán các tật, bệnh di truyền, hạn chế điều trị trong 1 số trường hợp bệnh lí.",
+            "giúp cho việc giải thích, chẩn đoán, phòng ngừa, hạn chế các bệnh tật di truyền và điều trị trong 1 số trường hợp bệnh lí."
+          ]
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": "Trong tế bào, phân tử nào sau đây mang bộ ba đối mã đặc hiệu (anticodon)?",
+          "points": 0.25,
+          "options": [
+            "tRN A.",
+            "mRN A.",
+            "rRN A.",
+            "DNA."
+          ]
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": "Trên mạch khuôn thuộc vùng mã hoá của gene mã hoá protein ở sinh vật nhân sơ có bộ ba là 5’-GCT-3’ thì trình tự nucleotide của anticodon trên phân tử tRNA tương ứng là",
+          "points": 0.25,
+          "options": [
+            "3’-CGA-5’.",
+            "3’-GCU-5’.",
+            "5’-GCU-3’.",
+            "5’-CGA-3’."
+          ]
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": "Để tạo và chọn giống cây trồng lấy rễ, thân, lá có năng suất cao trong chọn giống người ta phải dùng phương pháp để gây đột biến dạng nào?",
+          "points": 0.25,
+          "options": [
+            "Đa bội.",
+            "Lệch bội.",
+            "Lặp đoạn NST.",
+            "Đảo đoạn NST."
+          ]
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": "Trong phương pháp trồng cây thủy canh, chất dinh dưỡng được cung cấp cho cây dưới dạng",
+          "points": 0.25,
+          "options": [
+            "phân bón dạng hạt.",
+            "phân bón lá.",
+            "sương nhờ máy bơm.",
+            "dung dịch dinh dưỡng hòa tan trong nước."
+          ]
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": "Ở người, bệnh mù màu đỏ - lục do đột biến gene lặn nằm trên nhiễm sắc thể giới tính X gây ra. Xét bố mù màu cưới mẹ bình thường và sinh ra người con trai. Nếu người con trai đó bị mù màu thì đã nhận allele lặn từ",
+          "points": 0.25,
+          "options": [
+            "ông nội.",
+            "bố.",
+            "bà nội.",
+            "mẹ."
+          ]
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": "Ở kì giữa của nguyên phân, các NST kép sắp xếp thành mấy hàng trên mặt phẳng xích đạo của thoi phân bào",
+          "points": 0.25,
+          "options": [
+            "1 hàng.",
+            "3 hàng.",
+            "2 hàng.",
+            "4 hàng."
+          ]
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": "Ở các loài sinh vật, gene trên NST Y mà không có allele trên NST X. Theo giới dị giao tử gen này sẽ di truyền",
+          "points": 0.25,
+          "options": [
+            "dọc.",
+            "chéo.",
+            "ngang.",
+            "thẳng."
+          ]
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": "Quá trình tách triết DNA từ tế bào sinh vật được thực hiện trên cơ sở",
+          "points": 0.25,
+          "options": [
+            "sử dụng chất tẩy rửa để làm sạch DNA.",
+            "phá vỡ nhân tế bào và DNA bằng chất tẩy rửa và kết tủa bằng ethanol.",
+            "phá vỡ tế bào bằng chất tẩy rửa và NaCl, kết tủa DNA bằng dung dịch ethanol.",
+            "kết tủa DNA trong nhân tế bào nhhờ chất tẩy rửa và ethanol."
+          ]
+        },
+        {
+          "id": "q13",
+          "type": "single_choice",
+          "content": "Codon nào sau đây quy định tổng hợp methionine?",
+          "points": 0.25,
+          "options": [
+            "’AUG3’",
+            "5’GGG3’",
+            "5’AAA3’",
+            "5’UGA3’."
+          ]
+        },
+        {
+          "id": "q14",
+          "type": "single_choice",
+          "content": "Ở hoa mõm chó (Antirrhium majus), màu sắc của hoa do một gene quy định. Khi thực hiện phép lai giữa hai cây thuần chủng có hoa màu đỏ và hoa màu trắng với nhau thu được F1 gồm toàn cây có hoa màu hồng (màu sắc trung gian giữa hai dạng bố mẹ). Hiện tượng này được gọi là:",
+          "points": 0.25,
+          "options": [
+            "sự pha trộn vật chất di truyền.",
+            "đồng trội.",
+            "trội hoàn toàn.",
+            "trội không hoàn toàn."
+          ]
+        },
+        {
+          "id": "q15",
+          "type": "single_choice",
+          "content": [
+            [
+              "Sơ đồ sau mô tả con đường chuyển hóa phenylalanine liên quan đến 2 bệnh chuyển hóa di truyền ở người, gồm bệnh PKU và bệnh AKU:"
+            ],
+            {
+              "image": "1.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Cho biết: Allele A mã hoá (1), allele B mã hoá (2); các allele a và b không mã hoá enzyme. Nếu tích tụ nhiều phenylalanine sẽ gây bệnh PKU (Phenylketonuria); nếu tích tụ nhiều homogentistic acid sẽ gây bệnh AKU (Alkaptonuria). Biết rằng p-HPPA và Homogentistic acid chỉ được tạo ra từ con đường chuyển hóa trên và A, a, B, b thuộc các NST thường khác nhau. Phát biểu dưới đây sai về 2 bệnh trên?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Bố mẹ dị hợp 2 cặp gene xác suất sinh 1 con chỉ bị bệnh PKU mà không bị bệnh AKU bằng 3/16.",
+            "Người bị bệnh PKU và người bị bệnh AKU có số loại kiểu gene khác nhau.",
+            "Bố bị bệnh PKU, mẹ bị bệnh AKU có thể sinh con không mắc cả hai bệnh.",
+            "Trẻ bị bệnh AKU có thể cho ăn kiêng tyrosine và phenylalanine từ nhỏ thì trẻ sẽ không biểu hiện bệnh."
+          ]
+        },
+        {
+          "id": "q16",
+          "type": "single_choice",
+          "content": "Đối tượng Morgan sử dụng nghiên cứu để phát hiện các quy luật di truyền là",
+          "points": 0.25,
+          "options": [
+            "bí ngô.",
+            "đậu Hà lan.",
+            "hoa loa kèn.",
+            "ruồi giấm."
+          ]
+        },
+        {
+          "id": "q17",
+          "type": "single_choice",
+          "content": "Số nhóm gene liên kết trong ruồi giấm thường là",
+          "points": 0.25,
+          "options": [
+            "2.",
+            "4.",
+            "3.",
+            "1."
+          ]
+        },
+        {
+          "id": "q18",
+          "type": "single_choice",
+          "content": "Giống lúa “gạo vàng” được tạo ra do chuyển gene tổng hợp β-carotene vào lúa là thành tựu của",
+          "points": 0.25,
+          "options": [
+            "phương pháp gây đột biến.",
+            "công nghệ tế bào.",
+            "công nghệ gene.",
+            "nhân bản vô tính."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II. Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "true_false",
+          "content": [
+            [
+              "Bảng dưới đây ghi lại áp lực máu trong tâm nhĩ trái, tâm thất trái và động mạch chủ tại các thời điểm khác nhau trong một phần của chu kì tim ở một loài động vật thuộc lớp thú."
+            ],
+            {
+              "image": "2.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Mỗi nhận định sau đây là đúng hay sai khi nói về hoạt động tim trong chu kì tim đã nghiên cứu?"
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q1a",
+              "content": "Sử dụng Adrenalin kích thích lên tim, làm tim đập nhanh và mạnh hơn, làm thay đổi huyết áp và áp lực máu lên động mạch chủ."
+            },
+            {
+              "id": "q1b",
+              "content": "Tại thời điểm 0,2 giây áp lực máu trong tâm thất trái cao nhất."
+            },
+            {
+              "id": "q1c",
+              "content": "Áp lực máu trong chu kì tim ảnh hưởng đến hoạt động đóng mở của các van tim."
+            },
+            {
+              "id": "q1d",
+              "content": "Tại thời điểm 0,3 giây máu được đẩy từ tâm thất trái vào động mạch chủ."
+            }
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "content": [
+            [
+              "Ở ruồi giấm, allele B quy định thân xám, trội hoàn toàn so với allele b quy định thân đen, allele V quy định cánh dài, trội hoàn toàn so với allele v quy định cánh cụt. Các gene nằm trên cùng một NST với khoảng cách di truyền là 20 cM. Xét phép lai P:"
+            ],
+            {
+              "image": "3.png",
+              "align": "center",
+              "width": 30
+            },
+            [
+              ". Biết rằng không xảy ra đột biến. Theo lí thuyết, mỗi phát biểu dưới đây là Đúng hay Sai?"
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q2a",
+              "content": "Cá thể đực ở P chỉ hình thành hai loại giao tử là BV và bv."
+            },
+            {
+              "id": "q2b",
+              "content": [
+                "Ở F",
+                {
+                  "type": "text",
+                  "text": "1",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                ", tỉ lệ cá thể thân đen, cánh cụt là 20%."
+              ]
+            },
+            {
+              "id": "q2c",
+              "content": [
+                "Ở F",
+                {
+                  "type": "text",
+                  "text": "1",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                ", tỉ lệ cá thể thân xám, cánh dài dị hợp về 2 gene là 40%."
+              ]
+            },
+            {
+              "id": "q2d",
+              "content": "Ở P, tỉ lệ giao tử cái BV là 20%."
+            }
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "true_false",
+          "content": "Khi cho hai dòng thuần chủng cùng loài là cây hoa đỏ và cây hoa trắng giao phấn với nhau, thu được thế hệ F₁ với 100% cây hoa đỏ. Cho F₁ tự thụ phấn, thu được thế hệ F₂ gồm 368 cây hoa trắng và 272 cây hoa đỏ.",
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q3a",
+              "content": "Cây bố hoặc mẹ thiếu một trong hai gen trội về tính trạng này."
+            },
+            {
+              "id": "q3b",
+              "content": "Có tối đa 27 kiểu gen trong quần thể."
+            },
+            {
+              "id": "q3c",
+              "content": "Tính trạng màu hoa do hai gen quy định."
+            },
+            {
+              "id": "q3d",
+              "content": "Cây hoa đỏ có số kiểu gen nhiều hơn cây hoa trắng."
+            }
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "true_false",
+          "content": [
+            [
+              "Hình ảnh sau đây mô tả về một cơ chế di truyền ở cấp độ phân tử, mỗi nhận định sau đây đúng hay sai?"
+            ],
+            {
+              "image": "4.jpeg",
+              "align": "center",
+              "width": 60
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q4a",
+              "content": "Hình ảnh trên mô tả cơ chế phiên mã của sinh vật nhân thực."
+            },
+            {
+              "id": "q4b",
+              "content": "Quá trình này chỉ tạo ra được 1 loại mRNA trưởng thành."
+            },
+            {
+              "id": "q4c",
+              "content": "Cơ chế này có sự tham gia của enzyme RNApolimerase."
+            },
+            {
+              "id": "q4d",
+              "content": "Phân tử đang được tổng hợp có chiều từ E (5’) đến F (3’)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III. Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 1 đến câu 6.",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "short_answer",
+          "content": "Một đoạn đầu của vùng mã hóa gene cấu trúc của sinh vật nhân sơ có trật tự nucleotide trên mạch gốc như sau: 3’TAC - AAG - AAT - GTT- TTA - CCT - CGG - GCG - GCC - GAA – AAT... 5' Nếu đột biến thay thế nucleotide thứ 16 là C thay bằng A, thì số amino acid trong phân tử protein do gen đột biến tổng hợp là bao nhiêu?",
+          "points": 0.25
+        },
+        {
+          "id": "q2",
+          "type": "short_answer",
+          "content": "Cho biết mỗi cặp tính trạng do một cặp gene nằm trên NST thường quy định. Cho cây thân cao, hoa đỏ giao phấn với cây thân thấp, hoa trắng được F1 gồm 100% cây thần cao, hoa đỏ. Cho F1 tự thụ phấn đời F2 có tỉ lệ 56,25% cây thân cao, hoa đỏ: 18,75% cây thân cao, hoa trắng: 18,75% cây thân thấp, hoa đỏ: 6,25% cây thân thấp, hoa trắng. Hỏi tỉ lệ cây thân cao, hoa trắng thuần chúng trong tổng số những cây thân cao, hoa trắng ở F2 là?",
+          "points": 0.25
+        },
+        {
+          "id": "q3",
+          "type": "short_answer",
+          "content": [
+            [
+              {
+                "type": "text",
+                "text": "Câu 3",
+                "marks": [
+                  "bold"
+                ]
+              },
+              ": Hình bên mô tả một giai đoạn của quá trình phiên mã xảy ra trong vùng mã hóa của một gene ở sinh vật nhân sơ. Vị trí nucleotide 1-2-3 là bộ ba mở đầu; các nucleotide còn lại của gene không được thể hiện trên hình."
+            ],
+            {
+              "image": "5.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Nếu nucleotide? trên hình là U thì phân tử mRNA này khi làm khuôn để dịch mã sẽ tạo ra chuỗi polypeptide có bao nhiêu amino acid (không kể amino acid mở đầu)."
+            ]
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q4",
+          "type": "short_answer",
+          "content": "Ở một loài thực vật lưỡng bội, tính trạng màu hoa do một gene có 4 allele quy định. Allele A1 quy định hoa đỏ trội hoàn toàn so với allele A2, A3, A4; A2 quy định hoa vàng trội hoàn toàn so với allele A3, A4; allele A3 quy định hoa hồng trội hoàn toàn so với alen A4 quy định hoa trắng. Biết không xảy ra đột biến. Cho cây hoa vàng lai với các cây hoa khác, có tối đa bao nhiêu sơ đồ lai mà F1 thu được 100% vàng?",
+          "points": 0.25
+        },
+        {
+          "id": "q5",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 5",
+              "marks": [
+                "bold"
+              ]
+            },
+            ": Một gene có 3000 nucleotide trong đó số nucleotide loại A chiếm 30%. Số lượng nucleotide loại G của gene này là bao nhiêu?"
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q6",
+          "type": "short_answer",
+          "content": "Ở đậu Hà Lan, gene A quy định màu sắc hoa có 2 allele: allele A quy định hoa đỏ trội hoàn toàn so với allele a quy định hoa trắng. Không tính vai trò của bố mẹ, có bao nhiêu phép lai cho F1 đồng tính hoa đỏ?",
+          "points": 0.25
+        }
+      ]
+    }
+  ],
+  "//answer_key": {
+    "part1.q1": 2,
+    "part1.q2": 2,
+    "part1.q3": 2,
+    "part1.q4": 3,
+    "part1.q5": 0,
+    "part1.q6": 2,
+    "part1.q7": 0,
+    "part1.q8": 3,
+    "part1.q9": 3,
+    "part1.q10": 2,
+    "part1.q11": 3,
+    "part1.q12": 2,
+    "part1.q13": 0,
+    "part1.q14": 3,
+    "part1.q15": 0,
+    "part1.q16": 3,
+    "part1.q17": 1,
+    "part1.q18": 2,
+    "part2.q1": {
+      "q1a": true,
+      "q1b": false,
+      "q1c": true,
+      "q1d": true
+    },
+    "part2.q2": {
+      "q2a": true,
+      "q2b": true,
+      "q2c": true,
+      "q2d": false
+    },
+    "part2.q3": {
+      "q3a": false,
+      "q3b": true,
+      "q3c": false,
+      "q3d": false
+    },
+    "part2.q4": {
+      "q4a": true,
+      "q4b": false,
+      "q4c": true,
+      "q4d": false
+    },
+    "part3.q1": 4,
+    "part3.q2": 0.67,
+    "part3.q3": 4,
+    "part3.q4": 6,
+    "part3.q5": 600,
+    "part3.q6": 3
+  },
+  "//resources": {
+    "exam_file_url": null,
+    "answer_file_url": "https://drive.google.com/drive/folders/1ofir5uivJBGshc31H7xWz7ECGs3zLKst",
+    "answer_file_name": "Đáp án",
+    "video_url": null,
+    "edit_link": null
+  }
+}

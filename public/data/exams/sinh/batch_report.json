@@ -1,0 +1,1522 @@
+{
+  "generated_at": "2026-03-21T13:38:58.032554+00:00",
+  "input_dir": "D:\\Web sv\\dtht\\word-only",
+  "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh",
+  "subject": "sinh",
+  "time": 50,
+  "summary": {
+    "total_files": 60,
+    "success_count": 58,
+    "failure_count": 2
+  },
+  "files": [
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\01. Liên trường THPT Sở Bắc Ninh - KSCL L1 2026\\De-KSCL-thi-TN-THPT-2026-mon-Sinh-Cum-truong-Bac-NInh-2026-Lan-1.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\01. Liên trường THPT Sở Bắc Ninh - KSCL L1 2026",
+      "status": "success",
+      "slug": "01-lien-truong-thpt-so-bac-ninh-kscl-l1-2026",
+      "title": "De-KSCL-thi-TN-THPT-2026-mon-Sinh-Cum-truong-Bac-NInh-2026-Lan-1",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\01-lien-truong-thpt-so-bac-ninh-kscl-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 9,
+          "image_count_public": 9,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\02. Cụm THPT Sở Bắc Ninh - KSCL 2026\\De-thi-thu-TN-THPT-2026-Sinh-Lien-Truong-Bac-Ninh-Lan-1.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\02. Cụm THPT Sở Bắc Ninh - KSCL 2026",
+      "status": "success",
+      "slug": "02-cum-thpt-so-bac-ninh-kscl-2026",
+      "title": "De-thi-thu-TN-THPT-2026-Sinh-Lien-Truong-Bac-Ninh-Lan-1",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\02-cum-thpt-so-bac-ninh-kscl-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 10,
+          "image_count_public": 10,
+          "table_rows_raw": 4,
+          "table_rows_public": 4
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\03. THPT Lương Tài - Bắc Ninh - KS THPTQG 2026\\4.ĐỀ SINH 12.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\03. THPT Lương Tài - Bắc Ninh - KS THPTQG 2026",
+      "status": "success",
+      "slug": "03-thpt-luong-tai-bac-ninh-ks-thptqg-2026",
+      "title": "4.ĐỀ SINH 12",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\03-thpt-luong-tai-bac-ninh-ks-thptqg-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "table row mismatch: raw=49, public=31",
+          "part1.q1: single_choice must contain A/B/C/D in order.",
+          "part1.q2: single_choice must contain A/B/C/D in order.",
+          "part1.q3: single_choice must contain A/B/C/D in order.",
+          "part1.q4: single_choice must contain A/B/C/D in order.",
+          "part1.q5: single_choice must contain A/B/C/D in order.",
+          "part1.q6: single_choice must contain A/B/C/D in order.",
+          "part1.q7: single_choice must contain A/B/C/D in order.",
+          "part1.q8: single_choice must contain A/B/C/D in order.",
+          "part1.q9: single_choice must contain A/B/C/D in order.",
+          "part1.q10: single_choice must contain A/B/C/D in order.",
+          "part1.q11: single_choice must contain A/B/C/D in order.",
+          "part1.q12: single_choice must contain A/B/C/D in order.",
+          "part1.q13: single_choice must contain A/B/C/D in order.",
+          "part1.q14: single_choice must contain A/B/C/D in order.",
+          "part1.q15: single_choice must contain A/B/C/D in order.",
+          "part1.q16: single_choice must contain A/B/C/D in order.",
+          "part1.q17: single_choice must contain A/B/C/D in order.",
+          "part1.q18: single_choice must contain A/B/C/D in order.",
+          "part2.q1: true_false_group must contain a/b/c/d in order.",
+          "part2.q2: true_false_group must contain a/b/c/d in order.",
+          "part2.q3: true_false_group must contain a/b/c/d in order.",
+          "part2.q4: true_false_group must contain a/b/c/d in order.",
+          "part1.q1: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q2: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q3: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q4: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q5: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q6: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q7: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q8: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q9: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q10: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q11: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q12: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q13: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q14: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q15: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q16: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q17: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q18: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 9,
+          "image_count_public": 9,
+          "table_rows_raw": 49,
+          "table_rows_public": 31
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\04. THPT Yên Mỹ (Hưng Yên) - KS L1\\YÊN MỸ KHẢO SÁT LẦN 1.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\04. THPT Yên Mỹ (Hưng Yên) - KS L1",
+      "status": "success",
+      "slug": "04-thpt-yen-my-hung-yen-ks-l1",
+      "title": "YÊN MỸ KHẢO SÁT LẦN 1",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\04-thpt-yen-my-hung-yen-ks-l1",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "part1.q13: single_choice must contain A/B/C/D in order.",
+          "part1.q13: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 5,
+          "image_count_public": 5,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\05. 🔥 THPT CHUYÊN THOẠI NGỌC HẦU (An Giang) 🔥\\SINH 12 CHUYÊN THOẠI NGỌC HẦU.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\05. 🔥 THPT CHUYÊN THOẠI NGỌC HẦU (An Giang) 🔥",
+      "status": "success",
+      "slug": "05-thpt-chuyen-thoai-ngoc-hau-an-giang",
+      "title": "SINH 12 CHUYÊN THOẠI NGỌC HẦU",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\05-thpt-chuyen-thoai-ngoc-hau-an-giang",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "part1.q4: single_choice must contain A/B/C/D in order.",
+          "part1.q4: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 6,
+          "image_count_public": 6,
+          "table_rows_raw": 11,
+          "table_rows_public": 11
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\07. 🔥 Sở Ninh Bình - KSCL L1 2026 🔥\\de 0407.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\07. 🔥 Sở Ninh Bình - KSCL L1 2026 🔥",
+      "status": "success",
+      "slug": "07-so-ninh-binh-kscl-l1-2026",
+      "title": "de 0407",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\07-so-ninh-binh-kscl-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 27,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 27,
+          "question_count_public": 27,
+          "image_count_raw": 6,
+          "image_count_public": 6,
+          "table_rows_raw": 9,
+          "table_rows_public": 9
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\08. 🔥 THÀNH PHỐ CẦN THƠ - CK I 🔥\\CHINH THUC\\GDTHPT\\DE GOC THPT\\DAC TA THPT CHINH THUC.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\08. 🔥 THÀNH PHỐ CẦN THƠ - CK I 🔥",
+      "status": "success",
+      "slug": "08-thanh-pho-can-tho-ck-i",
+      "title": "DAC TA THPT CHINH THUC",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\08-thanh-pho-can-tho-ck-i",
+      "converted_from_doc": false,
+      "question_count": 1,
+      "validation": {
+        "errors": [
+          "part1.q1: single_choice must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 0,
+          "question_count_public": 1,
+          "image_count_raw": 0,
+          "image_count_public": 0,
+          "table_rows_raw": 35,
+          "table_rows_public": 35
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\09. 🔥 CHUYÊN HẠ LONG - Thi thử L1 2026 🔥\\0404.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\09. 🔥 CHUYÊN HẠ LONG - Thi thử L1 2026 🔥",
+      "status": "success",
+      "slug": "09-chuyen-ha-long-thi-thu-l1-2026",
+      "title": "0404",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\09-chuyen-ha-long-thi-thu-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 27,
+      "validation": {
+        "errors": [
+          "part1.q3: single_choice must contain A/B/C/D in order.",
+          "part1.q3: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 27,
+          "question_count_public": 27,
+          "image_count_raw": 25,
+          "image_count_public": 25,
+          "table_rows_raw": 27,
+          "table_rows_public": 27
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\10. 🔥 Cụm THPT Chuyên Phan Bội Châu & Chuyên Hà Tĩnh - L1 2026 🔥\\Ma_de_1205.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\10. 🔥 Cụm THPT Chuyên Phan Bội Châu & Chuyên Hà Tĩnh - L1 2026 🔥",
+      "status": "success",
+      "slug": "10-cum-thpt-chuyen-phan-boi-chau-chuyen-ha-tinh-l1-2026",
+      "title": "Ma_de_1205",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\10-cum-thpt-chuyen-phan-boi-chau-chuyen-ha-tinh-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 26,
+      "validation": {
+        "errors": [
+          "part1.q11: source_number=13 is outside declared range 1-12 for part1.",
+          "part1.q12: source_number=14 is outside declared range 1-12 for part1.",
+          "part1.q13: source_number=15 is outside declared range 1-12 for part1.",
+          "part1.q14: source_number=16 is outside declared range 1-12 for part1.",
+          "part1.q15: source_number=17 is outside declared range 1-12 for part1.",
+          "part1.q16: source_number=18 is outside declared range 1-12 for part1."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 26,
+          "question_count_public": 26,
+          "image_count_raw": 16,
+          "image_count_public": 16,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\11. 🔥 Liên trường THPT Sở Hải Phòng - KS L1 🔥\\Liên-trường-THPT-Sở-Hải-Phòng-L1-2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\11. 🔥 Liên trường THPT Sở Hải Phòng - KS L1 🔥",
+      "status": "success",
+      "slug": "11-lien-truong-thpt-so-hai-phong-ks-l1",
+      "title": "Liên-trường-THPT-Sở-Hải-Phòng-L1-2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\11-lien-truong-thpt-so-hai-phong-ks-l1",
+      "converted_from_doc": false,
+      "question_count": 25,
+      "validation": {
+        "errors": [
+          "part1.q14: single_choice must contain A/B/C/D in order.",
+          "part1.q14: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [
+          "public JSON references unknown images: ['img_441511d6bc1a']"
+        ],
+        "stats": {
+          "question_count_raw": 25,
+          "question_count_public": 25,
+          "image_count_raw": 13,
+          "image_count_public": 14,
+          "table_rows_raw": 14,
+          "table_rows_public": 14
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\12. 🔥 Liên trường THPT Sở Nghệ An - L1 2026 🔥\\1. Cụm trường nghệ an - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học).docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\12. 🔥 Liên trường THPT Sở Nghệ An - L1 2026 🔥",
+      "status": "success",
+      "slug": "12-lien-truong-thpt-so-nghe-an-l1-2026",
+      "title": "1. Cụm trường nghệ an - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học)",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\12-lien-truong-thpt-so-nghe-an-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 9,
+          "image_count_public": 9,
+          "table_rows_raw": 20,
+          "table_rows_public": 20
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\13. THPT HÀM RỒNG (Sở Thanh Hóa)\\5. THPT HÀM RỒNG - THANH HÓA - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học).docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\13. THPT HÀM RỒNG (Sở Thanh Hóa)",
+      "status": "success",
+      "slug": "13-thpt-ham-rong-so-thanh-hoa",
+      "title": "5. THPT HÀM RỒNG - THANH HÓA - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học)",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\13-thpt-ham-rong-so-thanh-hoa",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 3,
+          "image_count_public": 3,
+          "table_rows_raw": 7,
+          "table_rows_public": 7
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\14. THPT Cẩm Xuyên (Sở Hà Tĩnh)\\6. CẨM XUYÊN - HÀ TĨNH - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học).docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\14. THPT Cẩm Xuyên (Sở Hà Tĩnh)",
+      "status": "success",
+      "slug": "14-thpt-cam-xuyen-so-ha-tinh",
+      "title": "6. CẨM XUYÊN - HÀ TĨNH - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học)",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\14-thpt-cam-xuyen-so-ha-tinh",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 11,
+          "image_count_public": 11,
+          "table_rows_raw": 10,
+          "table_rows_public": 10
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\15. 🔥 THCS-THPT Nguyễn Khuyến (Tp.HCM) 🔥\\7. NGUYỄN KHUYẾN - HCM - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học).docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\15. 🔥 THCS-THPT Nguyễn Khuyến (Tp.HCM) 🔥",
+      "status": "success",
+      "slug": "15-thcs-thpt-nguyen-khuyen-tp-hcm",
+      "title": "7. NGUYỄN KHUYẾN - HCM - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học)",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\15-thcs-thpt-nguyen-khuyen-tp-hcm",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [
+          "public JSON references unknown images: ['img_c68f5a5b24cc']"
+        ],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 4,
+          "image_count_public": 5,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\16. THPT Hàn Thuyên (Bắc Ninh)\\8. ĐỀ HÀN THUYÊN - BẮC NINH - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học).docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\16. THPT Hàn Thuyên (Bắc Ninh)",
+      "status": "success",
+      "slug": "16-thpt-han-thuyen-bac-ninh",
+      "title": "8. ĐỀ HÀN THUYÊN - BẮC NINH - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học)",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\16-thpt-han-thuyen-bac-ninh",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 8,
+          "image_count_public": 8,
+          "table_rows_raw": 14,
+          "table_rows_public": 14
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\17. 🔥 Cụm 13 Trường THPT (Sở Hải Phòng) 🔥\\9. CỤM 13 TRƯỜNG - HẢI PHÒNG - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học).docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\17. 🔥 Cụm 13 Trường THPT (Sở Hải Phòng) 🔥",
+      "status": "success",
+      "slug": "17-cum-13-truong-thpt-so-hai-phong",
+      "title": "9. CỤM 13 TRƯỜNG - HẢI PHÒNG - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học)",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\17-cum-13-truong-thpt-so-hai-phong",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "images missing in public JSON: ['img_609c6ccbe8c2', 'img_f1d98a38d8f7']",
+          "table row mismatch: raw=20, public=18",
+          "part1.q15: single_choice must contain A/B/C/D in order.",
+          "part1.q16: single_choice must contain A/B/C/D in order.",
+          "part1.q17: single_choice must contain A/B/C/D in order.",
+          "part1.q15: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q16: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q17: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 10,
+          "image_count_public": 8,
+          "table_rows_raw": 20,
+          "table_rows_public": 18
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\18. 🔥 SỞ HƯNG YÊN - KSCL HK I 2026 🔥\\0427_ Sở Hưng Yên.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\18. 🔥 SỞ HƯNG YÊN - KSCL HK I 2026 🔥",
+      "status": "success",
+      "slug": "18-so-hung-yen-kscl-hk-i-2026",
+      "title": "0427_ Sở Hưng Yên",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\18-so-hung-yen-kscl-hk-i-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "table row mismatch: raw=2, public=0",
+          "part1.q9: single_choice must contain A/B/C/D in order.",
+          "part1.q9: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 2,
+          "image_count_public": 2,
+          "table_rows_raw": 2,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\19. THPT Số 2 Nguyễn Bỉnh Khiêm - Thi thử L1 2026\\THPT Số 2 Nguyễn Bỉnh Khiêm - Thi thử L1 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\19. THPT Số 2 Nguyễn Bỉnh Khiêm - Thi thử L1 2026",
+      "status": "success",
+      "slug": "19-thpt-so-2-nguyen-binh-khiem-thi-thu-l1-2026",
+      "title": "THPT Số 2 Nguyễn Bỉnh Khiêm - Thi thử L1 2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\19-thpt-so-2-nguyen-binh-khiem-thi-thu-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 26,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 26,
+          "question_count_public": 26,
+          "image_count_raw": 3,
+          "image_count_public": 3,
+          "table_rows_raw": 5,
+          "table_rows_public": 5
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\20. THPT Thuận Thành 1 (Sở Bắc Ninh)\\Mã 0101  Đề Sinh 12.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\20. THPT Thuận Thành 1 (Sở Bắc Ninh)",
+      "status": "success",
+      "slug": "20-thpt-thuan-thanh-1-so-bac-ninh",
+      "title": "Mã 0101  Đề Sinh 12",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\20-thpt-thuan-thanh-1-so-bac-ninh",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "part1.q8: single_choice must contain A/B/C/D in order.",
+          "part1.q8: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 11,
+          "image_count_public": 11,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\21. 🔥 SỞ NGHỆ AN - LIÊN TRƯỜNG THPT - KS + THI THỬ L1 2026 🔥\\Ma_de_0501.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\21. 🔥 SỞ NGHỆ AN - LIÊN TRƯỜNG THPT - KS + THI THỬ L1 2026 🔥",
+      "status": "success",
+      "slug": "21-so-nghe-an-lien-truong-thpt-ks-thi-thu-l1-2026",
+      "title": "Ma_de_0501",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\21-so-nghe-an-lien-truong-thpt-ks-thi-thu-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 9,
+          "image_count_public": 9,
+          "table_rows_raw": 20,
+          "table_rows_public": 20
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\22. 🔥 SỞ ĐÀ NẴNG - LIÊN TRƯỜNG THPT - THI THỬ L1 2026 🔥\\4. SINH CA 1.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\22. 🔥 SỞ ĐÀ NẴNG - LIÊN TRƯỜNG THPT - THI THỬ L1 2026 🔥",
+      "status": "success",
+      "slug": "22-so-da-nang-lien-truong-thpt-thi-thu-l1-2026",
+      "title": "4. SINH CA 1",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\22-so-da-nang-lien-truong-thpt-thi-thu-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "table row mismatch: raw=24, public=10",
+          "part1.q1: single_choice must contain A/B/C/D in order.",
+          "part1.q4: single_choice must contain A/B/C/D in order.",
+          "part1.q5: single_choice must contain A/B/C/D in order.",
+          "part1.q6: single_choice must contain A/B/C/D in order.",
+          "part1.q7: single_choice must contain A/B/C/D in order.",
+          "part1.q8: single_choice must contain A/B/C/D in order.",
+          "part1.q9: single_choice must contain A/B/C/D in order.",
+          "part1.q10: single_choice must contain A/B/C/D in order.",
+          "part1.q11: single_choice must contain A/B/C/D in order.",
+          "part1.q12: single_choice must contain A/B/C/D in order.",
+          "part1.q13: single_choice must contain A/B/C/D in order.",
+          "part1.q15: single_choice must contain A/B/C/D in order.",
+          "part1.q16: single_choice must contain A/B/C/D in order.",
+          "part1.q17: single_choice must contain A/B/C/D in order.",
+          "part1.q1: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q4: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q5: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q6: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q7: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q8: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q9: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q10: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q11: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q12: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q13: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q15: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q16: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q17: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 10,
+          "image_count_public": 10,
+          "table_rows_raw": 24,
+          "table_rows_public": 10
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\23. THPT KẺ SẶT - SỞ HẢI PHÒNG - KS 2026\\KSCL L1_Sinh12_Mã1221.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\23. THPT KẺ SẶT - SỞ HẢI PHÒNG - KS 2026",
+      "status": "success",
+      "slug": "23-thpt-ke-sat-so-hai-phong-ks-2026",
+      "title": "KSCL L1_Sinh12_Mã1221",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\23-thpt-ke-sat-so-hai-phong-ks-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 7,
+          "image_count_public": 7,
+          "table_rows_raw": 2,
+          "table_rows_public": 2
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\24. 🔥 Sở Lạng Sơn - Thi thử L1 2026 🔥\\Sở Lạng Sơn - Thi thử L1 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\24. 🔥 Sở Lạng Sơn - Thi thử L1 2026 🔥",
+      "status": "success",
+      "slug": "24-so-lang-son-thi-thu-l1-2026",
+      "title": "Sở Lạng Sơn - Thi thử L1 2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\24-so-lang-son-thi-thu-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 39,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 39,
+          "question_count_public": 39,
+          "image_count_raw": 15,
+          "image_count_public": 15,
+          "table_rows_raw": 25,
+          "table_rows_public": 25
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\25. THPT Việt Yên số 1 (Bắc Ninh)\\25. VIỆT YÊN - BẮC NINH - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học).docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\25. THPT Việt Yên số 1 (Bắc Ninh)",
+      "status": "success",
+      "slug": "25-thpt-viet-yen-so-1-bac-ninh",
+      "title": "25. VIỆT YÊN - BẮC NINH - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học)",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\25-thpt-viet-yen-so-1-bac-ninh",
+      "converted_from_doc": false,
+      "question_count": 27,
+      "validation": {
+        "errors": [],
+        "warnings": [
+          "public JSON references unknown images: ['img_4bcb1df51faf']"
+        ],
+        "stats": {
+          "question_count_raw": 27,
+          "question_count_public": 27,
+          "image_count_raw": 14,
+          "image_count_public": 15,
+          "table_rows_raw": 2,
+          "table_rows_public": 2
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\26. CỤM HIỆP HÒA - TIÊN DU (BẮC NINH)\\26. CỤM HIỆP HÒA - TIÊN DU (BẮC NINH).docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\26. CỤM HIỆP HÒA - TIÊN DU (BẮC NINH)",
+      "status": "success",
+      "slug": "26-cum-hiep-hoa-tien-du-bac-ninh",
+      "title": "26. CỤM HIỆP HÒA - TIÊN DU (BẮC NINH)",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\26-cum-hiep-hoa-tien-du-bac-ninh",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 11,
+          "image_count_public": 11,
+          "table_rows_raw": 6,
+          "table_rows_public": 6
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\27. Liên trường AS, ĐL - Sở Nghệ An - L1  2026\\Liên trường AS, ĐL - Sở Nghệ An.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\27. Liên trường AS, ĐL - Sở Nghệ An - L1  2026",
+      "status": "success",
+      "slug": "27-lien-truong-as-dl-so-nghe-an-l1-2026",
+      "title": "Liên trường AS, ĐL - Sở Nghệ An",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\27-lien-truong-as-dl-so-nghe-an-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 3,
+          "image_count_public": 3,
+          "table_rows_raw": 12,
+          "table_rows_public": 12
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\28. 🔥 Sở Ninh Bình - KSCL trực tuyến 2026 🔥\\Sở Ninh Bình trực tuyến .docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\28. 🔥 Sở Ninh Bình - KSCL trực tuyến 2026 🔥",
+      "status": "success",
+      "slug": "28-so-ninh-binh-kscl-truc-tuyen-2026",
+      "title": "Sở Ninh Bình trực tuyến ",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\28-so-ninh-binh-kscl-truc-tuyen-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 14,
+          "image_count_public": 14,
+          "table_rows_raw": 9,
+          "table_rows_public": 9
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\29. 🔥 Sở Phú Thọ - Thi thử L1 2026 🔥\\4001 - Sở Phú Thọ - Thi thử Đợt 1 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\29. 🔥 Sở Phú Thọ - Thi thử L1 2026 🔥",
+      "status": "success",
+      "slug": "29-so-phu-tho-thi-thu-l1-2026",
+      "title": "4001 - Sở Phú Thọ - Thi thử Đợt 1 2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\29-so-phu-tho-thi-thu-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 27,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 27,
+          "question_count_public": 27,
+          "image_count_raw": 10,
+          "image_count_public": 10,
+          "table_rows_raw": 10,
+          "table_rows_public": 10
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\30. 🔥 THPT Chuyên Thoại Ngọc Hầu (An Giang) - L1 2026 🔥\\thpt-chuyen-thoai-ngoc-hau-lan-1-an-giang.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\30. 🔥 THPT Chuyên Thoại Ngọc Hầu (An Giang) - L1 2026 🔥",
+      "status": "success",
+      "slug": "30-thpt-chuyen-thoai-ngoc-hau-an-giang-l1-2026",
+      "title": "thpt-chuyen-thoai-ngoc-hau-lan-1-an-giang",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\30-thpt-chuyen-thoai-ngoc-hau-an-giang-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 26,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 26,
+          "question_count_public": 26,
+          "image_count_raw": 5,
+          "image_count_public": 5,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\31. 🔥 Mã 147-KTTX-Ban B - Nguyễn Khuyến (HCM)-07-12 🔥\\KTTX-ban-b-thpt-nguyen-khuyen-tp-hcm-7-12.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\31. 🔥 Mã 147-KTTX-Ban B - Nguyễn Khuyến (HCM)-07-12 🔥",
+      "status": "success",
+      "slug": "31-ma-147-kttx-ban-b-nguyen-khuyen-hcm-07-12",
+      "title": "KTTX-ban-b-thpt-nguyen-khuyen-tp-hcm-7-12",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\31-ma-147-kttx-ban-b-nguyen-khuyen-hcm-07-12",
+      "converted_from_doc": false,
+      "question_count": 27,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 27,
+          "question_count_public": 27,
+          "image_count_raw": 17,
+          "image_count_public": 17,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\32. 🔥 KTTX-THPT Lê Thánh Tông-HCM-24-12 🔥\\KTTX-thpt-le-thanh-tong-ho-chi-minh.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\32. 🔥 KTTX-THPT Lê Thánh Tông-HCM-24-12 🔥",
+      "status": "success",
+      "slug": "32-kttx-thpt-le-thanh-tong-hcm-24-12",
+      "title": "KTTX-thpt-le-thanh-tong-ho-chi-minh",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\32-kttx-thpt-le-thanh-tong-hcm-24-12",
+      "converted_from_doc": false,
+      "question_count": 27,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 27,
+          "question_count_public": 27,
+          "image_count_raw": 10,
+          "image_count_public": 10,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\33. 🔥 THPT CHUYÊN ĐH VINH - L1 2026 🔥\\Made 0411.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\33. 🔥 THPT CHUYÊN ĐH VINH - L1 2026 🔥",
+      "status": "success",
+      "slug": "33-thpt-chuyen-dh-vinh-l1-2026",
+      "title": "Made 0411",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\33-thpt-chuyen-dh-vinh-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 11,
+          "image_count_public": 11,
+          "table_rows_raw": 29,
+          "table_rows_public": 29
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\34. 🔥 LIÊN TRƯỜNG THPT NGHỆ AN - L1 2026 🔥\\ĐỀ CHẴN\\Ma_de_5102.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\34. 🔥 LIÊN TRƯỜNG THPT NGHỆ AN - L1 2026 🔥",
+      "status": "success",
+      "slug": "34-lien-truong-thpt-nghe-an-l1-2026",
+      "title": "Ma_de_5102",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\34-lien-truong-thpt-nghe-an-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "table row mismatch: raw=23, public=9",
+          "part1.q2: single_choice must contain A/B/C/D in order.",
+          "part1.q3: single_choice must contain A/B/C/D in order.",
+          "part1.q4: single_choice must contain A/B/C/D in order.",
+          "part1.q5: single_choice must contain A/B/C/D in order.",
+          "part1.q6: single_choice must contain A/B/C/D in order.",
+          "part1.q7: single_choice must contain A/B/C/D in order.",
+          "part1.q9: single_choice must contain A/B/C/D in order.",
+          "part1.q10: single_choice must contain A/B/C/D in order.",
+          "part1.q11: single_choice must contain A/B/C/D in order.",
+          "part1.q13: single_choice must contain A/B/C/D in order.",
+          "part1.q14: single_choice must contain A/B/C/D in order.",
+          "part1.q15: single_choice must contain A/B/C/D in order.",
+          "part1.q17: single_choice must contain A/B/C/D in order.",
+          "part1.q18: single_choice must contain A/B/C/D in order.",
+          "part1.q2: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q3: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q4: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q5: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q6: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q7: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q9: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q10: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q11: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q13: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q14: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q15: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q17: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q18: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 11,
+          "image_count_public": 11,
+          "table_rows_raw": 23,
+          "table_rows_public": 9
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\35. THPT Hậu Lộc I (Thanh Hóa) - KSCL L1 2026\\Đề khảo sát chất lượng - môn Sinh học 12 - mã đề 101.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\35. THPT Hậu Lộc I (Thanh Hóa) - KSCL L1 2026",
+      "status": "success",
+      "slug": "35-thpt-hau-loc-i-thanh-hoa-kscl-l1-2026",
+      "title": "Đề khảo sát chất lượng - môn Sinh học 12 - mã đề 101",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\35-thpt-hau-loc-i-thanh-hoa-kscl-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 25,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 25,
+          "question_count_public": 25,
+          "image_count_raw": 6,
+          "image_count_public": 6,
+          "table_rows_raw": 4,
+          "table_rows_public": 4
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\36. THPT Tĩnh Gia 4 (Thanh Hóa) - KSCL 2026\\SINH.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\36. THPT Tĩnh Gia 4 (Thanh Hóa) - KSCL 2026",
+      "status": "success",
+      "slug": "36-thpt-tinh-gia-4-thanh-hoa-kscl-2026",
+      "title": "SINH",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\36-thpt-tinh-gia-4-thanh-hoa-kscl-2026",
+      "converted_from_doc": false,
+      "question_count": 56,
+      "validation": {
+        "errors": [
+          "table row mismatch: raw=57, public=41",
+          "part1.q5: single_choice must contain A/B/C/D in order.",
+          "part1.q6: single_choice must contain A/B/C/D in order.",
+          "part1.q8: single_choice must contain A/B/C/D in order.",
+          "part1.q10: single_choice must contain A/B/C/D in order.",
+          "part1.q11: single_choice must contain A/B/C/D in order.",
+          "part1.q12: single_choice must contain A/B/C/D in order.",
+          "part1.q14: single_choice must contain A/B/C/D in order.",
+          "part1.q23: single_choice must contain A/B/C/D in order.",
+          "part1.q24: single_choice must contain A/B/C/D in order.",
+          "part1.q26: single_choice must contain A/B/C/D in order.",
+          "part1.q28: single_choice must contain A/B/C/D in order.",
+          "part1.q29: single_choice must contain A/B/C/D in order.",
+          "part1.q30: single_choice must contain A/B/C/D in order.",
+          "part1.q32: single_choice must contain A/B/C/D in order.",
+          "part1.q5: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q6: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q8: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q10: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q11: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q12: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q14: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q23: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q24: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q26: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q28: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q29: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q30: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q32: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 56,
+          "question_count_public": 56,
+          "image_count_raw": 9,
+          "image_count_public": 9,
+          "table_rows_raw": 57,
+          "table_rows_public": 41
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\37. THPT HOẰNG HÓA  4 (Thanh Hóa) - L1 2026\\Ma_de_1401.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\37. THPT HOẰNG HÓA  4 (Thanh Hóa) - L1 2026",
+      "status": "success",
+      "slug": "37-thpt-hoang-hoa-4-thanh-hoa-l1-2026",
+      "title": "Ma_de_1401",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\37-thpt-hoang-hoa-4-thanh-hoa-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "part1.q5: single_choice must contain A/B/C/D in order.",
+          "part1.q5: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 13,
+          "image_count_public": 13,
+          "table_rows_raw": 14,
+          "table_rows_public": 14
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\38. THPT HẬU LỘC 4 (THANH HÓA) - KSCL L1 2026\\Đề, đáp án môn Sinh.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\38. THPT HẬU LỘC 4 (THANH HÓA) - KSCL L1 2026",
+      "status": "success",
+      "slug": "38-thpt-hau-loc-4-thanh-hoa-kscl-l1-2026",
+      "title": "Đề, đáp án môn Sinh",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\38-thpt-hau-loc-4-thanh-hoa-kscl-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 6,
+          "image_count_public": 6,
+          "table_rows_raw": 2,
+          "table_rows_public": 2
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\39. 🔥 Liên trường Sở Hà Nội - KS đợt 1 2026 🔥\\LIÊN TRƯỜNG HÀ NỘI - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học).docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\39. 🔥 Liên trường Sở Hà Nội - KS đợt 1 2026 🔥",
+      "status": "success",
+      "slug": "39-lien-truong-so-ha-noi-ks-dot-1-2026",
+      "title": "LIÊN TRƯỜNG HÀ NỘI - (Thi thử Tốt Nghiệp THPT 2026 môn Sinh Học)",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\39-lien-truong-so-ha-noi-ks-dot-1-2026",
+      "converted_from_doc": false,
+      "question_count": 29,
+      "validation": {
+        "errors": [
+          "question count mismatch: raw=28, public=29",
+          "part1.q1: single_choice must contain A/B/C/D in order."
+        ],
+        "warnings": [
+          "public JSON references unknown images: ['img_b0757888cead']"
+        ],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 29,
+          "image_count_raw": 14,
+          "image_count_public": 15,
+          "table_rows_raw": 10,
+          "table_rows_public": 10
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\40. 🔥 Sở BẮC NINH - Thi thử L1 2026 🔥\\SỞ BẮC NINH - Thi thử L1 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\40. 🔥 Sở BẮC NINH - Thi thử L1 2026 🔥",
+      "status": "success",
+      "slug": "40-so-bac-ninh-thi-thu-l1-2026",
+      "title": "SỞ BẮC NINH - Thi thử L1 2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\40-so-bac-ninh-thi-thu-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 4,
+          "image_count_public": 4,
+          "table_rows_raw": 17,
+          "table_rows_public": 17
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\41. Bộ 10 đề tham khảo THPTQG 2026 - môn Sinh học\\Bo-10-de-on-thi-TN-THPT-2026-mon-Sinh.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\41. Bộ 10 đề tham khảo THPTQG 2026 - môn Sinh học",
+      "status": "failed",
+      "slug": "41-bo-10-de-tham-khao-thptqg-2026-mon-sinh-hoc",
+      "title": "Bo-10-de-on-thi-TN-THPT-2026-mon-Sinh",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\41-bo-10-de-tham-khao-thptqg-2026-mon-sinh-hoc",
+      "converted_from_doc": false,
+      "error": "'Image asset not found: img_7820291b7b87 B.'"
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\42. 🔥 Cụm CM số 10 (Sở Hải Phòng) - Thi thử L1 2026 🔥\\Made 4001.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\42. 🔥 Cụm CM số 10 (Sở Hải Phòng) - Thi thử L1 2026 🔥",
+      "status": "success",
+      "slug": "42-cum-cm-so-10-so-hai-phong-thi-thu-l1-2026",
+      "title": "Made 4001",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\42-cum-cm-so-10-so-hai-phong-thi-thu-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 18,
+          "image_count_public": 18,
+          "table_rows_raw": 21,
+          "table_rows_public": 21
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\43. THPT Triệu Sơn 4 (Thanh Hóa) - L1 2026\\KSCL Sinh 12 - Mã đề 1207.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\43. THPT Triệu Sơn 4 (Thanh Hóa) - L1 2026",
+      "status": "success",
+      "slug": "43-thpt-trieu-son-4-thanh-hoa-l1-2026",
+      "title": "KSCL Sinh 12 - Mã đề 1207",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\43-thpt-trieu-son-4-thanh-hoa-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "table row mismatch: raw=16, public=15"
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 3,
+          "image_count_public": 3,
+          "table_rows_raw": 16,
+          "table_rows_public": 15
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\44. THPT Hoàng Lê Kha (Thanh Hóa) - L1 2026\\Ma_de_4401.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\44. THPT Hoàng Lê Kha (Thanh Hóa) - L1 2026",
+      "status": "failed",
+      "slug": "44-thpt-hoang-le-kha-thanh-hoa-l1-2026",
+      "title": "Ma_de_4401",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\44-thpt-hoang-le-kha-thanh-hoa-l1-2026",
+      "converted_from_doc": false,
+      "error": "'Image asset not found: img_54e72c8def4a B.'"
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\45. THPT ĐÔNG SƠN 2 (THANH HÓA) - KSCL 2026\\ĐS2 - MÔN SINH 12 NỘP SỞ 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\45. THPT ĐÔNG SƠN 2 (THANH HÓA) - KSCL 2026",
+      "status": "success",
+      "slug": "45-thpt-dong-son-2-thanh-hoa-kscl-2026",
+      "title": "ĐS2 - MÔN SINH 12 NỘP SỞ 2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\45-thpt-dong-son-2-thanh-hoa-kscl-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "part1.q2: single_choice must contain A/B/C/D in order.",
+          "part1.q5: single_choice must contain A/B/C/D in order.",
+          "part1.q14: single_choice must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 7,
+          "image_count_public": 7,
+          "table_rows_raw": 8,
+          "table_rows_public": 8
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\46. THPT Hà Trung (Thanh Hóa) - KSCL L2 2026\\Sinh_2025_kscltnthptlan2_1401.doc.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\46. THPT Hà Trung (Thanh Hóa) - KSCL L2 2026",
+      "status": "success",
+      "slug": "46-thpt-ha-trung-thanh-hoa-kscl-l2-2026",
+      "title": "Sinh_2025_kscltnthptlan2_1401.doc",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\46-thpt-ha-trung-thanh-hoa-kscl-l2-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 3,
+          "image_count_public": 3,
+          "table_rows_raw": 5,
+          "table_rows_public": 5
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\47. 🔥 Cụm 13 Trường Sở Hải Phòng - L2 2026 🔥\\Ma_de_1201.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\47. 🔥 Cụm 13 Trường Sở Hải Phòng - L2 2026 🔥",
+      "status": "success",
+      "slug": "47-cum-13-truong-so-hai-phong-l2-2026",
+      "title": "Ma_de_1201",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\47-cum-13-truong-so-hai-phong-l2-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 14,
+          "image_count_public": 14,
+          "table_rows_raw": 9,
+          "table_rows_public": 9
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\49. 🔥 Cụm Cẩm Xuyên (Hà Tĩnh) - L2 2026 🔥\\de 0421.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\49. 🔥 Cụm Cẩm Xuyên (Hà Tĩnh) - L2 2026 🔥",
+      "status": "success",
+      "slug": "49-cum-cam-xuyen-ha-tinh-l2-2026",
+      "title": "de 0421",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\49-cum-cam-xuyen-ha-tinh-l2-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 10,
+          "image_count_public": 10,
+          "table_rows_raw": 14,
+          "table_rows_public": 14
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\51. 🔥THÁI NGUYÊN - Thi thử Lần 1 2026🔥\\THÁI NGUYÊN THI THỬ 2026 LẦN 1.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\51. 🔥THÁI NGUYÊN - Thi thử Lần 1 2026🔥",
+      "status": "success",
+      "slug": "51-thai-nguyen-thi-thu-lan-1-2026",
+      "title": "THÁI NGUYÊN THI THỬ 2026 LẦN 1",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\51-thai-nguyen-thi-thu-lan-1-2026",
+      "converted_from_doc": false,
+      "question_count": 26,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 26,
+          "question_count_public": 26,
+          "image_count_raw": 6,
+          "image_count_public": 6,
+          "table_rows_raw": 9,
+          "table_rows_public": 9
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\52. 🔥THPT Phan Bội Châu - Cam Ranh (Khánh Hòa) - L1 2026 🔥\\thpt-phan-boi-chau-khanh-hoa.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\52. 🔥THPT Phan Bội Châu - Cam Ranh (Khánh Hòa) - L1 2026 🔥",
+      "status": "success",
+      "slug": "52-thpt-phan-boi-chau-cam-ranh-khanh-hoa-l1-2026",
+      "title": "thpt-phan-boi-chau-khanh-hoa",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\52-thpt-phan-boi-chau-cam-ranh-khanh-hoa-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 8,
+          "image_count_public": 8,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\53. THPT Vũng Tàu - L1 2026\\thpt-vung-tau-L1-2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\53. THPT Vũng Tàu - L1 2026",
+      "status": "success",
+      "slug": "53-thpt-vung-tau-l1-2026",
+      "title": "thpt-vung-tau-L1-2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\53-thpt-vung-tau-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 11,
+          "image_count_public": 11,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\54. 🔥THPT Chuyên Tuyên Quang - L1 2026🔥\\thpt-chuyen-tuyen-quang-lan-1-2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\54. 🔥THPT Chuyên Tuyên Quang - L1 2026🔥",
+      "status": "success",
+      "slug": "54-thpt-chuyen-tuyen-quang-l1-2026",
+      "title": "thpt-chuyen-tuyen-quang-lan-1-2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\54-thpt-chuyen-tuyen-quang-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [
+          "public JSON references unknown images: ['img_8b3da930b909']"
+        ],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 13,
+          "image_count_public": 14,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\55. 🔥Liên trường THPT Sở Hà Nội - L1 2026🔥\\lien-truong-ha-noi-L1-25-26.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\55. 🔥Liên trường THPT Sở Hà Nội - L1 2026🔥",
+      "status": "success",
+      "slug": "55-lien-truong-thpt-so-ha-noi-l1-2026",
+      "title": "lien-truong-ha-noi-L1-25-26",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\55-lien-truong-thpt-so-ha-noi-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 8,
+          "image_count_public": 8,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\56. 🔥Liên trường THPT Sở Hà Nội - L2 2026🔥\\Liên-Trường-THPT-Hà-Nội-L2 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\56. 🔥Liên trường THPT Sở Hà Nội - L2 2026🔥",
+      "status": "success",
+      "slug": "56-lien-truong-thpt-so-ha-noi-l2-2026",
+      "title": "Liên-Trường-THPT-Hà-Nội-L2 2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\56-lien-truong-thpt-so-ha-noi-l2-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "part2.q1: true_false_group must contain a/b/c/d in order.",
+          "part2.q2: true_false_group must contain a/b/c/d in order.",
+          "part2.q3: true_false_group must contain a/b/c/d in order.",
+          "part2.q4: true_false_group must contain a/b/c/d in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 7,
+          "image_count_public": 7,
+          "table_rows_raw": 30,
+          "table_rows_public": 30
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\57. 🔥Cụm THPT Chuyên Phan Bội Châu & Chuyên Hà Tĩnh - L2 2026🔥\\Cụm-THPT-Chuyên-PBC-Chuyên-Hà-Tĩnh-L2 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\57. 🔥Cụm THPT Chuyên Phan Bội Châu & Chuyên Hà Tĩnh - L2 2026🔥",
+      "status": "success",
+      "slug": "57-cum-thpt-chuyen-phan-boi-chau-chuyen-ha-tinh-l2-2026",
+      "title": "Cụm-THPT-Chuyên-PBC-Chuyên-Hà-Tĩnh-L2 2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\57-cum-thpt-chuyen-phan-boi-chau-chuyen-ha-tinh-l2-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 14,
+          "image_count_public": 14,
+          "table_rows_raw": 21,
+          "table_rows_public": 21
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\58. 🔥 THPT CHUYÊN BẮC NINH - LẦN 2 2026 🔥\\CHUYÊN BẮC NINH - LẦN 2 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\58. 🔥 THPT CHUYÊN BẮC NINH - LẦN 2 2026 🔥",
+      "status": "success",
+      "slug": "58-thpt-chuyen-bac-ninh-lan-2-2026",
+      "title": "CHUYÊN BẮC NINH - LẦN 2 2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\58-thpt-chuyen-bac-ninh-lan-2-2026",
+      "converted_from_doc": false,
+      "question_count": 53,
+      "validation": {
+        "errors": [
+          "part1.q15: single_choice must contain A/B/C/D in order.",
+          "part1.q31: single_choice must contain A/B/C/D in order.",
+          "part1.q15: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q31: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 53,
+          "question_count_public": 53,
+          "image_count_raw": 8,
+          "image_count_public": 8,
+          "table_rows_raw": 30,
+          "table_rows_public": 30
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\59. 🔥THPT Chuyên KHTN (Hà Nội) - Lần I 2026🔥\\THPT-Chuyên-KHTN-Lần-I-2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\59. 🔥THPT Chuyên KHTN (Hà Nội) - Lần I 2026🔥",
+      "status": "success",
+      "slug": "59-thpt-chuyen-khtn-ha-noi-lan-i-2026",
+      "title": "THPT-Chuyên-KHTN-Lần-I-2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\59-thpt-chuyen-khtn-ha-noi-lan-i-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 5,
+          "image_count_public": 5,
+          "table_rows_raw": 3,
+          "table_rows_public": 3
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\60. Cụm THPT Tỉnh Bắc Ninh - KSCL L1 2026\\De_0401.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\60. Cụm THPT Tỉnh Bắc Ninh - KSCL L1 2026",
+      "status": "success",
+      "slug": "60-cum-thpt-tinh-bac-ninh-kscl-l1-2026",
+      "title": "De_0401",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\60-cum-thpt-tinh-bac-ninh-kscl-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "images missing in public JSON: ['img_3139fea8fec9', 'img_8078547aa64b', 'img_d511250bd448']",
+          "table row mismatch: raw=33, public=30",
+          "part1.q2: single_choice must contain A/B/C/D in order.",
+          "part1.q17: single_choice must contain A/B/C/D in order.",
+          "part1.q18: single_choice must contain A/B/C/D in order.",
+          "part1.q2: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q17: declared single_choice range must contain A/B/C/D in order.",
+          "part1.q18: declared single_choice range must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 16,
+          "image_count_public": 13,
+          "table_rows_raw": 33,
+          "table_rows_public": 30
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\62. 🔥Sở Sơn La - Thi thử Lần 1 2026🔥\\Sở-Sơn-La - Lần-1-2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\62. 🔥Sở Sơn La - Thi thử Lần 1 2026🔥",
+      "status": "success",
+      "slug": "62-so-son-la-thi-thu-lan-1-2026",
+      "title": "Sở-Sơn-La - Lần-1-2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\62-so-son-la-thi-thu-lan-1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 10,
+          "image_count_public": 10,
+          "table_rows_raw": 14,
+          "table_rows_public": 14
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\63. Liên trường Sở Phú Thọ - KSCL L1 2026\\Mẫu 4. Đề khảo sát môn SINH_4001.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\63. Liên trường Sở Phú Thọ - KSCL L1 2026",
+      "status": "success",
+      "slug": "63-lien-truong-so-phu-tho-kscl-l1-2026",
+      "title": "Mẫu 4. Đề khảo sát môn SINH_4001",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\63-lien-truong-so-phu-tho-kscl-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 7,
+          "image_count_public": 7,
+          "table_rows_raw": 5,
+          "table_rows_public": 5
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\word-only\\64. THPT Lý Thái Tổ - Lần 1 2026\\thpt-ly-thai-to-L1-2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\word-only\\64. THPT Lý Thái Tổ - Lần 1 2026",
+      "status": "success",
+      "slug": "64-thpt-ly-thai-to-lan-1-2026",
+      "title": "thpt-ly-thai-to-L1-2026",
+      "output_dir": "D:\\Web sv\\dtht\\public\\data\\exams\\sinh\\64-thpt-ly-thai-to-lan-1-2026",
+      "converted_from_doc": false,
+      "question_count": 27,
+      "validation": {
+        "errors": [
+          "part1.q16: single_choice must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 27,
+          "question_count_public": 27,
+          "image_count_raw": 17,
+          "image_count_public": 17,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    }
+  ]
+}

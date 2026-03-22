@@ -1,67 +1,106 @@
 [
   {
+    "id": "01-lien-truong-thpt-so-bac-ninh-kscl-l1-2026",
+    "title": "Đề khảo sát liên trường THPT Sở Bắc Ninh Lần 1",
+    "subject": "sinh",
+    "color": "from-green-500 to-lime-600",
+    "icon": "biotech",
+    "questions": 28
+  },
+  {
+    "id": "02-cum-thpt-so-bac-ninh-kscl-2026",
+    "title": "Đề thi thử liên trường THPT Bắc Ninh lần 1",
+    "subject": "sinh",
+    "color": "from-green-500 to-lime-600",
+    "icon": "biotech",
+    "questions": 28
+  },
+  {
+    "id": "03-thpt-luong-tai-bac-ninh-ks-thptqg-2026",
+    "title": "3. THPT Lương Tài - Bắc Ninh (KS THPTQG 2026 môn Sinh học)",
+    "subject": "sinh",
+    "color": "from-green-500 to-lime-600",
+    "icon": "biotech",
+    "questions": 28
+  },
+  {
+    "id": "04-thpt-yen-my-hung-yen-ks-l1",
+    "title": "YÊN MỸ KHẢO SÁT LẦN 1",
+    "subject": "sinh",
+    "color": "from-green-500 to-lime-600",
+    "icon": "biotech",
+    "questions": 28
+  },
+  {
+    "id": "05-thpt-chuyen-thoai-ngoc-hau-an-giang",
+    "title": "SINH 12 CHUYÊN THOẠI NGỌC HẦU - An Giang",
+    "subject": "sinh",
+    "color": "from-green-500 to-lime-600",
+    "icon": "biotech",
+    "questions": 28
+  },
+  {
+    "id": "07-so-ninh-binh-kscl-l1-2026",
+    "title": "7. Sở GD&ĐT Ninh Bình - KSCL Lần 1 - 2026",
+    "subject": "sinh",
+    "color": "from-green-500 to-lime-600",
+    "icon": "biotech",
+    "questions": 27
+  },
+  {
+    "id": "09-chuyen-ha-long-thi-thu-l1-2026",
+    "title": "Chuyên Hạ Long thi thử lần 1 2026",
+    "subject": "sinh",
+    "color": "from-green-500 to-lime-600",
+    "icon": "biotech",
+    "questions": 27
+  },
+  {
+    "id": "10-cum-thpt-chuyen-phan-boi-chau-chuyen-ha-tinh-l1-2026",
+    "title": "Cụm THPT chuyên Phan Bội Châu - Hà Tĩnh lần 1",
+    "subject": "sinh",
+    "color": "from-green-500 to-lime-600",
+    "icon": "biotech",
+    "questions": 28
+  },
+  {
     "id": "han-thuyen-2026-lan-1",
     "title": "Đề thi thử tốt nghiệp THPT lần 1 năm học 2025-2026 Trường THPT Hàn Thuyên - Sinh học",
-    "subject": "Sinh học",
-    "subjectFolder": "sinh",
-    "examPath": "han-thuyen",
-    "time": 50,
-    "questions": 28,
-    "participants": 2012,
-    "status": "ongoing",
+    "subject": "sinh",
     "color": "from-green-500 to-lime-600",
-    "icon": "biotech"
+    "icon": "biotech",
+    "questions": 28
   },
   {
     "id": "bac-ninh-2026-lan-1",
     "title": "Đề khảo sát Toán 12 lần 1 năm 2025 – 2026 cụm các trường THPT – Bắc Ninh",
-    "subject": "Toán học",
-    "subjectFolder": "toan",
-    "examPath": "bac-ninh-2026-lan-1",
-    "time": 90,
-    "questions": 22,
-    "participants": 1799,
-    "status": "ongoing",
-    "color": "from-blue-500 to-indigo-600",
-    "icon": "functions"
+    "subject": "toan",
+    "color": "from-slate-500 to-slate-600",
+    "icon": "quiz",
+    "questions": 22
   },
   {
     "id": "le-thanh-tong-tp-hcm-2026",
     "title": "Đề thi thử TN THPT 2026 môn Toán - Trường Lê Thánh Tông TP.HCM",
-    "subject": "Toán học",
-    "subjectFolder": "toan",
-    "examPath": "le-thanh-tong-tp-hcm-2026",
-    "time": 90,
-    "questions": 28,
-    "participants": 630,
-    "status": "ongoing",
-    "color": "from-blue-500 to-indigo-600",
-    "icon": "functions"
+    "subject": "toan",
+    "color": "from-slate-500 to-slate-600",
+    "icon": "quiz",
+    "questions": 22
   },
   {
     "id": "lien-truong-thpt-cum9-lan2",
-    "title": "Đề Toán liên trường THPT cụm 9 lần 2",
-    "subject": "Toán học",
-    "subjectFolder": "toan",
-    "examPath": "lien-truong-thpt-cum9-lan2",
-    "time": 90,
-    "questions": 22,
-    "participants": 1786,
-    "status": "ongoing",
-    "color": "from-blue-500 to-indigo-600",
-    "icon": "functions"
+    "title": "Đề thi thử Toán 12 lần 2 năm 2025 – 2026 liên trường cụm 9 – Hà Nội",
+    "subject": "toan",
+    "color": "from-slate-500 to-slate-600",
+    "icon": "quiz",
+    "questions": 22
   },
   {
     "id": "son-la-2026-lan-1",
-    "title": "Đề thi thử Toán 12 lần 1 năm 2025 – 2026 cụm các trường THPT – Sơn La",
-    "subject": "Toán học",
-    "subjectFolder": "toan",
-    "examPath": "son-la-2026-lan-1",
-    "time": 90,
-    "questions": 22,
-    "participants": 1786,
-    "status": "ongoing",
-    "color": "from-blue-500 to-indigo-600",
-    "icon": "functions"
+    "title": "Đề thi thử tốt nghiệp THPT 2026 môn Toán lần 1 - Sở GD&ĐT Sơn La",
+    "subject": "toan",
+    "color": "from-slate-500 to-slate-600",
+    "icon": "quiz",
+    "questions": 22
   }
 ]

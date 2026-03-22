@@ -1,0 +1,1022 @@
+{
+  "id": "09-chuyen-ha-long-thi-thu-l1-2026",
+  "title": "Chuyên Hạ Long thi thử lần 1 2026",
+  "subject": "sinh",
+  "time": 50,
+  "description": null,
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 17. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": [
+            "Trong chọn, tạo giống vật nuôi, cây trồng, phương pháp lai hữu tính",
+            {
+              "type": "text",
+              "text": "không ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "có ưu điểm nào sau đây?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Đơn giản, dễ thực hiện.",
+            "Tạo ra đột biến theo hướng mong muốn.",
+            "Chi phí rẻ, hiệu quả cao.",
+            "Tạo ra nguồn biến dị tổ hợp phong phú."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": [
+            [
+              "Hãy sắp xếp mỗi ví dụ sau đây tương ứng với một đặc trưng di truyền quần thể."
+            ],
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Ví dụ"
+                  ],
+                  [
+                    "Đặc trưng về"
+                  ]
+                ],
+                [
+                  [
+                    "1. Khoảng 1 trong 2500 người gốc Đông Âu sinh ra bị bệnh xơ nang."
+                  ],
+                  [
+                    "a. Tần số allele."
+                  ]
+                ],
+                [
+                  [
+                    "2. Tỉ lệ người mang allele hồng cầu hình liềm ở Đông Nam Á khoảng 10%"
+                  ],
+                  [
+                    "b. Tần số kiểu gene."
+                  ]
+                ],
+                [
+                  [
+                    "3. Tỉ lệ gene đột biến mới sinh gây ra chứng loạn sản sụn xấp xỉ 5x10-5."
+                  ],
+                  [
+                    "c. Tần số kiểu hình"
+                  ]
+                ]
+              ]
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "1c, 2b, 3a.",
+            "1a, 2b, 3c.",
+            "1a, 2c, 3b.",
+            "1c, 2a, 3b."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": "Ở ruồi giấm, allele A quy định thân xám trội hoàn toàn so với allele a quy định thân đen; allele B quy định cánh dài trội hoàn toàn so với allele b quy định cánh cụt. Kiểu gene nào sau đây quy định kiểu hình thân xám, cánh cụt?",
+          "points": 0.25,
+          "options": [
+            "ab ab",
+            "AB AB",
+            "Ab Ab",
+            "aB aB"
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": "Trong các tế bào sinh dưỡng của người mắc hội chứng Klinfelter có số lượng NST là:",
+          "points": 0.25,
+          "options": [
+            "45.",
+            "47.",
+            "44.",
+            "46."
+          ]
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": "Ở một quần thể cà chua, xét một gen có hai alen (B, b), tần số alen b là 0,20. Theo lí thuyết, tần số alen B của quần thể này là",
+          "points": 0.25,
+          "options": [
+            "0,80.",
+            "0,04.",
+            "0,64.",
+            "0,40."
+          ]
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": "Cánh chim tương đồng với cơ quan nào sau đây?",
+          "points": 0.25,
+          "options": [
+            "Vây cá chép.",
+            "Cánh dơi.",
+            "Cánh bướm.",
+            "Cánh ong"
+          ]
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": [
+            "Hình 2 mô tả một quá trình sinh học diễn ra trong tế bào, biết rằng kí hiệu mạch [1] chính là mạch [3]. Có bao nhiêu nhận định sau đây sai?",
+            {
+              "image": "1.jpeg",
+              "align": "center",
+              "width": 50
+            },
+            "Chiều (a) → (b) là 3’ → 5’",
+            "Chiều (d) → (c) là 5’ → 3’",
+            "Hình 3 mô tả sự tái bản DNA ở sinh vật nhân sơ",
+            "Nếu mạch [3] có tỉ lệ (A+G)/(T+C) = 0,4 thì mạch [5] sẽ có tỉ lệ (A+G)/(T+C) = 2,5",
+            "Trình tự nucleotide trên mạch [6] bổ sung với trình tự nucleotide mạch [2]"
+          ],
+          "points": 0.25,
+          "options": [
+            "4.",
+            "3.",
+            "2.",
+            "1."
+          ]
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": [
+            [
+              "Bốn ống nghiệm được thiết lập như trong sơ đồ bên dưới và để dưới ánh sáng mặt trời đầy đủ. Sau 1 giờ, ống nghiệm nào chứa nhiều carbon dioxide (CO2) hoà tan nhất?"
+            ],
+            {
+              "image": "2.jpeg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Ống D.",
+            "Ống B.",
+            "Ống A.",
+            "Ống C."
+          ]
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": [
+            "Phả hệ dưới đây ghi lại sự di truyền một bệnh ở người. Biết bệnh do 1 trong 2 allele của 1 gene quy định, không phát sinh đột biến mới. Gene gây bệnh là gene",
+            {
+              "image": "3.jpeg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "lặn nằm trên NST thường.",
+            "nằm trong tế bào chất.",
+            "trội nằm trên NST giới tính X.",
+            "trội nằm trên NST thường."
+          ]
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": "Ở thực vật, pha tối của quá trình quang hợp diễn ra ở",
+          "points": 0.25,
+          "options": [
+            "màng thylakoid.",
+            "chất nền lục lạp.",
+            "màng ngoài lục lạp.",
+            "nhân tế bào."
+          ]
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": "Bằng chứng nào sau đây được xem là bằng chứng tiến hóa trực tiếp?",
+          "points": 0.25,
+          "options": [
+            "Chi trước của mèo và cánh của dơi có các xương phân bố theo thứ tự tương tự nhau.",
+            "Dấu tích của thực vật sống ở các thời đại trước đã được tìm thấy trong các lớp than đá ở Quảng Ninh.",
+            "Tất cả sinh vật từ đơn bào đến đa bào đều được cấu tạo từ tế bào.",
+            "Các amino acid trong chuỗi ß-hemoglobin của người và tinh tinh giống nhau."
+          ]
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": "Một số gene gây bệnh trong cơ thể người có thể được thay thế bằng các gene lành là nội dung của",
+          "points": 0.25,
+          "options": [
+            "liệu pháp tế bào gốc.",
+            "liệu pháp gene.",
+            "phương pháp gây đột biến.",
+            "kĩ thuật chọc dò dịch ối."
+          ]
+        },
+        {
+          "id": "q13",
+          "type": "single_choice",
+          "content": [
+            [
+              "Ở người, tính trạng thuận tay phải là trội hoàn toàn so với tính trạng thuận tay trái. Một gia đình có bố, mẹ thuận tay phải sinh ra hai người con, trong đó có một người con trai thuận tay trái. Phả hệ nào sau đây phản ánh đúng sự di truyền tính trạng tay thuận ở gia đình này?"
+            ],
+            {
+              "image": "png.png",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Phả hệ 3",
+            "Phả hệ 1",
+            "Phả hệ 2",
+            "Phả hệ 4"
+          ]
+        },
+        {
+          "id": "q14",
+          "type": "single_choice",
+          "content": "Một quần thể thực vật tự thụ phấn, xét 1 gene có 2 allele là H và h. Theo lí thuyết, quần thể có cấu trúc di truyền nào sau đây có tần số các kiểu gene không đổi qua các thế hệ?",
+          "points": 0.25,
+          "options": [
+            "50% HH: 50% Hh",
+            "25% Hh: 75% hh",
+            "100% Hh",
+            "100% hh"
+          ]
+        },
+        {
+          "id": "q15",
+          "type": "single_choice",
+          "content": [
+            "Trong hình bên, hình nào mô tả đúng trình tự các gene (X, Y, Z) nằm trên cặp nhiễm sắc thể tương đồng của tế bào sinh dưỡng bình thường?",
+            {
+              "image": "nst.png",
+              "align": "center",
+              "width": 50
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Hình 3",
+            "Hình 2",
+            "Hình 1",
+            "Hình 4"
+          ]
+        },
+        {
+          "id": "q16",
+          "type": "single_choice",
+          "content": "Phép lai P: $\\frac{\\underline{Ab}}{aB} \\times \\frac{\\underline{Ab}}{aB}$. Cho biết quá trình giảm phân bình thường và không xảy ra hoán vị gen. Theo lí thuyết, F1 có tối đa bao nhiêu loại kiểu gen?",
+          "points": 0.25,
+          "options": [
+            "2",
+            "3",
+            "4",
+            "5"
+          ]
+        },
+        {
+          "id": "q17",
+          "type": "single_choice",
+          "content": [
+            "Công nghệ DNA có nhiều ứng dụng trong y học để điều trị các bệnh di truyền ở người. Hiện nay, việc nào sau đây không được thực hiện vì vi phạm đạo đức sinh học?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Chẩn đoán một số bệnh di truyền cho thai nhi trước khi sinh.",
+            "Phân tích biểu hiện gene để cung cấp thêm các thông tin, xác định thuốc đích điều trị bệnh ung thư hiệu quả hơn.",
+            "Sản xuất hormone insulin để điều trị bệnh tiểu đường.",
+            "Chỉnh sửa hệ gene bằng hệ thống CRISPR-Cas9 trên mô phôi còn sống của người, điều trị bệnh di truyền ở người."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II. Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "true_false",
+          "content": [
+            [
+              "Ở một loài thực vật giao phối ngẫu nhiên, xét một gene có 2 allele: allele A quy định hoa đỏ trội hoàn toàn so với allele a quy định hoa trắng. Giả sử có 4 quần thể của loài trên được kí hiệu từ I, II, III, IV có số lượng cá thể thuộc mỗi loại kiểu gene như hình dưới."
+            ],
+            {
+              "image": "22.png",
+              "align": "center",
+              "width": 60
+            },
+            [
+              "Tần số allele a giảm dần theo thứ tự quần thể"
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q1a",
+              "content": "II > I> IV > III."
+            },
+            {
+              "id": "q1b",
+              "content": "Nếu cho các cây hoa đỏ ở quần thể I giao phối ngẫu nhiên với các cây hoa đỏ ở quần thể IV thì đời con phân li tỉ lệ kiểu hình 23 hoa đỏ: 1 hoa trắng."
+            },
+            {
+              "id": "q1c",
+              "content": "Nếu những cây có kiểu gene AA trong loài không ra hoa nên không tham gia sinh sản thì khi cho quần thể II giao phối ngẫu nhiên với quần thể III thì ở đời con tỉ lệ hoa đỏ là 9/21."
+            },
+            {
+              "id": "q1d",
+              "content": "Quần thể II là quần thể đang ở trạng thái cân bằng."
+            }
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "content": [
+            [
+              "Dựa trên cơ sở các thí nghiệm về di truyền của Morgan, một nhóm sinh viên đã thực hiện các phép lai trên ruồi giấm và thu được kết quả trong bảng dưới đây:"
+            ],
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Phép lai"
+                  ],
+                  [
+                    "Kiểu hình mẹ"
+                  ],
+                  [
+                    "Kiểu hình bố"
+                  ],
+                  [
+                    "Tỉ lệ biểu hiện kiểu hình mắt trắng (%)"
+                  ]
+                ],
+                [
+                  [],
+                  [],
+                  [],
+                  [
+                    "Trong tổng số đời con"
+                  ],
+                  [
+                    "Con đực/Tổng số con đực"
+                  ],
+                  [
+                    "Con cái/Tổng số con cái"
+                  ]
+                ],
+                [
+                  [
+                    "1"
+                  ],
+                  [
+                    "Mắt đỏ"
+                  ],
+                  [
+                    "Mắt trắng"
+                  ],
+                  [
+                    "0"
+                  ],
+                  [
+                    "0"
+                  ],
+                  [
+                    "0"
+                  ]
+                ],
+                [
+                  [
+                    "2"
+                  ],
+                  [
+                    "Mắt trắng"
+                  ],
+                  [
+                    "Mắt đỏ"
+                  ],
+                  [
+                    "50"
+                  ],
+                  [
+                    "100"
+                  ],
+                  [
+                    "0"
+                  ]
+                ],
+                [
+                  [
+                    "3"
+                  ],
+                  [
+                    "Mắt đỏ"
+                  ],
+                  [
+                    "Mắt đỏ"
+                  ],
+                  [
+                    "25"
+                  ],
+                  [
+                    "50"
+                  ],
+                  [
+                    "0"
+                  ]
+                ],
+                [
+                  [
+                    "4"
+                  ],
+                  [
+                    "Mắt trắng"
+                  ],
+                  [
+                    "Mắt trắng"
+                  ],
+                  [
+                    "100"
+                  ],
+                  [
+                    "100"
+                  ],
+                  [
+                    "100"
+                  ]
+                ]
+              ]
+            },
+            [
+              "Biết rằng tính trạng màu mắt do một gene có 2 allele trội lặn hoàn toàn quy định."
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q2a",
+              "content": "Phép lai 1, ruồi mẹ có kiểu gene dị hợp tử."
+            },
+            {
+              "id": "q2b",
+              "content": "Kết quả các phép lai phủ nhận kiểu hình màu mắt được quy định bởi một gene nằm trong ti thể."
+            },
+            {
+              "id": "q2c",
+              "content": "Nếu phép lai giữa ruồi mẹ có kiểu hình mắt đỏ và ruồi bố có kiểu hình mắt trắng thì đời con không thể xuất hiện kiểu hình mắt trắng."
+            },
+            {
+              "id": "q2d",
+              "content": "Phép lai 3 và phép lai 4 là phép lai thuận và phép lai nghịch."
+            }
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "true_false",
+          "content": [
+            "Hình bên mô tả cấu trúc tim và hệ dẫn truyền tim ở người với các thành phần được kí hiệu từ (1) đến (5).",
+            {
+              "image": "23.jpeg",
+              "align": "center",
+              "width": 55
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q3a",
+              "content": "Khi tâm thất co, mỏm tim co trước do xung thần kinh được truyền đến mỏm tim trước."
+            },
+            {
+              "id": "q3b",
+              "content": "Một bệnh nhân bị bệnh tim được lắp máy trợ tim có chức năng phát xung điện cho tim, máy trợ tim này co chức năng tương tự cấu trúc (3)."
+            },
+            {
+              "id": "q3c",
+              "content": "Người bị hẹp van động mạch chủ có tần số phát nhịp của nút xoang nhĩ giảm so với bình thường."
+            },
+            {
+              "id": "q3d",
+              "content": "Các kí hiệu (1), (2), (3) lần lượt là nút xoang nhĩ, mạng Purkinje, nút nhĩ thất."
+            }
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "true_false",
+          "content": [
+            [
+              "Nghiên cứu enzyme E ở hai loài trong cùng một chi, người ta xác định được hai biến thể enzyme E1 và E2, chúng cùng xúc tác cho một phản ứng trong tế bào. Hai biến thể này không chỉ có cùng số lượng amino acid trong chuỗi polypeptide mà trình tự các amino acid cũng giống nhau ở hầu hết các đoạn, ngoại trừ một đoạn kí hiệu là S1 ở biến thể E1 và S2 ở biến thể E2. Trình tự amino acid và trình tự nucleotide của các biến thể như sau: Đoạn DNA ở mạch khuôn của E1: 3'-CAG- GTA- TAA- GTT- TTT- GGA- AGT- CGA- 5' Đoạn S1 của biến thể E1: Val - His - Ile - Gln - Lys - Pro - Ser - Ala. Đoạn S2 của biến thể E2: Val - Leu- Ile - Gln - Asn - Pro - Ser - Ala. Biết gene mã hóa biến thể E2 được hình thành từ gene mã hóa biến thể E1 do xuất hiện hai đột biến điểm. Một số loại amino acid và các codon tương ứng có thể có trên phân tử mRNA thể hiện ở bảng sau:"
+            ],
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Amino acid"
+                  ],
+                  [
+                    "Cac codon tương ứng"
+                  ],
+                  [
+                    "Amino acid"
+                  ],
+                  [
+                    "Các codon tương ứng"
+                  ]
+                ],
+                [
+                  [
+                    "Ala"
+                  ],
+                  [
+                    "5'-GCU, GCC, GCA, GCG-3'"
+                  ],
+                  [
+                    "Lys"
+                  ],
+                  [
+                    "5'-AAA, AAG-3'"
+                  ]
+                ],
+                [
+                  [
+                    "Asn"
+                  ],
+                  [
+                    "5'-AAU, AAC-3'"
+                  ],
+                  [
+                    "Pro"
+                  ],
+                  [
+                    "5'-CCU, CCC, CCA, CCG-3'"
+                  ]
+                ],
+                [
+                  [
+                    "His"
+                  ],
+                  [
+                    "5'-CAU, CAC-3'"
+                  ],
+                  [
+                    "Val"
+                  ],
+                  [
+                    "5'-GUU, GUC, GUA, GUG-3'"
+                  ]
+                ],
+                [
+                  [
+                    "Ile"
+                  ],
+                  [
+                    "5'-AUU, AUC, AUA-3'"
+                  ],
+                  [
+                    "Gln"
+                  ],
+                  [
+                    "5'-CAA, CAG-3'"
+                  ]
+                ],
+                [
+                  [
+                    "Leu"
+                  ],
+                  [
+                    "5'-UUA, UUG, CUU-3'"
+                  ],
+                  [
+                    "Ser"
+                  ],
+                  [
+                    "5'-UCU, UCC, UCA-3'"
+                  ]
+                ]
+              ]
+            },
+            [
+              "Đoạn gene mã hóa S1 đã xảy ra đột biến thay thế cặp nucleotide T- A bằng cặp A- T ở hai vị trí để tạo"
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q4a",
+              "content": "ra S2."
+            },
+            {
+              "id": "q4b",
+              "content": "Trong cùng điều kiện phản ứng, người ta nhận thấy hiệu quả xúc tác của biến thể E2 thấp hơn E1, chứng tỏ đột biến này đã làm thay đổi cấu trúc, chức năng của protein nên hiệu quả xúc tác phản ứng của E2 kém hơn."
+            },
+            {
+              "id": "q4c",
+              "content": "Tỉ lệ A/G của đoạn gene mã hóa S1 là 5/3."
+            },
+            {
+              "id": "q4d",
+              "content": "Nếu thực hiện giải xoắn và tách hoàn toàn 2 mạch của đoạn gene mã hóa S1 và S2, sau đó trộn lẫn và cho hạ nhiệt độ để các mạch đơn liên kết bổ sung trở lại, số loại phân tử DNA kép tối đa có thể tạo ra là 4 loại."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III. Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào mỗi ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "short_answer",
+          "content": [
+            "Ở một quần thể thực vật giao phấn ngẫu nhiên, allele quy định thân cao trội hoàn toàn so với allele quy định thân thấp. Ở thế hệ xuất phát (P), số cây thân thấp chiếm tỉ lệ 10%. Ở F1, số cây thân thấp chiếm tỉ lệ 9%. Biết rằng quần thể không chịu tác động của các nhân tố tiến hóa. Theo lí thuyết, trong tổng số cây thân cao ở P, số cây không mang allele lặn chiếm tỉ lệ bao nhiêu? (",
+            {
+              "type": "text",
+              "text": "Hãy thể hiện kết quả làm tròn sau dấu phẩy 2 chữ số",
+              "marks": [
+                "italic"
+              ]
+            },
+            ")"
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q2",
+          "type": "short_answer",
+          "content": [
+            [
+              "Ở một loài ruồi, các gene 1, 2, 3, 4 nằm trên cùng một vai của NST số 2 nhưng chưa biết thứ tự, trong đó gene 2 gần tâm động hơn gene 4. Người ta đã phát hiện ra ba dòng đột biến mất các đoạn khác nhau: dòng A mất các gene 1, 3; dòng B mất các gene 3, 4; dòng C mất các gene 1, 2, 3. Hãy viết thứ tự đúng của các gene trên theo hướng từ tâm động đến đầu mút."
+            ],
+            {
+              "image": "24.jpeg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q3",
+          "type": "short_answer",
+          "content": [
+            "Ở người, gene quy định dạng tóc nằm trên nhiễm sắc thể thường có 2 allele, allele A quy định tóc quăn trội hoàn toàn so với allele a quy định tóc thẳng. Bệnh mù màu đỏ - xanh lục do allele lặn b nằm trên vùng không tương đồng của nhiễm sắc thể giới tính X quy định, allele trội B quy định mắt nhìn màu bình thường. Cho sơ đồ phả hệ sau: Biết rằng không phát sinh các đột biến mới ở tất cả các cá thể trong phả hệ. Cặp vợ chồng (10) – (11) trong phả hệ này sinh con, xác suất đứa con đầu lòng có tóc quăn và không bị mù màu là bao nhiêu? (",
+            {
+              "type": "text",
+              "text": "Hãy thể hiện kết quả làm tròn sau dấu phẩy 2 chữ số",
+              "marks": [
+                "italic"
+              ]
+            },
+            ")"
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q4",
+          "type": "short_answer",
+          "content": [
+            [
+              "Ở người, sự hình thành nhóm máu ABO do hoạt động phối hợp của 2 gene H và I, được thể hiện trong sơ đồ sau đây:"
+            ],
+            {
+              "image": "25.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Allele lặn h và allele lặn I",
+              {
+                "type": "text",
+                "text": "O",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "đều không tổng hợp được enzyme tương ứng. Gene H và gene I nằm trên hai NST khác nhau. Khi trên bề mặt hồng cầu có cả kháng nguyên A và kháng nguyên B thì biểu hiện nhóm máu AB, khi không có cả hai loại kháng nguyên thì biểu hiện nhóm máu O. Theo lý thuyết, có tối đa bao nhiêu loại kiểu gene quy định nhóm máu O?"
+            ]
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q5",
+          "type": "short_answer",
+          "content": [
+            [
+              "Ở vi khuẩn",
+              {
+                "type": "text",
+                "text": "E. coli ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "kiểu dại, sự biểu hiện của gene lacZ (mã hóa β- galactosidase), gene lacY (mã hóa permase) thuộc operon Lac phụ thuộc vào sự có mặt của lactose trong môi trường nuôi cấy. Bằng kỹ thuật gây đột biến nhân tạo, người ta đã tạo ra được các chủng vi khuẩn khác nhau và được nuôi cấy trong hai môi trường: không có lactose và có lactose. Sự biểu hiện gene của các chủng vi khuẩn được thể hiện ở bảng dưới đây. Biết dấu (+) gene biểu hiện, dấu (-) gene không biểu hiện."
+            ],
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Chủng vi khuẩn"
+                  ],
+                  [
+                    "Môi trường không có lactose"
+                  ],
+                  [
+                    "Môi trường có lactose"
+                  ]
+                ],
+                [
+                  [],
+                  [
+                    "β -galactosidase"
+                  ],
+                  [
+                    "Permase"
+                  ],
+                  [
+                    "β - galactosidase"
+                  ],
+                  [
+                    "Permase"
+                  ]
+                ],
+                [
+                  [
+                    "A"
+                  ],
+                  [
+                    "-"
+                  ],
+                  [
+                    "-"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ]
+                ],
+                [
+                  [
+                    "B"
+                  ],
+                  [
+                    "-"
+                  ],
+                  [
+                    "-"
+                  ],
+                  [
+                    "-"
+                  ],
+                  [
+                    "+"
+                  ]
+                ],
+                [
+                  [
+                    "C"
+                  ],
+                  [
+                    "-"
+                  ],
+                  [
+                    "-"
+                  ],
+                  [
+                    "-"
+                  ],
+                  [
+                    "-"
+                  ]
+                ],
+                [
+                  [
+                    "D"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ]
+                ]
+              ]
+            },
+            [
+              "Dựa vào kết quả, có bao nhiêu phát biểu sau đây đúng? Chủng A là chủng vi khuẩn",
+              {
+                "type": "text",
+                "text": "E. coli ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "kiểu dại (chủng bình thường). Chủng",
+              {
+                "type": "text",
+                "text": "E. coli ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "kiểu dại bị đột biến ở gene Lac Y tạo ra chủng B. Chủng C tạo ra do đột biến ở vùng promoter hoặc đột biến ở cả gene lacZ và gene lacY của chủng",
+              {
+                "type": "text",
+                "text": "E. coli ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "kiểu dại. Chủng D tạo ra do đột biến gene điều hòa hoặc đột biến vùng operator ở chủng",
+              {
+                "type": "text",
+                "text": "E. coli ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "kiểu dại."
+            ]
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q6",
+          "type": "short_answer",
+          "content": [
+            [
+              "Để xác định quan hệ họ hàng giữa loài người và một số loài linh trưởng, các nhà khoa học đã phân tích một đoạn trình tự nucleotide trên mạch khuôn của một gene mã hoá cấu trúc nhóm enzyme dehydrogenase như trong bảng sau."
+            ],
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Loài sinh vật"
+                  ],
+                  [
+                    "Trình tự các nucleotide"
+                  ]
+                ],
+                [
+                  [
+                    "(1) Người"
+                  ],
+                  [
+                    "CAG - TGT - TGG - GTT - TGT - TGG"
+                  ]
+                ],
+                [
+                  [
+                    "(2) Gorilla"
+                  ],
+                  [
+                    "CTG - TGT - TGG - GTT - TGT - TAT"
+                  ]
+                ],
+                [
+                  [
+                    "(3) Đười ươi"
+                  ],
+                  [
+                    "TGT - TGT - TGG - GTC - TGT - GAT"
+                  ]
+                ],
+                [
+                  [
+                    "(4) Tinh tinh"
+                  ],
+                  [
+                    "CGT - TGT - TGG - GTT - TGT - TGG"
+                  ]
+                ]
+              ]
+            },
+            [
+              "Xác định thứ tự các loài (gồm 4 số) thể hiện sự giảm dần mức độ gần gũi về nguồn gốc giữa người với một số loài thuộc bộ Linh trưởng?"
+            ]
+          ],
+          "points": 0.25
+        }
+      ]
+    }
+  ],
+  "//answer_key": {
+    "part1.q1": 1,
+    "part1.q2": 0,
+    "part1.q3": 2,
+    "part1.q4": 1,
+    "part1.q5": 0,
+    "part1.q6": 1,
+    "part1.q7": 1,
+    "part1.q8": 2,
+    "part1.q9": 0,
+    "part1.q10": 1,
+    "part1.q11": 1,
+    "part1.q12": 1,
+    "part1.q13": 1,
+    "part1.q14": 3,
+    "part1.q15": 3,
+    "part1.q16": 3,
+    "part1.q17": 2,
+    "part1.q18": 3,
+    "part2.q1": {
+      "q1a": true,
+      "q1b": true,
+      "q1c": true,
+      "q1d": false
+    },
+    "part2.q2": {
+      "q2a": false,
+      "q2b": true,
+      "q2c": false,
+      "q2d": false
+    },
+    "part2.q3": {
+      "q3a": true,
+      "q3b": false,
+      "q3c": false,
+      "q3d": false
+    },
+    "part2.q4": {
+      "q4a": false,
+      "q4b": false,
+      "q4c": true,
+      "q4d": true
+    },
+    "part3.q1": 0.56,
+    "part3.q2": 2134,
+    "part3.q3": 0.78,
+    "part3.q4": 8,
+    "part3.q5": 3,
+    "part3.q6": 1423
+  },
+  "//resources": {
+    "exam_file_url": null,
+    "answer_file_url": "https://drive.google.com/drive/folders/1bu6KTJuSIa9z07Om-hTqBDCm1zyCCwcl?usp=drive_link",
+    "answer_file_name": "Đáp án",
+    "video_url": null,
+    "edit_link": null
+  }
+}

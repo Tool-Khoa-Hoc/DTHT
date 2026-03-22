@@ -1,0 +1,158 @@
+[* SỞ GD&ĐT BẮC NINH CỤM TRƯỜNG THPT TT1-QV1-LVT -------------------- (Đề thi có 05 trang) | ĐỀ KHẢO SÁT CHẤT LƯỢNG NĂM HỌC 2025-2026 MÔN: SINH HỌC 12(Thời gian làm bài: 50 phút, không kể thời gian phát đề) *]
+[* Họ và tên: ............................................................................ | Số báo danh: ....... | Mã đề 1401 *]
+[!b:$PHẦN I. Trắc nghiệm nhiều lựa chọn.$] [!i:$Thí sinh làm từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án$]
+Câu 1. Phân tử có cấu trúc mang một bộ ba đối mã (anticodon) và có đầu 3' liên kết với amino acid là
+A. DNA.
+B. mRNA.
+C. tRNA.
+D. rRNA.
+Câu 2. Loài, nhóm loài thực vật nào sau đây chỉ có chu trình Calvin trong pha tối quang hợp?
+A. Dứa.
+B. Rau dền.
+C. Lúa nước
+D. Ngô.
+Câu 3. Nếu trình tự các nucleotide trong một đoạn mạch gốc của gene cấu trúc là 3’…TCAGCGCCA…5’. Thì trình tự các nucleotide trong phân tử RNA được tổng hợp từ đoạn gene trên sẽ là:
+A. 3’…UCAGCGCCU…5’.
+B. 5’...AGUCGCGGU…3’.
+C. 5’…UCAGCGCCU…3’.
+D. 3’...AGUCGCGGU…5’.
+Câu 4. Trong công nghệ DNA tái tổ hợp, enzyme cắt giới hạn Retrictase được dùng để
+A. nối gene cần chuyển vào vector tạo DNA tái tổ hợp.
+B. nhận biết dòng tế bào nhận mang DNA tái tổ hợp.
+C. làm giãn màng sinh chất của tế bào nhận.
+D. tạo đầu nối giữa vector và gene cần chuyển.
+Câu 5. Ở sinh vật nhân thực, NST được cấu tạo bởi hai thành phần chủ yếu là
+A. DNA và protein histone.
+B. RNA và protein histone.
+C. RNA và phospholipid.
+D. DNA và polysaccharide.
+Câu 6. Vùng nào trên NST là vị trí liên kết của NST với thoi phân bào?
+A. Tâm động.
+B. Eo thứ cấp.
+C. Đầu mút.
+D. Điểm khởi đầu nhân đôi.
+Câu 7. Vùng kết thúc của gene là vùng
+A. mang tín hiệu kết thúc quá trình tái bản DNA.
+B. mang tín hiệu kết thúc quá trình phiên mã.
+C. mang bộ ba kết thúc trong quá trình dịch mã.
+D. mang bộ ba mã hóa amino acid cuối cùng trong chuỗi polypeptide.
+Câu 8. Hình sau đây mô tả cơ chế di truyền nào trong tế bào?
+[img:$img_09e79ef541ea$]
+A. Tái bản DNA.
+B. Dịch mã tổng hợp polypeptide.
+C. Điều hòa hoạt động gene.
+D. Phiên mã của gene.
+Câu 9. Để tạo ra động vật chuyển gene, các nhà khoa học phải sử dụng đối tượng nào sau đây làm tế bào nhận gene chuyển?
+A. trứng đã được biến đổi gene.
+B. trứng chưa được thụ tinh.
+C. trứng vừa được thụ tinh.
+D. trứng đã được loại bỏ nhân.
+Câu 10. Ở loài hoa mõm chó ([!i:$Antirrhinum majus L.$])[!i:$, $]tính trạng màu hoa do một gene có hai allele qui định. Allele A quy định hoa đỏ trội không hoàn toàn so với allele a quy định hoa trắng, cơ thể có kiểu gene Aa cho màu hoa hồng. Khi cho các cây hoa hồng tự thụ phấn thu được đời con có tỉ lệ kiểu hình
+A. 1 hoa hồng: 1 hoa trắng.
+B. 1 hoa đỏ: 2 hoa hồng: 1 hoa trắng.
+C. 3 hoa đỏ: 1 hoa trắng.
+D. 9 hoa đỏ: 6 hoa hồng: 1 hoa trắng.
+Câu 11. Hóa chất gây đột biến 5-BU khi thấm vào tế bào gây đột biến thay thế cặp A - T thành G - C.[!b:$ $]Quá trình này được mô tả bằng sơ đồ nào sau đây?
+A. A - T → T-5BU → C-5BU → G - C
+B. A - T → A-5BU → G-5BU → G - C
+C. A - T → G-5BU → G-5BU → G - C
+D. A - T → C-5BU → G-5BU → G - C
+[img:$img_cefd97bdb0ae$]
+Câu 12. Hình vẽ dưới đây mô tả một cơ chế di truyền cấp độ phân tử đang diễn ra. Cấu trúc X trên hình vẽ là
+A. DNA ligase.
+B. Ribosome.
+C. RNA polymerase.
+D. DNA polymerase.
+Câu 13. Những cơ thể mang gene đột biến đã được biểu hiện ra thành kiểu hình được gọi là
+A. thể đột biến.
+B. đột biến gene.
+C. đột biến điểm.
+D. allele mới.
+Câu 14. Cho biết bộ nhiễm sắc thể 2n của châu chấu là 24, nhiễm thể giới tính của châu chấu cái là XX, của châu chấu đực là XO. Người ta lấy tinh hoàn của châu chấu bình thường để làm tiêu bản nhiễm sắc thể. Trong các kết luận sau đây được rút ra khi làm tiêu bản và quan sát tiêu bản bằng kính hiển vi kết luận nào [!b:$sai?$]
+A. Nhỏ dung dịch orcein axetic 4% - 5% lên tinh hoàn nhuộm trong 15 phút có thể quan sát được nhiễm sắc thể.
+B. Trên tiêu bản có thể tìm thấy cả tế bào chứa 12 nhiễm sắc thể kép và tế bào chứa 11 nhiễm sắc thể kép.
+C. Các tế bào con tạo ra sau giảm phân đều có số lượng nhiễm sắc thể bằng nhau.
+D. Quan sát bộ nhiễm sắc thể trong các tế bào trên tiêu bản bằng kính hiển vi có thể nhận biết được một số kỳ của quá trình phân bào.
+Câu 15. Người ta thường bảo quản hạt giống bằng phương pháp bảo quản khô. Nguyên nhân chủ yếu là do hạt khô
+A. không còn hoạt động hô hấp nên dễ bảo quản.
+B. đã giảm khối lượng nên dễ dàng bảo quản hơn.
+C. không có nước nên các sinh vật gây hại không xâm nhập được.
+D. có cường độ hô hấp tối thiểu giúp hạt sống ở trạng thái tiềm sinh.
+Câu 16. Trong cấu trúc siêu hiển vi của nhiễm sắc thể ở tế bào nhân thực, chromatid có đường kính là
+A. 30nm.
+B. 700nm.
+C. 300nm.
+D. 10nm.
+Câu 17. Một nam bệnh nhân [!i:$X $]có khối u trong dạ dày và được bác sĩ chỉ định phẫu thuật cắt bỏ khối u. Việc cắt bỏ khối u làm dạ dày của anh ấy bị thu hẹp khoảng 1/2 so với lúc bình thường. Sau phẫu thuật, hồi phục và bệnh nhân được về nhà. Dự đoán nào sau đây [!b:$đúng $]khi nói về sự tiêu hóa của bệnh nhân sau phẫu thuật?
+A. Dạ dày giảm khả năng tiêu hóa cơ học và tiêu hóa hóa học.
+B. Bệnh nhân [!i:$X $]không thể ăn các loại thịt được nữa.
+C. Ruột non tiết nhiều enzyme pepsin hơn bù lại cho dạ dày.
+D. Ruột già phải tăng cường hoạt động tiêu hóa.
+Câu 18. Ở đậu Hà Lan, allele quy định kiểu hình hạt trơn và allele quy định kiểu hình nào sau đây được gọi là một cặp allele?
+A. Hạt nhăn.
+B. Thân cao.
+C. Hạt vàng.
+D. Hoa trắng.
+[!b:$PHẦN II. Câu trắc nghiệm đúng sai.$] [!i:$Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý $a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.$$]
+Câu 1. Hình vẽ dưới đây mô tả các cơ chế di truyền diễn ra trong một tế bào. Biết rằng (A), (B), (C), (D), (E) là kí hiệu là các đại phân tử sinh học; 1, 2, 3, 4 là các quá trình.
+Quan sát hình vẽ, cho biết mỗi nhận định sau là đúng hay sai?
+[img:$img_9c023fd723fc$]
+a) Kết thúc quá trình 4, một chuỗi (E) hoàn chỉnh gồm có 311 amino acid.
+b) Tế bào đang xét là một tế bào nhân thực.
+c) Phân tử (B) có kích thước 933 nucleotide.
+d) Quá trình 1 là quá trình tái bản DNA.
+Câu 2. Một bạn học sinh đã tiến hành các thí nghiệm di truyền trên các cây cà chua. Khi cho các cặp bố mẹ (P) tương phản về 1 hoặc 2 cặp tính trạng lai với nhau đến F2, số loại kiểu gene ở từng thế hệ biểu thị ở biểu đồ 1 và biểu đồ 2. Biết rằng mỗi gene quy định một tính trạng và tính trạng trội là trội hoàn toàn.
+[img:$img_77451afc8918$]
+Theo lí thuyết, mỗi nhận định dưới đây là đúng hay sai?
+a) Biểu đồ 1 có thể là kết quả của phép lai P khác nhau hai cặp tính trạng tương phản.
+b) Trong biểu đồ 2, ở F2, các cá thể thuần chủng chiếm tỉ lệ 25%.
+c) Tỷ lệ kiểu gene ở F2 trong biểu đồ 2 là 9: 3: 3: 1.
+d) Nếu cho F1 ở biểu đồ 1 lai phân tích thu được Fa có 2 kiểu hình với tỉ lệ như nhau.
+Câu 3. Ở một loài thực vật, tính trạng màu sắc hoa do sự tương tác giữa các sản phẩm của hai cặp gene A, a và B, b phân li độc lập theo sơ đồ:
+[img:$img_5172df626734$]
+Các allele a và b không tổng hợp được enzyme nên không có chức năng trên. Lai các cây hoa màu vàng thuần chủng với nhau thu được F1 toàn cây có hoa màu tím. Cho F1 tự thụ phấn thu được F2. Biết rằng không xảy ra đột biến, sức sống của các giao tử và các cá thể như nhau. Theo lí thuyết, mỗi nhận định sau là [!b:$đúng $]hay [!b:$sai$]?
+a) Trong số các cây hoa màu vàng F2, cây đồng hợp chiếm tỉ lệ là 50%.
+b) Có tối đa 4 loại kiểu gene quy định kiểu hình hoa tím trong quần thể.
+c) Ở F2, cây hoa màu trắng chiếm tỉ lệ 6,25%.
+d) Tính trạng màu sắc hoa do sự tương tác trực tiếp sản phẩm của các gene khác nhau.
+Câu 4. Ở vi khuẩn E.coli kiểu bình thường, sự biểu hiện của gene [!i:$lacZ $](mã hóa ß- galactosidase), gene [!i:$lacY $](mã hóa permease), gene [!i:$lacA $](mã hóa transacetylase) thuộc operon lac phụ thuộc vào sự có mặt của lactose trong môi trường nuôi cấy. Bằng kỹ thuật gây đột biến nhân tạo, người ta đã tạo ra được các chủng vi khuẩn đột biến khác nhau và được nuôi cấy trong hai môi trường: không có lactose và có lactose. Sự biểu hiện gene của các chủng vi khuẩn được thể hiện ở bảng dưới đây:
+[img:$img_0c70c61d19ba$]
+Trong đó, dấu (+) là enzyme được tổng hợp, có dấu (-) là enzyme không được tổng hợp (hoặc tổng hợp rất ít).
+a) Cả 3 gene [!i:$lacZ, lacY $]và [!i:$lacA $]có vùng promoter giống nhau.
+b) Ở chủng vi khuẩn B đã xảy ra đột biến ở vùng trình tự P (promoter) của operon lac.
+c) Ở chủng vi khuẩn C có thể đã xảy ra đột biến ở vùng trình tự O (operator) của opreon lac, hoặc đột biến ở
+gene điều hòa [!i:$lacI$].
+d) Chủng vi khuẩn A là chủng vi khuẩn E.coli kiểu bình thường.
+[!b:$PHẦN III. Câu trắc nghiệm yêu cầu trả lời ngắn.$] [!i:$Thí sinh trả lời từ câu 1 đến câu 6.$]
+Câu 1. Một gene tương ứng các nucleotide ở các mạch đơn thể hiện ở bảng dưới đây. Biết tổng tỷ lệ các loại nucleotide ở mỗi mạch đơn là 1,00. Dấu - thể hiện chưa xác định được số liệu:
+[img:$img_25ee4e694535$]
+Nếu mạch 1 là mạch gốc của gene thì khi gene này phiên mã 1 lần cần các nucleotide tự do, trong đó tỉ số giữa nucleotide loại C trên tổng tổng số các nucleotide tự do bằng bao nhiêu? ([!i:$kết quả thể hiện bằng số thập phân làm tròn đến hàng phần trăm$])?
+Câu 2. Một cụ bà cần truyền máu, bác sĩ yêu cầu gia đình nạn nhân truyền máu gấp cho bà. Được biết thông tin về nhóm máu của một số người trong gia đình này qua phả hệ bên dưới. Tuy nhiên có một số người trong gia đình vắng mặt, một số khác chưa rõ thông tin về nhóm máu.
+[img:$img_e0e8f0e50a86$]
+Hỏi trong gia đình nạn nhân nên để người số bao nhiêu trong phả hệ truyền máu cho cụ bà (người số 11 trong phả hệ) là thích hợp và nhanh nhất?
+[img:$img_3a65b30f1fd9$]
+Câu 3. Quan sát các hình mô tả các bước trong qui trình tạo DNA tái tổ hợp dưới đây:
+Viết các số liền nhau theo trật tự các bước trong qui trình tạo DNA tái tổ hợp.
+Câu 4. Ở một loài thực vật lưỡng tính, xét hai cặp gene phân li độc lập (gồm các allele tương ứng là A, a và B, b), trong đó mỗi gene quy định một tính trạng và allele trội là trội hoàn toàn. Khi lai cây M lần lượt với các cây N, P, Q người ta thu được kết quả như bảng sau (biết rằng M, N, P, Q có kiểu hình khác nhau):
+[* Phép lai | Tiến hành | Kết quả đời con *]
+[* 1 | Cây M × Cây N | 4 loại kiểu hình *]
+[* 2 | Cây M × Cây P | 4 loại kiểu hình *]
+[* 3 | Cây M × Cây Q | 4 loại kiểu hình *]
+Nếu đem cây M tự thụ phấn, theo lí thuyết số cây thuần chủng về hai cặp gene ở đời con chiếm tỉ lệ bao nhiêu? (tính làm tròn đến 2 chữ số sau dấu phẩy).
+Câu 5. Cho các diễn biến:
+1. Dịch mã tổng hợp enzyme phân giải lactose
+2. Enzyme RNA polymerase liên kết với trình tự P (promoter) tiến hành phiên mã các gene cấu trúc
+3. Gen điều hòa phiên mã, dịch mã tạo sản phẩm protein ức chế
+4. Một lượng nhỏ lactose chuyển thành allolactose và liên kết với protein ức chế
+Viết các số liền nhau theo trình tự các diễn biến cơ chế điều hòa biểu hiện gene của operon lac ở E.coli khi môi trường có lactose
+Câu 6. Hình bên mô tả một giai đoạn của quá trình phiên mã xảy ra trong vùng mã hóa của một gene ở sinh vật nhân sơ. Vị trí nucleotide 1-2-3 là bộ ba mở đầu; các nucleotide còn lại của gene không được thể hiện trên hình.
+[img:$img_325f0875ba7d$]
+Nếu nucleotide ? trên hình là U thì phân tử mRNA này khi làm khuôn để dịch mã sẽ tạo ra chuỗi polipeptide có bao nhiêu amino acid (không kể amino acid mở đầu).
+[!b:$-------- HẾT --------$]
+[!b:$
+]
+[!b:$ĐÁP ÁN$]
+[* 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 *]
+[* C | C | B | D | A | A | B | A | C | B | B | C | A | C | D | B | A | A *]
+[* 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 *]
+[* SĐSS | SĐSĐ | SĐĐS | ĐSĐĐ | 0,45 | 22 | 2431 | 0,25 | 3421 | 4 *]

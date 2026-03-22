@@ -7,6 +7,8 @@ node_modules/
 dist/
 dist-ssr/
 build/
+*.zip
+*.tar.gz
 
 # Environment variables (QUAN TRỌNG - không commit key bí mật!)
 .env
@@ -20,8 +22,12 @@ logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
+yarn-debug.log*
 pnpm-debug.log*
+err.txt
+sync_log.txt
+status_log.txt
+rpc_output.txt
 
 # Editor & OS files
 .vscode/
@@ -40,6 +46,44 @@ desktop.ini
 .parcel-cache/
 .eslintcache
 *.tsbuildinfo
+.pytest_cache/
 
 # Vite
 vite.config.js.timestamp-*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.vendor/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Project Specific & Temp
+.tmp_public_export/
+supabase/.temp/
+folder-test/
+git_status_out.txt
+replace.cjs.timestamp-*
+paths.txt
+public_data_test.txt
+extract_output.txt
+extract_output.json
+exam_keys_db_data.txt
+exam_keys_sample.txt
+status.txt
+
+# Backups
+backups/
+
+# Local/Test Scripts (Tùy chọn: nếu muốn giữ lại trên local nhưng không đẩy lên Git)
+test_*.py
+test_*.js
+force_push_*.py
+fix_*.py

@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Navigate } from 'react-router-dom';
 import { assertSafeExternalUrl } from '../utils/urlSecurity';
+import Avatar from '../components/Avatar';
 
 const CATEGORIES = [
   { label: 'Toán', value: 'toan', icon: 'calculate', color: 'from-blue-500 to-indigo-600' },
@@ -29,7 +30,7 @@ export default function Admin() {
   const { user, profile } = useAuth();
   const isAdmin = profile?.role === 'admin';
 
-  const [mainTab, setMainTab] = useState('library'); // 'library' | 'vip' | 'thongsoai' | 'collaborators'
+  const [mainTab, setMainTab] = useState('library'); // 'library' | 'vip' | 'thongsoai' | 'collaborators' | 'exams'
 
   // VIP Management State
   const [vipSearch, setVipSearch] = useState('');
@@ -69,6 +70,13 @@ export default function Admin() {
   const [searchResults, setSearchResults] = useState([]);
   const [collaborators, setCollaborators] = useState([]);
   const [loadingCollabs, setLoadingCollabs] = useState(false);
+  
+  // Exam Management State
+  const [exams, setExams] = useState([]);
+  const [loadingExams, setLoadingExams] = useState(false);
+  const [examSearch, setExamSearch] = useState('');
+  const [editingExam, setEditingExam] = useState(null);
+  const [examEditForm, setExamEditForm] = useState({ answer_key: '', solution_url: '', video_url: '' });
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -81,6 +89,8 @@ export default function Admin() {
       fetchCollaborators();
     } else if (mainTab === 'vip') {
       fetchPaymentLogs();
+    } else if (mainTab === 'exams') {
+      fetchExams();
     }
   }, [isAdmin, mainTab]);
 
@@ -474,6 +484,133 @@ export default function Admin() {
     }
   };
 
+  const fetchExams = async () => {
+    setLoadingExams(true);
+    try {
+      // Primary source is exam_keys (synced data)
+      const { data: keysData, error: keysError } = await supabase
+        .from('exam_keys')
+        .select('*')
+        .order('exam_id', { ascending: true });
+        
+      if (keysError) throw keysError;
+      
+      // Secondary source is exams (metadata)
+      const { data: examsData, error: examsError } = await supabase
+        .from('exams')
+        .select('*');
+        
+      if (examsError) throw examsError;
+      
+      // Merge: primary source is exam_keys
+      const merged = (keysData || []).map(kd => {
+        const exMeta = (examsData || []).find(ex => ex.id === kd.exam_id);
+        return {
+          id: kd.exam_id,
+          title: exMeta?.title || kd.exam_id, // Fallback to ID if no title in metadata
+          subject: exMeta?.subject || 'khac',
+          solution_url: exMeta?.solution_url || kd.resources?.solution_url || '',
+          video_url: exMeta?.video_url || kd.resources?.video_url || '',
+          has_key: !!(kd.answer_key),
+          has_resources: !!(kd.resources && Object.keys(kd.resources).length > 0),
+          last_synced_at: kd.last_synced_at,
+          answer_key: kd.answer_key,
+          resources: kd.resources
+        };
+      });
+      
+      setExams(merged);
+    } catch (err) {
+      console.error('Lỗi lấy danh sách đề thi:', err);
+    } finally {
+      setLoadingExams(false);
+    }
+  };
+
+  const deleteExam = async (examId) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa đề thi ${examId} vĩnh viễn? Hành động này sẽ xóa cả metadata và đáp án trong database.`)) return;
+    
+    try {
+      const { error: error1 } = await supabase.from('exam_keys').delete().eq('exam_id', examId);
+      const { error: error2 } = await supabase.from('exams').delete().eq('id', examId);
+      
+      if (error1) throw error1;
+      if (error2) throw error2;
+
+      setExams(exams.filter(e => e.id !== examId));
+      toast('Đã xóa đề thi thành công');
+    } catch (err) {
+      alert('Lỗi khi xóa đề thi: ' + err.message);
+    }
+  };
+
+  const toggleExamKeyVisibility = async (examId, currentHasKey) => {
+    // This is a placeholder for a more complex visibility logic if needed
+    // For now, it just alerts that the key exists or not
+    alert(`Đề thi ${examId} hiện ${currentHasKey ? 'ĐÃ' : 'CHƯA'} có đáp án trên hệ thống.`);
+  };
+
+  const handleStartEdit = async (ex) => {
+    setEditingExam(ex.id);
+    // Fetch full data for this exam to ensure we have the correct answer_key
+    try {
+      const { data, error } = await supabase.from('exam_keys').select('*').eq('exam_id', ex.id).single();
+      if (!error && data) {
+        setExamEditForm({
+          answer_key: data.answer_key ? JSON.stringify(data.answer_key, null, 2) : '{}',
+          solution_url: ex.solution_url || '',
+          video_url: ex.video_url || ''
+        });
+      } else {
+        setExamEditForm({
+          answer_key: '{}',
+          solution_url: ex.solution_url || '',
+          video_url: ex.video_url || ''
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      let parsedKey;
+      try {
+        parsedKey = JSON.parse(examEditForm.answer_key);
+      } catch (e) {
+        throw new Error('Đáp án JSON không hợp lệ. Vui lòng kiểm tra lại cú pháp.');
+      }
+
+      const resources = {
+        solution_url: examEditForm.solution_url,
+        video_url: examEditForm.video_url
+      };
+
+      // Update exam_keys
+      const { error: keyError } = await supabase.from('exam_keys').upsert({
+        exam_id: editingExam,
+        answer_key: parsedKey,
+        resources: resources,
+        last_synced_at: new Date().toISOString()
+      });
+      if (keyError) throw keyError;
+
+      // Update exams
+      const { error: examError } = await supabase.from('exams').update({
+        solution_url: examEditForm.solution_url,
+        video_url: examEditForm.video_url
+      }).eq('id', editingExam);
+      if (examError) throw examError;
+
+      toast('Cập nhật dữ liệu đề thi thành công!');
+      setEditingExam(null);
+      fetchExams();
+    } catch (err) {
+      alert('Lỗi khi lưu: ' + err.message);
+    }
+  };
+
   return (
     <div className="bg-[#f8f6f6] dark:bg-[#1a0f12] font-display text-slate-900 dark:text-white min-h-screen pb-24">
       {/* Header */}
@@ -501,6 +638,9 @@ export default function Admin() {
           </button>
           <button onClick={() => setMainTab('vip')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'vip' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-amber-500' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
             <span className="material-symbols-outlined text-[18px]">workspace_premium</span> Quản lý VIP
+          </button>
+          <button onClick={() => setMainTab('exams')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'exams' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-blue-500' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
+            <span className="material-symbols-outlined text-[18px]">quiz</span> Quản lý đề thi
           </button>
         </div>
       </header>
@@ -670,6 +810,154 @@ export default function Admin() {
                       <span className="font-mono font-bold uppercase">{log.status}</span>
                       <span className="text-slate-500 flex-1 truncate">{log.error_message || 'OK'}</span>
                       <span className="text-slate-600 shrink-0">{new Date(log.created_at).toLocaleString('vi-VN')}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ─── Exam Management Tab ─────────────────────────────────── */}
+        {mainTab === 'exams' && (
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold flex items-center gap-2 text-blue-500">
+                  <span className="material-symbols-outlined">quiz</span>
+                  Quản lý kho đề thi
+                </h2>
+                <button onClick={fetchExams} className="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">refresh</span> Làm mới
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400">
+                    <span className="material-symbols-outlined text-[20px]">search</span>
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Tìm mã đề hoặc tên đề thi..."
+                    value={examSearch}
+                    onChange={(e) => setExamSearch(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Edit Mode Overlay/Form */}
+              {editingExam && (
+                <div className="mb-8 p-6 rounded-2xl bg-blue-50 dark:bg-blue-500/5 border-2 border-blue-500/30 space-y-4 animate-in fade-in slide-in-from-top-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                       <span className="material-symbols-outlined">edit_note</span>
+                       Đang chỉnh sửa: {editingExam}
+                    </h3>
+                    <button onClick={() => setEditingExam(null)} className="text-slate-400 hover:text-slate-600">
+                      <span className="material-symbols-outlined">close</span>
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                       <div>
+                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Link bài giải (PDF/Web)</label>
+                         <input 
+                           type="text" 
+                           value={examEditForm.solution_url} 
+                           onChange={e => setExamEditForm({...examEditForm, solution_url: e.target.value})}
+                           className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none"
+                         />
+                       </div>
+                       <div>
+                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Link Video bài giải</label>
+                         <input 
+                           type="text" 
+                           value={examEditForm.video_url} 
+                           onChange={e => setExamEditForm({...examEditForm, video_url: e.target.value})}
+                           className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none"
+                         />
+                       </div>
+                    </div>
+                    <div>
+                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Đáp án (JSON Answer Key)</label>
+                         <textarea 
+                           rows="6"
+                           value={examEditForm.answer_key} 
+                           onChange={e => setExamEditForm({...examEditForm, answer_key: e.target.value})}
+                           className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-xs font-mono focus:border-blue-500 outline-none resize-none"
+                         />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button onClick={() => setEditingExam(null)} className="px-4 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-white/5 transition-all">Hủy bỏ</button>
+                    <button onClick={handleSaveEdit} className="px-6 py-2 rounded-xl bg-blue-500 text-white text-sm font-bold shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">Lưu thay đổi</button>
+                  </div>
+                </div>
+              )}
+
+              {loadingExams ? (
+                <div className="flex justify-center py-12"><span className="material-symbols-outlined animate-spin text-blue-500 text-3xl">sync</span></div>
+              ) : exams.length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl">
+                  <span className="material-symbols-outlined text-5xl text-slate-300 mb-2">inventory_2</span>
+                  <p className="text-slate-500 font-medium">Chưa có đề thi nào trong hệ thống.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4">
+                  {exams.filter(ex => 
+                    ex.id.toLowerCase().includes(examSearch.toLowerCase()) || 
+                    (ex.title && ex.title.toLowerCase().includes(examSearch.toLowerCase()))
+                  ).map(ex => (
+                    <div key={ex.id} className="p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:border-blue-500/30 transition-all flex flex-col md:flex-row md:items-center gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 uppercase tracking-widest">{ex.id}</span>
+                          <h4 className="font-bold text-sm truncate">{ex.title || 'Đề thi chưa đặt tên'}</h4>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3">
+                           <div className="flex items-center gap-1">
+                              <span className={`material-symbols-outlined text-[16px] ${ex.has_key ? 'text-green-500' : 'text-slate-400'}`}>
+                                {ex.has_key ? 'check_circle' : 'cancel'}
+                              </span>
+                              <span className="text-[11px] font-bold text-slate-500 uppercase">Đáp án</span>
+                           </div>
+                           <div className="flex items-center gap-1">
+                              <span className={`material-symbols-outlined text-[16px] ${ex.has_resources ? 'text-purple-500' : 'text-slate-400'}`}>
+                                {ex.has_resources ? 'check_circle' : 'cancel'}
+                              </span>
+                              <span className="text-[11px] font-bold text-slate-500 uppercase">Video/Lời giải</span>
+                           </div>
+                           {ex.last_synced_at && (
+                             <span className="text-[11px] text-slate-400 italic">
+                               Sync: {new Date(ex.last_synced_at).toLocaleString('vi-VN')}
+                             </span>
+                           )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 self-end md:self-center border-t md:border-t-0 border-slate-200 dark:border-white/10 pt-3 md:pt-0">
+                        <button 
+                          onClick={() => handleStartEdit(ex)}
+                          className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-blue-500/10 hover:text-blue-500 text-xs font-bold transition-all flex items-center gap-1"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">edit</span> Sửa kho khóa
+                        </button>
+                        <button 
+                          onClick={() => toggleExamKeyVisibility(ex.id, ex.has_key)}
+                          className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-amber-500/10 hover:text-amber-500 text-xs font-bold transition-all flex items-center gap-1"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">visibility</span> Kiểm tra
+                        </button>
+                        <button 
+                          onClick={() => deleteExam(ex.id)}
+                          className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-red-500/10 hover:text-red-500 text-xs font-bold transition-all flex items-center gap-1"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">delete</span> Xóa
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -870,7 +1158,13 @@ export default function Admin() {
               <div className="grid grid-cols-1 gap-4">
                 {candidates.map(candidate => (
                   <div key={candidate.id} className="flex flex-col sm:flex-row items-center gap-4 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1a0f12] hover:shadow-md transition-shadow">
-                    <img src={candidate.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'} className="w-16 h-16 rounded-xl border-2 border-amber-400 shadow-sm" alt="avatar" />
+                    <Avatar 
+                      src={candidate.avatar_url} 
+                      name={candidate.display_name || candidate.full_name || 'Ẩn danh'} 
+                      id={candidate.id}
+                      size="w-16 h-16"
+                      className="border-2 border-amber-400 shadow-sm"
+                    />
                     <div className="flex-1 text-center sm:text-left">
                       <h3 className="font-bold text-xl text-slate-800 dark:text-white mb-1">{candidate.display_name || candidate.full_name || 'Ẩn danh'}</h3>
                       <p className="text-sm font-bold text-amber-600 dark:text-amber-500 bg-amber-100 dark:bg-amber-900/30 inline-block px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/50">
@@ -927,7 +1221,11 @@ export default function Admin() {
                   {searchResults.map(user => (
                     <div key={user.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1a0f12]">
                       <div className="flex items-center gap-4">
-                        <img src={user.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'} className="w-12 h-12 rounded-lg" alt="avatar" />
+                        <Avatar 
+                          src={user.avatar_url} 
+                          name={user.display_name || user.full_name || 'Khuyết danh'} 
+                          id={user.id}
+                        />
                         <div>
                           <div className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
                             {user.display_name || user.full_name || 'Khuyết danh'}
@@ -964,7 +1262,12 @@ export default function Admin() {
                   {collaborators.map(user => (
                     <div key={user.id} className="flex flex-col p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-900/10">
                       <div className="flex items-center gap-4 mb-4">
-                        <img src={user.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'} className="w-12 h-12 rounded-lg border border-emerald-200" alt="avatar" />
+                        <Avatar 
+                          src={user.avatar_url} 
+                          name={user.display_name || user.full_name || 'Khuyết danh'} 
+                          id={user.id}
+                          className="border border-emerald-200"
+                        />
                         <div>
                           <div className="font-bold text-slate-800 dark:text-white">{user.display_name || user.full_name || 'Khuyết danh'}</div>
                           <div className="text-xs text-slate-500">{user.email}</div>

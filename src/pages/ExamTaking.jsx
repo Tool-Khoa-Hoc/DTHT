@@ -302,8 +302,8 @@ export default function ExamTaking() {
                 });
                 if (allCorrect) correct++;
             } else if (question.type === 'short_answer') {
-                const correct_str = String(expectedAnswer ?? '').trim().toLowerCase();
-                const user_str = String(userAns ?? '').trim().toLowerCase();
+                const correct_str = String(expectedAnswer ?? '').replace(',', '.').trim().toLowerCase();
+                const user_str = String(userAns ?? '').replace(',', '.').trim().toLowerCase();
                 if (correct_str && correct_str === user_str) correct++;
             }
         });

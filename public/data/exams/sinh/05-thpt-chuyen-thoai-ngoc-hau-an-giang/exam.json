@@ -1,0 +1,1051 @@
+{
+  "id": "05-thpt-chuyen-thoai-ngoc-hau-an-giang",
+  "title": "SINH 12 CHUYÊN THOẠI NGỌC HẦU - An Giang",
+  "subject": "sinh",
+  "time": 50,
+  "description": null,
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I. ( 4,5 điểm ) Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": [
+            [
+              "Hình sau đây mô tả hoạt động của Operon Lac ở vi khuẩn E.coli trong môi trường nuôi cấy. Phân tích hình và cho biết phát biểu nào sau đây là đúng?"
+            ],
+            {
+              "image": "1.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Vi khuẩn đang được nuôi cấy trong môi trường có đường lactose."
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Chất X là enzyme β-galactosidase.",
+            "Hai vùng (P) luôn ở trạng thái liên kết với enzyme RNA polymerase.",
+            "Operon lac của vi khuẩn E.coli đang ở trạng thái không hoạt động.",
+            "Bd"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": [
+            "Một cơ thể đực mang kiểu gene Aa bD. Nếu trong quá trình giảm phân tạo giao tử, một số tế bào sinh tinh bị rối loạn phân li ở cặp NST mang 2 cặp alelle",
+            {
+              "type": "text",
+              "text": "B, b, D, d ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "trong lần giảm phân I, giảm phân II diễn ra bình thường thì theo lý thuyết, số loại tinh trùng tối đa có thể tạo ra từ cơ thể này là bao nhiêu?",
+            {
+              "type": "text",
+              "text": "(biết rằng các gene trên cùng một NST liên kết hoàn toàn).",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "image": "2.jpeg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "10.",
+            "12.",
+            "8.",
+            "16."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": "Hình sau đây mô tả cơ chế dẫn đến dạng đột biến cấu trúc NST nào?",
+          "points": 0.25,
+          "options": [
+            "Chuyển đoạn NST",
+            "Đảo đoạn NST.",
+            "Mất đoạn NST.",
+            "Lặp đoạn NST."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": [
+            "Ở người, màu da di truyền theo kiểu tương tác cộng gộp giữa 3 cặp gene không allele (",
+            {
+              "type": "text",
+              "text": "Aa",
+              "marks": [
+                "bold"
+              ]
+            },
+            ",",
+            {
+              "type": "text",
+              "text": "Bb",
+              "marks": [
+                "bold"
+              ]
+            },
+            ",",
+            {
+              "type": "text",
+              "text": "Dd",
+              "marks": [
+                "bold"
+              ]
+            },
+            ") phân li độc lập, trong đó mỗi allele trội chỉ tạo ra một lượng nhỏ sắc tố làm da có màu, càng nhiều allele trội thì màu da càng đen.Khi hai người có kiểu gene dị hợp về 3 cặp gene nói trên lấy nhau thì sẽ tạo ra đời con có số nhóm kiểu hình là?"
+          ],
+          "points": 0.25,
+          "options": [
+            "3",
+            "6",
+            "7",
+            "8"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": "Khi nói về hoán vị gen, phát biểu nào sau đây đúng? Hoán vị gen xảy ra do sự tiếp hợp và trao đổi chéo giữa 2 crômatit cùng nguồn gốc trong cặp NST tương đồng, diễn ra vào kì đầu của giảm phân I.",
+          "points": 0.25,
+          "options": [
+            "Hoán vị gen chỉ xảy ra trong giảm phân của sinh sản hữu tính mà không xảy ra trong nguyên",
+            "phân.",
+            "Tần số hoán vị gen phản ánh số lượng gen có trên NST.",
+            "Hoán vị gen tạo điều kiện cho các gen tổ hợp lại với nhau, làm phát sinh biến dị tổ hợp."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 6 ",
+              "marks": [
+                "bold"
+              ]
+            },
+            ": Trong quá trình điều hoà hoạt động của operon Lac, allolactose có vai trò gì?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Gắn và làm mất hoạt tính của protein điều hoà.",
+            "Gắn với promoter để hoạt hoá phiên mã.",
+            "Gắn với các gene cấu trúc để hoạt hoá phiên mã.",
+            "Gắn với operator để hoạt hoá phiên mã."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": "Công nghệ DNA tái tổ hợp là",
+          "points": 0.25,
+          "options": [
+            "gồm công nghệ DNA tái tổ hợp và công nghệ tạo sinh vật biến đổi gene.",
+            "quy trình kĩ thuật sử dụng công nghệ DNA tái tổ hợp để thay đổi kiểu gene và kiểu hình của sinh vật.",
+            "quy trình kĩ thuật dựa trên nguyên lí tái tổ hợp DNA và biểu hiện gene, tạo ra sản phẩm là DNA tái tổ hợp và protein tái tổ hợp với số lượng lớn phục vụ cho đời sống con người.",
+            "tạo ra đoạn DNA có khả năng làm vector có khả năng tái bản cũng như đảm bảo cho gene biểu hiện."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 8",
+              "marks": [
+                "bold"
+              ]
+            },
+            ": Hệ gene của sinh vật nhân sơ bao gồm"
+          ],
+          "points": 0.25,
+          "options": [
+            "tập hợp phân tử DNA trên NST trong nhân tế bào và trong bào quan ti thể, lục lạp.",
+            "tập hợp các phân tử DNA vòng trong vùng nhân và DNA plasmid.",
+            "tập hợp phân tử DNA vòng trên NST trong nhân tế bào và trong bào quan ti thể, lục lạp.",
+            "tập hợp phân tử DNA trên NST trong nhân tế bào và plasmid."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 9 ",
+              "marks": [
+                "bold"
+              ]
+            },
+            ": Dạng đột biến nào sau đây không làm thay đổi thành phần nucleotide của gen?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Thay thế cặp A - T bằng cặp G - C.",
+            "Mất một cặp nucleotide.",
+            "Thêm một cặp nucleotide.",
+            "Đảo vị trí các cặp nucleotide."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": [
+            "Ở người, alen",
+            {
+              "type": "text",
+              "text": "A ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "quy định tóc xoăn là trội hoàn toàn so với alen",
+            {
+              "type": "text",
+              "text": "a ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "quy định tóc thẳng. Cặp vợ chồng nào sau đây có thể sinh ra con có người tóc xoăn, có người tóc thẳng?"
+          ],
+          "points": 0.25,
+          "options": [
+            "AA × Aa.",
+            "Aa × Aa.",
+            "aa × aa.",
+            "aa × AA."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": [
+            "Cho các phát biểu sau: Coren là người đầu tiên phát hiện ở cây hoa phấn (",
+            {
+              "type": "text",
+              "text": "Mirabilis jalapa",
+              "marks": [
+                "italic"
+              ]
+            },
+            ") có sự di truyền tế bào chất. Ở sinh vật nhân sơ, gen ngoài nhân được thấy ở ti thể và lục lạp. Mọi hiện tượng di truyền theo dòng mẹ đều là di truyền tế bào chất. Di truyền tế bào chất không có sự phân tính ở các thế hệ sau. Di truyền tế bào chất còn gọi là di truyền ngoài nhân hay di truyền ngoài nhiễm sắc thể. Số phát biểu đúng là:"
+          ],
+          "points": 0.25,
+          "options": [
+            "1.",
+            "2.",
+            "3.",
+            "4."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": "Thỏ bị bạch tạng không tổng hợp được sắc tố melamine nên lông màu trắng, con ngươi của mắt có màu đỏ do nhìn thấu cả mạch máu trong đáy mắt. Đây là hiện tượng di truyền:",
+          "points": 0.25,
+          "options": [
+            "tương tác bổ sung.",
+            "tương tác cộng gộp.",
+            "liên kết gene hoàn toàn.",
+            "tác động đa hiệu của gene."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q13",
+          "type": "single_choice",
+          "content": [
+            [
+              {
+                "type": "text",
+                "text": "Câu 13",
+                "marks": [
+                  "bold"
+                ]
+              },
+              ": Sự liên kết giữa DNA với protein histon trong cấu trúc của nhiễm sắc thể đảm bảo chức năng:"
+            ],
+            {
+              "image": "3.jpeg",
+              "align": "center",
+              "width": 20
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "bảo quản thông tin di truyền.",
+            "phân li nhiễm sắc thể trong phân bào thuận lợi.",
+            "tổ hợp nhiễm sắc thể trong phân bào thuận lợi.",
+            "điều hòa hoạt động các gen trong DNA trên NST."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q14",
+          "type": "single_choice",
+          "content": "Tiến hành thí nghiệm tách chiết DNA theo các bước sau đây (biết các chất trong thí nghiệm đều được ước lượng chuẩn xác): \nBước 1: Cho lượng ít mẫu thực vật vào cối. Nghiền nát mẫu thành hỗn hợp đồng nhất. \nBước 2: Dùng cốc chứa nước, muối ăn và nước rửa bát trộn với dung dịch trong cối tạo dịch nghiền đồng nhất. Dùng phễu có lót sẵn giấy lọc để lọc bỏ phần bã trong dịch, thu được dịch. \nBước 3: Rót một thể tích tương đương ethanol lạnh vào dịch. Chuyển dung dịch ethanol phía trên trong cốc vào một ống nghiệm sạch. Để ống nghiệm ở nhiệt độ 0 – 4°C, xuất hiện kết tủa. \nCó bao nhiêu phát biểu đúng",
+          "points": 0.25,
+          "options": [
+            "Kết tủa xuất hiện sau bước 3 là deoxyribonucleic acid. ",
+            "Có thể thay dung dịch ethanol bằng dung dịch isopropanol. ",
+            "Mục đích chính của việc thêm nước rửa bát dạng lỏng ở bước 1 là để phá hủy màng tế bào, màng nhân để giải phóng vật chất di truyền. ",
+            "Thí nghiệm trên chứng minh DNA có cấu tạo theo nguyên tắc đa phân."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q15",
+          "type": "single_choice",
+          "content": [
+            "Một cá thể ở một loài thực vật có bộ nhiễm sắc thể",
+            {
+              "type": "text",
+              "text": "2n = 24",
+              "marks": [
+                "bold"
+              ]
+            },
+            ". Khi quan sát quá trình giảm phân của 2000 tế bào sinh tinh, người ta thấy 20 tế bào có cặp nhiễm sắc thể số 1 không phân li trong giảm phân I, các sự kiện khác trong giảm phân diễn ra bình thường; các tế bào còn lại giảm phân bình thường.Loại giao tử có 12 nhiễm sắc thể chiếm tỉ lệ:"
+          ],
+          "points": 0.25,
+          "options": [
+            "99%",
+            "40%",
+            "80%",
+            "49,5%"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q16",
+          "type": "single_choice",
+          "content": "Nucleotide là đơn phân của cấu trúc nào sau đây?",
+          "points": 0.25,
+          "options": [
+            "Gene",
+            "Chuỗi polypeptide.",
+            "Enzyme DNA polymerase.",
+            "Enzyme RNA polymerase."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q17",
+          "type": "single_choice",
+          "content": "Ở một loài thực vật, tính trạng màu sắc hoa do gene nằm trong tế bào chất quy định. Lấy hạt phấn của cây hoa vàng thụ phấn cho cây hoa đỏ (P), thu được F1. Cho F1 tự thụ phấn thu được F2. Theo lí thuyết, kiểu hình ở F2 gồm:",
+          "points": 0.25,
+          "options": [
+            "50% cây hoa đỏ và 50% cây hoa vàng.",
+            "100% cây hoa đỏ.",
+            "100% cây hoa vàng.",
+            "75% cây hoa đỏ và 25% cây hoa đỏ."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q18",
+          "type": "single_choice",
+          "content": "Yếu tố nào giúp enzim RNA polymerase có thể nhận biết mạch mang mã gốc trên gene để bắt đầu phiên mã và tổng hợp mRNA?",
+          "points": 0.25,
+          "options": [
+            "Vùng điều hoà.",
+            "Vùng vận hành.",
+            "Trình tự mã hóa.",
+            "Bộ ba mở đầu."
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II. ( 4,0 điểm ) Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "ý a), b), c), d) ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "ở mỗi câu, thí sinh chọn đúng hoặc sai. Khi nói về cơ chế di truyền nhiễm sắc thể, nhận định nào sau đây là",
+            {
+              "type": "text",
+              "text": "Đúng hay Sai?",
+              "marks": [
+                "bold"
+              ]
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q1a",
+              "content": "Sự vận động của NST trong nguyên phân, giảm phân và thụ tinh là cơ sở vận động của gene được thể hiện trong các quy luật di truyền, biến dị tổ hợp và biến dị số lượng NST.",
+              "correct": null
+            },
+            {
+              "id": "q1b",
+              "content": "Nguyên phân giúp thông tin di truyền trong gene truyền chính xác qua các thế hệ tế bào, đảm bảo ổn định bộ NST của loài, giúp cơ thể đa bào lớn lên và tăng số cá thể trong quần thể đơn bào.",
+              "correct": null
+            },
+            {
+              "id": "q1c",
+              "content": "Trong giảm phân, trao đổi chéo giữa các chromatid không chị em trong cặp NST tương đồng, cùng với sự phân li độc lập và tổ hợp tự do của các NST ở kì sau của giảm phân hình thành các giao tử mang các tổ hợp gene khác nhau.",
+              "correct": null
+            },
+            {
+              "id": "q1d",
+              "content": "Ở các loài sinh sản hữu tính, sự kết hợp 3 quá trình nguyên phân, giảm phân và thụ tinh là cơ chế chỉ tạo ra sự ổn định thông tin di truyền ở sinh vật.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "content": [
+            [
+              "Thí nghiệm của Meselson và Stahl đã chứng minh lý thuyết tái bản DNA theo kiểu bán bảo toàn."
+            ],
+            {
+              "image": "4.jpeg",
+              "align": "center",
+              "width": 70
+            },
+            [
+              "Bằng cách này, cho một phân tử DNA nặng 15N(15N là một chất phóng xạ nặng hơn chất phóng xạ thông thường 14N) chuyển nuôi cấy vào một môi trường chứa 14N, sau hai thế hệ thu được như hình. Mỗi nhận định sau đây là Đúng hay Sai về hình này? Ở thời điểm ban đầu chỉ có một phân tử tương ứng với DNA nặng 15N."
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q2a",
+              "content": "Sau một thế hệ trong môi trường chứa 14N: những phân tử DNA gồm một chuỗi nặng 15N",
+              "correct": null
+            },
+            {
+              "id": "q2b",
+              "content": "(chuỗi mẹ) và một chuỗi nhẹ 14N (mới được tổng hợp).",
+              "correct": null
+            },
+            {
+              "id": "q2c",
+              "content": "Sau hai thế hệ trong môi trường chứa 14N: có hai phân tử lai (gồm một chuỗi nặng và một chuỗi nhẹ) và hai phân tử đều gồm những chuỗi nhẹ không có chuỗi nặng.",
+              "correct": null
+            },
+            {
+              "id": "q2d",
+              "content": "Nếu quá trình này tiếp tục sau 4 thế hệ thì tỉ lệ DNA nhẹ chiếm tỉ lệ 93,75%.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "true_false",
+          "content": [
+            "Ở ruồi giấm, gene quy định màu mắt nằm trên vùng không tương đồng của nhiễm sắc thể giới tính X có 2 allele, allele",
+            {
+              "type": "text",
+              "text": "A ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "quy định mắt đỏ hoàn toàn so với allele",
+            {
+              "type": "text",
+              "text": "a ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "quy định mắt trắng. Lai ruồi cái mắt đỏ với ruồi đực mắt trắng (P) thu được F1 gồm",
+            {
+              "type": "text",
+              "text": "50% ruồi mắt đỏ, 50% ruồi mắt trắng",
+              "marks": [
+                "bold"
+              ]
+            },
+            ".Cho F1 giao phối tự do với nhau thu được F2. Mỗi phát biểu dưới đây về thế hệ ruồi ở F2. Mỗi nhận định sau đây là Đúng hay Sai?"
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q3a",
+              "content": "Trong tổng số ruồi F2, ruồi cái mắt đỏ chiếm tỉ lệ 31,25%.",
+              "correct": null
+            },
+            {
+              "id": "q3b",
+              "content": "Tỉ lệ ruồi đực mắt đỏ và ruồi đực mắt trắng bằng nhau.",
+              "correct": null
+            },
+            {
+              "id": "q3c",
+              "content": "Số ruồi cái mắt trắng bằng 50% số ruồi đực mắt trắng.",
+              "correct": null
+            },
+            {
+              "id": "q3d",
+              "content": "Ruồi cái mắt đỏ thuần chủng bằng 25% ruồi cái mắt đỏ không thuần chủng.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "true_false",
+          "content": [
+            [
+              "Màu lông chuột do hai enzyme được quy định bởi gene B và gene A xúc tác (hình). Thể đồng hợp lặn bb không có enzyme xúc tác chuyển hoá tiền chất không màu thành sắc tố đen nên có màu lông bạch tạng. Nếu sản phẩm của gene B có chức năng xúc tác nhưng sản phẩm của gene A không có hoạt tính thì chuột sẽ có màu lông đen. Chỉ khi cả hai gene B và A cùng tạo ra sản phẩm có chức năng xúc tác thì chuột sẽ có màu lông lang (vằn vàng đen)."
+            ],
+            {
+              "image": "5.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              {
+                "type": "text",
+                "text": "Mỗi nhận định sau đây là Đúng hay Sai?",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q4a",
+              "content": "Sản phẩm của allele B chi phối hoạt động biểu hiện của sản phẩm do allele A.",
+              "correct": null
+            },
+            {
+              "id": "q4b",
+              "content": "Số kiểu gen quy định lông đen nhiều hơn số kiểu gen quy định lông trắng.",
+              "correct": null
+            },
+            {
+              "id": "q4c",
+              "content": "Kí hiệu kiểu hình aaB- cho lông màu trắng.",
+              "correct": null
+            },
+            {
+              "id": "q4d",
+              "content": "Nếu cho chuột lông đen thuần chủng lai với chuột lông trắng thuần chủng thì đời con có thể thu được đời con có kiểu hình 100% vàng đen.",
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III. ( 1,5 điểm ) Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 1 đến câu 6.",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "short_answer",
+          "content": "Ở người xét các bệnh và hội chứng bệnh sau đây: Bệnh thiếu máu hồng cầu hình liềm. Bệnh phenylketonuria. Hội chứng Down. Bệnh mù màu đỏ và màu lục. Bệnh máu khó đông. Bệnh bạch tạng. Hội chứng Klinefelter. Hội chứng Turner. Có bao nhiêu bệnh, hội chứng bệnh liên quan đến đột biến số lượng NST?",
+          "points": 0.25,
+          "correct_answer": "………"
+        },
+        {
+          "id": "q2",
+          "type": "short_answer",
+          "content": [
+            "Cho con đực (XY) lông không có đốm lai với con cái lông có đốm được F₁:",
+            {
+              "type": "text",
+              "text": "Con đực: ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "100% lông có đốm.",
+            {
+              "type": "text",
+              "text": "Con cái: ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "100% lông không đốm. Từ kết quả của phép lai này cho phép kết luận cặp tính trạng này di truyền theo quy luật thuộc bao nhiêu trường hợp dưới đây? Trội hoàn toàn, gen nằm trên nhiễm sắc thể thường. Liên kết giới tính, gen nằm trên nhiễm sắc thể X. Di truyền theo dòng mẹ, gen nằm ở tế bào chất. Liên kết giới tính, gen nằm trên nhiễm sắc thể Y."
+          ],
+          "points": 0.25,
+          "correct_answer": "………"
+        },
+        {
+          "id": "q3",
+          "type": "short_answer",
+          "content": [
+            [
+              {
+                "type": "text",
+                "text": "Câu 3",
+                "marks": [
+                  "bold"
+                ]
+              },
+              ": Hình mô tả các thành phần của operon lac, có bao nhiêu phát biểu đúng về hình này?"
+            ],
+            {
+              "image": "6.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Vùng P là nơi tác tác của enzyme phiên mã RNA - polymerase. Vùng O là nơi tương tác của protein ức chế và có thể không chịu tác động của protein ức chế. Nếu gene cấu trúc lacZ bị đột biến thì các gene còn lại lacY và lacA cũng biến đổi theo. Vùng P luôn liên kết với enzyme RNA polymerase khi không có protein ức chế."
+            ]
+          ],
+          "points": 0.25,
+          "correct_answer": "………"
+        },
+        {
+          "id": "q4",
+          "type": "short_answer",
+          "content": [
+            "Một loài thực vật, xét 1 gene có 3 allele: allele A₁ quy định hoa đỏ, allele A₂ quy định hoa vàng, allele A₃ quy định hoa trắng.Phép lai P: cây hoa đỏ × cây hoa vàng, thu được F₁ có:50% cây hoa đỏ: 25% cây hoa vàng: 25% cây hoa trắng.F₁ giao phấn ngẫu nhiên, thu được F₂.Theo lí thuyết, ở",
+            {
+              "type": "text",
+              "text": "F₂ ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "số cây hoa",
+            {
+              "type": "text",
+              "text": "vàng ",
+              "marks": [
+                "bold"
+              ]
+            },
+            "chiếm tỉ lệ bao nhiêu?",
+            {
+              "type": "text",
+              "text": "(Hãy thể hiện kết quả bằng số thập phân và làm tròn 2 số sau dấu phẩy)",
+              "marks": [
+                "italic"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": "………"
+        },
+        {
+          "id": "q5",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 5",
+              "marks": [
+                "bold"
+              ]
+            },
+            ": Một quần thể thực vật giao phấn ngẫu nhiên, xét 4 cặp gene D, d; E, e; G, g; H, h phân li độc lập, mỗi gene quy định một tính trạng và các allele trội là trội hoàn toàn. Cho biết không xảy ra đột biến nhiễm sắc thể, các allele đột biến đều không ảnh hưởng tới sức sống và khả năng sinh sản của thể đột biến.Nếu D, E, g, h là các allele đột biến thì các thể đột biến về cả 4 gene thì có tối đa bao nhiêu kiểu gene?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "q6",
+          "type": "short_answer",
+          "content": [
+            [
+              "Đột biến thay thế đơn nu (single nucleotide polymorphism – viết tắt là SNP) là biến dị di truyền phổ biến nhất ở người. Giữa hai người bất kỳ ước lượng khác nhau khoảng ba triệu SNP. Hội chứng dị ứng lông mèo ở người được biết do gene nằm trên NST 20 gây nên. Để lập bản đồ gene này trên NST 20, người ta phân tích sự liên kết của một số SNP trên NST 20 với gene gây bệnh. Phân tích sự có mặt của các SNP ở 10 người bị mắc hoặc không mắc hội chứng thu được kết quả như sau:"
+            ],
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Cá thể"
+                  ],
+                  [
+                    "Tình trạng mắc hội chứng"
+                  ],
+                  [
+                    "SNP1"
+                  ],
+                  [
+                    "SNP2"
+                  ],
+                  [
+                    "SNP3"
+                  ],
+                  [
+                    "SNP4"
+                  ],
+                  [
+                    "SNP5"
+                  ]
+                ],
+                [
+                  [
+                    "1"
+                  ],
+                  [
+                    "Có"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ]
+                ],
+                [
+                  [
+                    "2"
+                  ],
+                  [
+                    "Không"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "–"
+                  ]
+                ],
+                [
+                  [
+                    "3"
+                  ],
+                  [
+                    "Có"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ]
+                ],
+                [
+                  [
+                    "4"
+                  ],
+                  [
+                    "Không"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "–"
+                  ]
+                ],
+                [
+                  [
+                    "5"
+                  ],
+                  [
+                    "Có"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ]
+                ],
+                [
+                  [
+                    "6"
+                  ],
+                  [
+                    "Không"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "–"
+                  ]
+                ],
+                [
+                  [
+                    "7"
+                  ],
+                  [
+                    "Có"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ]
+                ],
+                [
+                  [
+                    "8"
+                  ],
+                  [
+                    "Có"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ]
+                ],
+                [
+                  [
+                    "9"
+                  ],
+                  [
+                    "Có"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ]
+                ],
+                [
+                  [
+                    "10"
+                  ],
+                  [
+                    "Không"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "–"
+                  ],
+                  [
+                    "–"
+                  ]
+                ]
+              ]
+            },
+            [
+              {
+                "type": "text",
+                "text": "Trong đó: + là có mặt, - là vắng mặt",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "SPN nào nhiều khả năng liên kết chặt chẽ với gene gây hội chứng hơn cả"
+            ]
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        }
+      ]
+    }
+  ],
+  "//answer_key": {
+    "part1.q1": null,
+    "part1.q2": null,
+    "part1.q3": null,
+    "part1.q4": null,
+    "part1.q5": null,
+    "part1.q6": null,
+    "part1.q7": null,
+    "part1.q8": null,
+    "part1.q9": null,
+    "part1.q10": null,
+    "part1.q11": null,
+    "part1.q12": null,
+    "part1.q13": null,
+    "part1.q14": null,
+    "part1.q15": null,
+    "part1.q16": null,
+    "part1.q17": null,
+    "part1.q18": null,
+    "part2.q1": {
+      "q1a": null,
+      "q1b": null,
+      "q1c": null,
+      "q1d": null
+    },
+    "part2.q2": {
+      "q2a": null,
+      "q2b": null,
+      "q2c": null,
+      "q2d": null
+    },
+    "part2.q3": {
+      "q3a": null,
+      "q3b": null,
+      "q3c": null,
+      "q3d": null
+    },
+    "part2.q4": {
+      "q4a": null,
+      "q4b": null,
+      "q4c": null,
+      "q4d": null
+    },
+    "part3.q1": null,
+    "part3.q2": null,
+    "part3.q3": null,
+    "part3.q4": null,
+    "part3.q5": null,
+    "part3.q6": null
+  },
+  "//resources": {
+    "exam_file_url": null,
+    "answer_file_url": "https://drive.google.com/drive/folders/12j0PzL3tgnq5NzDn5ymrvMlcnxtgzXGW?usp=drive_link",
+    "answer_file_name": "Đáp án",
+    "video_url": null,
+    "edit_link": null
+  }
+}

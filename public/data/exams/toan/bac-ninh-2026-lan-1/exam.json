@@ -1,7 +1,7 @@
 {
   "id": "bac-ninh-2026-lan-1",
   "title": "Đề khảo sát Toán 12 lần 1 năm 2025 – 2026 cụm các trường THPT – Bắc Ninh",
-  "subject": "Toán học",
+  "subject": "toan",
   "time": 90,
   "description": "Đề khảo sát Toán 12 lần 1 năm 2025 – 2026 cụm các trường THPT – Bắc Ninh",
   "parts": [
@@ -1105,5 +1105,56 @@
         }
       ]
     }
-  ]
+  ],
+  "//answer_key": {
+    "part1.q1": 0,
+    "part1.q2": 2,
+    "part1.q3": 3,
+    "part1.q4": 0,
+    "part1.q5": 3,
+    "part1.q6": 2,
+    "part1.q7": 1,
+    "part1.q8": 0,
+    "part1.q9": 2,
+    "part1.q10": 3,
+    "part1.q11": 1,
+    "part1.q12": 2,
+    "part2.q13": {
+      "q13a": true,
+      "q13b": true,
+      "q13c": true,
+      "q13d": false
+    },
+    "part2.q14": {
+      "q14a": true,
+      "q14b": false,
+      "q14c": true,
+      "q14d": false
+    },
+    "part2.q15": {
+      "q15a": true,
+      "q15b": false,
+      "q15c": false,
+      "q15d": true
+    },
+    "part2.q16": {
+      "q16a": true,
+      "q16b": false,
+      "q16c": true,
+      "q16d": false
+    },
+    "part3.q17": 3,
+    "part3.q18": 1,
+    "part3.q19": 0.25,
+    "part3.q20": 0.31,
+    "part3.q21": 607,
+    "part3.q22": 87
+  },
+  "//resources": {
+    "exam_file_url": null,
+    "answer_file_url": "https://drive.google.com/file/d/1TF7uDQ1ot-YV_Q_6Kf5Y5Uvw2DX_5T_f/view?usp=drive_link",
+    "answer_file_name": "Đáp Án",
+    "video_url": null,
+    "edit_link": null
+  }
 }

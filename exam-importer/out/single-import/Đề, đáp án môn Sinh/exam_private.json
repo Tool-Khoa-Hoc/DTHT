@@ -1,0 +1,87 @@
+{
+  "schema_version": "2026-03-19",
+  "title": "Đề, đáp án môn Sinh",
+  "answer_key": {
+    "part1.q1": "B",
+    "part1.q2": "A",
+    "part1.q3": "B",
+    "part1.q4": "C",
+    "part1.q5": "B",
+    "part1.q6": "D",
+    "part1.q7": "B",
+    "part1.q8": "D",
+    "part1.q9": "C",
+    "part1.q10": "A",
+    "part1.q11": "B",
+    "part1.q12": "B",
+    "part1.q13": "A",
+    "part1.q14": "C",
+    "part1.q15": "A",
+    "part1.q16": "B",
+    "part1.q17": "C",
+    "part1.q18": "D",
+    "part2.q1": {
+      "a": true,
+      "b": false,
+      "c": false,
+      "d": true
+    },
+    "part2.q2": {
+      "a": true,
+      "b": false,
+      "c": true,
+      "d": true
+    },
+    "part2.q3": {
+      "a": true,
+      "b": true,
+      "c": true,
+      "d": false
+    },
+    "part2.q4": {
+      "a": false,
+      "b": false,
+      "c": false,
+      "d": true
+    },
+    "part3.q1": "2",
+    "part3.q2": "10",
+    "part3.q3": "4",
+    "part3.q4": "5",
+    "part3.q5": "6",
+    "part3.q6": "10"
+  },
+  "answer_key_template": {
+    "part1.q1": null,
+    "part1.q2": null,
+    "part1.q3": null,
+    "part1.q4": null,
+    "part1.q5": null,
+    "part1.q6": null,
+    "part1.q7": null,
+    "part1.q8": null,
+    "part1.q9": null,
+    "part1.q10": null,
+    "part1.q11": null,
+    "part1.q12": null,
+    "part1.q13": null,
+    "part1.q14": null,
+    "part1.q15": null,
+    "part1.q16": null,
+    "part1.q17": null,
+    "part1.q18": null,
+    "part2.q1": null,
+    "part2.q2": null,
+    "part2.q3": null,
+    "part2.q4": null,
+    "part3.q1": null,
+    "part3.q2": null,
+    "part3.q3": null,
+    "part3.q4": null,
+    "part3.q5": null,
+    "part3.q6": null
+  },
+  "meta": {
+    "question_count": 28
+  }
+}

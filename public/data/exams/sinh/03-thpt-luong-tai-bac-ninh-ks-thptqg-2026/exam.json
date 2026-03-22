@@ -1,0 +1,705 @@
+{
+  "id": "03-thpt-luong-tai-bac-ninh-ks-thptqg-2026",
+  "title": "3. THPT Lương Tài - Bắc Ninh (KS THPTQG 2026 môn Sinh học)",
+  "subject": "sinh",
+  "time": 50,
+  "description": "THPT Lương Tài - Bắc Ninh",
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": "Mendel đã tiến hành bảy phép lai một cặp tính trạng với bảy tính trạng ở cây đậu Hà Lan là màu hoa, hình dạng hạt, chiều cao cây, màu hạt, hình dạng quả, màu quả và vị trí hoa trên cây. Mỗi tính trạng đều có hai đặc tính khác biệt nhau. Thí nghiệm nào sau đây đúng với cách bố trí thí nghiệm của Mendel?",
+          "points": 0.25,
+          "options": [
+            "Cây hạt vàng x Cây hạt xanh. ",
+            "Cây hạt vỏ trơn x Cây hạt vỏ nhăn. ",
+            "Cây thân cao x Cây thân thấp.",
+            "Cây hoa tím x Cây hạt vàng."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": "Loại nucleic acid nào sau đây không có liên kết hydrogen trong phân tử?",
+          "points": 0.25,
+          "options": [
+            "mRN A. ",
+            "rRN A. ",
+            "DNA ",
+            "tRN A. "
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": [
+            [
+              "Hình dưới đây mô tả cấu trúc của một gene."
+            ],
+            {
+              "image": "1.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Gene này chắc chắn có trong tế bào của sinh vật nào dưới đây?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Thực vật. ",
+            "Động vật ",
+            "Nấm. ",
+            "Vi khuẩn. "
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": [
+            [
+              "Ở người, tính trạng nhóm máu do một gene có 3 allele quy định. Allele I",
+              {
+                "type": "text",
+                "text": "A",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "và I",
+              {
+                "type": "text",
+                "text": "B",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "đồng trội so với allele I",
+              {
+                "type": "text",
+                "text": "O",
+                "marks": [
+                  "sup"
+                ]
+              },
+              ". Một cặp vợ chồng đã sinh được hai người con có nhóm máu khác nhau là AB và O. Kết luận nào sau đây",
+              {
+                "type": "text",
+                "text": "đúng",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Người chồng hoặc người vợ có nhóm máu O.",
+            "Cả hai vợ chồng có thể đều có nhóm máu B.",
+            "Người chồng hoặc người vợ có nhóm máu A  . ",
+            "Người chồng hoặc người vợ có nhóm máu AB."
+          ]
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": "Cơ thể có kiểu gene nào sau đây được gọi là thể đồng hợp 2 cặp gene?",
+          "points": 0.25,
+          "options": [
+            "AaBb ",
+            "AAbb ",
+            "AABb ",
+            "AaBB"
+          ]
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": [
+            [
+              "Sản phẩm của quá trình quang hợp là"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "carbon dioxide và khí oxygen.",
+            "chất hữu cơ và khí carbon dioxide. ",
+            "nước và khí carbon dioxide.",
+            "chất hữu cơ và khí oxygen."
+          ]
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": [
+            [
+              "Cơ chế di truyền nào trong tế bào được mô tả trong hình dưới đây?"
+            ],
+            {
+              "image": "2.jpeg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Dịch mã tổng hợp polypeptide.",
+            "Phiên mã ngược.",
+            "Phiên mã tổng hợp mRNA",
+            "Tái bản DNA"
+          ]
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": [
+            [
+              "Hình dưới mô tả cấu trúc của operon",
+              {
+                "type": "text",
+                "text": "lac",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "theo Monod và Jacob"
+            ],
+            {
+              "image": "3.png",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Theo mô hình này, trong điều kiện có lactose thì RNA polymerase sẽ bám vào vị trí nào để tiến hành phiên mã nhóm gene cấu trúc?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "cấu trúc (1).",
+            "cấu trúc (2).",
+            "P của LacI.",
+            "LacZ."
+          ]
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": [
+            "Carotenoid có vai trò gì trong quá trình quang hợp?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Chuyển hóa năng lượng ánh sáng thành năng lượng hóa học.",
+            "Hấp thụ ánh sáng và truyền cho chlorophyl.",
+            "Tham gia vào pha tối của quang hợp.",
+            "Thay thế hoàn toàn diệp lục khi thiếu ánh sáng."
+          ]
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": [
+            [
+              "Phát biểu nào sau đây đúng khi nói về NST?"
+            ],
+            {
+              "type": "table",
+              "rows": [
+                [
+                  []
+                ],
+                [
+                  []
+                ],
+                [
+                  []
+                ]
+              ]
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Ngoài các gene, trên NST không còn chứa các thành phần nào khác.",
+            "Cùng một locus trên cặp NST tương đồng luôn chứa trình tự nucleotide giống nhau.",
+            "Các gene nằm kế tiếp nhau dọc theo chiều dài của NST.",
+            "Trình tự nucleotide ở đầu mút của NST có nhiệm vụ gắn với thoi phân bào."
+          ]
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": [
+            "Khi thủy phân đến cùng protein đơn giản sẽ thu được sản phẩm nào sau đây?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Glycerol và acid béo.",
+            "Glucose.",
+            "Amino acid.",
+            "Nucleotide."
+          ]
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": "Streptomycin là một loại kháng sinh có khả năng giết chết vi khuẩn bằng cách ức chế hoạt động của ribosome. Nguyên tắc cơ bản của loại kháng sinh này là ngăn chặn vi khuẩn tiến hành quá trình tổng hợp",
+          "points": 0.25,
+          "options": [
+            "tRNA",
+            "mRNA",
+            "Polypeptide",
+            "amino acid"
+          ]
+        },
+        {
+          "id": "q13",
+          "type": "single_choice",
+          "content": [
+            "Ở tế bào nhân thực, tổ chức nào sau đây không chứa DNA?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Nhân",
+            "Lục lạp",
+            "Ribosome",
+            "Ti thể"
+          ]
+        },
+        {
+          "id": "q14",
+          "type": "single_choice",
+          "content": "Trên mạch khuôn thuộc vùng mã hoá của gene mã hoá protein ở sinh vật nhân sơ có bộ ba là 5’-GCT-3’ thì trình tự nucleotide của anticodon trên phân tử tRNA tương ứng là",
+          "points": 0.25,
+          "options": [
+            "5’-CGA-3’",
+            "3’-CGA-5’",
+            "5’-GCU-3’",
+            "3’-GCU-5’"
+          ]
+        },
+        {
+          "id": "q15",
+          "type": "single_choice",
+          "content": "Ở Gà (2n = 78), số nhiễm sắc thể trong 1 tế bào sau khi kết thúc kì cuối I của giảm phân là bao nhiêu?",
+          "points": 0.25,
+          "options": [
+            "78 NST kép",
+            "39 NST đơn",
+            "78 NST đơn",
+            "39 NST kép"
+          ]
+        },
+        {
+          "id": "q16",
+          "type": "single_choice",
+          "content": [
+            [
+              "Quá trình nhân đôi DNA",
+              {
+                "type": "text",
+                "text": "không",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "có thành phần nào sau đây tham gia?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Enzyme ligase",
+            "Các nucleotide tự do",
+            "Amino acid",
+            "DNA polimerase"
+          ]
+        },
+        {
+          "id": "q17",
+          "type": "single_choice",
+          "content": "Để chứng minh các nhân tố di truyền không hoà trộn vào nhau, Mendel đã thực hiện phép lai nào?",
+          "points": 0.25,
+          "options": [
+            "Lai xa",
+            "Lai thuận nghịch",
+            "Lai phân tích",
+            "Lai khác dòng"
+          ]
+        },
+        {
+          "id": "q18",
+          "type": "single_choice",
+          "content": "Một loài thực vật giao phấn ngẫu nhiên, allele A bị đột biến thành allele a, allele B bị đột biến thành allele b. Cho biết mỗi gene quy định một tính trạng, các allele trội là trội hoàn toàn. Cơ thể có kiểu gene nào sau đây là thể đột biến?",
+          "points": 0.25,
+          "options": [
+            "AaBB",
+            "AaBb",
+            "aaBB",
+            "AABb"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II. Thí sinh trả lời từ câu 1 đến 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "true_false",
+          "content": [
+            [
+              "Hình vẽ dưới đây mô tả các cơ chế di truyền diễn ra trong một tế bào. Biết rằng (4) là kí hiệu của sự kiện diễn ra trong nhân tế bào, 1, 2, 5, 6, 7 là kí hiệu các đại phân tử sinh học."
+            ],
+            {
+              "image": "4.jpeg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q1a",
+              "content": "Nếu quá trình 4 diễn ra không theo nguyên tắc bổ sung thì dẫn đến đột biến gene."
+            },
+            {
+              "id": "q1b",
+              "content": "Nhờ cơ chế 4 mà thông tin di truyền được di truyền lại cho các thế hệ sau."
+            },
+            {
+              "id": "q1c",
+              "content": "Các chú thích 1, 2, 3, 7 lần lượt là phân tử tRNA, chuỗi polypeptide, bộ ba đối mã, ribosome."
+            },
+            {
+              "id": "q1d",
+              "content": "Tế bào đang xét là một tế bào nhân thực."
+            }
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "content": [
+            [
+              "Sơ đồ sau mô tả con đường chuyển hóa phenylalanine liên quan đến 2 bệnh chuyển hóa di truyền ở người, gồm bệnh PKU và bệnh AKU:"
+            ],
+            {
+              "image": "5.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Cho biết: Allele A mã hoá (1), allele B mã hoá (2); các allele a và b không mã hoá enzyme. Nếu tích tụ nhiều phenylalanine sẽ gây bệnh PKU (Phenylketonuria); nếu tích tụ nhiều homogentistic acid sẽ gây bệnh AKU (Alkaptonuria). Biết rằng p-HPPA và Homogentistic acid chỉ được tạo ra từ con đường chuyển hóa trên và A, a, B, b thuộc các NST thường khác nhau. Phát biểu dưới đây đúng hay sai về 2 bệnh trên?"
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q2a",
+              "content": "Bố bị bệnh PKU, mẹ bị bệnh AKU có thể sinh con không mắc cả hai bệnh."
+            },
+            {
+              "id": "q2b",
+              "content": "Người bị bệnh PKU và người bị bệnh AKU có số loại kiểu gene khác nhau."
+            },
+            {
+              "id": "q2c",
+              "content": "Trẻ bị bệnh AKU có thể cho ăn kiêng tyrosine và phenylalanine từ nhỏ thì trẻ sẽ không biểu hiện bệnh."
+            },
+            {
+              "id": "q2d",
+              "content": "Bố mẹ dị hợp 2 cặp gene xác suất sinh 1 con chỉ bị bệnh PKU mà không bị bệnh AKU bằng 3/16."
+            }
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "true_false",
+          "content": [
+            [
+              "Ở một loài thực vật lưỡng bội, giả sử allele A bị đột biến điểm tại vùng mã hóa trở thành allele A",
+              {
+                "type": "text",
+                "text": "1",
+                "marks": [
+                  "sub"
+                ]
+              },
+              ". Allele A trội hoàn toàn so với allele A",
+              {
+                "type": "text",
+                "text": "1",
+                "marks": [
+                  "sub"
+                ]
+              },
+              ". Mỗi nhận định sau đây là đúng hay sai về đột biến gene này?"
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q3a",
+              "content": "Nếu allele A và allele A1 có số nucleotide bằng nhau thì chuỗi polypeptide do hai allele này mã hóa có thể sẽ có số amino acid khác nhau."
+            },
+            {
+              "id": "q3b",
+              "content": "Nếu phân tử protein do allele A1 mã hóa có chức năng bị thay đổi so với phân tử protein do allele A mã hóa thì cơ thể mang allele A1 là thể đột biến."
+            },
+            {
+              "id": "q3c",
+              "content": "Nếu gene A1 là allele trội so với allele A thì thể đột biến có kiểu gene là AA ."
+            },
+            {
+              "id": "q3d",
+              "content": "Allele A và allele A1 có thể có số lượng nucleotide bằng nhau hoặc hơn kém nhau một nucleotide."
+            }
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "true_false",
+          "content": [
+            [
+              {
+                "type": "text",
+                "text": " Hình 5a",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "mô tả hệ tuần hoàn máu của người bình thường. Các chữ số (1), (2), (3), (4) chú thích cho các buồng tim (gồm tâm nhĩ và các tâm thất); các chữ cái A, B, C, D, E chú thích cho các mạch máu (gồm động mạch và tĩnh mạch); mũi tên chỉ chiều di chuyển của dòng máu chảy trong hệ mạch.",
+              {
+                "type": "text",
+                "text": "Hình 5b",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "mô tả sự thay đổi áp suất máu trong buồng tim (3), mạch máu B, mạch máu C và mao mạch ở các cơ quan."
+            ],
+            {
+              "image": "6.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              {
+                "type": "text",
+                "text": "Hình 5a Hình 5b",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q4a",
+              "content": "B và A chứa máu giàu O2; E và D chứa máu nghèo O2."
+            },
+            {
+              "id": "q4b",
+              "content": "(1), (2), (3) và (4) lần lượt là tâm nhĩ trái, tâm nhĩ phải, tâm thất phải và tâm thất trái."
+            },
+            {
+              "id": "q4c",
+              "content": "Áp lực của máu từ C đến mao mạch giảm dần"
+            },
+            {
+              "id": "q4d",
+              "content": "Sự chêch lệch giữa áp suất máu tối đa và tối thiểu trong buồng tim (3) thấp hơn trong mao mạch."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III. Thí sinh trả lời từ câu 1 đến câu 6.",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "short_answer",
+          "content": "Với 3 loại ribonucleotide là A, U, G có thể tạo ra được bao nhiêu codon có chứa G mã hóa cho amino acid trong chuỗi polipeptide?",
+          "points": 0.25
+        },
+        {
+          "id": "q2",
+          "type": "short_answer",
+          "content": [
+            "Cho các cây hoa đỏ (P) có kiểu gene AaBb tự thụ phấn thu được F",
+            {
+              "type": "text",
+              "text": "1 ",
+              "marks": [
+                "sub"
+              ]
+            },
+            "có tỉ lệ kiểu hình 9 cây hoa đỏ: 7 cây hoa trắng. Theo lí thuyết, trong số các cây hoa trắng F",
+            {
+              "type": "text",
+              "text": "1",
+              "marks": [
+                "sub"
+              ]
+            },
+            ", tỉ lệ cây thuần chủng là bao nhiêu? Hãy thể hiện kết quả bằng số thập phân và làm tròn đến 2 chữ số sau dấu phẩy."
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q3",
+          "type": "short_answer",
+          "content": "Một đoạn đầu của vùng mã hóa gene cấu trúc của sinh vật nhân sơ có trật tự nucleotide trên mạch gốc như sau: 3’TAC - AAG - AAT - GTT- TTA - CCT - CGG - GCG - GCC - GAA – AAT... 5' Nếu đột biến thay thế nucleotide thứ 16 là C thay bằng A, thì số amino acid trong phân tử protein do gen đột biến tổng hợp là bao nhiêu?",
+          "points": 0.25
+        },
+        {
+          "id": "q4",
+          "type": "short_answer",
+          "content": [
+            [
+              "Hình sau mô tả một đoạn trình tự nucleotide của gene bình thường và gene đột biến có cấu trúc như sau:"
+            ],
+            {
+              "image": "7.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Đoạn trình tự nucleotide sau đột biến có tổng số bao nhiêu liên kết hydrogene?"
+            ]
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q5",
+          "type": "short_answer",
+          "content": [
+            [
+              "Một tế bào sinh dục sơ khai có bộ NST 2n = 8 nguyên phân liên tiếp hai lần sau đó tiến hành giảm phân. Tất cả các tế bào con tạo ra đều tham gia thụ tinh tạo thành hợp tử. Sơ đồ nào trong hình sau biểu thị sự thay đổi về số lượng NST trong mỗi tế bào phù hợp với từng thời điểm? (Chú thích: A nguyên phân lần 1; B nguyên phân lần 2; C giảm phân; D thụ tinh tạo hợp tử)"
+            ],
+            {
+              "image": "8.jpeg",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": 0.25
+        },
+        {
+          "id": "q6",
+          "type": "short_answer",
+          "content": [
+            [
+              "Nhóm máu ABO được đặc trưng bởi sự hiện diện của kháng nguyên trên bề mặt tế bào hồng cầu, phân tử tiền chất hiện diện trên tế bào hồng cầu là tiền chất H. Con đường chuyển hóa được diễn ra như hình 1. Các alen lặn h và I",
+              {
+                "type": "text",
+                "text": "O",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "không có khă năng tổng hợp enzyme tương ứng. Biết rằng gen H và gen I không thuộc cùng một nhóm liên kết. Tế bào hồng cầu chỉ có kháng nguyên A thì biểu hiện nhóm máu A, chỉ có kháng nguyên B thì biểu hiện nhóm máu B; có cả 2 loại kháng nguyên A và B thì biểu hiện nhóm máu AB."
+            ],
+            {
+              "image": "9.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Trong sơ đồ phả hệ ở hình 2, khi xét về 2 gene nói trên, có thể xác định được chắc chắn kiểu gen của những người nào? (điền theo thứ tự từ nhỏ đến lớn)"
+            ]
+          ],
+          "points": 0.25
+        }
+      ]
+    }
+  ],
+  "//answer_key": {
+    "part1.q1": 3,
+    "part1.q2": 0,
+    "part1.q3": 3,
+    "part1.q4": 1,
+    "part1.q5": 1,
+    "part1.q6": 3,
+    "part1.q7": 3,
+    "part1.q8": 0,
+    "part1.q9": 1,
+    "part1.q10": 2,
+    "part1.q11": 2,
+    "part1.q12": 2,
+    "part1.q13": 2,
+    "part1.q14": 2,
+    "part1.q15": 3,
+    "part1.q16": 2,
+    "part1.q17": 2,
+    "part1.q18": 2,
+    "part2.q1": {
+      "q1a": false,
+      "q1b": false,
+      "q1c": true,
+      "q1d": true
+    },
+    "part2.q2": {
+      "q2a": true,
+      "q2b": true,
+      "q2c": true,
+      "q2d": false
+    },
+    "part2.q3": {
+      "q3a": true,
+      "q3b": false,
+      "q3c": false,
+      "q3d": false
+    },
+    "part2.q4": {
+      "q4a": true,
+      "q4b": false,
+      "q4c": true,
+      "q4d": false
+    },
+    "part3.q1": 17,
+    "part3.q2": 0.43,
+    "part3.q3": 4,
+    "part3.q4": 25,
+    "part3.q5": 3,
+    "part3.q6": 56
+  },
+  "//resources": {
+    "exam_file_url": null,
+    "answer_file_url": "https://drive.google.com/drive/folders/1JhaKzdmIuJ-H5-s8uyDpW6bT_IXmQ6HG",
+    "answer_file_name": "Đáp án",
+    "video_url": null,
+    "edit_link": null
+  }
+}

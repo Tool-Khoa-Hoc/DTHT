@@ -1,7 +1,7 @@
 {
   "id": "lien-truong-thpt-cum9-lan2",
   "title": "Đề thi thử Toán 12 lần 2 năm 2025 – 2026 liên trường cụm 9 – Hà Nội",
-  "subject": "Toán học",
+  "subject": "toan",
   "time": 90,
   "description": "Chuyển từ PDF đáp án chi tiết; chỉ giữ phần đề, bỏ toàn bộ lời giải.",
   "parts": [
@@ -998,5 +998,56 @@
         }
       ]
     }
-  ]
+  ],
+  "//answer_key": {
+    "part1.q1": 1,
+    "part1.q2": 1,
+    "part1.q3": 2,
+    "part1.q4": 3,
+    "part1.q5": 3,
+    "part1.q6": 3,
+    "part1.q7": 0,
+    "part1.q8": 0,
+    "part1.q9": 1,
+    "part1.q10": 1,
+    "part1.q11": 3,
+    "part1.q12": 0,
+    "part2.q13": {
+      "q13a": true,
+      "q13b": true,
+      "q13c": true,
+      "q13d": false
+    },
+    "part2.q14": {
+      "q14a": true,
+      "q14b": false,
+      "q14c": true,
+      "q14d": false
+    },
+    "part2.q15": {
+      "q15a": true,
+      "q15b": true,
+      "q15c": false,
+      "q15d": false
+    },
+    "part2.q16": {
+      "q16a": false,
+      "q16b": true,
+      "q16c": false,
+      "q16d": false
+    },
+    "part3.q17": 20,
+    "part3.q18": 1225,
+    "part3.q19": 16,
+    "part3.q20": 1.22,
+    "part3.q21": 294,
+    "part3.q22": -240
+  },
+  "//resources": {
+    "exam_file_url": null,
+    "answer_file_url": "https://drive.google.com/file/d/1W407kS39JX7i631l6oaslixge84rX4MP/view?usp=drive_link",
+    "answer_file_name": null,
+    "video_url": null,
+    "edit_link": null
+  }
 }

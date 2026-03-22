@@ -6,12 +6,18 @@ export default function RichTextRenderer({ content }) {
     if (!content) return null;
 
     const renderFormattedText = (text, keyPrefix) => {
-        const parts = String(text).split(/(\*\*.*?\*\*)/g).filter(Boolean);
+        // Match bold (**...**) and inline math ($...$)
+        const parts = String(text).split(/(\*\*.*?\*\*|\$.*?\$)/g).filter(Boolean);
 
         return parts.map((part, idx) => {
             const boldMatch = part.match(/^\*\*(.*)\*\*$/s);
             if (boldMatch) {
                 return <strong key={`${keyPrefix}-bold-${idx}`}>{boldMatch[1]}</strong>;
+            }
+
+            const mathMatch = part.match(/^\$(.*)\$$/s);
+            if (mathMatch) {
+                return <InlineMath key={`${keyPrefix}-math-${idx}`} math={mathMatch[1]} />;
             }
 
             return <React.Fragment key={`${keyPrefix}-text-${idx}`}>{part}</React.Fragment>;
@@ -190,6 +196,34 @@ export default function RichTextRenderer({ content }) {
             return (
                 <div key={index} className="p-4 rounded-xl bg-slate-50 border border-slate-200 mb-6">
                     {block.children?.map((childBlock, idx) => renderBlock(childBlock, idx))}
+                </div>
+            );
+        }
+
+        // Table support
+        if (block.type === 'table') {
+            return (
+                <div key={index} className="my-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm ring-1 ring-slate-900/5">
+                    <table className="w-full border-collapse text-[13px] sm:text-sm text-center">
+                        <tbody className="divide-y divide-slate-200">
+                            {block.rows?.map((row, rowIdx) => (
+                                <tr key={rowIdx} className="divide-x divide-slate-200 hover:bg-slate-50/20 transition-colors">
+                                    {row.map((cell, cellIdx) => (
+                                        <td
+                                            key={cellIdx}
+                                            className={`p-3 transition-colors ${rowIdx === 0 ? 'bg-slate-50/80 font-bold text-slate-700' : 'text-slate-600'}`}
+                                        >
+                                            <div className="flex flex-wrap items-center justify-center gap-1.5 leading-relaxed min-h-[1.5rem] min-w-[3rem]">
+                                                {Array.isArray(cell)
+                                                    ? cell.map((nc, ni) => renderInlineNode(nc, ni))
+                                                    : renderInlineNode(cell, 0)}
+                                            </div>
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             );
         }

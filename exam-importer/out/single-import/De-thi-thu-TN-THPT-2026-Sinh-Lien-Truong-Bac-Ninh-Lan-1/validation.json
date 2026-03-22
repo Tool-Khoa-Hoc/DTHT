@@ -1,0 +1,12 @@
+{
+  "errors": [],
+  "warnings": [],
+  "stats": {
+    "question_count_raw": 28,
+    "question_count_public": 28,
+    "image_count_raw": 10,
+    "image_count_public": 10,
+    "table_rows_raw": 4,
+    "table_rows_public": 4
+  }
+}

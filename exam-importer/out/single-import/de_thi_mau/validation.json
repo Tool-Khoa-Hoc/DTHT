@@ -1,0 +1,15 @@
+{
+  "errors": [
+    "part1.q1: single_choice must contain A/B/C/D in order.",
+    "part1.q5: single_choice must contain A/B/C/D in order."
+  ],
+  "warnings": [],
+  "stats": {
+    "question_count_raw": 5,
+    "question_count_public": 5,
+    "image_count_raw": 0,
+    "image_count_public": 0,
+    "table_rows_raw": 2,
+    "table_rows_public": 2
+  }
+}
