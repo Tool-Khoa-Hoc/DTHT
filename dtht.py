@@ -19,6 +19,7 @@ from lib.supabase_utils import (
     upload_exam_data, 
     check_db_links, 
     get_remote_exam_data, 
+    get_all_remote_exam_data,
     get_supabase_client, 
     check_db_answers,
     log_sync_event,
@@ -122,7 +123,10 @@ def cmd_sync(args):
             sanitized = sanitize_exam(json.loads(json.dumps(data)))
             save_exam_json(target, sanitized)
             for f in j.parent.iterdir():
-                if f.name != 'exam.json': shutil.copy2(f, target.parent / f.name)
+                if f.name != 'exam.json':
+                    dest = target.parent / f.name
+                    if not dest.exists() or f.stat().st_mtime > dest.stat().st_mtime:
+                        shutil.copy2(f, dest)
             console.print(f" [green]✔[/] Distributed {j.parent.name}")
         except Exception as e: console.print(f" [red]✘[/] Error {j.parent.name}: {e}")
 
@@ -155,30 +159,27 @@ def cmd_sync_db(args):
             if apply:
                 upload_exam_data(supabase, data, json_path)
                 log_sync_event(supabase, eid, "success", "upload")
-                # Auto hide
-                if "answer_key" in data: data["//answer_key"] = data.pop("answer_key")
-                if "resources" in data: data["//resources"] = data.pop("resources")
+                # Auto delete
+                for k in ["answer_key", "//answer_key", "resources", "//resources"]:
+                    if k in data:
+                        del data[k]
                 save_exam_json(json_path, data)
-                table.add_row(eid, "[bold green]✔ Done & Hidden[/]", "Now")
+                table.add_row(eid, "[bold green]✔ Done & Deleted keys[/]", "Now")
             else:
                 table.add_row(eid, "[cyan]→ Chờ upload[/]", last)
         except Exception as e: table.add_row(json_path.parent.name, f"[red]Lỗi: {e}[/]", "—")
     console.print(table)
 
-def cmd_hide_show(args, mode="hide"):
+def cmd_delete_keys(args):
     files = collect_exam_files()
     for (p, _) in files:
         try:
             d = load_exam_json(p); ch = False
-            if mode == "hide":
-                if "answer_key" in d: d["//answer_key"] = d.pop("answer_key"); ch = True
-                if "resources" in d: d["//resources"] = d.pop("resources"); ch = True
-                status = "Ẩn"
-            else:
-                if "//answer_key" in d: d["answer_key"] = d.pop("//answer_key"); ch = True
-                if "//resources" in d: d["resources"] = d.pop("//resources"); ch = True
-                status = "Hiện"
-            if ch: save_exam_json(p, d); console.print(f" [green]✔[/] {status} {p.parent.name}")
+            for k in ["answer_key", "//answer_key", "resources", "//resources"]:
+                if k in d:
+                    del d[k]
+                    ch = True
+            if ch: save_exam_json(p, d); console.print(f" [green]✔[/] Xóa đáp án & resource khỏi {p.parent.name}")
         except: pass
 
 def cmd_logs(args):
@@ -223,41 +224,68 @@ def cmd_git(args):
     except Exception as e:
         console.print(f"[bold red]✘ Git Error:[/][red] {str(e)}[/]")
 
+def cmd_backup(args):
+    """Backup entire exam_keys table to backup/ directory."""
+    try:
+        supabase = get_supabase_client()
+        backup_dir = Path("backup")
+        backup_dir.mkdir(exist_ok=True)
+        
+        with console.status("[cyan]Đang tải dữ liệu từ Supabase...[/]"):
+            records = get_all_remote_exam_data(supabase)
+        
+        if not records:
+            console.print("[yellow]⚠ Không có dữ liệu để backup.[/]")
+            return
+            
+        for record in records:
+            eid = record.get('exam_id', 'unknown')
+            save_path = backup_dir / f"{eid}.json"
+            save_exam_json(save_path, record)
+            
+        console.print(f"[bold green]✔ Đã backup {len(records)} bản ghi vào thư mục 'backup/'[/]")
+    except Exception as e:
+        console.print(f"[bold red]✘ Lỗi backup:[/] {e}")
+
 def main():
     if len(sys.argv) == 1:
         while True:
             print_banner()
             menu = Table(box=box.ROUNDED, show_header=True)
             menu.add_column("No."); menu.add_column("Cmd"); menu.add_column("Desc")
-            menu.add_row("1", "status", "Check status (local vs DB)"); menu.add_row("2", "sync", "Distribute to public/"); menu.add_row("3", "sync-db", "Upload keys to Database"); menu.add_row("4", "hide/show", "Comment/Uncomment keys (Security)"); menu.add_row("5", "history", "View sync logs"); menu.add_row("6", "build", "Rebuild index.json"); menu.add_row("7", "push", "Push to GitHub"); menu.add_row("0", "exit", "Exit")
+            menu.add_row("1", "status", "Check status (local vs DB)"); menu.add_row("2", "sync", "Distribute to public/"); menu.add_row("3", "sync-db", "Upload keys to Database"); menu.add_row("4", "delete-keys", "Xóa đáp án & resource khỏi JSON"); menu.add_row("5", "history", "View sync logs"); menu.add_row("6", "build", "Rebuild index.json"); menu.add_row("7", "push", "Push to GitHub"); menu.add_row("8", "backup", "Backup Database"); menu.add_row("0", "exit", "Exit")
             console.print(menu)
-            c = Prompt.ask("Select action", choices=[str(i) for i in range(8)] + ["exit"])
+            c = Prompt.ask("Select action", choices=[str(i) for i in range(9)] + ["exit"])
             from argparse import Namespace
             if c == "1": cmd_status(Namespace(public=(Prompt.ask("Check public?", choices=["y","n"], default="n")=="y")))
             elif c == "2": cmd_sync(Namespace())
             elif c == "3":
                 a = Prompt.ask("Apply to Database?", choices=["y","n"], default="n") == "y"
                 cmd_sync_db(Namespace(apply=a, force=False, source="public"))
-            elif c == "4": cmd_hide_show(Namespace(), Prompt.ask("Action", choices=["hide","show"], default="hide"))
+            elif c == "4":
+                if Prompt.ask("Bạn có chắc chắn muốn xóa đáp án và resource khỏi JSON?", choices=["y","n"], default="n") == "y":
+                    cmd_delete_keys(Namespace())
             elif c == "5": cmd_logs(Namespace())
             elif c == "6": cmd_build(Namespace())
             elif c == "7": cmd_git(Namespace())
+            elif c == "8": cmd_backup(Namespace())
             elif c == "0" or c == "exit": break
             console.print("\n" + "─" * 40 + "\n")
         return
     p = argparse.ArgumentParser(); sub = p.add_subparsers(dest="cmd")
     st = sub.add_parser("status"); st.add_argument("--public", action="store_true")
     sub.add_parser("sync"); db = sub.add_parser("sync-db"); db.add_argument("--apply", action="store_true")
-    sub.add_parser("hide"); sub.add_parser("show"); sub.add_parser("logs"); sub.add_parser("build"); sub.add_parser("push")
+    sub.add_parser("delete-keys"); sub.add_parser("logs"); sub.add_parser("build"); sub.add_parser("push")
+    sub.add_parser("backup")
     a = p.parse_args()
     if a.cmd == "status": cmd_status(a)
     elif a.cmd == "sync": cmd_sync(a)
     elif a.cmd == "sync-db": cmd_sync_db(a)
-    elif a.cmd == "hide": cmd_hide_show(a, "hide")
-    elif a.cmd == "show": cmd_hide_show(a, "show")
+    elif a.cmd == "delete-keys": cmd_delete_keys(a)
     elif a.cmd == "logs": cmd_logs(a)
     elif a.cmd == "build": cmd_build(a)
     elif a.cmd == "push": cmd_git(a)
+    elif a.cmd == "backup": cmd_backup(a)
 
 if __name__ == "__main__":
     main()

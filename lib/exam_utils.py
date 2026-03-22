@@ -102,14 +102,14 @@ def get_subject_ui_meta(subject: str = '') -> dict:
     return {'icon': 'quiz', 'color': 'from-slate-500 to-slate-600'}
 
 def sanitize_exam(data: dict) -> dict:
-    # Comment out sensitive top-level fields instead of deleting
-    if 'answer_key' in data:
-        data['//answer_key'] = data.pop('answer_key')
+    # Completely remove sensitive fields for the public version.
+    # We do NOT use // comments here as they are still visible in the JSON payload.
+    data.pop('answer_key', None)
+    data.pop('//answer_key', None)
+    data.pop('resources', None)
+    data.pop('//resources', None)
     
-    if 'resources' in data:
-        data['//resources'] = data.pop('resources')
-    
-    # Remove correct answers from questions (these remain deleted for safety)
+    # Remove correct answers from questions
     for part in data.get('parts', []):
         for q in part.get('questions', []):
             if 'correct_answer' in q:

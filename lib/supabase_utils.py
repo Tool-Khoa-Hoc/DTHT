@@ -41,6 +41,13 @@ def get_remote_exam_data(supabase, exam_id: str) -> dict:
         pass
     return {}
 
+def get_all_remote_exam_data(supabase: Client) -> list:
+    try:
+        res = supabase.table('exam_keys').select('*').execute()
+        return res.data or []
+    except Exception:
+        return []
+
 def upload_exam_data(supabase: Client, exam_data: dict, exam_path: Path) -> bool:
     """Upload answer key to exam_keys and update solution links in exams table."""
     from datetime import datetime

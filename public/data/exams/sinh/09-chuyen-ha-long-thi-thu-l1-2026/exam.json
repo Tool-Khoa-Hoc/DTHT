@@ -301,6 +301,25 @@
           "id": "q17",
           "type": "single_choice",
           "content": [
+            "Hình 1 thể hiện một cơ chế di truyền ở cấp phân tử. Tên gọi cơ chế di truyền và chú thích X lần lượt là: ",
+            {
+              "image": "21.jpeg",
+              "align": "center",
+              "width": 50
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "phiên mã và các nucleotide. ",
+            "tái bản DNA và các nucleotide. ",
+            "dịch mã và các amino acid. ",
+            "dịch mã và liên kết peptide. "
+          ]
+        },
+        {
+          "id": "q18",
+          "type": "single_choice",
+          "content": [
             "Công nghệ DNA có nhiều ứng dụng trong y học để điều trị các bệnh di truyền ở người. Hiện nay, việc nào sau đây không được thực hiện vì vi phạm đạo đức sinh học?"
           ],
           "points": 0.25,
@@ -961,62 +980,5 @@
         }
       ]
     }
-  ],
-  "//answer_key": {
-    "part1.q1": 1,
-    "part1.q2": 0,
-    "part1.q3": 2,
-    "part1.q4": 1,
-    "part1.q5": 0,
-    "part1.q6": 1,
-    "part1.q7": 1,
-    "part1.q8": 2,
-    "part1.q9": 0,
-    "part1.q10": 1,
-    "part1.q11": 1,
-    "part1.q12": 1,
-    "part1.q13": 1,
-    "part1.q14": 3,
-    "part1.q15": 3,
-    "part1.q16": 3,
-    "part1.q17": 2,
-    "part1.q18": 3,
-    "part2.q1": {
-      "q1a": true,
-      "q1b": true,
-      "q1c": true,
-      "q1d": false
-    },
-    "part2.q2": {
-      "q2a": false,
-      "q2b": true,
-      "q2c": false,
-      "q2d": false
-    },
-    "part2.q3": {
-      "q3a": true,
-      "q3b": false,
-      "q3c": false,
-      "q3d": false
-    },
-    "part2.q4": {
-      "q4a": false,
-      "q4b": false,
-      "q4c": true,
-      "q4d": true
-    },
-    "part3.q1": 0.56,
-    "part3.q2": 2134,
-    "part3.q3": 0.78,
-    "part3.q4": 8,
-    "part3.q5": 3,
-    "part3.q6": 1423
-  },
-  "//resources": {
-    "exam_file_url": null,
-    "answer_file_url": "https://drive.google.com/drive/folders/1bu6KTJuSIa9z07Om-hTqBDCm1zyCCwcl?usp=drive_link",
-    "answer_file_name": "Đáp án",
-    "video_url": null,
-    "edit_link": null
-  }
+  ]
 }

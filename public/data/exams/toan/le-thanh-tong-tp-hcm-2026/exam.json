@@ -1138,56 +1138,5 @@
         }
       ]
     }
-  ],
-  "//answer_key": {
-    "part1.q1": 3,
-    "part1.q2": 2,
-    "part1.q3": 3,
-    "part1.q4": 3,
-    "part1.q5": 1,
-    "part1.q6": 1,
-    "part1.q7": 0,
-    "part1.q8": 2,
-    "part1.q9": 1,
-    "part1.q10": 2,
-    "part1.q11": 3,
-    "part1.q12": 1,
-    "part2.q13": {
-      "q13a": false,
-      "q13b": false,
-      "q13c": true,
-      "q13d": false
-    },
-    "part2.q14": {
-      "q14a": true,
-      "q14b": false,
-      "q14c": false,
-      "q14d": false
-    },
-    "part2.q15": {
-      "q15a": false,
-      "q15b": false,
-      "q15c": false,
-      "q15d": true
-    },
-    "part2.q16": {
-      "q16a": true,
-      "q16b": false,
-      "q16c": false,
-      "q16d": true
-    },
-    "part3.q17": 10.4,
-    "part3.q18": 7,
-    "part3.q19": 44,
-    "part3.q20": 41.6,
-    "part3.q21": 1167,
-    "part3.q22": 9900
-  },
-  "//resources": {
-    "exam_file_url": null,
-    "answer_file_url": "https://drive.google.com/file/d/1UICVKNK4c24GCQulKmXA6KzX-p9McolD/view?usp=drive_link",
-    "answer_file_name": null,
-    "video_url": null,
-    "edit_link": null
-  }
+  ]
 }

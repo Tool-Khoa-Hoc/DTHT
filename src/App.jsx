@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import RootLayout from './components/RootLayout';
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import SecurityWrapper from './components/SecurityWrapper';
 
 // Include global styles
 import './index.css';
@@ -41,8 +42,9 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <SpeedInsights />
-        <Suspense fallback={<PageLoader />}>
+        <SecurityWrapper>
+          <SpeedInsights />
+          <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/auth" element={<AuthScreen />} />
 
@@ -68,6 +70,7 @@ function App() {
             </Route>
           </Routes>
         </Suspense>
+        </SecurityWrapper>
       </AuthProvider>
     </BrowserRouter>
   );

@@ -12,8 +12,14 @@ const resolveDefaultApiBase = () => {
 
 const API_BASE = (import.meta.env.VITE_EXAM_REVIEW_API_BASE || resolveDefaultApiBase()).replace(/\/$/, '');
 
+const ADMIN_TOKEN = 'dtht_secret_token_123'; // Matches default in server
+
 async function request(path, options = {}) {
-  const response = await fetch(`${API_BASE}${path}`, options);
+  const headers = {
+    ...(options.headers || {}),
+    'Authorization': `Bearer ${ADMIN_TOKEN}`
+  };
+  const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(payload?.error || `Request failed: ${response.status}`);
