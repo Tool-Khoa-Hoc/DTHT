@@ -698,6 +698,75 @@ def _render_cell(
     return " [br] ".join(line for line in (_normalize_spacing(item) for item in cell_lines) if line)
 
 
+def _process_word_table_grid(table: ET.Element) -> list[list[dict[str, Any] | None]]:
+    tr_elements = table.findall(f"./{W_TR}")
+    grid: list[list[dict[str, Any] | None]] = []
+    
+    # Pass 1: Build logical grid and horizontal spans
+    for r_idx, tr in enumerate(tr_elements):
+        logical_row: list[dict[str, Any] | None] = []
+        tc_elements = tr.findall(f"./{W_TC}")
+        tc_idx = 0
+        while True:
+            if tc_idx >= len(tc_elements):
+                break
+            tc = tc_elements[tc_idx]
+            tc_pr = tc.find(f"./{{{W_NS}}}tcPr")
+            
+            colspan = 1
+            vmerge = None
+            if tc_pr is not None:
+                grid_span_node = tc_pr.find(f"./{{{W_NS}}}gridSpan")
+                if grid_span_node is not None:
+                    try:
+                        colspan = int(grid_span_node.get(f"{{{W_NS}}}val", 1))
+                    except ValueError:
+                        pass
+                vmerge_node = tc_pr.find(f"./{{{W_NS}}}vMerge")
+                if vmerge_node is not None:
+                    vmerge_val = vmerge_node.get(f"{{{W_NS}}}val")
+                    if vmerge_val == "restart":
+                        vmerge = "restart"
+                    else:
+                        vmerge = "continue"
+                        
+            cell_data = {
+                "tc": tc,
+                "colspan": colspan,
+                "rowspan": 1,
+                "vmerge": vmerge,
+                "is_rendered": True
+            }
+            logical_row.append(cell_data)
+            for _ in range(colspan - 1):
+                logical_row.append(None)
+            tc_idx += 1
+        grid.append(logical_row)
+        
+    # Pass 2: Resolve vertical merges
+    max_cols = max((len(row) for row in grid), default=0)
+    for c_idx in range(max_cols):
+        current_restart_cell = None
+        for r_idx in range(len(grid)):
+            if c_idx >= len(grid[r_idx]):
+                continue
+            cell_data = grid[r_idx][c_idx]
+            if cell_data is None:
+                continue
+            
+            vmerge = cell_data["vmerge"]
+            if vmerge == "restart":
+                current_restart_cell = cell_data
+            elif vmerge == "continue":
+                if current_restart_cell is not None:
+                    current_restart_cell["rowspan"] += 1
+                    cell_data["is_rendered"] = False
+            else:
+                current_restart_cell = None
+
+    return grid
+
+
 def _render_table(
     table: ET.Element,
     *,
@@ -707,21 +776,45 @@ def _render_table(
     image_map: dict[str, dict[str, Any]],
     math_map: dict[str, dict[str, Any]],
 ) -> list[str]:
+    grid = _process_word_table_grid(table)
     rows: list[str] = []
-    for row in table.findall(f"./{W_TR}"):
-        cells = [
-            _render_cell(
-                cell,
+    
+    for row in grid:
+        cells = []
+        for cell_data in row:
+            if cell_data is None or not cell_data["is_rendered"]:
+                continue
+            
+            tc = cell_data["tc"]
+            rendered_cell = _render_cell(
+                tc,
                 zf=zf,
                 rels=rels,
                 asset_dir=asset_dir,
                 image_map=image_map,
                 math_map=math_map,
             )
-            for cell in row.findall(f"./{W_TC}")
-        ]
-        if any(cells):
+            colspan = cell_data["colspan"]
+            rowspan = cell_data["rowspan"]
+            
+            props = ""
+            if colspan > 1:
+                props += f"c={colspan},"
+            if rowspan > 1:
+                props += f"r={rowspan},"
+            
+            if props:
+                cells.append(f"{{{{{props.strip(',')}}}}} {rendered_cell}")
+            else:
+                cells.append(rendered_cell)
+        
+        # Determine if this row should be omitted entirely if it's completely empty?
+        # No! We must keep the row to respect rowspans, even if empty.
+        # But if the ORIGINAL row had NO cells at all, maybe we skip it.
+        # len(row) is length of logical grid. If len(row) == 0, skip.
+        if len(row) > 0:
             rows.append(f"[* {' | '.join(cells)} *]")
+            
     return rows
 
 
@@ -744,29 +837,46 @@ def extract_word_data(*, docx_path: Path, asset_dir: Path) -> ExtractedWordData:
         math_map: dict[str, dict[str, Any]] = {}
         lines: list[str] = []
 
-        for child in list(body):
-            if child.tag == W_P:
-                lines.extend(
-                    _render_paragraph(
-                        child,
-                        zf=zf,
-                        rels=rels,
-                        asset_dir=asset_dir,
-                        image_map=image_map,
-                        math_map=math_map,
-                    )
-                )
-            elif child.tag == W_TBL:
-                lines.extend(
-                    _render_table(
-                        child,
-                        zf=zf,
-                        rels=rels,
-                        asset_dir=asset_dir,
-                        image_map=image_map,
-                        math_map=math_map,
-                    )
-                )
+        MC_NS = "http://schemas.openxmlformats.org/markup-compatibility/2006"
+        for alt_content in root.findall(f".//{{{MC_NS}}}AlternateContent"):
+            fallback = alt_content.find(f"{{{MC_NS}}}Fallback")
+            if fallback is not None:
+                alt_content.remove(fallback)
+
+        def walk_block_level(node: ET.Element, is_in_table: bool = False):
+            for child in list(node):
+                if child.tag == W_P:
+                    if not is_in_table:
+                        lines.extend(
+                            _render_paragraph(
+                                child,
+                                zf=zf,
+                                rels=rels,
+                                asset_dir=asset_dir,
+                                image_map=image_map,
+                                math_map=math_map,
+                            )
+                        )
+                    walk_block_level(child, is_in_table)
+                elif child.tag == W_TBL:
+                    if not is_in_table:
+                        lines.extend(
+                            _render_table(
+                                child,
+                                zf=zf,
+                                rels=rels,
+                                asset_dir=asset_dir,
+                                image_map=image_map,
+                                math_map=math_map,
+                            )
+                        )
+                    walk_block_level(child, True)
+                elif child.tag in {f"{{{W_NS}}}txbxContent", f"{{{V_NS}}}textbox"}:
+                    walk_block_level(child, False)
+                else:
+                    walk_block_level(child, is_in_table)
+
+        walk_block_level(body)
 
         raw_markup = "\n".join(lines).strip()
         return ExtractedWordData(

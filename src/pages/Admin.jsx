@@ -484,44 +484,93 @@ export default function Admin() {
     }
   };
 
+  const [keysError, setKeysError] = useState(null);
+  const [examsDbError, setExamsDbError] = useState(null);
+
   const fetchExams = async () => {
     setLoadingExams(true);
+    setKeysError(null);
+    setExamsDbError(null);
+    console.log("Đang bắt đầu lấy danh sách đề thi...");
     try {
-      // Primary source is exam_keys (synced data)
-      const { data: keysData, error: keysError } = await supabase
-        .from('exam_keys')
-        .select('*')
-        .order('exam_id', { ascending: true });
-        
-      if (keysError) throw keysError;
+      const examMap = new Map();
+
+      // 1. Fetch from local index.json (Prioritize local data as base)
+      let localIndex = [];
+      try {
+        console.log("Đang fetch index.json...");
+        const res = await fetch('/data/exams/index.json', { cache: 'no-store' });
+        if (res.ok) {
+           localIndex = await res.json();
+           console.log(`Đã lấy ${localIndex.length} đề từ index.json`);
+           localIndex.forEach(ex => {
+             const id = (ex.id || '').toLowerCase();
+             if (id) {
+               examMap.set(id, {
+                 ...ex,
+                 is_local: true,
+                 is_in_db: false,
+                 has_key: !!(ex.answer_key || ex.has_key),
+                 has_resources: !!(ex.solution_url || ex.video_url || ex.solutionUrl || ex.videoUrl || ex.has_resources),
+                 solution_url: ex.solution_url || ex.solutionUrl || '',
+                 video_url: ex.video_url || ex.videoUrl || ''
+               });
+             }
+           });
+        } else {
+           console.warn(`Fetch index.json failed: ${res.status}`);
+        }
+      } catch (err) {
+        console.error('Lỗi lấy index.json:', err);
+      }
+
+      // 2. Fetch from Supabase exam_keys
+      let keysData = [];
+      try {
+        console.log("Đang fetch exam_keys...");
+        const { data, error } = await supabase.from('exam_keys').select('*');
+        if (error) {
+          console.error("Supabase exam_keys error:", error);
+          setKeysError(error.message);
+        } else {
+          keysData = data || [];
+        }
+      } catch (err) {
+        console.error("Supabase exam_keys crash:", err);
+        setKeysError(err.message);
+      }
       
-      // Secondary source is exams (metadata)
-      const { data: examsData, error: examsError } = await supabase
-        .from('exams')
-        .select('*');
+      // Add Supabase data (overlay)
+      keysData.forEach(kd => {
+        const id = (kd.exam_id || '').toLowerCase();
+        if (!id) return;
+        const existing = examMap.get(id) || { id: kd.exam_id, is_local: false };
+        const solUrl = kd.resources?.solution_url || kd.resources?.answer_file_url || existing.solution_url || '';
+        const vidUrl = kd.resources?.video_url || existing.video_url || '';
         
-      if (examsError) throw examsError;
-      
-      // Merge: primary source is exam_keys
-      const merged = (keysData || []).map(kd => {
-        const exMeta = (examsData || []).find(ex => ex.id === kd.exam_id);
-        return {
-          id: kd.exam_id,
-          title: exMeta?.title || kd.exam_id, // Fallback to ID if no title in metadata
-          subject: exMeta?.subject || 'khac',
-          solution_url: exMeta?.solution_url || kd.resources?.solution_url || '',
-          video_url: exMeta?.video_url || kd.resources?.video_url || '',
-          has_key: !!(kd.answer_key),
-          has_resources: !!(kd.resources && Object.keys(kd.resources).length > 0),
-          last_synced_at: kd.last_synced_at,
+        examMap.set(id, {
+          ...existing,
+          id: existing.id || kd.exam_id,
+          title: existing.title || kd.resources?.title || 'Đề thi (chỉ có DB)',
+          subject: existing.subject || kd.resources?.subject || 'khac',
+          questions: existing.questions,
+          solution_url: solUrl,
+          video_url: vidUrl,
+          has_key: !!kd.answer_key && (typeof kd.answer_key === 'object' ? Object.keys(kd.answer_key).length > 0 : String(kd.answer_key).trim().length > 2),
+          has_resources: !!(solUrl || vidUrl),
           answer_key: kd.answer_key,
-          resources: kd.resources
-        };
+          is_in_db: true,
+          last_synced_at: kd.last_synced_at || kd.updated_at || kd.created_at,
+          kd: kd // store reference
+        });
       });
-      
-      setExams(merged);
+
+      const merged = Array.from(examMap.values());
+      setExams(merged.sort((a, b) => b.id.localeCompare(a.id)));
+      console.log(`Hoàn tất gộp ${merged.length} đề thi.`);
     } catch (err) {
-      console.error('Lỗi lấy danh sách đề thi:', err);
+      console.error('Lỗi hệ thống khi gộp đề thi:', err);
+      toast('Lỗi hệ thống: ' + err.message);
     } finally {
       setLoadingExams(false);
     }
@@ -532,10 +581,8 @@ export default function Admin() {
     
     try {
       const { error: error1 } = await supabase.from('exam_keys').delete().eq('exam_id', examId);
-      const { error: error2 } = await supabase.from('exams').delete().eq('id', examId);
       
       if (error1) throw error1;
-      if (error2) throw error2;
 
       setExams(exams.filter(e => e.id !== examId));
       toast('Đã xóa đề thi thành công');
@@ -552,24 +599,70 @@ export default function Admin() {
 
   const handleStartEdit = async (ex) => {
     setEditingExam(ex.id);
-    // Fetch full data for this exam to ensure we have the correct answer_key
-    try {
-      const { data, error } = await supabase.from('exam_keys').select('*').eq('exam_id', ex.id).single();
-      if (!error && data) {
-        setExamEditForm({
-          answer_key: data.answer_key ? JSON.stringify(data.answer_key, null, 2) : '{}',
-          solution_url: ex.solution_url || '',
-          video_url: ex.video_url || ''
-        });
-      } else {
-        setExamEditForm({
-          answer_key: '{}',
-          solution_url: ex.solution_url || '',
-          video_url: ex.video_url || ''
-        });
+    
+    // Check if we already have the data in memory
+    if (ex.answer_key) {
+      setExamEditForm({
+        answer_key: JSON.stringify(ex.answer_key, null, 2),
+        solution_url: ex.solution_url || '',
+        video_url: ex.video_url || ''
+      });
+    } else {
+      // Fetch full data for this exam to ensure we have the correct answer_key if it exists in DB
+      try {
+        const { data, error } = await supabase.from('exam_keys').select('*').eq('exam_id', ex.id).maybeSingle();
+        if (!error && data) {
+          setExamEditForm({
+            answer_key: data.answer_key ? JSON.stringify(data.answer_key, null, 2) : '{}',
+            solution_url: ex.solution_url || data.resources?.solution_url || '',
+            video_url: ex.video_url || data.resources?.video_url || ''
+          });
+        } else {
+          setExamEditForm({
+            answer_key: '{}',
+            solution_url: ex.solution_url || '',
+            video_url: ex.video_url || ''
+          });
+        }
+      } catch (err) {
+        console.error(err);
       }
+    }
+  };
+
+  const handleSyncFromJson = async () => {
+    if (!editingExam) return;
+    
+    const ex = exams.find(e => e.id === editingExam);
+    if (!ex) return;
+
+    setLoadingExams(true);
+    try {
+      const resp = await fetch(`/data/exams/${ex.subject}/${ex.id}/exam.json`, { cache: 'no-store' });
+      if (!resp.ok) throw new Error('Không tìm thấy file exam.json cục bộ.');
+      
+      const data = await resp.json();
+      
+      setExamEditForm({
+        answer_key: data.answer_key ? JSON.stringify(data.answer_key, null, 2) : '{}',
+        solution_url: data.resources?.solution_url || data.resources?.answer_file_url || data.solution_url || data.solutionUrl || '',
+        video_url: data.resources?.video_url || data.video_url || data.videoUrl || ''
+      });
+      
+      toast('Đã nạp dữ liệu từ file JSON thành công!');
     } catch (err) {
-      console.error(err);
+      alert('Lỗi khi đồng bộ: ' + err.message);
+    } finally {
+      setLoadingExams(false);
+    }
+  };
+
+  const formatJson = () => {
+    try {
+      const parsed = JSON.parse(examEditForm.answer_key);
+      setExamEditForm({ ...examEditForm, answer_key: JSON.stringify(parsed, null, 2) });
+    } catch (e) {
+      alert('JSON không hợp lệ để định dạng.');
     }
   };
 
@@ -582,26 +675,39 @@ export default function Admin() {
         throw new Error('Đáp án JSON không hợp lệ. Vui lòng kiểm tra lại cú pháp.');
       }
 
+      const ex = exams.find(e => e.id === editingExam);
+      const kd = ex?.kd || {};
+      const currentResources = kd.resources || {};
+
       const resources = {
+        ...currentResources,
         solution_url: examEditForm.solution_url,
-        video_url: examEditForm.video_url
+        video_url: examEditForm.video_url,
+        answer_file_url: currentResources.answer_file_url || examEditForm.solution_url,
+        title: ex?.title, // preserve title for DB-only records just in case
+        subject: ex?.subject // preserve subject
       };
 
-      // Update exam_keys
+      // 1. Update exam_keys directly
       const { error: keyError } = await supabase.from('exam_keys').upsert({
         exam_id: editingExam,
         answer_key: parsedKey,
         resources: resources,
         last_synced_at: new Date().toISOString()
-      });
+      }, { onConflict: 'exam_id' });
       if (keyError) throw keyError;
 
-      // Update exams
-      const { error: examError } = await supabase.from('exams').update({
-        solution_url: examEditForm.solution_url,
-        video_url: examEditForm.video_url
-      }).eq('id', editingExam);
-      if (examError) throw examError;
+      // 2. Update exams table (sync Metadata)
+      const { error: examsError } = await supabase.from('exams').upsert({
+        id: editingExam,
+        title: ex?.title || 'Đề thi (chưa có tên)',
+        subject: ex?.subject || 'khac',
+        solution_url: examEditForm.solution_url
+      }, { onConflict: 'id' });
+      if (examsError) {
+        console.warn('Lỗi lưu metadata vào bảng exams:', examsError.message);
+        setExamsDbError(examsError.message);
+      }
 
       toast('Cập nhật dữ liệu đề thi thành công!');
       setEditingExam(null);
@@ -649,6 +755,7 @@ export default function Admin() {
         {/* ─── VIP Management Tab ─────────────────────────────────── */}
         {mainTab === 'vip' && (
           <div className="space-y-6">
+            {/* Search & Statistics */}
             {/* Toast message */}
             {vipMsg.text && (
               <div className={`px-4 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 ${
@@ -821,6 +928,19 @@ export default function Admin() {
         {/* ─── Exam Management Tab ─────────────────────────────────── */}
         {mainTab === 'exams' && (
           <div className="space-y-6">
+            {/* Error Display for DB Issues */}
+            {(keysError || examsDbError) && (
+              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-bold animate-pulse">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="material-symbols-outlined text-[18px]">database_off</span>
+                  <span>CẢNH BÁO DATABASE: Dữ liệu từ Supabase có thể không đầy đủ.</span>
+                </div>
+                {keysError && <div className="ml-7">• Lỗi Kho khóa: {keysError}</div>}
+                {examsDbError && <div className="ml-7">• Lỗi Metadata: {examsDbError}</div>}
+                <div className="ml-7 mt-2 text-slate-400 font-normal">Gợi ý: Kiểm tra phân quyền RLS hoặc chính tả hàm is_admin(). Bạn vẫn có thể dùng "Sync từ File" để sửa.</div>
+              </div>
+            )}
+
             <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold flex items-center gap-2 text-blue-500">
@@ -851,13 +971,25 @@ export default function Admin() {
               {editingExam && (
                 <div className="mb-8 p-6 rounded-2xl bg-blue-50 dark:bg-blue-500/5 border-2 border-blue-500/30 space-y-4 animate-in fade-in slide-in-from-top-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-black text-blue-600 dark:text-blue-400 flex items-center gap-2">
-                       <span className="material-symbols-outlined">edit_note</span>
-                       Đang chỉnh sửa: {editingExam}
-                    </h3>
-                    <button onClick={() => setEditingExam(null)} className="text-slate-400 hover:text-slate-600">
-                      <span className="material-symbols-outlined">close</span>
-                    </button>
+                    <div>
+                      <h3 className="font-black text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                        <span className="material-symbols-outlined">edit_note</span>
+                        Đang chỉnh sửa: {editingExam}
+                      </h3>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase mt-1">Dữ liệu sẽ được lưu vào Supabase (Bản VIP)</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={handleSyncFromJson}
+                        className="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-[10px] font-black uppercase flex items-center gap-1 hover:bg-amber-600 shadow-sm"
+                        title="Tự động lấy đáp án và link từ file JSON cục bộ"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">sync</span> Đồng bộ từ File
+                      </button>
+                      <button onClick={() => setEditingExam(null)} className="text-slate-400 hover:text-slate-600">
+                        <span className="material-symbols-outlined">close</span>
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -866,35 +998,43 @@ export default function Admin() {
                          <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Link bài giải (PDF/Web)</label>
                          <input 
                            type="text" 
+                           placeholder="https://..."
                            value={examEditForm.solution_url} 
                            onChange={e => setExamEditForm({...examEditForm, solution_url: e.target.value})}
-                           className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none"
+                           className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
                          />
                        </div>
                        <div>
                          <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Link Video bài giải</label>
                          <input 
                            type="text" 
+                           placeholder="https://youtube.com/..."
                            value={examEditForm.video_url} 
                            onChange={e => setExamEditForm({...examEditForm, video_url: e.target.value})}
-                           className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none"
+                           className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
                          />
                        </div>
                     </div>
                     <div>
-                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Đáp án (JSON Answer Key)</label>
+                         <div className="flex items-center justify-between mb-1">
+                           <label className="block text-xs font-bold text-slate-500 uppercase">Đáp án (JSON Answer Key)</label>
+                           <button onClick={formatJson} className="text-[10px] font-bold text-blue-500 hover:underline">Định dạng JSON</button>
+                         </div>
                          <textarea 
                            rows="6"
                            value={examEditForm.answer_key} 
                            onChange={e => setExamEditForm({...examEditForm, answer_key: e.target.value})}
-                           className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-xs font-mono focus:border-blue-500 outline-none resize-none"
+                           className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-xs font-mono focus:border-blue-500 outline-none resize-none shadow-inner"
                          />
                     </div>
                   </div>
 
                   <div className="flex justify-end gap-3 pt-2">
                     <button onClick={() => setEditingExam(null)} className="px-4 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-white/5 transition-all">Hủy bỏ</button>
-                    <button onClick={handleSaveEdit} className="px-6 py-2 rounded-xl bg-blue-500 text-white text-sm font-bold shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">Lưu thay đổi</button>
+                    <button onClick={handleSaveEdit} className="px-6 py-2 rounded-xl bg-blue-500 text-white text-sm font-bold shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2">
+                       <span className="material-symbols-outlined text-[18px]">save</span>
+                       Lưu kho khóa
+                    </button>
                   </div>
                 </div>
               )}
@@ -915,7 +1055,10 @@ export default function Admin() {
                     <div key={ex.id} className="p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:border-blue-500/30 transition-all flex flex-col md:flex-row md:items-center gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-black px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 uppercase tracking-widest">{ex.id}</span>
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest ${ex.is_in_db ? 'bg-blue-500/10 text-blue-500' : 'bg-slate-500/10 text-slate-500'}`}>
+                            {ex.is_in_db ? 'Synced' : 'Local Only'}
+                          </span>
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-500 uppercase tracking-widest">{ex.id}</span>
                           <h4 className="font-bold text-sm truncate">{ex.title || 'Đề thi chưa đặt tên'}</h4>
                         </div>
                         <div className="flex flex-wrap items-center gap-3">

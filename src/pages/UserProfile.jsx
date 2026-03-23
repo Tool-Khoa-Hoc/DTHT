@@ -224,6 +224,22 @@ export default function UserProfile() {
                         )}
                     </div>
 
+                    {/* Rank Progress Bar */}
+                    {rankInfo?.progress && !rankInfo?.isMax && (
+                        <div className={`w-full max-w-[200px] mx-auto mb-5 relative z-10 ${rankInfo.color}`}>
+                            <div className="flex justify-between items-end mb-1.5 opacity-80">
+                                <span className="text-[10px] font-bold tracking-wider uppercase">Lên {rankInfo.nextRank.name}</span>
+                                <span className="text-xs font-black">{rankInfo.progress.current} / {rankInfo.progress.target}</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full overflow-hidden bg-white/5 border border-white/10">
+                                <div
+                                    className="h-full bg-current transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_currentColor]"
+                                    style={{ width: `${rankInfo.progress.percentage}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* School Info Row */}
                     <p className="text-slate-400 text-sm font-light flex items-center justify-center gap-1 mb-6 relative z-10">
                         <span className="material-symbols-outlined text-sm">{profile?.user_mode === 'student' ? 'local_library' : 'school'}</span>
@@ -312,12 +328,12 @@ export default function UserProfile() {
                                         <div className="mt-auto">
                                             <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                                                 <span>Tiến độ</span>
-                                                <span>{camp.targets.filter(t => t.is_completed).length} / {camp.targets.length}</span>
+                                                <span>{camp.is_completed ? camp.targets.length : camp.targets.filter(t => t.is_completed).length} / {camp.targets.length}</span>
                                             </div>
                                             <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                                                 <div
                                                     className={`h-full rounded-full ${camp.is_completed ? 'bg-green-500' : 'bg-indigo-500'}`}
-                                                    style={{ width: `${(camp.targets.filter(t => t.is_completed).length / camp.targets.length) * 100}%` }}
+                                                    style={{ width: `${camp.is_completed ? 100 : (camp.targets.filter(t => t.is_completed).length / camp.targets.length) * 100}%` }}
                                                 ></div>
                                             </div>
                                         </div>

@@ -1,0 +1,1116 @@
+{
+  "id": "54-thpt-chuyen-tuyen-quang-l1-2026",
+  "title": "THPT Chuyên Tuyên Quang Lần 1 2026",
+  "subject": "sinh",
+  "time": 50,
+  "description": null,
+  "parts": [
+    {
+      "id": "part1",
+      "name": "PHẦN I. TRẮC NGHIỆM NHIỀU PHƯƠNG ÁN LỰC CHỌN",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": [
+            {
+              "image": "1.png",
+              "align": "center",
+              "width": 60
+            },
+            [
+              "Các trình tự của một operon ở vi khuẩn",
+              {
+                "type": "text",
+                "text": "E. coli ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "nằm trong đoạn NST được kí hiệu từ A đến E. Để xác định các trình tự của operon này, người ta sử dụng 5 trường hợp đột biến mất đoạn như hình bên dưới (các đường gạch chéo biểu hiện đoạn bị mất). Kết quả thu được trường hợp 4 và 5 có các gene cấu trúc luôn được phiên mã; trường hợp 2 và 3 có các gene cấu trúc luôn không được phiên mã; trường hợp 1 chưa xác định được mức biểu hiện của các gene cấu trúc trong operon. Trong các phát biểu sau, phát biểu nào về trình tự operon trên là đúng?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Đoạn CD chứa vùng vận hành, đoạn DE chứa vùng khởi động.",
+            "Đoạn B chứa vùng vận hành, đoạn E chứa vùng khởi động.",
+            "Đoạn DE chứa vùng vận hành, đoạn BC chứa vùng khởi động.",
+            "Đoạn A chứa vùng vận hành, đoạn B chứa vùng khởi động."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": [
+            [
+              "Quan sát hình bên cho biết, nếu đột biến thay thế một cặp G − C ở đoạn gene trên tại vị trí số 11 bằng một cặp T − A thì chuỗi polypeptide do gene đột biến quy định sẽ như thế nào?"
+            ],
+            {
+              "image": "2.jpeg",
+              "align": "center",
+              "width": 60
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Tăng thêm 1 amino acid.",
+            "Có thể thay Ser bằng một loại amino acid khác.",
+            "Ngắn lại.",
+            "Có thể không thay đổi amino acid so với trước khi đột biến."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": [
+            [
+              "Để phát hiện hô hấp ở thực vật, một nhóm học sinh đã tiến hành thí nghiệm như sau: Dùng 4 bình cách nhiệt giống nhau đánh số thứ tự 1, 2, 3, 4. Cả 4 bình đều đựng hạt đỗ xanh. Đậy kín nắp mỗi bình rồi để trong 2 giờ. Biết rằng các điều kiện khác ở 4 bình là như nhau và phù hợp với thí nghiệm."
+            ],
+            {
+              "image": "3.jpeg",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Bình 1: Chứa 1 kg hạt mới nhú mầm.\n",
+              "Bình 2: Chứa 1 kg hạt khô. \n",
+              "Bình 3: Chứa 1 kg hạt mới nhú mầm đã luộc chín. \n",
+              "Bình 4: Chứa 0,5 kg hạt mới nhú mầm. \n",
+              "Theo lý thuyết, dự đoán nào sau đây đúng về kết quả thí  nghiệm? \n",
+              "1. Nhiệt độ ở cả 4 bình đều tăng. \n",
+              "2. Nhiệt độ ở bình 1 cao nhất. \n",
+              "3. Nồng độ O2 ở bình 1 và bình 4 đều giảm. \n",
+              "4. Nồng độ O2 ở bình 3 tăng."
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "1, 3.",
+            "2, 3.",
+            "1, 4.",
+            "2, 4."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": [
+            "Ở cà chua, gene",
+            {
+              "type": "text",
+              "text": " SIKLUH ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "giúp làm tăng kích thước quả thông qua kích thích các tế bào phân chia. Muốn tăng năng suất cho loài cây ăn quả khác (loài A), kĩ thuật nào sau đây phù hợp nhất?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Chuyển gene",
+              {
+                "type": "text",
+                "text": "SIKLUH ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "vào các giống của loài A bằng công nghệ DNA tái tổ hợp."
+            ],
+            [
+              "Lai hữu tính giữa cây cà chua với các giống của loài A nhằm chuyển gene",
+              {
+                "type": "text",
+                "text": "SIKLUH ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "sang loài A."
+            ],
+            [
+              "Chỉnh sửa một số gene trong loài A để biến những gene này thành gene",
+              {
+                "type": "text",
+                "text": "SIKLUH",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "."
+            ],
+            [
+              "Nhân giống vô tính giống cà chua mang gene",
+              {
+                "type": "text",
+                "text": "SIKLUH ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "để tạo hàng loạt cây có năng suất cao."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": "Ở người, bệnh máu khó đông do một allele lặn (m) nằm trên nhiễm sắc thể X không có allele tương ứng trên nhiễm sắc thể Y quy định. Cặp bố mẹ nào sau đây có thể sinh con trai bị bệnh máu khó đông với xác suất 25%?",
+          "points": 0.25,
+          "options": [
+            [
+              "X",
+              {
+                "type": "text",
+                "text": "M",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "X",
+              {
+                "type": "text",
+                "text": "M",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "× X",
+              {
+                "type": "text",
+                "text": "m",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "Y."
+            ],
+            [
+              "X",
+              {
+                "type": "text",
+                "text": "M",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "X",
+              {
+                "type": "text",
+                "text": "m ",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "× X",
+              {
+                "type": "text",
+                "text": "M",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "Y."
+            ],
+            [
+              "X",
+              {
+                "type": "text",
+                "text": "M",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "X",
+              {
+                "type": "text",
+                "text": "m ",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "× X",
+              {
+                "type": "text",
+                "text": "m",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "Y."
+            ],
+            [
+              "X",
+              {
+                "type": "text",
+                "text": "m",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "X",
+              {
+                "type": "text",
+                "text": "m ",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "× X",
+              {
+                "type": "text",
+                "text": "M",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "Y."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": "Khi nghiên cứu 1 dòng đột biến ở 1 loài côn trùng được tạo ra từ phòng thí nghiệm, người ta quan sát thấy trên NST số 2 có số lượng gene tăng lên, các NST khác bình thường. Hiện tượng trên là do đột biến",
+          "points": 0.25,
+          "options": [
+            "Đảo đoạn.",
+            "Mất đoạn.",
+            "Lặp đoạn.",
+            "Chuyển đoạn trong 1 NST."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": [
+            [
+              "Bệnh bạch tạng ở người là hậu quả của sự thiếu hụt melanin − sắc tố do các tế bào sắc tố (melanocyte) tổng hợp, đặc biệt tập trung nhiều tại chân lông và da. Quá trình sinh tổng hợp melanin gồm hai phản ứng liên tiếp:"
+            ],
+            {
+              "image": "4.png",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Khi phân tích các tế bào chân tóc của hai cá thể mắc bệnh bạch tạng − cá thể A (nam) và cá thể B (nữ) − người ta phát hiện cả hai đều tích lũy tiền chất P. Tuy nhiên, khi nhúng một số sợi tóc của họ vào dung dịch chứa tyrosine, tóc của cá thể B chuyển sang màu đen (do có melanin), trong khi tóc của A không đổi màu. Biết rằng E1 và E2 là các enzyme do hai gene trội khác nhau trên hai nhiễm sắc thể thường khác nhau mã hóa. Các allele lặn tương ứng là allele đột biến làm mất chức năng enzyme. Dựa trên lý thuyết di truyền học, hãy xác định phát biểu nào sau đây là sai?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Những người bị bạch tạng có thể có 4 loại kiểu gene khác nhau.",
+            "Hai người có da bình thường kết hôn với nhau, vẫn có thể sinh con bị bạch tạng.",
+            "Nếu người A và người B kết hôn, sinh con thì vẫn có thể sinh con bình thường.",
+            "Tính trạng da bị bạch tạng ở người do 2 cặp gene quy định và tương tác bổ sung."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": [
+            "Nghiên cứu cơ chế tái bản DNA ở một loài sinh vật trong phòng thí nghiệm, các nhà khoa học thu được kết quả như hình bên dưới. Có 3 phân tử DNA chứa $^{15}N$ cùng tiến hành tái bản trong môi trường chỉ chứa $^{14}N$. Sau thời gian 2 giờ nuôi cấy thu được số phân tử DNA chứa $^{14}N$ gấp 31 lần số phân tử DNA chứa $^{15}N/^{14}N$. Nhận định nào sau đây về quá trình tái bản DNA này là sai?",
+            {
+              "image": "5.png",
+              "align": "center",
+              "width": 70
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Số phân tử DNA chỉ chứa $^{14}N$ tạo ra sau 1 giờ là 18.",
+            "Thời gian thế hệ của loại tế bào chứa DNA này là 30 phút.",
+            "Tổng số mạch polynucleotide chỉ chứa $^{14}N$ là 378.",
+            "Thí nghiệm này chứng minh cơ chế tái bản DNA diễn ra theo nguyên tắc bán bảo toàn."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": [
+            [
+              "Một nhóm nghiên cứu tiến hành trồng các cây có cùng kiểu gene của một giống hoa cẩm tú cầu (Mophead Hydrange a) ở đất có pH khác nhau, thu được kết quả:"
+            ],
+            {
+              "image": "6.png",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Nhận định nào sau đây là đúng về giống hoa cẩm tú cầu trên?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Màu sắc hoa của giống hoa cẩm tú cầu này hoàn toàn do độ pH đất quy định.",
+            "Độ pH đất thay đổi đã làm cho kiểu gene của giống hoa cẩm tú cầu thay đổi.",
+            "Giống hoa cẩm tú cầu này có nhiều mức phản ứng khác nhau về tính trạng màu sắc hoa.",
+            "Tập hợp các màu sắc hoa khác nhau (xanh, tím, hồng, đỏ) là mức phản ứng của kiểu gene quy định tính trạng màu sắc hoa."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": [
+            [
+              "Phát biểu nào sau đây đúng với các thông tin ở hình bên?",
+              {
+                "type": "text",
+                "text": "3",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            {
+              "image": "7.jpeg",
+              "align": "center",
+              "width": 60
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Số loại giao tử tối đa của cặp nhiễm sắc thể (NST) này là 4.",
+            "Mỗi gene trên cặp NST này đều có 2 trạng thái.",
+            "Cặp NST này có 6 locus gene.",
+            [
+              "Có 2 nhóm gene liên kết là",
+              {
+                "type": "text",
+                "text": "PaB ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "và",
+              {
+                "type": "text",
+                "text": "Pab",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": "Khi nói về quá trình phiên mã, có bao nhiêu phát biểu sau đây đúng? Quá trình phiên mã diễn ra theo nguyên tắc bổ sung. Enzyme RNA polymerase chỉ sử dụng mạch 3’− 5’ làm mạch khuôn. Một gene phiên mã 10 lần sẽ tổng hợp được 10 phân tử RNA. Quá trình phiên mã sử dụng mạch khuôn của gene làm khuôn mẫu.",
+          "points": 0.25,
+          "options": [
+            "3.",
+            "1.",
+            "2.",
+            "4."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": [
+            [
+              "Theo dõi sự di truyền bệnh Q trên những người thuộc một dòng họ, người ta vẽ được sơ đồ phả hệ sau:"
+            ],
+            {
+              "image": "8.png",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Biết bệnh Q do một trong hai allele của một gene nằm trên NST giới tính quy định, allele trội là trội hoàn toàn và không phát sinh thêm đột biến mới. Theo lý thuyết, phát biểu nào sau đây sai?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Xác suất đứa con đầu lòng của chồng (6) và vợ (7) bị bệnh Q là 1/8.",
+            "Có thể xác định chính xác kiểu gene tối đa của 8 người trong phả hệ.",
+            "Nếu người số (6) kết hôn với người vợ bị bệnh thì 100% con gái của họ sẽ không mắc bệnh Q.",
+            "Bệnh Q do gene lặn quy định."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q13",
+          "type": "single_choice",
+          "content": [
+            "Cho biết allele",
+            {
+              "type": "text",
+              "text": "A ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "quy định thân cao trội hoàn toàn so với allele a quy định thân thấp, allele",
+            {
+              "type": "text",
+              "text": "B ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "quy định hoa đỏ trội hoàn toàn so với allele b quy định hoa trắng. Tần số hoán vị gene là 20% ở cả 2 giới. Cho phép lai P: ♂",
+            {
+              "type": "text",
+              "text": "AB",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "ab",
+              "marks": [
+                "italic"
+              ]
+            },
+            "× ♀",
+            {
+              "type": "text",
+              "text": "AB",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "ab",
+              "marks": [
+                "italic"
+              ]
+            },
+            "thu được F1. Biết không xảy ra hiện tượng đột biến. Theo lí thuyết, tỉ lệ cây thân cao, hoa đỏ thuần chủng F1 chiếm tỉ lệ:"
+          ],
+          "points": 0.25,
+          "options": [
+            "4%.",
+            "16%.",
+            "54%.",
+            "21%."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q14",
+          "type": "single_choice",
+          "content": [
+            [
+              "Hình dưới đây là sơ đồ mô tả sự di truyền gene ngoài nhân trong thí nghiệm của Correns trên cây hoa phấn (hoa bốn giờ). Tế bào trứng Lục lạp mang gene không đột biến Cây lá đốm Lục lạp mang gene đột biến Hạt phấn bất kì Hợp tử Cây lá xanh Cây lá đốm Cây lá trắng",
+              {
+                "type": "text",
+                "text": "4",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            {
+              "image": "9.png",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Nhận định nào không đúng về sự di truyền gene ngoài nhân trong thí nghiệm của Correns?"
+            ]
+          ],
+          "points": 0.25,
+          "options": [
+            "Trong tế bào chất của tế bào trứng có thể chỉ chứa lục lạp mang gene đột biến hoặc gene không đột biến hoặc chứa cả hai loại lục lạp này.",
+            "Lá màu đốm hoặc màu trắng là do gene quy định tổng hợp diệp lục trong lục lạp bị đột biến tạo nên.",
+            "Trong giảm phân, lục lạp được phân chia đồng đều về các tế bào trứng.",
+            "Trong quá trình thụ tinh, gene trong lục lạp ở tế bào chất của hợp tử chủ yếu nhận từ tế bào trứng."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q15",
+          "type": "single_choice",
+          "content": "Trong quy trình tách chiết DNA, chất tẩy rửa được sử dụng nhằm mục đích",
+          "points": 0.25,
+          "options": [
+            "Phá huỷ màng tế bào.",
+            "Phân giải RN A.",
+            "Phân giải protein.",
+            "Kết tủa DNA."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q16",
+          "type": "single_choice",
+          "content": "Mendel với công trình nghiên cứu trên đậu Hà Lan, ông đã sử dụng phép lai nào sau đây để kiểm tra giả thuyết của mình?",
+          "points": 0.25,
+          "options": [
+            "Phép lai thuận nghịch.",
+            "Cho các cây F1 tự thụ phấn.",
+            "Phép lai phân tích.",
+            "Phép lai khác dòng."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q17",
+          "type": "single_choice",
+          "content": "Quá trình tổng hợp DNA dựa trên mạch khuôn RNA được gọi là",
+          "points": 0.25,
+          "options": [
+            "dịch mã.",
+            "tái bản.",
+            "phiên mã.",
+            "phiên mã ngược."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q18",
+          "type": "single_choice",
+          "content": "Trong chu kì hoạt động của tim người bình thường, ngăn nào sau đây của tim trực tiếp nhận máu giàu O2 từ tĩnh mạch phổi?",
+          "points": 0.25,
+          "options": [
+            "Tâm nhĩ trái.",
+            "Tâm thất trái.",
+            "Tâm nhĩ phải.",
+            "Tâm thất phải."
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "name": "PHẦN II. TRẮC NGHIỆM ĐÚNG / SAI",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "true_false",
+          "content": [
+            [
+              "Để nghiên cứu tác động của 2 loại thuốc mới (thuốc X và Y) lên bệnh nhân nhiễm virus SARS−CoV−2, người ta tiến hành thử nghiệm trên tế bào người nuôi cấy invitro. Hàm lượng mRNA và protein virus lần lượt được mô tả trong biểu đồ 1,2. Biết rằng điều kiện thí nghiệm như nhau."
+            ],
+            {
+              "image": "10.png",
+              "align": "center",
+              "width": 100
+            },
+            [
+              "Theo lí thuyết, nhận định nào sau đây đúng, nhận định nào sai? Thuốc Y: cơ chế tác động của thuốc là ngăn cản quá trình dịch mã của virus."
+            ]
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q1a",
+              "content": "Thuốc X: lượng mRNA và protein tạo ra ít hơn hẳn so với mẫu đối chứng.",
+              "correct": null
+            },
+            {
+              "id": "q1b",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "5",
+                  "marks": [
+                    "bold"
+                  ]
+                }
+              ],
+              "correct": null
+            },
+            {
+              "id": "q1c",
+              "content": "Thuốc X: ngăn cản quá trình phiên mã của virus dẫn đến giảm mRNA và giảm protein.",
+              "correct": null
+            },
+            {
+              "id": "q1d",
+              "content": "Thuốc Y: lượng mRNA tương đương mẫu đối chứng nhưng lượng protein tạo ra tăng.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "content": [
+            [
+              "Allele",
+              {
+                "type": "text",
+                "text": "B ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "bị các đột biến điểm tại cùng 1 triplet tạo thành các allele",
+              {
+                "type": "text",
+                "text": "B1",
+                "marks": [
+                  "italic"
+                ]
+              },
+              ",",
+              {
+                "type": "text",
+                "text": "B2 ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "và",
+              {
+                "type": "text",
+                "text": "B3",
+                "marks": [
+                  "italic"
+                ]
+              },
+              ". Các chuỗi polipeptide do các allele này quy định lần lượt là",
+              {
+                "type": "text",
+                "text": "B",
+                "marks": [
+                  "italic"
+                ]
+              },
+              ",",
+              {
+                "type": "text",
+                "text": "B1",
+                "marks": [
+                  "italic"
+                ]
+              },
+              ",",
+              {
+                "type": "text",
+                "text": "B2 ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "và",
+              {
+                "type": "text",
+                "text": "B3 ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "chỉ khác nhau ở 1 amino acid đó là glycine ở chuỗi B bị thay bằng alanine ở chuỗi B1, arginine ở chuỗi B2 và tryptophan ở chuỗi B3. Cho biết các codon mã hóa các amino acid tương ứng ở bảng sau. Hãy cho biết nhận định nào sau đây đúng, nhận định nào sai?"
+            ],
+            {
+              "image": "11.png",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q2a",
+              "content": [
+                "Đột biến thay thế nucleotide thứ nhất của triplet mã hóa Gly ở allele",
+                {
+                  "type": "text",
+                  "text": "B ",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                "bằng T hoặc G tạo ra triplet mã hóa Arg ở allele",
+                {
+                  "type": "text",
+                  "text": "B2",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q2b",
+              "content": [
+                "Các allele",
+                {
+                  "type": "text",
+                  "text": "B1",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                ",",
+                {
+                  "type": "text",
+                  "text": "B2 ",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                "và",
+                {
+                  "type": "text",
+                  "text": "B3 ",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                "đều là kết quả đột biến thay thế nucleotide thứ nhất của triplet mã hóa Gly."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q2c",
+              "content": [
+                "Đột biến thay thế nucleotide thứ hai của triplet mã hóa Gly ở allele",
+                {
+                  "type": "text",
+                  "text": "B ",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                "bằng T tạo ra triplet mã hóa Trp ở allele",
+                {
+                  "type": "text",
+                  "text": "B3",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "q2d",
+              "content": [
+                "Đột biến thay thế nucleotide thứ nhất của triplet mã hóa Gly ở allele",
+                {
+                  "type": "text",
+                  "text": "B ",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                "bằng G tạo ra triplet mã hóa Ala ở allele",
+                {
+                  "type": "text",
+                  "text": "B1",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                "."
+              ],
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "true_false",
+          "content": [
+            [
+              "Hình bên minh họa cho cấu tạo của tim và các thành phần của hệ dẫn truyền tim ở người. Theo lí thuyết, nhận định nào sau đây đúng, nhận định nào sai?"
+            ],
+            {
+              "image": "12.png",
+              "align": "center",
+              "width": 50
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q3a",
+              "content": "Cơ chế hoạt động của hệ dẫn truyền tim: Nút xoang nhĩ tự phát xung thần kinh, xung thần kinh truyền xuống tâm nhĩ làm tâm nhĩ co, xung thần kinh từ tâm nhĩ truyền đến bó His và các sợi Purkinje làm cho cơ tâm thất co.",
+              "correct": null
+            },
+            {
+              "id": "q3b",
+              "content": "Một bệnh nhân bị bệnh tim được lắp máy trợ tim có chức năng phát xung điện cho tim. Máy trợ tim này có chức năng tương tự nút xoang nhĩ trong hệ dẫn truyền tim.",
+              "correct": null
+            },
+            {
+              "id": "q3c",
+              "content": "Các chú thích trên hình là các thành phần của hệ dẫn truyền tim: (1) Nút xoang nhĩ, (3) nút nhĩ thất, (5) bó His, (2) nhánh bó His và (4) sợi Purkinje.",
+              "correct": null
+            },
+            {
+              "id": "q3d",
+              "content": "Khi tâm nhĩ co thì van động mạch phổi và van nhĩ thất trái mở, khi tâm thất co thì van động mạch chủ và van nhĩ thất phải mở.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "true_false",
+          "content": [
+            [
+              "Ở một loài động vật, xét 2 cặp gene",
+              {
+                "type": "text",
+                "text": "Aa ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "và",
+              {
+                "type": "text",
+                "text": "Bb ",
+                "marks": [
+                  "italic"
+                ]
+              },
+              "trong đó mỗi cặp gene quy định một cặp tính trạng, allele trội là trội hoàn toàn. Thực hiện 4 phép lai (P1, P2, P3 và P4) giữa các cặp bố mẹ khác nhau,",
+              {
+                "type": "text",
+                "text": "6",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "thu được kết quả F1 được mô tả ở bảng dưới đây. Biết rằng không xảy ra đột biến; nếu có hoán vị gene thì hoán vị gene có thể xảy ra ở một bên đực hoặc cái, hoặc xảy ra hoán vị cả hai giới với tần số hoán vị như nhau. Theo lí thuyết, nhận định nào sau đây đúng, nhận định nào sai?"
+            ],
+            {
+              "image": "13.png",
+              "align": "center",
+              "width": 100
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "q4a",
+              "content": "Phép lai P3 và P4 có thể có kiểu gene giống nhau.",
+              "correct": null
+            },
+            {
+              "id": "q4b",
+              "content": "Ở phép lai P1, nếu cho F1 lai phân tích thì F2 kiểu hình mang hai tính trạng trội chiếm tỉ lệ 24/25.",
+              "correct": null
+            },
+            {
+              "id": "q4c",
+              "content": "Ở phép lai P4, trong số kiểu hình trội về hai tính trạng ở F1, kiểu gene ba allele trội chiếm tỉ lệ 24/59.",
+              "correct": null
+            },
+            {
+              "id": "q4d",
+              "content": "Có 5 sơ đồ lai thỏa mãn dữ kiện của phép lai P2.",
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "name": "PHẦN III. TRẮC NGHIỆM TRẢ LỜI NGẮN",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "short_answer",
+          "content": [
+            "Allele",
+            {
+              "type": "text",
+              "text": "A ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "quy định thân cao trội hoàn toàn so với allele",
+            {
+              "type": "text",
+              "text": "a ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "quy định thân thấp; allele",
+            {
+              "type": "text",
+              "text": "B ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "quy định hoa đỏ trội hoàn toàn so với allele",
+            {
+              "type": "text",
+              "text": "b ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "quy định hoa trắng. \nThế hệ P: Cây thân cao, hoa đỏ tự thụ phấn, được F1 gồm 4 loại kiểu hình, trong đó có 4% số cây thân thấp, hoa đỏ thuần chủng. Cho biết quá trình phát sinh giao tử đực và giao tử cái đều xảy ra hoán vị gene với tần số bằng nhau. Theo lí thuyết, số cây thân cao, hoa đỏ dị hợp 2 cặp gene ở F1 chiếm tỉ lệ bao nhiêu%?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "q2",
+          "type": "short_answer",
+          "content": [
+            "Ở một loài động vật, khi cho giao phối hai dòng thuần chủng thân đen với thân xám thu được F1. Cho F1 giao phối với nhau được F2 có tỉ lệ: \nỞ giới đực: 3 thân đen: 1 thân xám. \nỞ giới cái: 3 thân xám: 1 thân đen.\n Cho biết allele",
+            {
+              "type": "text",
+              "text": "A ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "quy định thân đen trội hoàn toàn so với allele",
+            {
+              "type": "text",
+              "text": "a ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "quy định thân xám và trong quần thể có tối đa 3 loại kiểu gene, không phát sinh đột biến, sức sống của các giao tử và hợp tử ngang nhau, sự biểu hiện của tính trạng không chịu tác động của môi trường sống. Nếu đem các con cái thân xám F2 lai phân tích thì tỉ lệ kiểu hình thân đen ở Fa là bao nhiêu?",
+            {
+              "type": "text",
+              "text": "(Kết quả làm tròn đến 2 chữ số thập phân)",
+              "marks": [
+                "italic"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "q3",
+          "type": "short_answer",
+          "content": [
+            [
+              "Dưới đây là bản gel điện di các mẫu DNA (ở hai locus thuộc 2 nhiễm sắc thể khác nhau) của một người con, một người mẹ và bốn người đàn ông được nghi là cha của đứa bé (được kí hiệu là 1, 2, 3 và 4).",
+              {
+                "type": "text",
+                "text": "7",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            {
+              "image": "14.png",
+              "align": "center",
+              "width": 70
+            },
+            [
+              "Dựa vào hai locus gene trên, hãy cho biết người nào có thể là cha của đứa bé?"
+            ]
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "q4",
+          "type": "short_answer",
+          "content": "Ở một loài thực vật, xét 2 tính trạng, mỗi tính trạng đều do một gene có 2 allele quy định, allele trội là trội hoàn toàn. Hai cặp gene này cùng nằm trên một cặp NST thường, hoán vị gene xảy ra ở cả quá trình phát sinh giao tử đực và giao tử cái. Giao phấn cây thuần chủng có kiểu hình trội về cả 2 tính trạng với cây có kiểu hình lặn về cả 2 tính trạng (P), thu được F1. Cho F1 giao phấn với nhau, thu được F2. Biết rằng không xảy ra đột biến. Theo lí thuyết, có tối đa bao nhiêu kiểu gene ở F2?",
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "q5",
+          "type": "short_answer",
+          "content": [
+            "Ở một loài thực vật allele",
+            {
+              "type": "text",
+              "text": "A ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "quy định hoa đỏ trội hoàn toàn; allele",
+            {
+              "type": "text",
+              "text": "a ",
+              "marks": [
+                "italic"
+              ]
+            },
+            "quy định hoa trắng lặn hoàn toàn. Lấy cây hoa đỏ thuần chủng lai với cây hoa trắng được F1. Lấy F1 lai với F1 được F2. Lấy tất cả các cây có kiểu hình hoa đỏ ở F2 cho giao phối ngẫu nhiên với nhau được F3. Theo lí thuyết, cây hoa đỏ thuần chủng ở F3 chiếm tỉ lệ là bao nhiêu?",
+            {
+              "type": "text",
+              "text": "(Tính làm tròn đến 2 chữ số sau dấu phẩy)",
+              "marks": [
+                "italic"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "q6",
+          "type": "short_answer",
+          "content": [
+            "Một gene ở sinh vật nhân thực có chiều dài 272 nm và có tỉ lệ (A+T)/(G+C) = 1. Một 4 đột biến không làm thay đổi chiều dài của gene nhưng làm cho số liên kết hydrogen giảm 3 liên kết. Tỉ lệ số nucleotide loại A của gene ban đầu so với số nucleotide loại A của gene đột biến là bao nhiêu?",
+            {
+              "type": "text",
+              "text": "(Tính làm tròn đến hai chữ số sau dấu phẩy).",
+              "marks": [
+                "italic"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

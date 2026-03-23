@@ -1,0 +1,203 @@
+{
+  "generated_at": "2026-03-23T12:48:07.907050+00:00",
+  "input_dir": "D:\\Web sv\\dtht\\input",
+  "output_dir": "D:\\Web sv\\dtht\\output",
+  "subject": "sinh",
+  "time": 50,
+  "summary": {
+    "total_files": 8,
+    "success_count": 8,
+    "failure_count": 0
+  },
+  "files": [
+    {
+      "source_file": "D:\\Web sv\\dtht\\input\\56. 🔥Liên trường THPT Sở Hà Nội - L2 2026🔥\\Liên-Trường-THPT-Hà-Nội-L2 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\input\\56. 🔥Liên trường THPT Sở Hà Nội - L2 2026🔥",
+      "status": "success",
+      "slug": "56-lien-truong-thpt-so-ha-noi-l2-2026",
+      "title": "Liên-Trường-THPT-Hà-Nội-L2 2026",
+      "output_dir": "D:\\Web sv\\dtht\\output\\56-lien-truong-thpt-so-ha-noi-l2-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "table row mismatch: raw=30, public=14"
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 7,
+          "image_count_public": 7,
+          "table_rows_raw": 30,
+          "table_rows_public": 14
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\input\\57. 🔥Cụm THPT Chuyên Phan Bội Châu & Chuyên Hà Tĩnh - L2 2026🔥\\Cụm-THPT-Chuyên-PBC-Chuyên-Hà-Tĩnh-L2 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\input\\57. 🔥Cụm THPT Chuyên Phan Bội Châu & Chuyên Hà Tĩnh - L2 2026🔥",
+      "status": "success",
+      "slug": "57-cum-thpt-chuyen-phan-boi-chau-chuyen-ha-tinh-l2-2026",
+      "title": "Cụm-THPT-Chuyên-PBC-Chuyên-Hà-Tĩnh-L2 2026",
+      "output_dir": "D:\\Web sv\\dtht\\output\\57-cum-thpt-chuyen-phan-boi-chau-chuyen-ha-tinh-l2-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 14,
+          "image_count_public": 14,
+          "table_rows_raw": 21,
+          "table_rows_public": 21
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\input\\58. 🔥 THPT CHUYÊN BẮC NINH - LẦN 2 2026 🔥\\CHUYÊN BẮC NINH - LẦN 2 2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\input\\58. 🔥 THPT CHUYÊN BẮC NINH - LẦN 2 2026 🔥",
+      "status": "success",
+      "slug": "58-thpt-chuyen-bac-ninh-lan-2-2026",
+      "title": "CHUYÊN BẮC NINH - LẦN 2 2026",
+      "output_dir": "D:\\Web sv\\dtht\\output\\58-thpt-chuyen-bac-ninh-lan-2-2026",
+      "converted_from_doc": false,
+      "question_count": 54,
+      "validation": {
+        "errors": [
+          "part1.q15: single_choice must contain A/B/C/D in order.",
+          "part1.q32: single_choice must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 54,
+          "question_count_public": 54,
+          "image_count_raw": 8,
+          "image_count_public": 8,
+          "table_rows_raw": 30,
+          "table_rows_public": 30
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\input\\59. 🔥THPT Chuyên KHTN (Hà Nội) - Lần I 2026🔥\\THPT-Chuyên-KHTN-Lần-I-2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\input\\59. 🔥THPT Chuyên KHTN (Hà Nội) - Lần I 2026🔥",
+      "status": "success",
+      "slug": "59-thpt-chuyen-khtn-ha-noi-lan-i-2026",
+      "title": "THPT-Chuyên-KHTN-Lần-I-2026",
+      "output_dir": "D:\\Web sv\\dtht\\output\\59-thpt-chuyen-khtn-ha-noi-lan-i-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 5,
+          "image_count_public": 5,
+          "table_rows_raw": 8,
+          "table_rows_public": 8
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\input\\60. Cụm THPT Tỉnh Bắc Ninh - KSCL L1 2026\\De_0401.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\input\\60. Cụm THPT Tỉnh Bắc Ninh - KSCL L1 2026",
+      "status": "success",
+      "slug": "60-cum-thpt-tinh-bac-ninh-kscl-l1-2026",
+      "title": "De_0401",
+      "output_dir": "D:\\Web sv\\dtht\\output\\60-cum-thpt-tinh-bac-ninh-kscl-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [
+          "images missing in public JSON: ['img_3139fea8fec9', 'img_8078547aa64b', 'img_d511250bd448']",
+          "table row mismatch: raw=33, public=30",
+          "part1.q2: single_choice must contain A/B/C/D in order.",
+          "part1.q17: single_choice must contain A/B/C/D in order.",
+          "part1.q18: single_choice must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 16,
+          "image_count_public": 13,
+          "table_rows_raw": 33,
+          "table_rows_public": 30
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\input\\62. 🔥Sở Sơn La - Thi thử Lần 1 2026🔥\\Sở-Sơn-La - Lần-1-2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\input\\62. 🔥Sở Sơn La - Thi thử Lần 1 2026🔥",
+      "status": "success",
+      "slug": "62-so-son-la-thi-thu-lan-1-2026",
+      "title": "Sở-Sơn-La - Lần-1-2026",
+      "output_dir": "D:\\Web sv\\dtht\\output\\62-so-son-la-thi-thu-lan-1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 10,
+          "image_count_public": 10,
+          "table_rows_raw": 14,
+          "table_rows_public": 14
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\input\\63. Liên trường Sở Phú Thọ - KSCL L1 2026\\Mẫu 4. Đề khảo sát môn SINH_4001.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\input\\63. Liên trường Sở Phú Thọ - KSCL L1 2026",
+      "status": "success",
+      "slug": "63-lien-truong-so-phu-tho-kscl-l1-2026",
+      "title": "Mẫu 4. Đề khảo sát môn SINH_4001",
+      "output_dir": "D:\\Web sv\\dtht\\output\\63-lien-truong-so-phu-tho-kscl-l1-2026",
+      "converted_from_doc": false,
+      "question_count": 28,
+      "validation": {
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 28,
+          "question_count_public": 28,
+          "image_count_raw": 7,
+          "image_count_public": 7,
+          "table_rows_raw": 5,
+          "table_rows_public": 5
+        }
+      }
+    },
+    {
+      "source_file": "D:\\Web sv\\dtht\\input\\64. THPT Lý Thái Tổ - Lần 1 2026\\thpt-ly-thai-to-L1-2026.docx",
+      "source_group_dir": "D:\\Web sv\\dtht\\input\\64. THPT Lý Thái Tổ - Lần 1 2026",
+      "status": "success",
+      "slug": "64-thpt-ly-thai-to-lan-1-2026",
+      "title": "thpt-ly-thai-to-L1-2026",
+      "output_dir": "D:\\Web sv\\dtht\\output\\64-thpt-ly-thai-to-lan-1-2026",
+      "converted_from_doc": false,
+      "question_count": 27,
+      "validation": {
+        "errors": [
+          "part1.q16: single_choice must contain A/B/C/D in order."
+        ],
+        "warnings": [],
+        "stats": {
+          "question_count_raw": 27,
+          "question_count_public": 27,
+          "image_count_raw": 17,
+          "image_count_public": 17,
+          "table_rows_raw": 0,
+          "table_rows_public": 0
+        }
+      }
+    }
+  ]
+}

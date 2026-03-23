@@ -46,6 +46,47 @@ class ErrorBoundary extends React.Component {
 }
 
 
+function useDraggableScroll() {
+  const ref = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragged, setDragged] = useState(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const onMouseDown = useCallback((e) => {
+    if (!ref.current) return;
+    setIsDragging(true);
+    setDragged(false);
+    startX.current = e.pageX - ref.current.offsetLeft;
+    scrollLeft.current = ref.current.scrollLeft;
+  }, []);
+
+  const onMouseLeave = useCallback(() => setIsDragging(false), []);
+  const onMouseUp = useCallback(() => setIsDragging(false), []);
+
+  const onMouseMove = useCallback((e) => {
+    if (!isDragging || !ref.current) return;
+    e.preventDefault();
+    const x = e.pageX - ref.current.offsetLeft;
+    if (Math.abs(x - startX.current) > 3) {
+      setDragged(true);
+    }
+    ref.current.scrollLeft = scrollLeft.current - (x - startX.current) * 2;
+  }, [isDragging]);
+
+  return {
+    events: {
+      ref,
+      onMouseDown,
+      onMouseLeave,
+      onMouseUp,
+      onMouseMove
+    },
+    dragged,
+    isDragging
+  };
+}
+
 export default function Library() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -66,6 +107,9 @@ export default function Library() {
   const [notifications, setNotifications] = useState([]);
   const [showNotifs, setShowNotifs] = useState(false);
   const notifRef = useRef(null);
+
+  const categoriesScroll = useDraggableScroll();
+  const featuredScroll = useDraggableScroll();
 
   const fetchDocuments = useCallback(async () => {
     try {
@@ -325,7 +369,16 @@ export default function Library() {
 
         <main className="flex-1 relative z-10 pt-2">
           {/* Categories */}
-          <div className="flex gap-2 p-4 overflow-x-auto no-scrollbar">
+          <div 
+            {...categoriesScroll.events}
+            onClickCapture={(e) => {
+              if (categoriesScroll.dragged) {
+                e.stopPropagation();
+                e.preventDefault();
+              }
+            }}
+            className={`flex gap-2 p-4 overflow-x-auto no-scrollbar ${categoriesScroll.isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+          >
             {categoriesList.map(cat => (
               <button
                 key={cat.value}
@@ -350,7 +403,16 @@ export default function Library() {
                   <span className="material-symbols-outlined text-amber-400 text-lg">star</span>
                   <h2 className="text-sm font-bold uppercase tracking-widest text-amber-400">Tài liệu nổi bật</h2>
                 </div>
-                <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+                <div 
+                  {...featuredScroll.events}
+                  onClickCapture={(e) => {
+                    if (featuredScroll.dragged) {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }
+                  }}
+                  className={`flex gap-3 overflow-x-auto no-scrollbar pb-1 ${featuredScroll.isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                >
                   {featured.map(doc => {
                     const safeFileUrl = sanitizeExternalUrl(doc.file_url);
 
@@ -423,62 +485,78 @@ export default function Library() {
                 const safeFileUrl = sanitizeExternalUrl(doc.file_url);
 
                 return (
-                <div key={doc.id} className="bg-white/5 backdrop-blur-md border border-white/10 p-2.5 sm:p-3 rounded-2xl flex flex-col gap-2.5 sm:gap-3 hover:bg-white/10 transition-colors cursor-pointer group relative">
+                <div key={doc.id} className="bg-white/5 backdrop-blur-md border border-white/10 p-3 sm:p-4 rounded-2xl flex flex-col gap-3 hover:bg-white/10 transition-all cursor-pointer group relative shadow-sm hover:shadow-md">
                   {/* Report button */}
                   {user && doc.uploaded_by !== user.id && (
                     <button
                       onClick={(e) => { e.stopPropagation(); openReportModal(doc); }}
                       title="Báo cáo tài liệu"
-                      className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/0 hover:bg-red-500/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                      className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/20 hover:bg-red-500/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                     >
                       <span className="material-symbols-outlined text-[16px] text-slate-400 hover:text-red-400 transition-colors">flag</span>
                     </button>
                   )}
 
-                  <div className="aspect-[4/3] rounded-xl bg-[#306ee8]/20 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay bg-gradient-to-br from-indigo-500 to-purple-500 group-hover:scale-110 transition-transform duration-500"></div>
-                    <span className="material-symbols-outlined text-3xl sm:text-4xl text-white drop-shadow-md relative z-10">picture_as_pdf</span>
+                  <div className="flex gap-3 items-start pr-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-xl bg-[#306ee8]/20 flex items-center justify-center relative overflow-hidden">
+                      <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay bg-gradient-to-br from-indigo-500 to-purple-500 group-hover:scale-110 transition-transform duration-500"></div>
+                      <span className="material-symbols-outlined text-xl sm:text-2xl text-white drop-shadow-md relative z-10">picture_as_pdf</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-sm text-white line-clamp-2 leading-snug">{doc.title}</h3>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        {doc.uploaded_by ? (
+                          <Link to={`/profile/${doc.uploaded_by}`} className="text-[11px] text-blue-400 hover:text-blue-300 hover:underline truncate max-w-[100px]">
+                            {doc.author_name}
+                          </Link>
+                        ) : (
+                          <p className="text-[11px] text-slate-400 truncate max-w-[100px]">{doc.author_name}</p>
+                        )}
+                        {getSafeDate(doc.publish_date) && (
+                          <>
+                            <span className="text-slate-600 text-[10px]">•</span>
+                            <p className="text-[10px] text-slate-400 flex items-center gap-0.5 whitespace-nowrap"><span className="material-symbols-outlined text-[10px]">calendar_month</span> {getSafeDate(doc.publish_date)}</p>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <h3 className="font-bold text-sm line-clamp-2 leading-snug">{doc.title}</h3>
-                    {doc.uploaded_by ? (
-                      <Link to={`/profile/${doc.uploaded_by}`} className="text-[11px] text-blue-400 hover:text-blue-300 hover:underline">
-                        {doc.author_name}
-                      </Link>
-                    ) : (
-                      <p className="text-[11px] text-slate-400">{doc.author_name}</p>
+
+                  <div className="flex flex-col gap-2">
+                    {doc.description && (
+                      <p className="text-[11px] sm:text-xs text-slate-400 line-clamp-2 leading-relaxed">{doc.description}</p>
                     )}
-                    {getSafeDate(doc.publish_date) && (
-                      <p className="text-[10px] text-slate-400"><span className="material-symbols-outlined text-[10px] align-middle">calendar_month</span> {getSafeDate(doc.publish_date)}</p>
-                    )}
-                    <div className="flex flex-wrap gap-1 mt-0.5">
+                    <div className="flex flex-wrap gap-1.5">
                       {doc.major && doc.education_level === 'university' && (
-                        <span className="text-[10px] font-semibold uppercase tracking-wide text-rose-400/80 bg-rose-500/10 rounded px-1.5 py-0.5 inline-block">
+                        <span className="text-[9px] font-semibold uppercase tracking-wide text-rose-400/80 bg-rose-500/10 rounded-md px-1.5 py-0.5 inline-block">
                           {doc.major}
                         </span>
                       )}
                       {doc.category && (
-                        <span className={`text-[10px] font-semibold uppercase tracking-wide ${doc.education_level === 'university' ? 'text-[#7f13ec]/80 bg-[#7f13ec]/10' : 'text-[#306ee8]/80 bg-[#306ee8]/10'} rounded px-1.5 py-0.5 inline-block`}>
+                        <span className={`text-[9px] font-semibold uppercase tracking-wide ${doc.education_level === 'university' ? 'text-[#7f13ec]/80 bg-[#7f13ec]/10' : 'text-[#306ee8]/80 bg-[#306ee8]/10'} rounded-md px-1.5 py-0.5 inline-block`}>
                           {getDisplayCategory(doc)}
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-500 line-clamp-1 mt-1">{doc.description}</p>
                   </div>
-                  {safeFileUrl ? (
-                    <a
-                      href={safeFileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-1.5 sm:py-2 bg-[#306ee8]/20 hover:bg-[#306ee8]/40 text-blue-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-colors border border-[#306ee8]/20 mt-auto"
-                    >
-                      <span className="material-symbols-outlined text-[14px] sm:text-[16px]">download</span> Tải về
-                    </a>
-                  ) : (
-                    <div className="w-full py-1.5 sm:py-2 bg-red-500/10 text-red-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1 border border-red-500/20 mt-auto">
-                      <span className="material-symbols-outlined text-[14px] sm:text-[16px]">link_off</span> Link lỗi
-                    </div>
-                  )}
+
+                  <div className="mt-auto pt-2">
+                    {safeFileUrl ? (
+                      <a
+                        href={safeFileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-2 bg-[#306ee8]/10 hover:bg-[#306ee8]/30 text-blue-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-[#306ee8]/20 group-hover:border-[#306ee8]/40"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">download</span> Tải về
+                      </a>
+                    ) : (
+                      <div className="w-full py-2 bg-red-500/10 text-red-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 border border-red-500/20">
+                        <span className="material-symbols-outlined text-[16px]">link_off</span> Link lỗi
+                      </div>
+                    )}
+                  </div>
                 </div>
               )})
             )}

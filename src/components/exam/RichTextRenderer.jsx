@@ -6,21 +6,33 @@ export default function RichTextRenderer({ content }) {
     if (!content) return null;
 
     const renderFormattedText = (text, keyPrefix) => {
-        // Match bold (**...**) and inline math ($...$)
-        const parts = String(text).split(/(\*\*.*?\*\*|\$.*?\$)/g).filter(Boolean);
+        // Handle literal newlines or escaped \n
+        const lines = String(text).split(/\\n|\n/);
 
-        return parts.map((part, idx) => {
-            const boldMatch = part.match(/^\*\*(.*)\*\*$/s);
-            if (boldMatch) {
-                return <strong key={`${keyPrefix}-bold-${idx}`}>{boldMatch[1]}</strong>;
-            }
+        return lines.map((line, lIdx) => {
+            // Match bold (**...**) and inline math ($...$)
+            const parts = line.split(/(\*\*.*?\*\*|\$.*?\$)/g).filter(Boolean);
 
-            const mathMatch = part.match(/^\$(.*)\$$/s);
-            if (mathMatch) {
-                return <InlineMath key={`${keyPrefix}-math-${idx}`} math={mathMatch[1]} />;
-            }
+            const renderedLine = parts.map((part, idx) => {
+                const boldMatch = part.match(/^\*\*(.*)\*\*$/s);
+                if (boldMatch) {
+                    return <strong key={`${keyPrefix}-${lIdx}-bold-${idx}`}>{boldMatch[1]}</strong>;
+                }
 
-            return <React.Fragment key={`${keyPrefix}-text-${idx}`}>{part}</React.Fragment>;
+                const mathMatch = part.match(/^\$(.*)\$$/s);
+                if (mathMatch) {
+                    return <InlineMath key={`${keyPrefix}-${lIdx}-math-${idx}`} math={mathMatch[1]} />;
+                }
+
+                return <React.Fragment key={`${keyPrefix}-${lIdx}-text-${idx}`}>{part}</React.Fragment>;
+            });
+
+            return (
+                <React.Fragment key={`${keyPrefix}-line-${lIdx}`}>
+                    {renderedLine}
+                    {lIdx < lines.length - 1 && <br />}
+                </React.Fragment>
+            );
         });
     };
 
@@ -110,7 +122,16 @@ export default function RichTextRenderer({ content }) {
 
         // Legacy / Verbose format
         if (node.type === 'text') {
-            return <span key={index}>{renderFormattedText(node.text || '', `legacy-text-${index}`)}</span>;
+            let rendered = renderFormattedText(node.text || '', `legacy-text-${index}`);
+            if (node.marks && Array.isArray(node.marks)) {
+                node.marks.forEach((mark, mIdx) => {
+                    if (mark === 'sup') rendered = <sup key={`${index}-${mIdx}`}>{rendered}</sup>;
+                    if (mark === 'sub') rendered = <sub key={`${index}-${mIdx}`}>{rendered}</sub>;
+                    if (mark === 'italic') rendered = <em key={`${index}-${mIdx}`}>{rendered}</em>;
+                    if (mark === 'bold') rendered = <strong key={`${index}-${mIdx}`}>{rendered}</strong>;
+                });
+            }
+            return <span key={index}>{rendered}</span>;
         }
         if (node.type === 'math') {
             if (node.display === 'block') {
@@ -206,22 +227,36 @@ export default function RichTextRenderer({ content }) {
                 <div key={index} className="my-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm ring-1 ring-slate-900/5">
                     <table className="w-full border-collapse text-[13px] sm:text-sm text-center">
                         <tbody className="divide-y divide-slate-200">
-                            {block.rows?.map((row, rowIdx) => (
-                                <tr key={rowIdx} className="divide-x divide-slate-200 hover:bg-slate-50/20 transition-colors">
-                                    {row.map((cell, cellIdx) => (
-                                        <td
-                                            key={cellIdx}
-                                            className={`p-3 transition-colors ${rowIdx === 0 ? 'bg-slate-50/80 font-bold text-slate-700' : 'text-slate-600'}`}
-                                        >
-                                            <div className="flex flex-wrap items-center justify-center gap-1.5 leading-relaxed min-h-[1.5rem] min-w-[3rem]">
-                                                {Array.isArray(cell)
-                                                    ? cell.map((nc, ni) => renderInlineNode(nc, ni))
-                                                    : renderInlineNode(cell, 0)}
-                                            </div>
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
+                            {block.rows?.map((row, rowIdx) => {
+                                // A row that was completely swallowed by rowspans will have no cells
+                                if (!row || row.length === 0) return null;
+                                
+                                return (
+                                    <tr key={rowIdx} className="divide-x divide-slate-200 hover:bg-slate-50/20 transition-colors">
+                                        {row.map((cellData, cellIdx) => {
+                                            const isObjectCell = cellData && typeof cellData === 'object' && !Array.isArray(cellData) && cellData.content !== undefined;
+                                            const actualCell = isObjectCell ? cellData.content : cellData;
+                                            const colSpan = isObjectCell ? cellData.colspan : 1;
+                                            const rowSpan = isObjectCell ? cellData.rowspan : 1;
+                                            
+                                            return (
+                                                <td
+                                                    key={cellIdx}
+                                                    colSpan={colSpan > 1 ? colSpan : undefined}
+                                                    rowSpan={rowSpan > 1 ? rowSpan : undefined}
+                                                    className={`p-3 transition-colors ${rowIdx === 0 ? 'bg-slate-50/80 font-bold text-slate-700' : 'text-slate-600'}`}
+                                                >
+                                                    <div className="flex flex-wrap items-center justify-center gap-1.5 leading-relaxed min-h-[1.5rem] min-w-[3rem]">
+                                                        {Array.isArray(actualCell)
+                                                            ? actualCell.map((nc, ni) => renderInlineNode(nc, ni))
+                                                            : renderInlineNode(actualCell, 0)}
+                                                    </div>
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

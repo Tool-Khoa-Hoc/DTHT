@@ -204,7 +204,16 @@ def cmd_build(args):
             try:
                 d = load_exam_json(jp)
                 ui = get_subject_ui_meta(d.get('subject', ''))
-                idx.append({"id": d.get('id', ef.name), "title": d.get('title'), "subject": d.get('subject'), "color": ui.get('color'), "icon": ui.get('icon'), "questions": get_question_count(d)})
+                mtime = jp.stat().st_mtime
+                idx.append({
+                    "id": d.get('id', ef.name), 
+                    "title": d.get('title'), 
+                    "subject": d.get('subject'), 
+                    "color": ui.get('color'), 
+                    "icon": ui.get('icon'), 
+                    "questions": get_question_count(d),
+                    "updated_at": mtime
+                })
             except: pass
     save_exam_json(pub / "index.json", idx)
     console.print(f"[bold green]✔ Built index.json ({len(idx)} items)[/]")

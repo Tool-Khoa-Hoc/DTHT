@@ -9,7 +9,7 @@ import { questionHasOptionContent, questionHasStatementContent } from '../utils/
 const AUTOSAVE_DEBOUNCE_MS = 2000; // 2s sau khi chọn đáp án
 const AUTOSAVE_INTERVAL_MS = 30000; // 30s định kỳ
 const FREE_DAILY_LIMIT = 3;
-const CHOICE_LABELS = ['A', 'B', 'C', 'D'];
+const CHOICE_LABELS = ['A', 'B', 'C', 'D']; 
 const TRUE_FALSE_LABELS = ['a', 'b', 'c', 'd'];
 
 const getQuestionKey = (partId, questionId) => `${partId}.${questionId}`;

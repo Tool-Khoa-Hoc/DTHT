@@ -5,15 +5,12 @@ from dataclasses import dataclass
 
 
 SECTION_KEYWORD_RE = r"(?:PHẦN|PHAN|PART)"
-SECTION_INDEX_RE = r"(?:III|II|I|[123])"
+SECTION_INDEX_RE = r"(?:IV|III|II|I|[1234])"
 SECTION_TRAILER_RE = r"(?=[\s\.\:\)\-]|$)"
 
+# Note: We now use match_section_header logic to filter out false positives
 SECTION_HEADER_RE = re.compile(
-    rf"^\s*{SECTION_KEYWORD_RE}\s*({SECTION_INDEX_RE}){SECTION_TRAILER_RE}\s*[\.\:\)\-]?\s*(.*)$",
-    re.IGNORECASE,
-)
-EMBEDDED_SECTION_BOUNDARY_RE = re.compile(
-    rf"(?:(?<=\])|(?<=[\.\:\)\-]))\s+(?=(?:\[\!b:(?:\$)?)?{SECTION_KEYWORD_RE}\s*{SECTION_INDEX_RE}{SECTION_TRAILER_RE})",
+    rf"^\s*({SECTION_KEYWORD_RE})\s*({SECTION_INDEX_RE}){SECTION_TRAILER_RE}\s*[\.\:\)\-]?\s*(.*)$",
     re.IGNORECASE,
 )
 
@@ -46,7 +43,20 @@ def match_section_header(text: str) -> SectionHeader | None:
     match = SECTION_HEADER_RE.match(text or "")
     if not match:
         return None
-    raw_index = match.group(1)
+        
+    keyword = match.group(1)
+    raw_index = match.group(2)
+    tail = match.group(3) or ""
+    
+    # Strict heuristic for false positives:
+    # If the word 'PHẦN' is not completely uppercase, it might be a description like 'Phần 1 ADN'.
+    # In that case, the tail MUST be empty or contain exam-related instructions.
+    if not keyword.isupper():
+        if tail.strip():
+            exam_keywords = re.compile(r"(trắc nghiệm|thí sinh|phương án|lựa chọn|câu|điểm|tự luận|trả lời|ngắn|đúng|sai)", re.IGNORECASE)
+            if not exam_keywords.search(tail):
+                return None
+                
     part_index = _coerce_part_index(raw_index)
     if part_index is None:
         return None
@@ -59,7 +69,4 @@ def match_section_header(text: str) -> SectionHeader | None:
 
 
 def find_embedded_section_start(text: str) -> int | None:
-    match = EMBEDDED_SECTION_BOUNDARY_RE.search(text or "")
-    if not match:
-        return None
-    return match.end()
+    return None

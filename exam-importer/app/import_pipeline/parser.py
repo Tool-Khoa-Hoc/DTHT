@@ -10,7 +10,7 @@ from .types import ParseResult
 
 SPACE_RE = re.compile(r"\s+")
 QUESTION_RE = re.compile(
-    r"^\s*(?:Câu|Cau|Question|Q)\s*(?:số|so|number|no\.?)?\s*(\d{1,4})\s*[:\.\)\-]\s*(.*)$",
+    r"^\s*(?:Câu|Cau|Question|Q)\s*(?:số|so|number|no\.?)?\s*(\d{1,4})(?:\s*[:\.\)\-])?\s*(.*)$",
     re.IGNORECASE,
 )
 NUMERIC_QUESTION_RE = re.compile(r"^\s*(\d{1,4})\s*[\.\)]\s*(.+)$")
@@ -35,7 +35,7 @@ QUESTION_RANGE_RE = re.compile(
     re.IGNORECASE,
 )
 EMBEDDED_QUESTION_RE = re.compile(
-    r"(?<=[^\s])((?:Câu|Cau|Question|Q)\s*(?:số|so|number|no\.?)?\s*\d{1,4}\s*[:\.\)\-])",
+    r"(?<=[^\s])((?:Câu|Cau|Question|Q)\s*(?:số|so|number|no\.?)?\s*\d{1,4}(?:\s*[:\.\)\-])?)",
     re.IGNORECASE,
 )
 INLINE_CHOICE_RE = re.compile(r"(?<![\w])([A-D])\.\s*")
@@ -373,7 +373,7 @@ def _parse_question_start(line: str, *, allow_numeric_fallback: bool = True) -> 
     direct = QUESTION_RE.match(plain_line)
     if direct:
         stem = re.sub(
-            r"^\s*(?:Câu|Cau|Question|Q)\s*(?:số|so|number|no\.?)?\s*\d{1,4}\s*[:\.\)\-]\s*",
+            r"^\s*(?:Câu|Cau|Question|Q)\s*(?:số|so|number|no\.?)?\s*\d{1,4}(?:\s*[:\.\)\-])?\s*",
             "",
             candidate_line,
             flags=re.IGNORECASE,
@@ -444,8 +444,33 @@ def _parse_table_row(line: str) -> dict[str, Any] | None:
     match = TABLE_ROW_RE.match(line.strip())
     if not match:
         return None
-    cells = [cell.strip() for cell in match.group(1).split("|")]
-    return {"type": "table_row", "cells": [_parse_inline_fragments(cell) for cell in cells]}
+        
+    raw_content = match.group(1).strip()
+    if not raw_content:
+        return {"type": "table_row", "cells": []}
+        
+    cells = [cell.strip() for cell in raw_content.split("|")]
+    parsed_cells: list[dict[str, Any]] = []
+    
+    for cell in cells:
+        colspan, rowspan = 1, 1
+        m = re.match(r"^\{\{([cr=\d,]+)\}\}\s*(.*)$", cell)
+        if m:
+            props = m.group(1).split(',')
+            for p in props:
+                if p.startswith("c="): colspan = int(p[2:])
+                if p.startswith("r="): rowspan = int(p[2:])
+            content = m.group(2)
+        else:
+            content = cell
+            
+        parsed_cells.append({
+            "colspan": colspan,
+            "rowspan": rowspan,
+            "content": _parse_inline_fragments(content)
+        })
+        
+    return {"type": "table_row", "cells": parsed_cells}
 
 
 def _join_wrapped_lines(lines: list[str]) -> str:
@@ -894,20 +919,50 @@ def parse_full_raw_markup(full_raw_markup: str, *, title: str = "Imported exam")
 
         plain_cleaned = _strip_markup_for_detection(cleaned_line)
 
-        option = OPTION_RE.match(plain_cleaned)
-        if option and current_question.qtype != "short_answer":
-            label = option.group(1).upper()
-            content = re.sub(r"^\s*([A-D])\s*[\.\):\-]\s*", "", cleaned_line).strip()
+        option_match = None
+        option_content = None
+        if _is_table_line(cleaned_line):
+            cells = _split_table_cells(cleaned_line)
+            if cells:
+                first_cell_plain = _strip_markup_for_detection(cells[0])
+                om = OPTION_RE.match(first_cell_plain)
+                if om:
+                    option_match = om
+                    option_content = cells[0]
+        else:
+            om = OPTION_RE.match(plain_cleaned)
+            if om:
+                option_match = om
+                option_content = cleaned_line
+
+        if option_match and current_question.qtype != "short_answer" and option_content is not None:
+            label = option_match.group(1).upper()
+            content = re.sub(r"^\s*([A-D])\s*[\.\):\-]\s*", "", option_content).strip()
             current_question.choices.setdefault(label, [])
             if content:
                 current_question.choices[label].append(content)
             current_question.last_bucket = ("choice", label)
             continue
 
-        statement = TF_RE.match(plain_cleaned)
-        if statement:
-            sid = statement.group(1).lower()
-            content = re.sub(r"^\s*([a-dA-D])\)\s*", "", cleaned_line).strip()
+        statement_match = None
+        statement_content = None
+        if _is_table_line(cleaned_line):
+            cells = _split_table_cells(cleaned_line)
+            if cells:
+                first_cell_plain = _strip_markup_for_detection(cells[0])
+                sm = TF_RE.match(first_cell_plain)
+                if sm:
+                    statement_match = sm
+                    statement_content = cells[0]
+        else:
+            sm = TF_RE.match(plain_cleaned)
+            if sm:
+                statement_match = sm
+                statement_content = cleaned_line
+
+        if statement_match and statement_content is not None:
+            sid = statement_match.group(1).lower()
+            content = re.sub(r"^\s*([a-dA-D])\)\s*", "", statement_content).strip()
             current_question.statements.setdefault(sid, [])
             if content:
                 current_question.statements[sid].append(content)
