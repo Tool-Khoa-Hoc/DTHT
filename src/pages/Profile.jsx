@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { getUserRank } from '../utils/rankHelper';
 import Avatar from '../components/Avatar';
+import { getExamIndex } from '../utils/examIndexCache';
 
 // Helper: đếm ngược VIP
 function useVipCountdown(vipExpiredAt) {
@@ -105,12 +106,12 @@ export default function Profile() {
 
     const fetchExamRoutes = async () => {
         try {
-            const res = await fetch('/data/exams/index.json');
-            if (!res.ok) throw new Error('Exam index not found');
-            const data = await res.json();
+            const data = await getExamIndex();
             const nextMap = {};
-            data.forEach((exam) => {
-                nextMap[`${exam.subjectFolder}:${exam.id}`] = exam.examPath || exam.id;
+            (Array.isArray(data) ? data : []).forEach((exam) => {
+                const subjectFolder = String(exam.subjectFolder || exam.subject || '').trim().toLowerCase();
+                if (!subjectFolder || !exam.id) return;
+                nextMap[`${subjectFolder}:${exam.id}`] = exam.examPath || exam.id;
             });
             setExamRouteMap(nextMap);
         } catch (error) {
@@ -119,7 +120,7 @@ export default function Profile() {
     };
 
     const getExamRoutePath = (subjectFolder, examId) => (
-        examRouteMap[`${subjectFolder}:${examId}`] || examId
+        examRouteMap[`${String(subjectFolder || '').trim().toLowerCase()}:${examId}`] || examId
     );
 
     const handleRedo = async (result) => {

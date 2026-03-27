@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useExamAccess } from '../hooks/useExamAccess';
 import RichTextRenderer from '../components/exam/RichTextRenderer';
 import { questionHasOptionContent, questionHasStatementContent } from '../utils/examQuestionLayout';
+import { getExamIndex } from '../utils/examIndexCache';
 
 const AUTOSAVE_DEBOUNCE_MS = 2000; // 2s sau khi chọn đáp án
 const AUTOSAVE_INTERVAL_MS = 30000; // 30s định kỳ
@@ -43,29 +44,81 @@ const normalizeExamMediaPaths = (value, basePath) => {
     return next;
 };
 
-const getExpectedAnswer = (examData, partId, question) => {
-    const topLevelAnswer = examData?.answer_key?.[getQuestionKey(partId, question.id)];
-    if (topLevelAnswer !== undefined) return topLevelAnswer;
-
-    if (question.type === 'single_choice' || question.type === 'short_answer') {
-        return question.correct_answer;
+const sanitizeQuestionPayloadForTaking = (question) => {
+    if (!question || typeof question !== 'object') {
+        return question;
     }
 
-    if (question.type === 'true_false') {
-        const statementAnswers = {};
-        let hasAny = false;
+    const nextQuestion = { ...question };
+    delete nextQuestion.answer_key;
+    delete nextQuestion.answerKey;
+    delete nextQuestion.correct_answer;
+    delete nextQuestion.correctAnswer;
+    delete nextQuestion.correct;
+    delete nextQuestion.answer;
+    delete nextQuestion.expected;
+    delete nextQuestion.expected_answer;
+    delete nextQuestion.expectedAnswer;
 
-        question.statements?.forEach((statement) => {
-            if (statement.correct !== undefined) {
-                statementAnswers[statement.id] = statement.correct;
-                hasAny = true;
+    if (Array.isArray(nextQuestion.options)) {
+        nextQuestion.options = nextQuestion.options.map((option) => {
+            if (!option || typeof option !== 'object') {
+                return option;
             }
+            const nextOption = { ...option };
+            delete nextOption.answer;
+            delete nextOption.correct;
+            delete nextOption.is_correct;
+            delete nextOption.isCorrect;
+            return nextOption;
         });
-
-        return hasAny ? statementAnswers : undefined;
     }
 
-    return undefined;
+    if (Array.isArray(nextQuestion.statements)) {
+        nextQuestion.statements = nextQuestion.statements.map((statement) => {
+            if (!statement || typeof statement !== 'object') {
+                return statement;
+            }
+            const nextStatement = { ...statement };
+            delete nextStatement.answer;
+            delete nextStatement.correct;
+            delete nextStatement.is_correct;
+            delete nextStatement.isCorrect;
+            delete nextStatement.correct_answer;
+            delete nextStatement.correctAnswer;
+            delete nextStatement.expected;
+            return nextStatement;
+        });
+    }
+
+    return nextQuestion;
+};
+
+const sanitizeExamPayloadForTaking = (rawExamData) => {
+    if (!rawExamData || typeof rawExamData !== 'object') {
+        return rawExamData;
+    }
+
+    const sanitizedExamData = { ...rawExamData };
+    delete sanitizedExamData.answer_key;
+    delete sanitizedExamData.answerKey;
+
+    if (Array.isArray(sanitizedExamData.parts)) {
+        sanitizedExamData.parts = sanitizedExamData.parts.map((part) => {
+            if (!part || typeof part !== 'object') {
+                return part;
+            }
+
+            const nextPart = { ...part };
+            if (Array.isArray(nextPart.questions)) {
+                nextPart.questions = nextPart.questions.map(sanitizeQuestionPayloadForTaking);
+            }
+
+            return nextPart;
+        });
+    }
+
+    return sanitizedExamData;
 };
 
 const getVideoReviewUrl = (examData) => (
@@ -77,12 +130,11 @@ const getVideoReviewUrl = (examData) => (
 );
 
 const resolveExamMeta = async (subjectFolder, routePath) => {
+    const normalizedSubject = String(subjectFolder || '').trim().toLowerCase();
     try {
-        const res = await fetch('/data/exams/index.json', { cache: 'no-store' });
-        if (!res.ok) throw new Error('Index not found');
-        const examIndex = await res.json();
+        const examIndex = await getExamIndex();
         const matchedExam = examIndex.find((exam) => (
-            exam.subjectFolder === subjectFolder &&
+            String(exam.subjectFolder || exam.subject || '').trim().toLowerCase() === normalizedSubject &&
             (exam.examPath === routePath || exam.id === routePath)
         ));
         if (matchedExam) {
@@ -95,7 +147,8 @@ const resolveExamMeta = async (subjectFolder, routePath) => {
     return {
         id: routePath,
         examPath: routePath,
-        subjectFolder
+        subjectFolder: normalizedSubject,
+        subject: normalizedSubject,
     };
 };
 
@@ -150,9 +203,9 @@ export default function ExamTaking() {
         return () => { cancelled = true; };
     }, [subjectFolder, examPath]);
 
-    const examId = examMeta?.id;
     const normalizedExamPath = examMeta?.examPath || examPath;
-    const { loading: accessLoading, allowed, reason } = useExamAccess(examId);
+    const examLookupId = examMeta?.id || normalizedExamPath || examPath;
+    const { loading: accessLoading, allowed, reason } = useExamAccess(examLookupId);
 
     // ─── Tải đề thi và khôi phục tiến trình ─────────────────
     useEffect(() => {
@@ -168,7 +221,8 @@ export default function ExamTaking() {
             const res = await fetch(`${examBasePath}/exam.json`);
             if (!res.ok) throw new Error('Exam not found');
             const rawData = await res.json();
-            const data = normalizeExamMediaPaths(rawData, examBasePath);
+            const sanitizedExamData = sanitizeExamPayloadForTaking(rawData);
+            const data = normalizeExamMediaPaths(sanitizedExamData, examBasePath);
             setExamData(data);
 
             // 2. Kiểm tra tiến trình đang dở (in_progress)
@@ -176,7 +230,7 @@ export default function ExamTaking() {
                 .from('exam_progress')
                 .select('id, answers, time_left_seconds')
                 .eq('user_id', user.id)
-                .eq('exam_id', examId)
+                .eq('exam_id', examLookupId)
                 .eq('status', 'in_progress')
                 .maybeSingle();
 
@@ -191,7 +245,7 @@ export default function ExamTaking() {
                     .from('exam_progress')
                     .insert({
                         user_id: user.id,
-                        exam_id: examId,
+                        exam_id: examLookupId,
                         subject_folder: subjectFolder,
                         answers: {},
                         time_left_seconds: data.time * 60,
@@ -279,38 +333,6 @@ export default function ExamTaking() {
         debounceTimerRef.current = setTimeout(saveProgress, AUTOSAVE_DEBOUNCE_MS);
     };
 
-    // ─── Tính điểm ──────────────────────────────────────────
-    const calculateScore = (data, userAnswers) => {
-        const allQuestions = data.parts?.flatMap((part) => part.questions.map((question) => ({
-            partId: part.id,
-            question,
-        }))) || [];
-        let correct = 0;
-
-        allQuestions.forEach(({ partId, question }) => {
-            const userAns = userAnswers[getQuestionKey(partId, question.id)];
-            const expectedAnswer = getExpectedAnswer(data, partId, question);
-
-            if (question.type === 'single_choice') {
-                if (userAns !== undefined && userAns === expectedAnswer) correct++;
-            } else if (question.type === 'true_false') {
-                const allCorrect = question.statements?.every((statement, index) => {
-                    if (Array.isArray(expectedAnswer)) {
-                        return userAns?.[statement.id] === expectedAnswer[index];
-                    }
-                    return userAns?.[statement.id] === expectedAnswer?.[statement.id];
-                });
-                if (allCorrect) correct++;
-            } else if (question.type === 'short_answer') {
-                const correct_str = String(expectedAnswer ?? '').replace(',', '.').trim().toLowerCase();
-                const user_str = String(userAns ?? '').replace(',', '.').trim().toLowerCase();
-                if (correct_str && correct_str === user_str) correct++;
-            }
-        });
-
-        return { correct, total: allQuestions.length };
-    };
-
     // ─── Nộp bài ────────────────────────────────────────────
     const submitExam = async () => {
         if (isSubmitting || submitted) return;
@@ -324,7 +346,7 @@ export default function ExamTaking() {
         try {
             // Nộp bài bảo mật qua RPC (Tính điểm và ghi kết quả trên Server)
             const { data: resultData, error: rpcError } = await supabase.rpc('submit_exam_securely', {
-                p_exam_id: examId,
+                p_exam_id: examLookupId,
                 p_subject_folder: subjectFolder,
                 p_exam_title: examData.title,
                 p_answers: answersRef.current
@@ -332,18 +354,29 @@ export default function ExamTaking() {
 
             if (rpcError) throw rpcError;
 
-            const { result_id, score, correct, total } = resultData;
+            const { result_id, score, correct, total, is_scored, message } = resultData || {};
+            const isScored = Boolean(is_scored);
+
+            if (!isScored && message === 'pending_answer_key') {
+                alert('Đề này chưa có đáp án trong hệ thống nên chưa thể chấm tự động. Bài làm của bạn đã được lưu.');
+            }
+
+            const resultPath = result_id
+                ? `/exam/${subjectFolder}/${normalizedExamPath}/result?resultId=${encodeURIComponent(result_id)}`
+                : `/exam/${subjectFolder}/${normalizedExamPath}/result`;
 
             setSubmitted(true);
-            navigate(`/exam/${subjectFolder}/${normalizedExamPath}/result`, {
+            navigate(resultPath, {
                 state: {
                     examData,
                     answers: answersRef.current,
                     score,
                     correct,
                     total,
+                    isScored,
+                    scoreMessage: message || null,
                     resultId: result_id,
-                    examId,
+                    examId: examLookupId,
                     examPath: normalizedExamPath,
                     subjectFolder
                 },

@@ -1,0 +1,11 @@
+{
+  "provider": "gemini",
+  "auto_model": true,
+  "model": "gemini-2.5-flash",
+  "output_dir": "D:/Web sv/dtht/output",
+  "asset_dir": "",
+  "dump_raw_dir": "",
+  "max_retries": 1,
+  "remember_api_key": true,
+  "api_key": "AIzaSyBWR0oDNdCkbVggHSu3t3eCj-6Urr2S7wE"
+}

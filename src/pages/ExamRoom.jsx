@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getExamIndex } from '../utils/examIndexCache';
 
 const DEFAULT_EXAM_META = {
     status: 'ongoing',
@@ -77,6 +78,10 @@ function ExamCard({ exam, onJoin }) {
     const examMeta = { ...DEFAULT_EXAM_META, ...exam };
     const examHref = getExamHref(examMeta);
     const isOngoing = examMeta.status === 'ongoing';
+    const displayQuestionCount = Number.isFinite(Number(examMeta.questions)) ? Number(examMeta.questions) : '?';
+    const displayTime = Number.isFinite(Number(examMeta.time))
+        ? `${Number(examMeta.time)} phút`
+        : (examMeta.time || '--');
 
     // Fix for the title where it shouldn't just be uppercase THPT
     let displayTitle = examMeta.title;
@@ -129,7 +134,7 @@ function ExamCard({ exam, onJoin }) {
                         </div>
                         <div className="leading-tight">
                             <div className="text-[9px] text-slate-400">Câu hỏi</div>
-                            <div className="font-bold text-[10px] text-slate-200">{examMeta.questions} câu</div>
+                            <div className="font-bold text-[10px] text-slate-200">{displayQuestionCount} câu</div>
                         </div>
                     </div>
                     <div className="w-px h-6 bg-white/10"></div>
@@ -139,7 +144,7 @@ function ExamCard({ exam, onJoin }) {
                         </div>
                         <div className="leading-tight">
                             <div className="text-[9px] text-slate-400">Thời gian</div>
-                            <div className="font-bold text-[10px] text-slate-200">{typeof examMeta.time === 'number' ? `${examMeta.time} phút` : examMeta.time}</div>
+                            <div className="font-bold text-[10px] text-slate-200">{displayTime}</div>
                         </div>
                     </div>
                 </div>
@@ -256,14 +261,13 @@ export default function ExamRoom() {
     const filterScroll = useDraggableScroll();
 
     React.useEffect(() => {
-        fetch('/data/exams/index.json', { cache: 'no-store' })
-            .then(res => res.json())
-            .then(data => {
-                setExams(data);
+        getExamIndex({ forceRefresh: true })
+            .then((data) => {
+                setExams(Array.isArray(data) ? data : []);
                 setLoading(false);
             })
-            .catch(err => {
-                console.error("Failed to load exams", err);
+            .catch((err) => {
+                console.error('Failed to load exams', err);
                 setLoading(false);
             });
     }, []);

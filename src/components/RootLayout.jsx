@@ -106,7 +106,7 @@ export default function RootLayout() {
 
         <div className="mt-auto">
           <Link to="/profile" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/profile') ? 'bg-white/10 text-white font-semibold border border-white/20' : 'text-slate-500 hover:bg-white/5'}`}>
-            <Avatar 
+            <Avatar
               src={profile?.avatar_url || user?.user_metadata?.avatar_url}
               name={profile?.display_name || user?.user_metadata?.full_name || 'Cá nhân'}
               id={user?.id}

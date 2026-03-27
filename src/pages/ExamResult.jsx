@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import RichTextRenderer from '../components/exam/RichTextRenderer';
 import { sanitizeExternalUrl } from '../utils/urlSecurity';
+import { getExamIndex } from '../utils/examIndexCache';
 import {
     formatTrueFalseValue,
     hasKnownTrueFalseValue,
@@ -14,6 +15,92 @@ import {
 const getQuestionKey = (partId, questionId) => `${partId}.${questionId}`;
 const CHOICE_LABELS = ['A', 'B', 'C', 'D'];
 const TRUE_FALSE_LABELS = ['a', 'b', 'c', 'd'];
+
+const toChoiceIndex = (value) => {
+    if (Number.isInteger(value) && value >= 0 && value <= 3) return value;
+
+    const text = String(value ?? '').trim().toUpperCase();
+    if (!text) return null;
+    if (/^[0-3]$/.test(text)) return Number(text);
+    if (text === 'A') return 0;
+    if (text === 'B') return 1;
+    if (text === 'C') return 2;
+    if (text === 'D') return 3;
+
+    return null;
+};
+
+const toPartNumber = (partId) => {
+    const normalized = String(partId ?? '').trim().toLowerCase();
+    if (!normalized) return null;
+
+    const direct = normalized.match(/^([123])$/);
+    if (direct) return direct[1];
+
+    const match = normalized.match(/^part[_-]?([123])$/);
+    if (match) return match[1];
+
+    return null;
+};
+
+const toQuestionNumber = (questionId) => {
+    const normalized = String(questionId ?? '').trim().toLowerCase();
+    if (!normalized) return null;
+
+    const direct = normalized.match(/^([0-9]+)$/);
+    if (direct) return direct[1];
+
+    const match = normalized.match(/^q([0-9]+)$/);
+    if (match) return match[1];
+
+    return null;
+};
+
+const buildQuestionKeyCandidates = (partId, questionId) => {
+    const rawKey = getQuestionKey(partId, questionId);
+    const partNumber = toPartNumber(partId);
+    const questionNumber = toQuestionNumber(questionId);
+
+    const candidates = [
+        rawKey,
+        String(rawKey || '').toLowerCase(),
+    ];
+
+    if (partNumber && questionNumber) {
+        candidates.push(
+            `part-${partNumber}.${questionNumber}`,
+            `part${partNumber}.${questionNumber}`,
+            `part${partNumber}.q${questionNumber}`,
+            `part-${partNumber}.q${questionNumber}`,
+        );
+    }
+
+    const deduped = [];
+    const seen = new Set();
+    for (const key of candidates) {
+        const normalized = String(key || '').trim();
+        if (!normalized || seen.has(normalized)) continue;
+        seen.add(normalized);
+        deduped.push(normalized);
+    }
+
+    return deduped;
+};
+
+const pickQuestionValue = (sourceMap, partId, questionId) => {
+    if (!sourceMap || typeof sourceMap !== 'object') {
+        return undefined;
+    }
+
+    const candidates = buildQuestionKeyCandidates(partId, questionId);
+    for (const key of candidates) {
+        if (Object.prototype.hasOwnProperty.call(sourceMap, key)) {
+            return sourceMap[key];
+        }
+    }
+
+    return undefined;
+};
 
 const EXAM_RESOURCE_FIELD_PATHS = {
     examFileUrl: [
@@ -118,12 +205,11 @@ const normalizeExamMediaPaths = (value, basePath) => {
 };
 
 const resolveExamMeta = async (subjectFolder, routePath, examId = null) => {
+    const normalizedSubject = String(subjectFolder || '').trim().toLowerCase();
     try {
-        const res = await fetch('/data/exams/index.json', { cache: 'no-store' });
-        if (!res.ok) throw new Error('Index not found');
-        const examIndex = await res.json();
+        const examIndex = await getExamIndex();
         const matchedExam = examIndex.find((exam) => (
-            exam.subjectFolder === subjectFolder &&
+            String(exam.subjectFolder || exam.subject || '').trim().toLowerCase() === normalizedSubject &&
             (
                 (routePath && exam.examPath === routePath) ||
                 (routePath && exam.id === routePath) ||
@@ -140,7 +226,8 @@ const resolveExamMeta = async (subjectFolder, routePath, examId = null) => {
     return {
         id: examId || routePath,
         examPath: routePath || examId,
-        subjectFolder
+        subjectFolder: normalizedSubject,
+        subject: normalizedSubject,
     };
 };
 
@@ -316,18 +403,9 @@ export default function ExamResult() {
     const location = useLocation();
     const navigate = useNavigate();
     const { subjectFolder: routeSubjectFolder, examPath: routeExamPath } = useParams();
-    const initialAnswerKey = location.state?.answerKey || location.state?.examData?.answer_key || null;
-    const hasInitialReviewData = Boolean(
-        location.state?.examData &&
-        location.state?.answers &&
-        hasPopulatedAnswerKey(initialAnswerKey)
-    );
     const [examData, setExamData] = useState(() => (
         location.state?.examData
-            ? {
-                ...location.state.examData,
-                ...(hasPopulatedAnswerKey(initialAnswerKey) ? { answer_key: initialAnswerKey } : {})
-            }
+            ? { ...location.state.examData, answer_key: {} }
             : null
     ));
     const [answers, setAnswers] = useState(location.state?.answers || {});
@@ -337,7 +415,7 @@ export default function ExamResult() {
         correct: location.state?.correct ?? null,
         total: location.state?.total ?? null
     }));
-    const [loading, setLoading] = useState(!hasInitialReviewData);
+    const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
     const [showReview, setShowReview] = useState(false);
     const [vipResources, setVipResources] = useState(null); // Loaded from DB for VIP only
@@ -367,11 +445,6 @@ export default function ExamResult() {
     }, [location.state?.examId, location.state?.examPath, location.state?.subjectFolder, routeExamPath, routeSubjectFolder]);
 
     useEffect(() => {
-        if (hasInitialReviewData) {
-            setLoading(false);
-            return;
-        }
-
         const loadReviewData = async () => {
             if (!user) {
                 setLoadError('Vui lòng đăng nhập để xem lại bài thi.');
@@ -380,7 +453,8 @@ export default function ExamResult() {
             }
 
             try {
-                const resultId = location.state?.resultId;
+                const searchParams = new URLSearchParams(location.search);
+                const resultId = location.state?.resultId || searchParams.get('resultId');
                 const routeExamMeta = await resolveExamMeta(routeSubjectFolder, routeExamPath, location.state?.examId);
                 setExamMeta(routeExamMeta);
                 let resultQuery = supabase
@@ -418,7 +492,7 @@ export default function ExamResult() {
                 });
                 if (reviewError) throw reviewError;
 
-                const mergedAnswerKey = reviewPayload?.answer_key || rawExamData.answer_key || {};
+                const mergedAnswerKey = reviewPayload?.answer_key || {};
 
                 setExamData(normalizeExamMediaPaths({
                     ...rawExamData,
@@ -439,7 +513,7 @@ export default function ExamResult() {
         };
 
         loadReviewData();
-    }, [hasInitialReviewData, location.state, routeExamPath, routeSubjectFolder, user]);
+    }, [location.search, location.state, routeExamPath, routeSubjectFolder, user]);
 
     // Load VIP resources from DB (only returned for VIP/Admin by server)
     useEffect(() => {
@@ -511,27 +585,26 @@ export default function ExamResult() {
 
     examData.parts.forEach(part => {
         part.questions.forEach(q => {
-             const qKey = getQuestionKey(part.id, q.id);
-             let expectedAnswer = examData.answer_key?.[qKey];
-             if (expectedAnswer === undefined && q.correct_answer !== undefined) {
-                 expectedAnswer = q.correct_answer;
-             }
+             const expectedAnswer = pickQuestionValue(examData.answer_key, part.id, q.id);
+             const userAnswer = pickQuestionValue(answers, part.id, q.id);
 
-             if (q.type === 'single_choice') {
-                 details.part1.total += 1;
-                 if (answers[qKey] === expectedAnswer) {
-                     totalScore += q.points ?? 0.25;
-                     details.part1.correct += 1;
-                 }
-             } else if (q.type === 'true_false') {
-                 details.part2.total += 1;
-                 const qAnswers = answers[qKey] || {};
-                 let correctCount = 0;
-                 
+              if (q.type === 'single_choice') {
+                  details.part1.total += 1;
+                  const expectedChoiceIndex = toChoiceIndex(expectedAnswer);
+                  const userChoiceIndex = toChoiceIndex(userAnswer);
+                  if (expectedChoiceIndex !== null && userChoiceIndex === expectedChoiceIndex) {
+                      totalScore += q.points ?? 0.25;
+                      details.part1.correct += 1;
+                  }
+              } else if (q.type === 'true_false') {
+                  details.part2.total += 1;
+                  const qAnswers = (userAnswer && typeof userAnswer === 'object') ? userAnswer : {};
+                  let correctCount = 0;
+                
                  q.statements.forEach((stmt, idx) => {
                      const expectedStmtAnswer = Array.isArray(expectedAnswer) 
                          ? expectedAnswer[idx] 
-                         : (expectedAnswer?.[stmt.id] ?? stmt.correct);
+                         : expectedAnswer?.[stmt.id];
 
                      if (qAnswers[stmt.id] === expectedStmtAnswer && expectedStmtAnswer !== undefined && expectedStmtAnswer !== null) {
                          correctCount += 1;
@@ -545,10 +618,10 @@ export default function ExamResult() {
                      totalScore += 1.0; 
                      details.part2.correct += 1;
                  }
-             } else if (q.type === 'short_answer') {
-                 details.part3.total += 1;
-                 const userAns = String(answers[qKey] || '').replace(',', '.').trim().toLowerCase();
-                 const expectAns = String(expectedAnswer ?? '').replace(',', '.').trim().toLowerCase();
+              } else if (q.type === 'short_answer') {
+                  details.part3.total += 1;
+                  const userAns = String(userAnswer || '').replace(',', '.').trim().toLowerCase();
+                  const expectAns = String(expectedAnswer ?? '').replace(',', '.').trim().toLowerCase();
                  
                  if (userAns && userAns === expectAns) {
                      totalScore += q.points ?? 0.5;
@@ -559,7 +632,10 @@ export default function ExamResult() {
     });
 
     const hasReviewAnswerKey = hasPopulatedAnswerKey(examData.answer_key);
-    const displayScore = hasReviewAnswerKey ? totalScore : Number(resultMetrics.score ?? 0);
+    const scoreFromServer = Number(resultMetrics.score);
+    const displayScore = Number.isFinite(scoreFromServer)
+        ? scoreFromServer
+        : (hasReviewAnswerKey ? totalScore : 0);
     const fallbackCorrectCount = Number(resultMetrics.correct ?? 0);
     const fallbackTotalQuestions = Number(resultMetrics.total ?? 0);
 
@@ -599,13 +675,10 @@ export default function ExamResult() {
                                 <div className="space-y-10">
                                     {part.questions.map((q, qIndex) => {
                                         const questionKey = getQuestionKey(part.id, q.id);
-                                        const userAns = answers[questionKey];
+                                        const userAns = pickQuestionValue(answers, part.id, q.id);
                                         const hasOptionContent = questionHasOptionContent(q);
                                         const hasStatementContent = questionHasStatementContent(q);
-                                        let expectedAnswer = examData.answer_key?.[questionKey];
-                                        if (expectedAnswer === undefined && q.correct_answer !== undefined) {
-                                            expectedAnswer = q.correct_answer;
-                                        }
+                                        const expectedAnswer = pickQuestionValue(examData.answer_key, part.id, q.id);
 
                                         return (
                                         <div key={questionKey} className="scroll-mt-24">
@@ -622,9 +695,11 @@ export default function ExamResult() {
                                                     {q.type === 'single_choice' && (
                                                         <div className={`grid gap-3 ${hasOptionContent ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-2 md:grid-cols-4'}`}>
                                                             {q.options.map((opt, optIdx) => {
-                                                                const isChecked = userAns === optIdx;
-                                                                const hasKnownAnswer = Number.isInteger(expectedAnswer);
-                                                                const isCorrect = hasKnownAnswer && expectedAnswer === optIdx;
+                                                                const expectedChoiceIndex = toChoiceIndex(expectedAnswer);
+                                                                const userChoiceIndex = toChoiceIndex(userAns);
+                                                                const isChecked = userChoiceIndex === optIdx;
+                                                                const hasKnownAnswer = expectedChoiceIndex !== null;
+                                                                const isCorrect = hasKnownAnswer && expectedChoiceIndex === optIdx;
 
                                                                 let bgClass = 'bg-white border-slate-200';
                                                                 let textClass = 'bg-slate-100 text-slate-600';
@@ -656,7 +731,7 @@ export default function ExamResult() {
                                                                 const userStmtAns = userAns?.[stmt.id];
                                                                 const expectedStmtAnswer = Array.isArray(expectedAnswer) 
                                                                     ? expectedAnswer[stmtIdx] 
-                                                                    : (expectedAnswer?.[stmt.id] ?? stmt.correct);
+                                                                    : expectedAnswer?.[stmt.id];
 
                                                                 const hasKnownExpected = hasKnownTrueFalseValue(expectedStmtAnswer);
                                                                 const isCorrect = userStmtAns === expectedStmtAnswer && hasKnownExpected;
@@ -715,7 +790,9 @@ export default function ExamResult() {
                                                             <div className="bg-blue-50 border border-blue-200 px-4 py-3 rounded-xl min-w-[120px]">
                                                                 <p className="text-xs font-bold text-blue-500 mb-1 uppercase tracking-wider">Đáp án đúng</p>
                                                                 <p className="font-mono text-lg font-black text-blue-700">
-                                                                    {expectedAnswer ? String(expectedAnswer).replace('.', ',') : <span className="text-slate-400 italic font-normal text-sm">Chưa có đáp án</span>}
+                                                                    {(expectedAnswer !== undefined && expectedAnswer !== null && String(expectedAnswer).trim() !== '')
+                                                                        ? String(expectedAnswer).replace('.', ',')
+                                                                        : <span className="text-slate-400 italic font-normal text-sm">Chưa có đáp án</span>}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -766,6 +843,13 @@ export default function ExamResult() {
                         <span className="material-symbols-outlined text-6xl text-[#fe5f36] mb-4">gpp_good</span>
                         <h1 className="text-3xl font-black text-slate-900 mb-2">Hoàn thành bài thi!</h1>
                         <p className="text-slate-500 font-medium mb-8">{examData.title}</p>
+
+                        {!hasReviewAnswerKey && (
+                            <div className="mb-6 mx-auto max-w-xl rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-left">
+                                <p className="text-sm font-bold text-amber-700">Đề này chưa có đáp án chuẩn trong database.</p>
+                                <p className="mt-1 text-xs font-medium text-amber-700/80">Điểm hiển thị là kết quả lưu tạm từ lần nộp bài, chưa có chấm chi tiết từng câu.</p>
+                            </div>
+                        )}
                         
                         <div className="inline-block p-1 rounded-[2rem] bg-gradient-to-r from-[#fe5f36] to-pink-500 mb-8">
                             <div className="bg-white rounded-[1.8rem] px-12 py-8">

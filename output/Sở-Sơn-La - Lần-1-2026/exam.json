@@ -1,0 +1,706 @@
+{
+  "id": "0404",
+  "title": "KỲ THI THỬ TỐT NGHIỆP THPT LẦN THỨ NHẤT NĂM HỌC 2025 – 2026",
+  "subject": "sinh",
+  "time": 50,
+  "description": "SỞ GD&ĐT SƠN LA\nĐỀ CHÍNH THỨC\n(Đề thi có 04 trang)\nHọ, tên thí sinh: ............................................................\nSố báo danh: .................................................................",
+  "parts": [
+    {
+      "id": "part_1",
+      "name": "PHẦN I.",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "single_choice",
+          "content": [
+            "Để xác định quan hệ họ hàng giữa loài người và một số loài linh trưởng, các nhà khoa học đã phân tích một đoạn trình tự nucleotide trên mạch khuôn của một gene mã hoá các tiểu phần enzyme dehydrogenase như trong bảng sau.",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Loài sinh vật"
+                  ],
+                  [
+                    "Trình tự các nucleotide"
+                  ]
+                ],
+                [
+                  [
+                    "(1) Người"
+                  ],
+                  [
+                    "CAG - TGT - TGG - GTT - TGT - TGG"
+                  ]
+                ],
+                [
+                  [
+                    "(2) Gorilla"
+                  ],
+                  [
+                    "CTG - TGT - TGG - GTT - TGT - TAT"
+                  ]
+                ],
+                [
+                  [
+                    "(3) Đười ươi"
+                  ],
+                  [
+                    "TGT - TGT - TGG - GTC - TGT - GAT"
+                  ]
+                ],
+                [
+                  [
+                    "(4) Tinh tinh"
+                  ],
+                  [
+                    "CGT - TGT - TGG - GTT - TGT - TGG"
+                  ]
+                ]
+              ]
+            },
+            "Xác định thứ tự các loài có quan hệ gần gũi về nguồn gốc giữa người với một số loài linh trưởng."
+          ],
+          "points": 0.25,
+          "options": [
+            "1-4-2-3.",
+            "1-3-2-4.",
+            "1-2-3-4.",
+            "1-2-4-3."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "single_choice",
+          "content": [
+            "Nghiên cứu sự thay đổi thành phần kiểu gene ở một quần thể qua 4 thế hệ liên tiếp, người ta thu được kết quả sau:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Kiểu gen"
+                  ],
+                  [
+                    "Thế hệ F₁"
+                  ],
+                  [
+                    "Thế hệ F₂"
+                  ],
+                  [
+                    "Thế hệ F₃"
+                  ],
+                  [
+                    "Thế hệ F₄"
+                  ]
+                ],
+                [
+                  [
+                    "AA"
+                  ],
+                  [
+                    "0,5"
+                  ],
+                  [
+                    "0,6"
+                  ],
+                  [
+                    "0,65"
+                  ],
+                  [
+                    "0,675"
+                  ]
+                ],
+                [
+                  [
+                    "Aa"
+                  ],
+                  [
+                    "0,4"
+                  ],
+                  [
+                    "0,2"
+                  ],
+                  [
+                    "0,1"
+                  ],
+                  [
+                    "0,05"
+                  ]
+                ],
+                [
+                  [
+                    "aa"
+                  ],
+                  [
+                    "0,1"
+                  ],
+                  [
+                    "0,2"
+                  ],
+                  [
+                    "0,25"
+                  ],
+                  [
+                    "0,275"
+                  ]
+                ]
+              ]
+            },
+            "Nhân tố nào sau đây gây nên sự thay đổi thành phần kiểu gene của quần thể trên qua các thế hệ?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Giao phối ngẫu nhiên.",
+            "Phiêu bạt di truyền.",
+            "Đột biến.",
+            "Giao phối không ngẫu nhiên."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "single_choice",
+          "content": "Loài có số lượng lớn nhất hoặc sinh khối cao nhất trong quần xã được gọi là",
+          "points": 0.25,
+          "options": [
+            "loài chủ chốt.",
+            "loài ngẫu nhiên.",
+            "loài thứ yếu.",
+            "loài ưu thế."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "single_choice",
+          "content": "Sơ đồ nào sau đây mô tả đúng về 1 chuỗi thức ăn?",
+          "points": 0.25,
+          "options": [
+            "Lúa → diều hâu → chuột → rắn.",
+            "Lúa → chuột → diều hâu → rắn.",
+            "Lúa → rắn → chuột → diều hâu.",
+            "Lúa → chuột → rắn → diều hâu."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "single_choice",
+          "content": "Thành tựu nào sau đây có thể là kết quả của phương pháp lai hữu tính?",
+          "points": 0.25,
+          "options": [
+            "Tạo ra cây trồng tự mở nội gene.",
+            "Tạo ra giống lúa chịu hạn.",
+            "Tạo ra cây trồng biến đổi gene.",
+            "Tạo ra giống cừu Dolly."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "single_choice",
+          "content": "Loài động vật nào sau đây có quan nào chuyển hóa với chức năng hô hấp?",
+          "points": 0.25,
+          "options": [
+            "Cá.",
+            "Hoa.",
+            "Thân.",
+            "Rễ."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "7",
+          "type": "single_choice",
+          "content": "Hệ sinh thái nào sau đây cần phải bổ sung thêm nguồn vật chất để nâng cao hiệu quả sử dụng?",
+          "points": 0.25,
+          "options": [
+            "Hệ sinh thái nông nghiệp.",
+            "Hệ sinh thái sông, suối.",
+            "Hệ sinh thái rừng mưa nhiệt đới.",
+            "Hệ sinh thái biển."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "8",
+          "type": "single_choice",
+          "content": [
+            "Hội chứng KeRNAS-Sayre là một rối loạn hiếm gặp do đột biến gene ty thể, chiếm khoảng 10.000 nucleotide khối DNA ty thể. Bệnh nhân thường có biểu hiện yếu cơ mắt yếu, mệt mỏi, sụp mi, giảm thị lực và thường có vóc dáng thấp. Phả hệ nào sau đây cho thấy một gia đình bị ảnh hưởng bởi hội chứng KeRNAS-Sayre rõ ràng nhất (người bị bệnh tô màu đen, người không bị bệnh là không tô) và không có đột biến mới phát sinh?",
+            {
+              "image": "img_0ab6152a.jpg"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Phả hệ 1.",
+            "Phả hệ 3.",
+            "Phả hệ 2.",
+            "Phả hệ 4."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "9",
+          "type": "single_choice",
+          "content": "Mối quan hệ sinh thái nào dưới đây là quan hệ cạnh tranh?",
+          "points": 0.25,
+          "options": [
+            "Cây tỏi tiết chất gây ức chế hoạt động của vi sinh vật xung quanh.",
+            "Cây phong lan sống bám trên thân cây gỗ.",
+            "Tảo giáp nở hoa gây độc cho cá, tôm, chim ăn cá.",
+            "Cú và chồn cùng sống trong rừng, cùng bắt chuột làm thức ăn."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "10",
+          "type": "single_choice",
+          "content": "Chuỗi hemoglobin của người trưởng thành và người khỉ khác nhau ba amino acid. Đây là bằng chứng tiến hóa",
+          "points": 0.25,
+          "options": [
+            "cơ quan tương đồng.",
+            "tế bào học.",
+            "sinh học phân tử.",
+            "cơ quan thoái hóa."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "11",
+          "type": "single_choice",
+          "content": "Quá trình hô hấp hiếu khí của tế bào thực vật xảy ra mạnh nhất trong trường hợp nào dưới đây?",
+          "points": 0.25,
+          "options": [
+            "Lá đang hóa già.",
+            "Chồi đang ngủ.",
+            "Hạt đang nảy mầm.",
+            "Rễ đang bị ngập úng."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "12",
+          "type": "single_choice",
+          "content": "Một loài thực vật lưỡng bội có 8 nhóm gene liên kết. Số chromatid có trong mỗi tế bào ở thể ba của loài này khi đang ở kì giữa của nguyên phân là",
+          "points": 0.25,
+          "options": [
+            "32.",
+            "8.",
+            "34.",
+            "16."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "13",
+          "type": "single_choice",
+          "content": "Theo thuyết tiến hóa tổng hợp, nhân tố tiến hóa nào sau đây có thể làm phong phú vốn gene của quần thể?",
+          "points": 0.25,
+          "options": [
+            "Đột biến.",
+            "Chọn lọc tự nhiên.",
+            "Phiêu bạt di truyền.",
+            "Giao phối không ngẫu nhiên."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "14",
+          "type": "single_choice",
+          "content": [
+            "Hình ảnh sau mô tả các bước thí nghiệm chứng minh sự hình thành tinh bột trong quang hợp ở thực vật. Dựa vào hình ảnh, hãy cho biết có bao nhiêu nhận định sau đây là đúng?",
+            {
+              "image": "img_22451220.jpeg"
+            },
+            "I. Phần lá bị bịt giấy đen sau khi nhúng vào dung dịch iodine thì không quan sát thấy sự đổi màu.",
+            "II. Phần lá bị bịt giấy đen sau khi nhúng vào dung dịch iodine có sự đổi màu xanh tím.",
+            "III. Đun sôi cách thủy trong cồn nhằm mục đích loại bỏ diệp lục trong lá để quan sát thí nghiệm dễ dàng hơn.",
+            "IV. Phần lá không bị bịt giấy đen sau khi nhúng vào dung dịch iodine có sự đổi màu xanh tím."
+          ],
+          "points": 0.25,
+          "options": [
+            "4.",
+            "1.",
+            "2.",
+            "3."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "15",
+          "type": "single_choice",
+          "content": "Cây tre mọc theo bụi có khả năng chống chịu gió tốt hơn sống đơn lẻ. Đây là ví dụ về mối quan hệ nào giữa các cá thể tre trong quần thể?",
+          "points": 0.25,
+          "options": [
+            "Hợp tác.",
+            "Cộng sinh.",
+            "Hỗ trợ.",
+            "Cạnh tranh."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "16",
+          "type": "single_choice",
+          "content": "Trong trồng trọt, bón phân trong điều kiện thiếu nước nghiêm trọng thì cây không hấp thụ được. Đây là ví dụ về quy luật sinh thái nào?",
+          "points": 0.25,
+          "options": [
+            "Quy luật tác động không đồng đều.",
+            "Quy luật giới hạn sinh thái.",
+            "Quy luật tác động qua lại.",
+            "Quy luật tác động tổng hợp."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "17",
+          "type": "single_choice",
+          "content": [
+            {
+              "image": "img_d993b947.jpeg"
+            },
+            "Hình bên mô tả quá trình dịch mã của mRNA tại hai ribosome R1 và R2. Mỗi ribosome đang dịch chuyển về phía nào trên mRNA?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Hai ribosome đều di vị trí cho nhau trên phân tử mRNA.",
+            "Cả R1 và R2 cùng di chuyển về phía đầu Y.",
+            "R1 di chuyển về phía đầu X, R2 di chuyển về phía đầu Y.",
+            "Cả R1 và R2 cùng di chuyển về phía đầu X."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "18",
+          "type": "single_choice",
+          "content": [
+            "Sơ đồ nào ở hình bên mô tả chính xác nội dung của giảm phân?",
+            {
+              "image": "img_3492c172.jpg"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Sơ đồ IV.",
+            "Sơ đồ I.",
+            "Sơ đồ III.",
+            "Sơ đồ II."
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part_2",
+      "name": "PHẦN II.",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_c2d589d5.png"
+            },
+            "Một quần đảo gồm nhiều đảo lớn nhỏ. Người ta tiến hành thí nghiệm phun thuốc trừ sâu với lượng lớn lên hai đảo A và B (tách biệt hoàn toàn nhau và với đất liền) thuộc quần đảo này để diệt côn trùng trên đảo, sau đó khảo sát sự thay đổi đa dạng loài theo thời gian. Sự phục hồi được minh họa ở bên (đường nét đứt nhạt thể hiện số loài trước thí nghiệm). Cho rằng không có sự tác động của các nhân tố tiến hóa khác."
+          ],
+          "points": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Nếu thay vi loài bọ côn trùng mà tiến hành loại bỏ sạch hết các loài thì sự phục hồi giữa 2 đảo A và B khác nhau không đáng kể do bờ biển các đảo không phải là rào cản lớn cho côn trùng.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Tỷ lệ nhập cư, tỷ lệ xuất cư, tỷ lệ sinh và tỷ lệ tử vong là 4 yếu tố giới hạn số lượng loài trên các đảo để khôi phục sau số lượng trước khi thí nghiệm.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Sau thí nghiệm, lưới thức ăn ở đảo A phức tạp hơn lưới thức ăn ở đảo B.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Kết thúc thí nghiệm dài hạn, đảo A phục hồi số lượng loài và đạt trạng thái cân bằng, còn đảo B chưa phục hồi.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "type": "true_false",
+          "content": "Một loài mèo, loài con đực mắt trắng, đuôi dài giao phối với con cái mắt đỏ, đuôi ngắn (P), thu được F₁ có 100% con mắt đỏ, đuôi ngắn. Cho F₁ giao phối với nhau, thu được F₂ có kiểu hình gồm: 0% con đực mắt đỏ, đuôi ngắn; 40% cá thể mắt đỏ, đuôi ngắn; 40% cá thể mắt trắng, đuôi dài; 10% cá thể mắt đỏ, đuôi dài; 10% cá thể mắt trắng, đuôi ngắn. Biết mỗi tính trạng do một cặp gene quy định và không xảy ra đột biến.",
+          "points": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Lấy ngẫu nhiên một cá thể cái ở F₂, xác suất thu được cá thể thuần chủng là 20%.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Đã xảy ra hoán vị gene ở cả giới đực và giới cái với tần số 20%.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Các gene quy định các tính trạng đang xét đều nằm trên nhiễm sắc thể giới tính.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Nếu cho cá thể cái F₁ lai phân tích thì sẽ thu được Fₐ có các cá thể đực mắt đỏ, đuôi dài chiếm 5%.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_919c9fb2.jpeg"
+            },
+            "Đồ thị hình bên biểu thị sự biến thiên tiết diện của các đoạn mạch và vận tốc máu trong các đoạn mạch của hệ tuần hoàn ở người."
+          ],
+          "points": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Tổng tiết diện mao mạch lớn hơn mao mạch nên vận tốc dòng máu chảy trong các mao mạch cũng tăng mạnh.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "[1] là biến thiên tổng tiết diện các đoạn mạch, mỗi mao mạch có tiết diện nhỏ nên tổng tiết diện mạch lớn.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "[2] là biến thiên vận tốc máu các đoạn mạch, vận tốc máu tỉ lệ nghịch với tổng tiết diện của mạch.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "[3] là động mạch từ lớn đến nhỏ, [4] là mao mạch, [5] là tĩnh mạch từ nhỏ đến lớn.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_757acd15.jpeg"
+            },
+            "Quan sát quá trình phân bào của một tế bào sinh dưỡng ở một loài sinh vật, một học sinh đã vẽ lại sơ đồ như sau:"
+          ],
+          "points": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Thứ tự các giai đoạn xảy ra là a → b → d → c → e.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Tế bào được quan sát là tế bào của một loài động vật.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Ở giai đoạn (b) tế bào đang có 8 phân tử DNA thuộc 2 cặp nhiễm sắc thể.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Bộ nhiễm sắc thể của loài này có 2n = 8.",
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part_3",
+      "name": "PHẦN III.",
+      "description": "Thí sinh trả lời từ câu 1 đến câu 6.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "short_answer",
+          "content": [
+            "Một loài động vật, màu vỏ là kết quả tương tác giữa sản phẩm của 2 cặp gene (A, a và B, b) phân li độc lập quy định. Sản phẩm của gene A và gene B tác động đến sự hình thành màu sắc vỏ theo sơ đồ hình dưới đây. Allele a và allele b không tạo được enzyme tương ứng. Theo lí thuyết, các con ốc vỏ trắng theo sơ đồ hình dưới đây có bao nhiêu kiểu gen?",
+            {
+              "image": "img_d463b664.jpeg"
+            }
+          ],
+          "points": 0.5,
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "short_answer",
+          "content": [
+            "Trong một nghiên cứu y học phân tử tại Viện Huyết học – Truyền máu Trung ương, các nhà khoa học tiến hành phân tích trình tự chuỗi amino acid của β-hemoglobin của hai nhóm người:",
+            "Nhóm 1: Người khỏe mạnh bình thường.",
+            "Nhóm 2: Bệnh nhân mắc thiếu máu hồng cầu hình liềm (sickle-cell anemia).",
+            "Kết quả phân tích 7 amino acid đầu mạch β–hemoglobin ở hai nhóm như sau:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Loại hemoglobin"
+                  ],
+                  [
+                    "Trình tự 7 amino acid đầu mạch"
+                  ]
+                ],
+                [
+                  [
+                    "HbA (bình thường)"
+                  ],
+                  [
+                    "Valin – Histidin – Leucin – Threonin – Prolin – Glutamic acid – Glutamic acid"
+                  ]
+                ],
+                [
+                  [
+                    "HbS (bệnh nhân)"
+                  ],
+                  [
+                    "Valin – Histidin – Leucin – Threonin – Prolin – Valin – Glutamic acid"
+                  ]
+                ]
+              ]
+            },
+            "Chuỗi polypeptide trong phân tử HbS đã bị thay đổi amino acid thứ mấy so với chuỗi polypeptide do gene HbA?"
+          ],
+          "points": 0.5,
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "short_answer",
+          "content": [
+            "Cho sơ đồ dưới đây minh họa một phần bản đồ di truyền NST giới tính X của ruồi giấm (chữ số đơn vị của bản đồ di truyền). Tần số trao đổi chéo giữa gene v và ruồi đực mấy %?",
+            {
+              "image": "img_69710532.png"
+            }
+          ],
+          "points": 0.5,
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "short_answer",
+          "content": [
+            "Hai loài ếch bào rừng Arena berlandieri và R. sphenocephala thường có màu xanh sáng trong khu vực chúng cùng chung sống, nhưng khi sống tách biệt thì hai loài sinh sản có màu xanh và màu thu. Tại khu vực sống gần nhau của 2 loài, một ao nước đặc biệt minh họa hình thành tạo điều kiện cho cá thể hai loài này gặp gỡ nhau, các nhà khoa học đã phát hiện ra có sự xuất hiện của con lai khác loài. Khi nghiên cứu tỉ lệ con sống sót theo từng giai đoạn trong ao, các nhà khoa học thu được kết quả như sau:",
+            {
+              "image": "img_cdf4a7e7.png"
+            },
+            "Cho các nhận xét sau:",
+            "Tỷ lệ các con lai có xu hướng giảm dần ở các giai đoạn phát triển.",
+            "Cơ chế cách li sinh sản của 2 loài này là cách li sau hợp tử.",
+            "Khi sống chung trong tự nhiên, hai loài này có xu hướng hạn chế giao phối với nhau bởi sự khác biệt về màu sinh sản.",
+            "Theo thời gian trong ao nước này, tỉ lệ nòng nọc mới nở của con lai khác loài có xu hướng tăng dần bởi lưu lượng môi trường.",
+            "Hãy viết các phát biểu đúng theo thứ tự từ nhỏ đến lớn."
+          ],
+          "points": 0.5,
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "short_answer",
+          "content": [
+            "Cộng đồng sinh thái thường bao gồm các loài cây trồng (mô hình “ruộng lúa, bờ hoa”) nhằm lợi dụng côn trùng có ích để tiêu diệt sâu hại lúa, qua đó giảm bớt việc sử dụng thuốc hóa học trên đồng ruộng. Những giống hoa được trồng xung quanh để thu hút các loài thiên địch (ong ký sinh, bọ rùa, nhện, kiến bắt mồi…). Do vậy, mô hình ruộng lúa có bờ hoa có nhiều mặt và phản ứng thúc đẩy các loài thiên địch như nhiều loài ong ký sinh, bọ rùa, nhện, kiến bắt mồi, … đến cư trú và săn mồi sâu hại lúa nhiều hơn.",
+            "Hãy viết các phát biểu đúng theo số thứ tự từ nhỏ đến lớn:",
+            "Cơ sở khoa học của mô hình trên là từ hiện tượng khống chế sinh học của các loài trong quần xã.",
+            "Trong quần xã sinh vật trong ruộng lúa, quan hệ giữa các loài côn trùng ký sinh và cây lúa là quan hệ cộng sinh.",
+            "Các loài hoa được trồng trong mô hình trên là loài ưu thế của quần xã.",
+            "Mô hình “ruộng lúa, bờ hoa” đem lại hiệu quả kinh tế cho người và khống chế được sâu bệnh."
+          ],
+          "points": 0.5,
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "short_answer",
+          "content": [
+            "Một loài sinh vật lưỡng bội, xét một gene có 2 allele nằm trên NST thường, allele A trội hoàn toàn so với allele a. Bốn quần thể của loài này đều đang ở trạng thái cân bằng di truyền. Tỷ lệ cá thể có kiểu hình trội như sau:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Quần thể"
+                  ],
+                  [
+                    "1"
+                  ],
+                  [
+                    "2"
+                  ],
+                  [
+                    "3"
+                  ],
+                  [
+                    "4"
+                  ]
+                ],
+                [
+                  [
+                    "Tỷ lệ kiểu hình trội"
+                  ],
+                  [
+                    "96%"
+                  ],
+                  [
+                    "64%"
+                  ],
+                  [
+                    "75%"
+                  ],
+                  [
+                    "84%"
+                  ]
+                ]
+              ]
+            },
+            "Theo lý thuyết, quần thể nào có tần số kiểu gene dị hợp lớn nhất?"
+          ],
+          "points": 0.5,
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

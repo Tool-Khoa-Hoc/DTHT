@@ -35,29 +35,29 @@ const TRUE_FALSE_HINTS = [
 const SINGLE_CHOICE_HINTS = ["trắc nghiệm", "trac nghiem", "chọn đáp án", "chon dap an", "multiple choice"];
 
 function splitEmbeddedQuestionLines(line) {
-  try {
-    const rawChunks = line.split(EMBEDDED_QUESTION_SPLIT_RE);
-    const chunks = rawChunks.map(c => c?.trim()).filter(c => c);
-    
-    const result = [];
-    const mergeTailWords = /(?:từ|đến|và|cho|gồm|các|tới|tu|den|va|gom|cac|những)$/i;
+    try {
+        const rawChunks = line.split(EMBEDDED_QUESTION_SPLIT_RE);
+        const chunks = rawChunks.map(c => c?.trim()).filter(c => c);
 
-    for (const chunk of chunks) {
-        if (result.length > 0) {
-            const prev = result[result.length - 1].trim();
-            const words = prev.split(/\s+/);
-            const lastWord = words[words.length - 1].replace(/[,.:;]+$/, "");
-            if (mergeTailWords.test(lastWord)) {
-                result[result.length - 1] += ' ' + chunk;
-                continue;
+        const result = [];
+        const mergeTailWords = /(?:từ|đến|và|cho|gồm|các|tới|tu|den|va|gom|cac|những)$/i;
+
+        for (const chunk of chunks) {
+            if (result.length > 0) {
+                const prev = result[result.length - 1].trim();
+                const words = prev.split(/\s+/);
+                const lastWord = words[words.length - 1].replace(/[,.:;]+$/, "");
+                if (mergeTailWords.test(lastWord)) {
+                    result[result.length - 1] += ' ' + chunk;
+                    continue;
+                }
             }
+            result.push(chunk);
         }
-        result.push(chunk);
+        return result;
+    } catch (e) {
+        return [line.trim()];
     }
-    return result;
-  } catch (e) {
-      return [line.trim()];
-  }
 }
 
 function unwrapFormatTags(input) {
@@ -226,7 +226,7 @@ function extractInlineChoices(text) {
 
     const prefix = text.substring(0, marks[0].index).trim();
     const choices = [];
-    
+
     for (let idx = 0; idx < marks.length; idx++) {
         const mark = marks[idx];
         const start = mark.index + mark[0].length;
@@ -240,10 +240,10 @@ function extractInlineChoices(text) {
 
     const labels = choices.map(c => c[0]);
     if (new Set(labels).size !== labels.length) return [text, []];
-    
+
     const startCode = labels[0].charCodeAt(0);
-    const expected = Array.from({length: labels.length}, (_, i) => String.fromCharCode(startCode + i));
-    
+    const expected = Array.from({ length: labels.length }, (_, i) => String.fromCharCode(startCode + i));
+
     if (labels.join("") !== expected.join("")) return [text, []];
     return [prefix, choices];
 }
@@ -354,7 +354,7 @@ function partIdFromHeader(sequence, rawIdx) {
     if (!rawIdx) return `part${sequence}`;
     const parsed = parseInt(rawIdx, 10);
     if (!isNaN(parsed)) return `part${parsed}`;
-    
+
     const romanMap = { "I": 1, "II": 2, "III": 3, "IV": 4, "V": 5, "VI": 6 };
     return `part${romanMap[rawIdx.toUpperCase()] || sequence}`;
 }
@@ -473,7 +473,7 @@ export function linesToExam(lines, assets) {
 
         currentQType = inferSectionQType(plain, currentQType);
         currentQType = forceQTypeByPart(currentPartId, currentQType);
-        
+
         const answerHeader = ANSWER_KEY_HEADER_RE.exec(plain);
         if (answerHeader && questions.length > 0 && current === null) {
             collectingAnswerKey = true;
@@ -500,7 +500,7 @@ export function linesToExam(lines, assets) {
             const res = stripInlineAnswer(stem);
             stem = res[0];
             const answer = res[1];
-            
+
             current = createEmptyQuestion(qid, currentPartName, currentPartId, currentQType, sourceNum);
             current.stem = stem.trim();
             current.answer = answer;
@@ -508,7 +508,7 @@ export function linesToExam(lines, assets) {
             const inlineRes = extractInlineChoices(stem);
             const stemPrefix = inlineRes[0];
             const inlineChoices = inlineRes[1];
-            
+
             if (inlineChoices.length > 0) {
                 current.stem = stemPrefix.trim();
                 for (const [label, content] of inlineChoices) {

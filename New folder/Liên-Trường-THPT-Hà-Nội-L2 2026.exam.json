@@ -1,0 +1,1467 @@
+{
+  "id": "thpt-2026-sinhhoc-0416",
+  "title": "THI THỬ TỐT NGHIỆP THPT NĂM 2026 (LẦN 2)",
+  "subject": "sinh",
+  "time": 50,
+  "description": "Đề thi có 05 trang",
+  "parts": [
+    {
+      "id": "part_1",
+      "name": "PHẦN I",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Mỗi câu hỏi thí sinh chỉ chọn 1 phương án.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "content": "Một quần thể có thành phần kiểu gene là: 0,16AA: 0,48Aa: 0,36aa, tần số allele a của quần thể này là bao nhiêu?",
+          "points": 1.0,
+          "options": [
+            "A. 0,6.",
+            "B. 0,4.",
+            "C. 0,5.",
+            "D. 0,3."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "content": "Khi lai giữa hai cây hoa mõm chó thuần chủng có hoa màu đỏ và màu trắng với nhau thu được F₁ gồm toàn các cây có màu hoa hồng (màu sắc trung gian giữa 2 dạng bố mẹ). Hiện tượng tương tác này được gọi là",
+          "points": 1.0,
+          "options": [
+            "A. tương tác gián tiếp.",
+            "B. trội không hoàn toàn.",
+            "C. tương tác đồng trội.",
+            "D. tương tác cộng gộp."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "content": "Trong nguyên phân, đặc điểm của NST ở kì giữa là",
+          "points": 1.0,
+          "options": [
+            "A. các NST kép co xoắn cực đại xếp thành 1 hàng trên mặt phẳng xích đạo.",
+            "B. các NST kép co xoắn cực đại xếp thành 2 hàng trên mặt phẳng xích đạo.",
+            "C. các NST đơn xếp thành 1 hàng trên mặt phẳng xích đạo.",
+            "D. các NST đơn xếp thành 2 hàng trên mặt phẳng xích đạo."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q4",
+          "type": "single_choice",
+          "content": [
+            "Cho sơ đồ phả hệ về một bệnh di truyền ở người:",
+            {
+              "image": "img_a3b1a51c.jpg"
+            },
+            "Biết bệnh này do một trong hai allele của một gene quy định, không có đột biến mới. Nhận định nào sau đây là đúng về phả hệ trên?"
+          ],
+          "points": 1.0,
+          "options": [
+            "A. Gene quy định tính trạng này nằm trên NST giới tính X.",
+            "B. Xác suất sinh con có kiểu hình bình thường của cặp vợ chồng 13 và 14 là 8/9.",
+            "C. Tính trạng bệnh do gene trội quy định.",
+            "D. Xác định được chắc chắn kiểu gene của 8 người trong phả hệ."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q5",
+          "type": "single_choice",
+          "content": "Theo quan niệm của Charles Darwin, nguyên nhân chủ yếu của quá trình tiến hoá là",
+          "points": 1.0,
+          "options": [
+            "A. tác động của chọn lọc tự nhiên thông qua các biến dị cá thể và tính di truyền của sinh vật.",
+            "B. sinh vật chủ động biến đổi để thích nghi với môi trường sống.",
+            "C. sự di truyền các đặc điểm thu được trong quá trình sống của cá thể.",
+            "D. sự biến đổi đồng loạt của các cá thể trong quần thể theo hướng có lợi."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q6",
+          "type": "single_choice",
+          "content": "Thành tựu nào sau đây là ứng dụng của công nghệ gene?",
+          "points": 1.0,
+          "options": [
+            "A. Tạo ra giống dâu tằm tam bội (3n) có lá to.",
+            "B. Nhân bản vô tính cừu Dolly.",
+            "C. Tạo ra giống lúa “Gạo vàng” có khả năng tổng hợp β-carotene.",
+            "D. Tạo ra giống táo má hồng từ xử lý hoá chất."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q7",
+          "type": "single_choice",
+          "content": "Mạch rây được cấu tạo từ hai loại tế bào là",
+          "points": 1.0,
+          "options": [
+            "A. tế bào quản bào và tế bào kèm.",
+            "B. tế bào quản bào và tế bào mạch ống.",
+            "C. tế bào ống rây và tế bào mạch ống.",
+            "D. tế bào ống rây và tế bào kèm."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q8",
+          "type": "single_choice",
+          "content": "Một loài thực vật lưỡng bội có 12 nhóm gene liên kết. Số NST có trong một tế bào ở thể ba của loài này đang ở kì sau của nguyên phân là",
+          "points": 1.0,
+          "options": [
+            "A. 24.",
+            "B. 46.",
+            "C. 25.",
+            "D. 50."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q9",
+          "type": "single_choice",
+          "content": "Dạng đột biến cấu trúc NST có thể làm tăng số lượng gene trên một NST là",
+          "points": 1.0,
+          "options": [
+            "A. mất đoạn.",
+            "B. lặp đoạn.",
+            "C. đảo đoạn.",
+            "D. chuyển đoạn trong một NST."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q10",
+          "type": "single_choice",
+          "content": [
+            "Bảng sau thể hiện mối quan hệ giữa các thành phần của operon lac ở vi khuẩn ",
+            {
+              "type": "text",
+              "text": "E.coli",
+              "marks": [
+                "italic"
+              ]
+            },
+            " và kết quả biểu hiện gene:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    {
+                      "type": "text",
+                      "text": "Thành ",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "phần",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "type": "text",
+                      "text": "Môi",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": " ",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "trường",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": " ",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "không",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": " ",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "có",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": " lactose",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "type": "text",
+                      "text": "Môi",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": " ",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "trường",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": " ",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "có",
+                      "marks": [
+                        "bold"
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": " lactose",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ]
+                ],
+                [
+                  [
+                    "Protein ức chế"
+                  ],
+                  [
+                    "Gắn vùng vận hành"
+                  ],
+                  [
+                    "Không gắn vùng vận hành"
+                  ]
+                ],
+                [
+                  [
+                    "RNA polymerase"
+                  ],
+                  [
+                    "Không hoạt động"
+                  ],
+                  [
+                    "Hoạt động"
+                  ]
+                ],
+                [
+                  [
+                    "Gene cấu trúc"
+                  ],
+                  [
+                    "Không hoạt động"
+                  ],
+                  [
+                    "Hoạt động"
+                  ]
+                ],
+                [
+                  [
+                    "Ý nghĩa sinh học"
+                  ],
+                  [
+                    "Tiết kiệm năng lượng"
+                  ],
+                  [
+                    "Thích nghi môi trường"
+                  ]
+                ]
+              ]
+            },
+            "Phát biểu nào sau đây đúng khi nói về cơ chế điều hòa hoạt động của gene?"
+          ],
+          "points": 1.0,
+          "options": [
+            "A. Điều hòa hoạt động của gene ở vi khuẩn chủ yếu diễn ra ở mức dịch mã.",
+            "B. Lactose trực tiếp tham gia vào quá trình phiên mã DNA.",
+            "C. Điều hòa operon lac giúp vi khuẩn sử dụng hiệu quả nguồn dinh dưỡng.",
+            "D. Operon lac luôn hoạt động không phụ thuộc điều kiện môi trường."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q11",
+          "type": "single_choice",
+          "content": "Để vận chuyển các cây ăn quả lâu năm đi trồng ở một nơi mới cách xa vị trí cũ, người nông dân thường thực hiện các thao tác: (1) Tỉa bớt cành và lá, (2) Bọc bầu đất kỹ bằng nilon, (3) Phun một lớp sáp mỏng lên bề mặt lá (ở một số loài cây cảnh), (4) Vận chuyển vào thời điểm đêm hoặc sáng sớm mát. Mục đích chủ yếu của việc kết hợp các biện pháp trên là gì?",
+          "points": 1.0,
+          "options": [
+            "A. Để giảm trọng lượng của cây, giúp quá trình vận chuyển trở nên dễ dàng và tiết kiệm chi phí hơn.",
+            "B. Để hạn chế tối đa quá trình thoát hơi nước qua lá, tránh cho cây bị mất nước và héo chết khi bộ rễ chưa kịp phục hồi.",
+            "C. Để kích thích cây tập trung chất dinh dưỡng nuôi rễ, giúp rễ nhanh chóng bám vào môi trường đất mới.",
+            "D. Để ngăn chặn các loài sâu bệnh từ nơi cũ theo cây sang vùng kinh tế mới."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q12",
+          "type": "single_choice",
+          "content": [
+            "Ở cây hoa bốn giờ (",
+            {
+              "type": "text",
+              "text": "Mirabilis ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "jalapa",
+              "marks": [
+                "italic"
+              ]
+            },
+            "), gene quy định màu lá nằm trong tế bào chất. Lấy hạt phấn của cây lá xanh thụ phấn cho cây lá trắng. Theo lí thuyết, đời con có tỉ lệ kiểu hình là"
+          ],
+          "points": 1.0,
+          "options": [
+            "A. 3 cây lá xanh : 1 cây lá trắng.",
+            "B. 3 cây lá trắng : 1 cây lá xanh.",
+            "C. 100% cây lá xanh.",
+            "D. 100% cây lá trắng."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q13",
+          "type": "single_choice",
+          "content": "Tính trạng nào sau đây có mức phản ứng hẹp?",
+          "points": 1.0,
+          "options": [
+            "A. Số lượng quả dưa hấu trong một vụ thu hoạch.",
+            "B. Số lượng trứng gà thu được trong một tháng.",
+            "C. Số lượng hạt trên một bắp ngô.",
+            "D. Hàm lượng vitamin A có trong quả gấc."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q14",
+          "type": "single_choice",
+          "content": "Loại enzyme nào sau đây tham gia tổng hợp mạch mới trong quá trình nhân đôi DNA?",
+          "points": 1.0,
+          "options": [
+            "A. Enzyme DNA polymerase.",
+            "B. Enzyme restrictase.",
+            "C. Enzyme ligase.",
+            "D. Enzyme helicase."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q15",
+          "type": "single_choice",
+          "content": [
+            "Điều nào sau đây ",
+            {
+              "type": "text",
+              "text": "không",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "đúng",
+              "marks": [
+                "bold"
+              ]
+            },
+            " khi nói về hoá thạch?"
+          ],
+          "points": 1.0,
+          "options": [
+            "A. Là bằng chứng trực tiếp cho thấy các sinh vật đã tồn tại và tiến hoá trên Trái đất.",
+            "B. Là xác sinh vật được bảo tồn trong hổ phách.",
+            "C. Là xác của voi Mamut được bảo tồn nguyên vẹn trong băng tuyết.",
+            "D. Là các mẫu sinh vật được bảo quản trong bảo tàng."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q16",
+          "type": "single_choice",
+          "content": [
+            "Một cơ thể P có kiểu gene ",
+            {
+              "type": "text",
+              "text": "Ab aB",
+              "marks": [
+                "bold"
+              ]
+            },
+            "XY giảm phân bình thường tạo các giao tử. Biết khoảng cách giữa 2 gene A và b là 20cM. Theo lí thuyết, tỉ lệ loại giao tử không mang allele lặn tạo ra từ cơ thể trên chiếm bao nhiêu %?"
+          ],
+          "points": 1.0,
+          "options": [
+            "A. 2,5%.",
+            "B. 5,0%.",
+            "C. 20,0%.",
+            "D. 10,0%."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q17",
+          "type": "single_choice",
+          "content": "Cơ quan thoái hoá (cấu trúc thoái hoá) là",
+          "points": 1.0,
+          "options": [
+            "A. những cơ quan ở sinh vật giống nhau giữa các loài sinh vật do tác động của môi trường sống, không phải do thừa hưởng gene từ tổ tiên chung.",
+            "B. những cơ quan ở sinh vật không có chức năng rõ ràng nhưng rất giống với cơ quan vốn có chức năng nhất định ở loài tổ tiên.",
+            "C. những cơ quan ở sinh vật giống nhau giữa các loài sinh vật do thừa hưởng các gene từ tổ tiên chung nhưng có chức năng khác nhau.",
+            "D. những cơ quan ở sinh vật giống nhau giữa các loài sinh vật do có tập tính sinh sống giống nhau, mặc dù có chức năng khác nhau."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "q18",
+          "type": "single_choice",
+          "content": "Trong quang hợp ở thực vật, về mặt năng lượng, pha sáng cần có",
+          "points": 1.0,
+          "options": [
+            "A. ATP và NADPH.",
+            "B. H₂O và O₂.",
+            "C. Năng lượng ánh sáng.",
+            "D. CO₂ và ATP."
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part_2",
+      "name": "PHẦN II",
+      "description": "Câu trắc nghiệm đúng sai. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "q19",
+          "type": "true_false",
+          "content": [
+            "Ở người, một bệnh X liên quan đến đột biến chuyển đoạn trên NST số 22 và NST số 9 làm cho NST số 22 ngắn hơn bình thường. Khi nghiên cứu tế bào của 6 đứa trẻ (A) đến (G) bị bệnh X và bị thêm nhiều rối loạn khác, người ta thấy vùng bị mất đoạn nhỏ trên nhiễm sắc thể số 22 được thể hiện ở hình bên dưới. Trong đó, các NST 22 tương ứng của 6 đứa trẻ được đánh dấu (A) đến (G); các số từ 1 đến 13 là các đoạn bằng nhau tương ứng trên NST 22 ở người bình thường.",
+            {
+              "image": "img_ec431acc.png"
+            }
+          ],
+          "points": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Những trẻ bị bệnh X là mất đoạn NST ở vị trí số 8.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Tỉ lệ trẻ bị bệnh X ở nam cao hơn ở nữ.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Trẻ (C) có thể biểu hiện nhiều rối loạn hơn các trẻ còn lại.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Cả 6 trẻ này có thể đều bị ung thư máu ác tính.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "q20",
+          "type": "true_false",
+          "content": [
+            "Hình dưới đây mô tả mối quan hệ giữa: Gene → RNA → Protein ở sinh vật nhân sơ. X và Y là 2 cơ chế di truyền phân tử.",
+            {
+              "image": "img_a647d4f1.jpeg"
+            }
+          ],
+          "points": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Vật liệu di truyền được truyền lại cho đời sau thông qua quá trình X và Y.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Mạch 2 của gene D là mạch làm khuôn cho quá trình X.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Nếu chỉ xét trong đoạn trình tự nucleotide của gene D thì có tối đa 3 trường hợp đột biến thay thế 1 cặp nucleotide làm xuất hiện mã kết thúc sớm.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Một đột biến thay thế xảy ra trong trình tự nucleotide của gene D làm cho codon 5'UCG3' trên mRNA được phiên mã từ allele D trở thành codon 5'UGA3' trên mRNA được phiên mã từ gene đột biến thì chuỗi polypeptide do gene đột biến quy định sẽ ngắn hơn so với chuỗi polypeptide do gene D quy định tổng hợp.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "q21",
+          "type": "true_false",
+          "content": [
+            "Ở người nhóm máu A, B, O do 3 gene alen ",
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "A",
+              "marks": [
+                "sup"
+              ]
+            },
+            ", ",
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "B",
+              "marks": [
+                "sup"
+              ]
+            },
+            ", ",
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "O",
+              "marks": [
+                "sup"
+              ]
+            },
+            " quy định, nhóm máu A được quy định bởi các kiểu gene ",
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "A",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "A",
+              "marks": [
+                "sup"
+              ]
+            },
+            ", ",
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "A",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "O",
+              "marks": [
+                "sup"
+              ]
+            },
+            "; nhóm máu B được quy định bởi các kiểu gene ",
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "B",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "B",
+              "marks": [
+                "sup"
+              ]
+            },
+            ", ",
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "B",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "O",
+              "marks": [
+                "sup"
+              ]
+            },
+            "; nhóm máu O được quy định bởi kiểu gene ",
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "O",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "O",
+              "marks": [
+                "sup"
+              ]
+            },
+            "; nhóm máu AB được quy định bởi gene ",
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "A",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "I",
+              "marks": []
+            },
+            {
+              "type": "text",
+              "text": "B",
+              "marks": [
+                "sup"
+              ]
+            },
+            ", những nhận định dưới đây là đúng hay sai?"
+          ],
+          "points": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                "Bố và mẹ có kiểu gene ",
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "O",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "O",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " và ",
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "A",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "B",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " thì đời con sinh ra chắc chắn là nhóm máu A hoặc B."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": [
+                "Bố và mẹ có kiểu gene ",
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "A",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "B",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " và ",
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "A",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "O",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " thì đời con sinh ra chắc chắn có nhóm máu A."
+              ],
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                "Bố và mẹ có kiểu gene ",
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "O",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "O",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " và ",
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "B",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "O",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " thì đời con sinh ra có ½ khả năng mang nhóm máu O."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                "Bố và mẹ có kiểu gene ",
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "A",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "A",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " và ",
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "B",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "I",
+                  "marks": []
+                },
+                {
+                  "type": "text",
+                  "text": "O",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " thì đời con sinh ra không thể là nhóm máu O."
+              ],
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "q22",
+          "type": "true_false",
+          "content": [
+            "Khi nghiên cứu hình dưới đây về chu kì hoạt động của tim. Một học sinh đã đưa ra một số phát biểu sau đây:",
+            {
+              "image": "img_bbf7330c.jpeg"
+            }
+          ],
+          "points": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Một chu kì tim bắt đầu từ pha co tâm nhĩ, tiếp đó là pha co tâm thất và kết thúc là pha dãn chung.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Ở động vật, các loài khác nhau nhưng sẽ có thời gian của một chu kì tim là giống 0,8s và có nhịp tim trung bình là như nhau.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Khi tâm thất co, van nhĩ – thất mở, van động mạch đóng giúp máu từ tâm thất chảy vào động mạch.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Khi bị bệnh hở van nhĩ thất thì tim đập nhanh và mạnh hơn bình thường, lâu dần dễ dẫn đến suy tim. Vì vậy sức khỏe của người bệnh ngày càng giảm sút.",
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part_3",
+      "name": "PHẦN III",
+      "description": "Câu trắc nghiệm trả lời ngắn. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phần trả lời.",
+      "questions": [
+        {
+          "id": "q23",
+          "type": "short_answer",
+          "content": [
+            "Trên quần đảo Madero, ở một loài côn trùng cánh cứng, gene ",
+            {
+              "type": "text",
+              "text": "A",
+              "marks": [
+                "bold"
+              ]
+            },
+            " quy định cánh dài trội không hoàn toàn so với gene a quy định cánh ngắn, kiểu gene Aa quy định cánh trung gian. Quần thể nghiên cứu ban đầu có tần số kiểu hình cánh dài là 0,25AA : 0,6Aa : 0,15aa, khi môi trường thảm, các cá thể có cánh dài không chịu được gió mạnh sau lốc nên bị cuốn ra biển. Tính theo lí thuyết, tỉ lệ kiểu gene aa của quần thể ở thế hệ sau là bao nhiêu?"
+          ],
+          "points": 1.0,
+          "correct_answer": null
+        },
+        {
+          "id": "q24",
+          "type": "short_answer",
+          "content": [
+            {
+              "image": "img_fc95546c.png"
+            },
+            "Cho biết hai gene quy định enzyme tham gia vào con đường chuyển hóa tạo ra màu vỏ ốc ",
+            {
+              "type": "text",
+              "text": "Physaheterostropha",
+              "marks": [
+                "italic"
+              ]
+            },
+            " theo sơ đồ dưới đây và các allele lặn a, b không có khả năng tổng hợp protein. Biết rằng các allele lặn ",
+            {
+              "type": "text",
+              "text": "a, b",
+              "marks": [
+                "bold"
+              ]
+            },
+            " không có khả năng tổng hợp protein. Có tối đa bao nhiêu kiểu gene quy định ốc vỏ nâu?"
+          ],
+          "points": 1.0,
+          "correct_answer": null
+        },
+        {
+          "id": "q25",
+          "type": "short_answer",
+          "content": [
+            "Cho biết các phân tử tRNA mang các bộ ba đối mã (anticodon) vận chuyển tương ứng các amino acid như sau:",
+            "- tRNA mang bộ ba đối mã AGA vận chuyển amino acid Serine.",
+            "- tRNA mang bộ ba đối mã GGG vận chuyển amino acid Proline.",
+            "- tRNA mang bộ ba đối mã ACC vận chuyển amino acid Tryptophane.",
+            "- tRNA mang bộ ba đối mã ACG vận chuyển amino acid Cysteine.",
+            "- tRNA mang bộ ba đối mã UAG vận chuyển amino acid Tyrosine.",
+            "- tRNA mang bộ ba đối mã GAG vận chuyển amino acid Leucine.",
+            "Trong quá trình tổng hợp phân tử Protein, phân tử mRNA đã mã hóa được 50 amino acid Serine, 70 amino acid Proline, 80 amino acid Tryptophane, 90 amino acid Cysteine, 100 amino acid Tyrosine, 105 amino acid Leucine.",
+            "Biết mã kết thúc phân tử mRNA này là UAG, tổng số nucleotide C có trong các bộ ba trên phân tử mRNA được ribosome đọc trong quá trình dịch mã là bao nhiêu?"
+          ],
+          "points": 1.0,
+          "correct_answer": null
+        },
+        {
+          "id": "q26",
+          "type": "short_answer",
+          "content": [
+            "Quy trình tách chiết DNA từ tế bào gan gà được tiến hành theo các bước như hình sau. Trong bước 3, cho nước rửa bát có vai trò phá vỡ một số cấu trúc tế bào để DNA có thể được giải phóng ra ngoài. Các cấu trúc được kí hiệu như sau:",
+            {
+              "image": "img_caed1247.jpeg"
+            },
+            "Những cấu trúc tế bào nào được phá vỡ? ",
+            {
+              "type": "text",
+              "text": "(",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Viết",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "các",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "chữ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "số",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "tương",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "ứng",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "theo",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "chuỗi",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " 4 ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "kí",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "tự",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "từ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "nhỏ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "đến",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "lớn",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ")",
+              "marks": [
+                "italic"
+              ]
+            }
+          ],
+          "points": 1.0,
+          "correct_answer": null
+        },
+        {
+          "id": "q27",
+          "type": "short_answer",
+          "content": [
+            "Bảng sau là số liệu giả định (dùng để đánh giá kĩ năng phân tích bằng chứng tiến hóa sinh học phân tử). Bảng thể hiện tỉ lệ % giống nhau của một đoạn DNA (giả định dài 6820 với bốn loài khác, đồng thời cho biết mức độ giống nhau (+) hoặc không giống nhau (-) của một số đặc điểm sinh học phân tử.",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    {
+                      "type": "text",
+                      "text": "Loài",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "type": "text",
+                      "text": "% DNA giống 6820",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "type": "text",
+                      "text": "Trình tự amino acid",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "type": "text",
+                      "text": "Mã di truyền",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "type": "text",
+                      "text": "Cấu trúc gene",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ]
+                ],
+                [
+                  [
+                    "6816"
+                  ],
+                  [
+                    "90%"
+                  ],
+                  [
+                    "-"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "-"
+                  ]
+                ],
+                [
+                  [
+                    "6817"
+                  ],
+                  [
+                    "89%"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "-"
+                  ]
+                ],
+                [
+                  [
+                    "6818"
+                  ],
+                  [
+                    "88%"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "+"
+                  ]
+                ],
+                [
+                  [
+                    "6819"
+                  ],
+                  [
+                    "91%"
+                  ],
+                  [
+                    "-"
+                  ],
+                  [
+                    "+"
+                  ],
+                  [
+                    "-"
+                  ]
+                ]
+              ]
+            },
+            "Dựa vào các bằng chứng sinh học phân tử trong bảng, loài nào có quan hệ họ hàng gần gũi nhất với loài 6820?"
+          ],
+          "points": 1.0,
+          "correct_answer": null
+        },
+        {
+          "id": "q28",
+          "type": "short_answer",
+          "content": [
+            {
+              "image": "img_b74f8760.png"
+            },
+            "Hình dưới đây mô tả hoạt động của NST trong hai tế bào của một loài động vật lưỡng bội (2n) trong quá trình phân bào bình thường. Tổng số NST trong tâm tế bào sinh dục tạo ra tế bào 1 và bảy tế bào sinh dục tạo ra tế bào 2 là bao nhiêu?"
+          ],
+          "points": 1.0,
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

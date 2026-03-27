@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "exam-index": "node scripts/generate-exam-index.mjs",
+    "predev": "npm run exam-index -- --silent",
     "dev": "vite",
+    "prebuild": "npm run exam-index -- --silent",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
