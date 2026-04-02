@@ -1,8 +1,8 @@
 {
   "provider": "gemini",
-  "auto_model": true,
+  "auto_model": false,
   "model": "gemini-2.5-flash",
-  "output_dir": "D:/Web sv/dtht/output",
+  "output_dir": "D:/DTHT/output",
   "asset_dir": "",
   "dump_raw_dir": "",
   "max_retries": 1,

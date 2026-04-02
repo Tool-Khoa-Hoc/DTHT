@@ -1,0 +1,1961 @@
+{
+  "id": "e-khao-sat-vat-ly-12-thpt-ngo-gia-tu-phu-tho-2025-2026",
+  "title": "Đề khảo sát Vật Lý 12 THPT Ngô Gia Tự - Phú Thọ (2025-2026)",
+  "subject": "ly",
+  "time": 50,
+  "description": "Đề khảo sát Vật Lý 12 THPT Ngô Gia Tự - Phú Thọ (2025-2026)",
+  "parts": [
+    {
+      "id": "part-1",
+      "name": "PHẦN I",
+      "description": "[{'type': 'text', 'text': 'PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn.', 'marks': ['bold']}, 'Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.']",
+      "questions": [
+        {
+          "id": "1",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 1:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Tính chất nào sau đây không đúng với chất ở thể khí?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Có hình dạng và thể tích xác định."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Có các phân tử chuyển động hỗn độn."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Có thể nén được dễ dàng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Lực tương tác phân tử nhỏ hơn lực tương tác phân tử ở thể rắn và thể lỏng."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 2:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Chuyển động nào sau đây là đúng đối với các phân tử ở thể lỏng?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Chuyển động hỗn loạn không ngừng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Dao động xung quanh các vị trí cân bằng cố định."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Chuyển động hoàn toàn tự do."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Dao động xung quanh các vị trí cân bằng không cố định."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 3:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Trong các đặc điểm bay hơi sau đây, đặc điểm nào không đúng cho sự sôi?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Xảy ra ở một nhiệt độ xác định của chất lỏng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Xảy ra ở cả trong lòng lẫn mặt thoáng của chất lỏng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Xảy ra ở bất kì nhiệt độ nào."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Trong suốt quá trình diễn ra hiện tượng này, nhiệt độ của lỏng không thay đổi."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 4:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Nhiệt độ của vật giảm là do các nguyên tử hoặc phân tử cấu tạo nên vật"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " ngừng chuyển động."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " nhận thêm động năng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " chuyển động chậm đi."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "va chạm vào nhau."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 5:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Quy ước về dấu nào sau đây phù hợp với công thức ΔU = A + Q của định luật I nhiệt động lực học?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Vật nhận công A < 0, vật nhận nhiệt Q < 0."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Vật nhận công A > 0, vật nhận nhiệt Q > 0."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Vật thực hiện công A < 0, vật truyền nhiệt Q > 0."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Vật thực hiện công A > 0, vật truyền nhiệt Q < 0."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 6:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Cho 20 g một chất ở thể rắn có nhiệt độ 70",
+            {
+              "math": "℃"
+            },
+            " vào 100 g một chất khác có lỏng ở 20",
+            {
+              "math": "℃"
+            },
+            ". Cân bằng nhiệt đạt được ở 30",
+            {
+              "math": "℃"
+            },
+            ". Nhiệt dung riêng của chất rắn này"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " bằng nhiệt dung riêng của chất lỏng đã cho."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " nhỏ hơn nhiệt dung riêng của chất lỏng đã cho."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " lớn hơn nhiệt dung riêng chất lỏng đã cho."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "có thể lớn hơn hoặc bằng nhiệt dung riêng của chất lỏng đã cho tuỳ thuộc vào chất liệu."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "7",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 7:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Nhiệt độ của không khí trong một phòng theo nhiệt giai Celsius là 27",
+            {
+              "math": "℃"
+            },
+            ". Úng với nhiệt giai Fahrenheit, nhiệt độ này là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 48, 6",
+              {
+                "math": "℉"
+              },
+              "."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "80, 6",
+              {
+                "math": "℉"
+              },
+              "."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "15",
+              {
+                "math": "℉"
+              },
+              "."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "47",
+              {
+                "math": "℉"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "8",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 8:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Khoảng 70% bề mặt của Trái Đất được bao phủ bởi nước. Vì có ...(1)... nên lượng nước này có thể hấp thụ năng lượng nhiệt khổng lồ từ Mặt Trời mà vẫn giữ cho ...(2)... của bề mặt Trái Đất tăng không nhanh và không nhiều, tạo điều kiện thuận lợi cho sự sống con người và các sinh vật khác. Khoảng trống (1), (2) lần lượt được điền các từ là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " nhiệt độ sôi lớn, áp suất."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " nhiệt độ sôi lớn, nhiệt độ"
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "nhiệt dung riêng lớn, nhiệt độ"
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "nhiệt dung riêng nhỏ, nhiệt độ."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "9",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 9:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Lấy 0,01 kg hơi nước ở 100",
+            {
+              "math": "℃"
+            },
+            " cho ngưng tụ trong bình nhiệt lượng kế chứa 0,2 kg nước ở 9,5",
+            {
+              "math": "℃"
+            },
+            ". Nhiệt độ cuối cùng là 40",
+            {
+              "math": "℃"
+            },
+            ", cho nhiệt dung riêng của nước là 4180 J/kgK. Nhiệt hóa hơi của nước bằng"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 2,3.10",
+              {
+                "type": "text",
+                "text": "6",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "J/kg."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 2,5.10",
+              {
+                "type": "text",
+                "text": "6",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "J/kg."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "2,0.10",
+              {
+                "type": "text",
+                "text": "6",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "J/kg."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "2,7.10",
+              {
+                "type": "text",
+                "text": "6",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "J/kg."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "10",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 10:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Câu nào sau đây nói về nhiệt lượng là không đúng?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Nhiệt lượng là số đo độ biến thiên nội năng của vật trong quá trình truyền nhiệt."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Một vật lúc nào cũng có nội năng do đó lúc nào cũng có nhiệt lượng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Đơn vị của nhiệt lượng cũng là đơn vị của nội năng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Nhiệt lượng không phải łà nội năng."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "11",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 11:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Hai chất khí có thể trộn lẫn vào nhau tạo nên một hỗn hợp khí đồng đều là vì\n(1). các phân tử khí chuyển động nhiệt.\n(2). các chất khí đã cho không có phản ứng hoá học với nhau.\n(3). giữa các phân tử khí có khoảng trống."
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "(1) và (2)."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "(2) và (3)."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "(3) và (1)."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "cả (1), (2) và (3)."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "12",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 12:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Đun nóng khối khí trong một bình kín. Các phân tử khí"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " xích lại gần nhau hơn"
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " có tốc độ trung bình lớn hơn."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " nở ra lớn hơn."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "liên kết lại với nhau."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "13",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 13:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Người ta thả một vật rắn có khối lượng m",
+            {
+              "type": "text",
+              "text": "1",
+              "marks": [
+                "sub"
+              ]
+            },
+            " có nhiệt độ 150",
+            {
+              "math": "℃"
+            },
+            " vào một bình nước có khối lượng m",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            ", nhiệt độ của nước tăng từ 20",
+            {
+              "math": "℃"
+            },
+            " đến 50",
+            {
+              "math": "℃"
+            },
+            ". Gọi c",
+            {
+              "type": "text",
+              "text": "1",
+              "marks": [
+                "sub"
+              ]
+            },
+            ", c",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            " lần lượt là nhiệt dung riêng của vật rắn và nhiệt dung riêng của nước. Bỏ qua sự truyền nhiệt ra môi trường bên ngoài. Tỉ số đúng là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " ",
+              {
+                "math": "\\frac{m_{1}c_{1}}{m_{2}c_{2}}"
+              },
+              " = ",
+              {
+                "math": "\\frac{3}{10}"
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "math": "\\frac{m_{1}c_{1}}{m_{2}c_{2}}"
+              },
+              " = ",
+              {
+                "math": "\\frac{1}{13}"
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " ",
+              {
+                "math": "\\frac{m_{1}c_{1}}{m_{2}c_{2}}"
+              },
+              " = ",
+              {
+                "math": "\\frac{10}{3}"
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "math": "\\frac{m_{1}c_{1}}{m_{2}c_{2}}"
+              },
+              " = ",
+              {
+                "math": "\\frac{13}{1}"
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "14",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 14:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Điều nào sau đây là sai khi nói về nhiệt nóng chảy?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Nhiệt nóng chảy của vật rắn là nhiệt cung cấp cho vật rắn trong quá trình nóng chảy."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Đơn vị của nhiệt nóng chảy là Jun (J)."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Các chất có khối lượng bằng nhau thì nhiệt nóng chảy như nhau."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Nhiệt nóng chảy tính bằng công thức Q = λm trong đó λ là nhiệt nóng chảy riêng của chất làm vật, m là khối lượng của vật."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "15",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 15:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Khi đặt vật 1 tiếp xúc với vật 2 thì có sự truyền nhiệt từ vật 2 sang vật 1. Khẳng định nào sau đây là đúng?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Vật 2 chứa rất nhiều nhiệt lượng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Vật 1 chứa rất ít nhiệt lượng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Cả hai vật không chứa nhiệt lượng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Nhiệt độ của hai vật bằng nhau."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "16",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 16:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Đun nước trong thùng bằng một dây nung nhúng trong nước có công suất 1,2 kW. Sau 3 phút nước nóng lên từ 80",
+            {
+              "math": "℃"
+            },
+            " đến 90",
+            {
+              "math": "℃"
+            },
+            ". Sau đó người ta rút dây nung ra khỏi nước thì thấy cứ sau mỗi phút nước trong thùng nguội đi 1,5",
+            {
+              "math": "℃"
+            },
+            ". Coi rằng nhiệt toả ra môi trường một cách đều đặn. Bỏ qua sự hấp thụ nhiệt của thùng. Biết rằng nhiệt dung riêng của nước là c = 4200 J/kg.K. Khối lượng nước đựng trong thùng là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 5,14 kg."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "3,55 kg."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "1,55 kg."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "4,55 kg."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "17",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 17:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Một bình chứa carbon dioxide (CO",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            ") ở nhiệt độ phòng và áp suất 20 atm (áp suất không khí trong phòng là 1 atm). Để quan sát hiện tượng khối khí CO",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            " giảm nhiệt độ và hoá rắn khi phun ra khỏi bình, người ta đặt một miếng vải ở miệng ống xả của bình chứa và mở van thì thấy CO",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            " rắn (có nhiệt độ thấp) được hình thành trên miếng vải. Hiện tượng khối khí biến đổi trực tiếp thành chất rắn như CO",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            " trong hiện tượng này được gọi là sự ngưng kết. CO",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            " khi phun ra lại giảm nhiệt độ là vì"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Khi CO",
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              " phun ra khỏi bình thì do chênh lệch áp suất, khí thực hiện công (A < 0) lên môi trường ngoài để tăng thể tích đột ngột. Quá trình này không có sự truyền nhiệt lượng (Q = 0).\nDo đó, độ biến thiên nội năng của khí ΔU < 0, nội năng của khí CO",
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              " giảm nên nhiệt độ giảm."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Khí CO",
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              " chuyển thể trực tiếp từ thể khí sang thể rắn nên có sự toả nhiệt ra môi trường làm cho nhiệt độ cả khí CO",
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              " và môi trường xung quanh đều hạ xuống."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Khí CO",
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              " chuyển thể trực tiếp từ thể khí sang thể rắn, sau đó CO",
+              {
+                "type": "text",
+                "text": "2 ",
+                "marks": [
+                  "sub"
+                ]
+              },
+              "lại nhận nhiệt từ môi trường xung quanh và hoá hơi nên nhiệt độ cả khí CO",
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              " và môi trường xung quanh đều hạ xuống."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "Khí CO",
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              " chuyển thể trực tiếp từ thể khí sang thể rắn nên khoảng cách giữa các phân tử, tốc độ chuyển động của chúng tăng lên nhanh, làm nội năng của khối khí giảm. Do đó, nhiệt độ của khối khí giảm."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "18",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 18:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Để đúc các vật bằng thép, người ta phải nấu chảy thép trong lò. Thép đưa vào lò có nhiệt độ t",
+            {
+              "type": "text",
+              "text": "1",
+              "marks": [
+                "sub"
+              ]
+            },
+            " = 20",
+            {
+              "math": "℃"
+            },
+            ", hiệu suất của lò là 60%, nghĩa là 60% nhiệt lượng cung cấp cho lò được dùng vào việc đun nóng thép cho đến khi thép nóng chảy. Để cung cấp nhiệt lượng, người ta đã đốt hết m",
+            {
+              "type": "text",
+              "text": "t",
+              "marks": [
+                "sub"
+              ]
+            },
+            " = 200 kg than đá có năng suất tỏa nhiệt là q",
+            {
+              "type": "text",
+              "text": "t",
+              "marks": [
+                "sub"
+              ]
+            },
+            " = 29.10",
+            {
+              "type": "text",
+              "text": "6",
+              "marks": [
+                "sup"
+              ]
+            },
+            " J/kg. Cho biết thép có nhiệt nóng chảy λ = 83,7.10",
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            "J/kg, nhiệt độ nóng chảy là t",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            " = 1400",
+            {
+              "math": "℃"
+            },
+            ", nhiệt dung riêng ở thể rắn là c = 0,46 kJ/kg.K. Khối lượng của mẻ thép bị nấu chảy có giá trị gần nhất nào sau đây?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 1,6 tấn."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "4,8 tấn."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "8,1 tấn."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              "3,2 tấn."
+            ]
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part-2",
+      "name": "PHẦN II",
+      "description": "[{'type': 'text', 'text': 'PHẦN II. Câu trắc nghiệm đúng sai.', 'marks': ['bold']}, ' Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.']",
+      "questions": [
+        {
+          "id": "1",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 1:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Hiện tượng băng tan với tốc độ ngày càng tăng đã khiến mực nước biển dâng lên hơn 1 mm mỗi năm. Từ năm 1971 đến nay, con số này đã lên tới 2,3 cm. Trong giai đoạn từ năm 2005-2015, tổng lượng băng mất đi tại Bắc Cực là 447 tỷ tấn/năm, điều này đồng nghĩa với việc cứ mỗi giây lại có 14000 tấn nước đổ ra biển tăng gấp ba lần so với thời kỳ từ năm 1986-2005. Biết nhiệt nóng chảy của nước là 334.10",
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            " J/kg."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "a)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                " Băng tan là hiện tượng ngưng tụ và hoá hơi."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "b)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                " Khi băng tan, nó hấp thu nhiệt từ môi trường, làm cho nhiệt độ môi trường tăng lên."
+              ],
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "c)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                " Từ năm 2005-2015, nhiệt cung cấp cho khối băng trong mỗi giây để tan chảy hoàn toàn là\n4,7.10",
+                {
+                  "type": "text",
+                  "text": "12 ",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                "J."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "d)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                " Băng tan có thể đem theo vius cổ đại và khí CO",
+                {
+                  "type": "text",
+                  "text": "2",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                " vĩnh cửu gây ô nhiễm môi trường và ảnh\nhưởng xấu đến sức khoẻ con người."
+              ],
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 2:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Giả sử một học sinh tạo ra một nhiệt kế sử dụng một thang nhiệt độ mới cho riêng mình, gọi là nhiệt độ Z, có đơn vị là ",
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            "Z. Trong đó nhiệt độ của nước đá đang tan ở 1 atm là −20",
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            "Z và nhiệt độ nước đang sôi ở 1 am là 120",
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            "Z."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "a)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                " Trong thang đo nhiệt độ Z có 140 khoảng chia."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "b)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                " Biểu thức chuyển đổi nhiệt độ từ thang nhiệt độ Xen-xi-út sang nhiệt độ Z là: t(",
+                {
+                  "type": "text",
+                  "text": "0",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                "Z) = 1,4t(",
+                {
+                  "math": "℃"
+                },
+                ") + 20"
+              ],
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "c)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                "Nếu dùng nhiệt kế mới này đo nhiệt độ một vật thì thấy giá trị 61",
+                {
+                  "type": "text",
+                  "text": "0",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                "Z, nhiệt độ của vật trong\nthang nhiệt độ Xen-xi-út là 20",
+                {
+                  "math": "℃"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "d)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                "Nhiệt độ của vật bằng 40",
+                {
+                  "math": "℃"
+                },
+                " thì số chỉ trên hai thang nhiệt độ bằng nhau."
+              ],
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 3:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Một bình đun nước nóng bằng điện có công suất 1,2 kW. Nước ở 15",
+            {
+              "math": "℃"
+            },
+            " được làm nóng khi đi qua buồng đốt của bình. Nước chảy qua buồng đốt với lưu lượng 5,8.10",
+            {
+              "type": "text",
+              "text": "−3",
+              "marks": [
+                "sup"
+              ]
+            },
+            " kg/s. Nhiệt độ của nước khi đi vào buồng đốt là 15",
+            {
+              "math": "℃"
+            },
+            ". Cho nhiệt dung riêng của nước là 4180 J/kg. K. Biết rằng tiền điện phải trả cho công ty điện lực là 1750 đồng một \"số điện\"."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "a)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                "Nếu một ngày đun nước nóng trong thời gian 4 giờ thì tiền điện phải trả cho bình nước đó là 8400 đồng."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "b)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                "Trong điều kiện lí tưởng, nhiệt độ của nước khi ra khỏi buồng đốt là 60,5",
+                {
+                  "math": "℃"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "c)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                "Nếu muốn nước ở đầu ra của buồng đốt đạt đến nhiệt độ sôi thì công suất tối thiểu của ấm là 2,06 kW."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "d)",
+                  "marks": [
+                    "bold"
+                  ]
+                }
+              ],
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 4:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Một nhóm HS muốn đo nhiệt dung riêng của nước. Họ thực hiện các nội dung sau: (I) chuẩn bị các dụng cụ gồm: biến áp nguồn, nhiệt lượng kế cách nhiệt tốt kèm dây điện trở; nhiệt kế, oat kế, đồng hồ bấm giây; (II) họ cho rằng muốn đo nhiệt dung riêng c cần đo nhiệt lượng cung cấp cho nước Q, khối lượng nước m làm thí nghiệm, độ biến thiên nhiệt độ của nước Δt; (III) họ tiến hành đo khối lượng nước làm thí nghiệm, đo nhiệt độ ban đầu, công suất đun, thời gian đun, đọc số chỉ nhiệt kế sau mỗi 3 phút (thu được bảng số liệu như hình bên), vẽ đồ thị biểu diễn sự phụ thuộc của nhiệt độ vào thời gian; (IV) sau đó họ sử dụng công thức c = Q/mΔt để xác định nhiệt dung riêng. Bỏ qua sai số dụng cụ.\n",
+            {
+              "image": "img_81efdcca3cc0.png"
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "a)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                " Theo đúng tiến trình khoa học thì thứ tự các nội dung thực hiện là (I), (II), (III), (IV)."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "b)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                " Việc vẽ đồ thị chỉ mang tính chất biểu diễn, không giúp ích gì cho việc xác định nhiệt dung riêng."
+              ],
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "c)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                "Sau mỗi ba phút, nhiệt độ của nước tăng lên trung bình là Δt = 5,4 ± 0,5(K)."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "d)",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                "Nhiệt dung riêng của nước đo được trong thí nghiệm này là 4160 J/(kg. K)."
+              ],
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part-3",
+      "name": "PHẦN III",
+      "description": "[{'type': 'text', 'text': 'PHẦN III. Câu trắc nghiệm trả lời ngắn.', 'marks': ['bold']}, ' Thí sinh trả lời từ câu 1 đến câu 6.']",
+      "questions": [
+        {
+          "id": "1",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 1:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Một bình đun nước siêu tốc có công suất định mức 1800 W được sử dụng để đun sôi 1,5 kg nước từ 27",
+            {
+              "math": "℃"
+            },
+            ". Nước sôi trong khoảng thời gian 6 phút. Biết nhiệt dung riêng của nước c = 4180 J/kg.\nBình đun hoạt động hoàn toàn bình thường. Hiệu suất của bình đun bằng bao nhiêu %? (làm tròn kết quả đến chữ số hàng phần mười)."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 2:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Cần cho tối thiểu bao nhiêu gam nước đá ở −10",
+            {
+              "math": "℃"
+            },
+            " vào 0,5 kg nước ở 20",
+            {
+              "math": "℃"
+            },
+            " để thu được nước ở 0",
+            {
+              "math": "℃"
+            },
+            "? Cho biết nhiệt dung riêng của nước đá là 2100 J/kg.K, nhiệt nóng chảy riêng của nước đá là\n3,34.10",
+            {
+              "type": "text",
+              "text": "5",
+              "marks": [
+                "sup"
+              ]
+            },
+            "J/kg, nhiệt dung riêng của nước là 4200 J/kg.K. (Kết quả làm tròn đến phần nguyên.)"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 3:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Một động cơ hơi nước cần một nồi hơi \"súp de\" để đun nước sôi tạo hơi. Việc giãn nở của hơi tạo áp lực đẩy lên pit-tông hay các cánh turbine, khi đó chuyển động thẳng được chuyển thành chuyển động quay để quay bánh xe hay truyền động cho các bộ phận cơ khí khác. Để vận hành một động cơ hơi nước có công suất 30 kW thì nồi hơi \"súp de\" cần liên tục nhận được nhiệt lượng bằng 40000 J mỗi giây. Tính phần hao phí nhiệt lượng của nồi hơi \"súp de\" ra đơn vị phần trăm."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 4:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Một động cơ hơi nước cần một nồi hơi \"súp de\" để đun nước sôi tạo hơi. Việc giãn nở của hơi tạo áp lực đẩy lên pit-tông hay các cánh turbine, khi đó chuyển động thẳng được chuyển thành chuyển động quay để quay bánh xe hay truyền động cho các bộ phận cơ khí khác. Để vận hành một động cơ hơi nước có công suất 30 kW thì nồi hơi \"súp de\" cần liên tục nhận được nhiệt lượng bằng 40000 J mỗi giây. Người ta cung cấp nhiệt lượng cho nồi hơi \"súp de\" bằng việc đốt than đá, hiệu suất động cơ hơi nước này là 20%. Hãy tính công suất toả nhiệt ở lò than ra đơn vị kW."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 5:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Người ta đặt một viên bi đặc bằng sắt bán kính R = 6 cm đã được nung nóng tới nhiệt độ t = 325",
+            {
+              "math": "℃"
+            },
+            " lên một khối nước đá rất lớn ở 0",
+            {
+              "math": "℃"
+            },
+            ", có mặt trên phẳng ngang. Bỏ qua sự dẫn nhiệt của nước đá và sự nóng lên của đá đã tan, và trao đổi nhiệt với môi trường ngoài. Cho khối lượng riêng của sắt là ρ = 7800 kg/m",
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            ", của nước đá là ρo = 915 kg/m",
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            ". Nhiệt dung riêng của sắt là C = 460 J/kgK, nhiệt nóng chảy của nước đá là 3,4.10",
+            {
+              "type": "text",
+              "text": "5 ",
+              "marks": [
+                "sup"
+              ]
+            },
+            "J/kg. Hỏi viên bi chui vào nước đá đến độ sâu là bao nhiêu cm, tính từ bề mặt của khối nước đá tới điểm sâu nhất của viên bi. (Kết quả làm tròn đến hàng đơn vị)\n",
+            {
+              "image": "img_ee2801a9d4ec.png"
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 6:",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Hình bên dưới mô tả hệ thống sưởi bằng nước nóng của một căn phòng. Nước nóng được bơm vào các đường ống bên trong lò sưởi. Các cánh tản nhiệt được gắn vào các đường ống đó. Không khí lạnh được quạt hút vào đế lò sưởi, nhận nhiệt lượng và đi ra khỏi lò sưởi là không khí nóng hơn. Giả sử có 600 kg nước nóng đi qua lò sưởi mỗi giờ và nhiệt độ của nước giảm đi 5",
+            {
+              "math": "℃"
+            },
+            " khi đi qua lò sưởi. Tính năng lượng nhiệt đượctruyền từ nước mỗi giờ (theo đơn vị MJ). Cho biết nhiệt dung riêng của nước là 4200 J/kg."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

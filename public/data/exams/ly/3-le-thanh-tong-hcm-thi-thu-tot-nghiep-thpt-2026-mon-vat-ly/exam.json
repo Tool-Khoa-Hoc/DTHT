@@ -1,0 +1,974 @@
+{
+  "id": "thpt-le-thanh-tong-hcm-2025-2026",
+  "title": "THPT LÊ THÁNH TÔNG – HCM 2025-2026",
+  "subject": "ly",
+  "time": 50,
+  "description": "THPT LÊ THÁNH TÔNG – HCM 2025-2026",
+  "parts": [
+    {
+      "id": "part-1",
+      "name": "PHẦN I",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án",
+      "questions": [
+        {
+          "id": "1",
+          "type": "single_choice",
+          "content": "Đơn vị của từ thông có thể là:",
+          "points": 0.25,
+          "options": [
+            "Tesla trên mét (T/m).",
+            "Tesla nhân mét (T.m).",
+            [
+              "Tesla trên mét bình phương (T/m",
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sup"
+                ]
+              },
+              ")."
+            ],
+            [
+              "Tesla nhân mét bình phương (T.m",
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sup"
+                ]
+              },
+              ")."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "single_choice",
+          "content": "Khi nói về sóng điện từ phát biểu nào sau đây là đúng?",
+          "points": 0.25,
+          "options": [
+            "Khi truyền trong chân không, sóng điện từ không mang theo năng lượng.",
+            "Sóng điện từ có thể là sóng dọc hoặc sóng ngang.",
+            [
+              "Sóng điện từ luôn lan truyền với tốc độ ",
+              {
+                "math": "c=3108"
+              },
+              " m/s."
+            ],
+            "Tốc độ truyền sóng điện từ phụ thuộc vào môi trường."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "single_choice",
+          "content": [
+            {
+              "image": "img_541f95bfd4c3.jpg"
+            },
+            "Một khung dây kín (",
+            {
+              "math": "C"
+            },
+            ") chuyển động trong một vùng từ trường có cảm ứng từ ",
+            {
+              "math": "B"
+            },
+            " như hình vẽ. Dòng điện cảm ứng xuất hiện trong khung dây có chiều ngược chiều kim đồng hồ khi khung dây chuyển động theo hướng nào?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Hướng 1.",
+            "Hướng 2.",
+            "Hướng 3 hoặc hướng 4.",
+            "Dòng điện cảm ứng không xuất hiện trong khung dây kín (C) khi khung dây chuyển động trong vùng từ trường theo cả 4 hướng kể trên."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "single_choice",
+          "content": [
+            "Cho các phát biểu sau:",
+            "(1) Độ lớn từ thông qua một mạch kín càng lớn khi số lượng đường sức từ xuyên qua mạch kín đó càng nhỏ.",
+            "(2) Đơn vị của từ thông là weber.",
+            "(3) Khi từ thông qua mặt giới hạn bởi một khung dây dẫn kín biến thiên theo thời gian thì trong khung dây xuất hiện dòng điện cảm ứng.",
+            "(4) Trong hiện tượng cảm ứng điện từ, dòng điện cảm ứng sinh ra trong một khung dây dẫn kín có tác dụng chống lại sự biến thiên từ thông qua chính khung dây đó.",
+            "Trong các phát biểu trên, có mấy phát biểu đúng?"
+          ],
+          "points": 0.25,
+          "options": [
+            "4.",
+            "2.",
+            "3.",
+            "1."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "single_choice",
+          "content": "Quá trình chuyển hóa nào sau đây là quá trình ngưng tụ?",
+          "points": 0.25,
+          "options": [
+            "Từ thể lỏng sang thể rắn.",
+            "Từ thể rắn sang thể khí.",
+            "Từ thể lỏng sang thể khí.",
+            "Từ thể khí sang thể lỏng."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "single_choice",
+          "content": "Nếu tăng nhiệt độ của một hệ mà không làm thay đổi thể tích của nó thì nội năng của nó",
+          "points": 0.25,
+          "options": [
+            "tăng.",
+            "giảm.",
+            "ban đầu tăng, sau đó giảm.",
+            "luôn không đổi."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "7",
+          "type": "single_choice",
+          "content": [
+            "Một sóng điện từ có tần số ",
+            {
+              "math": "106Hz"
+            },
+            " truyền trong một môi trường với tốc độ ",
+            {
+              "math": "3108ms"
+            },
+            ". Trong môi trường đó, sóng điện từ này có bước sóng là"
+          ],
+          "points": 0.25,
+          "options": [
+            "200 m.",
+            "30 m.",
+            "150 m.",
+            "300 m."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "8",
+          "type": "single_choice",
+          "content": [
+            {
+              "image": "img_4f136df5dbc6.jpg"
+            },
+            "Hình bên diễn tả chiều cảm ứng từ tạo bởi dòng điện không đổi I chạy trong một vòng dây dẫn hình tròn tại các điểm nằm trong mặt phẳng dây dẫn. Tại điểm nào có kí hiệu không đúng với chiều của cảm ứng từ tại đó?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Điểm M.",
+            "Điểm Q.",
+            "Điểm N.",
+            "Điểm P."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "9",
+          "type": "single_choice",
+          "content": [
+            "Điểm cố định dưới và cố định trên của một nhiệt kế bị hỏng là ",
+            {
+              "math": "5"
+            },
+            " và ",
+            {
+              "math": "99"
+            },
+            ". Nếu số chỉ của nhiệt kế là ",
+            {
+              "math": "52"
+            },
+            " thì nhiệt độ tương ứng trên thang đo Fahrenheit là:"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "154F"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "122F"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "151F"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "132F"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "10",
+          "type": "single_choice",
+          "content": [
+            {
+              "image": "img_afa3dc0ce55b.jpg"
+            },
+            "Thanh kim loại dẫn điện có thể lăn không ma sát dọc theo hai đoạn dây dẫn không nhiễm từ (Hình vẽ). Khi đóng công tắc K, dòng điện chạy theo chiều mũi tên, lúc này thanh kim loại sẽ:"
+          ],
+          "points": 0.25,
+          "options": [
+            "lăn về bên phải.",
+            "lăn về bên trái.",
+            "đứng yên.",
+            "chuyển động đi lên cực bắc của nam châm."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "11",
+          "type": "single_choice",
+          "content": [
+            "Khi nhiệt độ của một khối khí lí tưởng tăng từ ",
+            {
+              "math": "27C"
+            },
+            " đến ",
+            {
+              "math": "927C"
+            },
+            " thì tốc độ căn quân phương của các phân tử sẽ"
+          ],
+          "points": 0.25,
+          "options": [
+            "tăng gấp bốn lần.",
+            "tăng gấp đôi.",
+            "giảm 4 lần.",
+            "giảm 2 lần."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "12",
+          "type": "single_choice",
+          "content": "Khi sét đánh, có dòng điện tích âm chuyển động từ đám mây xuống mặt đất. Từ trường của Trái Đất hướng về phía Bắc. Tia sét bị từ trường Trái Đất làm lệch hướng theo hướng nào?",
+          "points": 0.25,
+          "options": [
+            "Bắc.",
+            "Nam.",
+            "Đông.",
+            "Tây."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "13",
+          "type": "single_choice",
+          "content": [
+            {
+              "image": "img_f9f7d65d4d68.jpg"
+            },
+            "Như hình vẽ, cuộn dây M và cuộn dây P được quấn trên cùng một lõi sắt. Phát biểu nào sau đây là sai?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Ngay khi đóng khoá ",
+              {
+                "math": "K"
+              },
+              ", cuộn dây ",
+              {
+                "math": "M"
+              },
+              " và cuộn dây ",
+              {
+                "math": "P"
+              },
+              " đẩy nhau."
+            ],
+            [
+              "Khi đóng khoá ",
+              {
+                "math": "K"
+              },
+              " và dòng điện đã ổn định, số chỉ của ampe kế là 0."
+            ],
+            [
+              "Ngay khi ngắt khoá ",
+              {
+                "math": "K"
+              },
+              ", dòng điện chạy qua ampe kế có chiều từ ",
+              {
+                "math": "b"
+              },
+              " đến ",
+              {
+                "math": "a"
+              },
+              "."
+            ],
+            [
+              "Ngay khi ngắt khoá ",
+              {
+                "math": "K"
+              },
+              ", từ trường của dòng điện cảm ứng trong cuộn dây ",
+              {
+                "math": "P"
+              },
+              " hướng sang trái."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "14",
+          "type": "single_choice",
+          "content": [
+            "Một sóng điện từ truyền qua điểm M trong không gian. Cường độ điện trường và cảm ứng từ tại M biến thiên điều hòa với giá trị cực đại lần lượt là ",
+            {
+              "math": "E0"
+            },
+            " và ",
+            {
+              "math": "B0"
+            },
+            ". Khi cảm ứng từ tại M bằng ",
+            {
+              "math": "05B0"
+            },
+            " thì cường độ điện trường tại đó có độ lớn là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "025E0"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "E0"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "05E0"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "E032"
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "15",
+          "type": "single_choice",
+          "content": [
+            "Một khung dây phẳng diện tích ",
+            {
+              "math": "S=40cm2"
+            },
+            " đặt trong từ trường đều có vectơ cảm ứng từ ",
+            {
+              "math": "B"
+            },
+            " hợp với mặt phẳng khung dây một góc ",
+            {
+              "math": "=60"
+            },
+            " và có độ lớn ",
+            {
+              "math": "B=012T"
+            },
+            ". Từ thông qua khung dây này là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "2410-6Wb"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "4210-4Wb"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "2410-4Wb"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "4210-6Wb"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "16",
+          "type": "single_choice",
+          "content": [
+            "Biết nhôm có nhiệt dung riêng ",
+            {
+              "math": "896JkgK()"
+            },
+            " và nhiệt nóng chảy riêng là ",
+            {
+              "math": "39105Jkg"
+            },
+            ". Nhiệt lượng cần cung cấp cho miếng nhôm khối lượng 200 g ở nhiệt độ ",
+            {
+              "math": "58C"
+            },
+            " để nó hóa lỏng hoàn toàn ở nhiệt độ ",
+            {
+              "math": "658C"
+            },
+            " là:"
+          ],
+          "points": 0.25,
+          "options": [
+            "107520 J.",
+            "78000 J.",
+            "185520 J.",
+            "29520 kJ."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "17",
+          "type": "single_choice",
+          "content": "Độ lớn suất điện động cảm ứng được xác định bằng định luật nào trong các định luật sau đây?",
+          "points": 0.25,
+          "options": [
+            "Định luật Ohm cho vật dẫn kim loại.",
+            "Định luật Coulomb về tương tác điện.",
+            "Định luật Lenz về cảm ứng điện từ.",
+            "Định luật Faraday về cảm ứng điện từ."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "18",
+          "type": "single_choice",
+          "content": [
+            {
+              "image": "img_d48b840e8061.jpg"
+            },
+            "Một đoạn dây đồng MN thẳng dài 16 cm, nặng 80 g được treo ở hai đầu bằng hai sợi dây mềm, rất nhẹ, cách điện sao cho MN nằm ngang. Ban đầu hai sợi dây treo có phương thẳng đứng. Đưa đoạn dây đồng vào trong từ trường đều có cảm ứng từ ",
+            {
+              "math": "B=05T"
+            },
+            " và các đường sức từ là những đường thẳng đứng hướng lên. Lấy ",
+            {
+              "math": "g=10ms2"
+            },
+            ". Cho dòng điện qua dây MN có cường độ ",
+            {
+              "math": "I=75"
+            },
+            " A thì lực căng mỗi sợi dây treo có độ lớn là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "01N"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "05N"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "07N"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "10N"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part-2",
+      "name": "PHẦN II",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai",
+      "questions": [
+        {
+          "id": "1",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_75ed3ebabe0c.jpg"
+            },
+            "Một nhóm học sinh thảo luận phương án thí nghiệm làm giảm ảnh hưởng của sự trao đổi nhiệt với môi trường khi đo nhiệt nóng chảy riêng của nước đá. Họ dùng các dụng cụ: Phễu chứa nước đá (1), dây điện trở (2), cốc (3), cân điện tử (4) như hình bên.",
+            "Nhóm học sinh cho rằng: Trong thời gian cấp điện cho dây điện trở, nếu xác định được càng chính xác khối lượng nước đá tan chảy vào cốc do nhiệt lượng nhận từ môi trường thì sẽ giảm được càng nhiều ảnh hưởng của sự trao đổi nhiệt giữa nước đá với môi trường. Phương án thí nghiệm của họ gồm hai giai đoạn và được tóm tắt như sau:",
+            "Giai đoạn 1. Chưa cấp điện cho dây điện trở: Xác định khối lượng ",
+            {
+              "math": "m1"
+            },
+            " của nước đá tan và đã chảy từ phễu vào cốc trong khoảng thời gian ",
+            {
+              "math": "t1"
+            },
+            ".",
+            "Giai đoạn 2. Cấp điện cho dây điện trở: Xác định khối lượng ",
+            {
+              "math": "m2"
+            },
+            " của nước đá tan và đã chảy từ phễu vào cốc trong khoảng thời gian ",
+            {
+              "math": "t2"
+            },
+            ".",
+            "Ở cả hai giai đoạn, coi rằng khối lượng nước đá tan và đã chảy vào cốc do nhiệt lượng nhận từ môi trường trong những khoảng thời gian bằng nhau là như nhau và bỏ qua các ảnh hưởng khác (bay hơi, ngưng tụ của nước.)."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Ở giai đoạn 1, nước đá tan do nhận nhiệt lượng từ môi trường.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Ở giai đoạn 2, nước đá tan do nhận nhiệt lượng từ dây điện trở và từ môi trường.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                "Nếu ",
+                {
+                  "math": "t2=t1"
+                },
+                " thì có thể coi khối lượng của nước đá tan do nhận nhiệt lượng từ dây điện trở là ",
+                {
+                  "math": "m=m2-2m1"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Phương án thí nghiệm này là một trong những phương án có thể làm giảm được ảnh hưởng của sự trao đổi nhiệt với môi trường đến kết quả thí nghiệm.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_27fa6248e692.jpg"
+            },
+            "Một khối khí lí tưởng biến đổi trạng thái theo một chu trình ở hình bên. Biết thể tích và áp suất của khí ở trạng thái (1) là 1 lít và ",
+            {
+              "math": "3105Pa"
+            },
+            "."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Quá trình (3) - (1) là quá trình đẳng tích.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Thể tích của khí ở trạng thái (2) là 3 lít.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Công khối khí thực hiện trong một chu trình là 200 J.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Nhiệt độ khí ở trạng thái (2) là lớn nhất.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_7892925bc0b7.jpg"
+            },
+            "Một nam châm được đặt trên cân. Một đoạn dây dẫn cứng được cố định, nằm ngang, vuông góc với các đường sức từ của từ trường đều giữa hai cực của nam châm (hình bên). Cảm ứng từ ",
+            {
+              "math": "B"
+            },
+            " của từ trường có phương nằm ngang và có độ lớn là ",
+            {
+              "math": "016T"
+            },
+            ". Chiều dài của phần dây dẫn PQ nằm trong vùng từ trường đều giữa hai cực của nam châm là 10 cm. Ban đầu, chưa có dòng điện chạy trong dây dẫn, cân chỉ một giá trị xác định. Sau đó, cho dòng điện không đổi với cường độ dòng điện là 5 A chạy theo chiều từ điểm P đến Q. Bỏ qua ảnh hưởng của từ trường Trái Đất."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                "Cảm ứng từ ",
+                {
+                  "math": "B"
+                },
+                " có hướng từ cực N sang cực S của nam châm."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Lực từ do từ trường tác dụng lên đoạn dây PQ hướng thẳng đứng lên trên.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Cân chỉ giá trị nhỏ hơn giá trị ban đầu.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                "Lực từ do từ trường tác dụng lên đoạn dây PQ có độ lớn là ",
+                {
+                  "math": "008N"
+                },
+                "."
+              ],
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_83d674b9b99a.jpg"
+            },
+            "Một quả khí cầu có một lỗ hở ở phía dưới để trao đổi khí với môi trường xung quanh, có thể tích không đổi ",
+            {
+              "math": "V=115m3"
+            },
+            ". Vỏ khí cầu có thể tích không đáng kể và khối lượng ",
+            {
+              "math": "m=02kg"
+            },
+            " (gồm khối lượng vỏ và bộ phận đốt nóng). Ở mặt đất nhiệt độ của không khí là ",
+            {
+              "math": "t1=20C"
+            },
+            ", áp suất khí quyển là ",
+            {
+              "math": "p1=1013105Pa"
+            },
+            ", khối lượng riêng của không khí là ",
+            {
+              "math": "0=12kgm3"
+            },
+            ", gia tốc trọng trường là ",
+            {
+              "math": "g=10ms2"
+            },
+            ". Cho biết: ",
+            {
+              "math": "TK()=tC()+273"
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                "Khối lượng mol trung bình của không khí là ",
+                {
+                  "math": "288kgmol"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Nung nóng khí bên trong khí cầu lên thì áp suất trong khí cầu cũng tăng lên.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                "Để quả khí cầu bắt đầu bay lên, ta cần nung nóng khí bên trong khí cầu đến nhiệt độ ",
+                {
+                  "math": "697C"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                "Sau khi nung nóng khí bên trong khí cầu, người ta bịt kín lỗ hở lại và thả cho quả khí cầu bay lên. Cho nhiệt độ khí bên trong khí cầu ",
+                {
+                  "math": "t2=110C"
+                },
+                " không đổi. Nhiệt độ của khí quyển và gia tốc trọng trường ở mặt đất coi như không đổi theo độ cao, còn khối lượng riêng của khí quyển phụ thuộc vào độ cao h (so với mặt đất) theo công thức ",
+                {
+                  "math": "=0e-0ghP1"
+                },
+                "; với ",
+                {
+                  "math": "e=2718"
+                },
+                ". Độ cao cực đại mà quả khí cầu lên được là xấp xỉ 797 m."
+              ],
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part-3",
+      "name": "PHẦN III",
+      "description": "Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 1 đến câu 6.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "short_answer",
+          "content": [
+            {
+              "image": "img_b6d32a0d6399.jpg"
+            },
+            {
+              "type": "text",
+              "text": "Dùng thông tin sau cho câu 1 và câu 2",
+              "marks": [
+                "italic"
+              ]
+            },
+            ": Hình vẽ bên cho thấy hai cylinder được nối với nhau nhờ một ống hẹp có thể tích rất nhỏ so với thể tích của cylinder, ngăn cách bởi van nhỏ.",
+            "Cylinder I chứa khí oxygen có thể tích ",
+            {
+              "math": "V1=30"
+            },
+            " lít ở áp suất ",
+            {
+              "math": "p1=32105Pa"
+            },
+            ", cylinder II có thể tích ",
+            {
+              "math": "V2=10"
+            },
+            " lít. Khi van được mở, khí sẽ lấp đầy cả hai cylinder.",
+            "Nếu cylinder II là môi trường chân không. Áp suất của khí sau khi mở van là ",
+            {
+              "math": "x105Pa"
+            },
+            ". Cho rằng nhiệt độ của chất khí là không đổi. Tìm ",
+            {
+              "type": "text",
+              "text": "x",
+              "marks": [
+                "italic"
+              ]
+            },
+            "."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "short_answer",
+          "content": [
+            "Nếu ban đầu cylinder II chứa 1,0 lít khí nitrogen dưới áp suất ",
+            {
+              "math": "p2=10105Pa"
+            },
+            ". Sau khi mở van thì áp suất thu được là ",
+            {
+              "math": "y105Pa"
+            },
+            ". Biết hai khí cùng nhiệt độ và không tác dụng hóa học với nhau. Tìm y."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "short_answer",
+          "content": [
+            "Một electron chuyển động tròn đều trong từ trường có ",
+            {
+              "math": "B=310-5T"
+            },
+            " chỉ do tác dụng của lực từ. Biết lực từ tác dụng lên electron có độ lớn là ",
+            {
+              "math": "evB"
+            },
+            " và ",
+            {
+              "math": "me=9110-31kg"
+            },
+            ". Thời gian để electron chuyển động được một vòng là ",
+            {
+              "math": "x10-6s"
+            },
+            ". Tìm giá trị của ",
+            {
+              "type": "text",
+              "text": "x",
+              "marks": [
+                "italic"
+              ]
+            },
+            " (làm tròn kết quả đến chữ số hàng phần mười)."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "short_answer",
+          "content": [
+            {
+              "image": "img_c93ccdd4682d.jpg"
+            },
+            {
+              "type": "text",
+              "text": "Dùng thông tin sau cho câu 4 và câu 5:",
+              "marks": [
+                "italic"
+              ]
+            },
+            " Đàn ghita điện có cấu tạo như đàn ghita thông thường nhưng có thêm bộ phận quan trọng là pickup. Pickup là một thiết bị điện tử có tác dụng chuyển đổi các rung động của dây đàn thành các tín hiệu điện. Phía dưới mỗi dây đàn có một nam châm được đặt bên trong cuộn dây dẫn (pickup). Đoạn dây đàn bên trên nam châm bị từ hóa. Khi gảy đàn thì trong cuộn dây có dòng điện cảm ứng. Dòng điện này được biến đổi qua máy tăng âm và loa làm ta nghe được âm thanh do dây đàn phát ra.",
+            "Cho biết từ thông qua cuộn dây thay đổi từ 0 Wb đến ",
+            {
+              "math": "310-6Wb"
+            },
+            " trong ",
+            {
+              "math": "510-4s"
+            },
+            ". Độ lớn suất điện động cảm ứng trong cuộn dây xuất hiện trong thời gian đó là bao nhiêu milivon?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "short_answer",
+          "content": "Dây đàn rung tạo ra dòng điện cảm ứng đổi chiều liên tục. Khi chơi nốt Sol có tần số 392 Hz thì mỗi giây dòng điện cảm ứng đổi chiều bao nhiêu lần (làm tròn đến hàng đơn vị)?",
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "short_answer",
+          "content": [
+            {
+              "image": "img_07315c97631b.jpg"
+            },
+            "Một thanh dẫn điện MN trượt trên hai thanh kim loại trong vùng từ trường vuông góc với hướng của cảm ứng từ (Hình vẽ). Biết ",
+            {
+              "math": "B=006T"
+            },
+            ", ",
+            {
+              "math": "MN=PQ=03m"
+            },
+            ". Thanh đang chuyển động về bên trái với vận tốc có độ lớn ",
+            {
+              "math": "60ms"
+            },
+            " và có hướng vuông góc với thanh. Suất điện động cảm ứng bằng bao nhiêu mV? (Hình vẽ mô tả thanh MN trượt trên hai thanh ray PQ, trong từ trường ",
+            {
+              "math": "B"
+            },
+            " hướng vào ",
+            {
+              "math": "X ()"
+            },
+            ", vận tốc ",
+            {
+              "math": "v"
+            },
+            " hướng sang trái)"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

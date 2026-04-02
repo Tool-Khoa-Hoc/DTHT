@@ -1,0 +1,1296 @@
+{
+  "id": "015",
+  "title": "Chuyên KHTN Hà Nội",
+  "subject": "ly",
+  "time": 50,
+  "description": "TRƯỜNG THPT CHUYÊN\nKHOA HỌC TỰ NHIÊN HÀ NỘI\nĐề thi gồm: 05 trang | ĐỀ KHẢO SÁT CHẤT LƯỢNG TỐT NGHIỆP THPT\nNĂM HỌC 2025 - 2026\nMôn: Vật lý\nThời gian làm bài: 50 phút không kể thời gian phát đề\nĐỀ CHÍNH THỨC\nHọ và tên thí sinh………………………………………………………\nSố báo danh | Mã đề: 015\nCho biết: π = 3,14; T(K) = t(0C) + 273; R = 8,31 J. mol-1; NA = 6,02.1023 hạt/mol",
+  "parts": [
+    {
+      "id": "part-1",
+      "name": "PHẦN I",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "single_choice",
+          "content": "Tập hợp ba thông số nào sau đây xác định trạng thái của một lượng khí xác định?",
+          "points": 0.25,
+          "options": [
+            "Áp suất, thể tích, khối lượng.",
+            "Áp suất, nhiệt độ, thể tích.",
+            "Thể tích, trọng lượng, áp suất.",
+            "Áp suất, nhiệt độ, khối lượng."
+          ],
+          "correct_answer": "A"
+        },
+        {
+          "id": "2",
+          "type": "single_choice",
+          "content": "Xung quanh vật nào sau đây không có từ trường?",
+          "points": 0.25,
+          "options": [
+            "Dòng điện không đổi.",
+            "Hạt mang điện chuyển động.",
+            "Hạt mang điện đứng yên.",
+            "Nam châm hình chữ U."
+          ],
+          "correct_answer": "C"
+        },
+        {
+          "id": "3",
+          "type": "single_choice",
+          "content": "Trong quá trình đẳng nhiệt, khi thể tích của một lượng khí lí tưởng xác định giảm 2 lần thì áp suất của khí đó sẽ",
+          "points": 0.25,
+          "options": [
+            "tăng lên 2 lần.",
+            "giảm 2 lần.",
+            "tăng 4 lần.",
+            "không đổi."
+          ],
+          "correct_answer": "A"
+        },
+        {
+          "id": "4",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Bốn đoạn dây dẫn a, b, c, d có cùng chiều dài ℓ được đặt vuông góc với vector cảm ứng từ B trong từ trường đều, mang dòng điện I"
+            },
+            {
+              "type": "text",
+              "text": "1",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " > I"
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " > I"
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " > I"
+            },
+            {
+              "type": "text",
+              "text": "4",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " (hình vẽ bên). Lực từ do từ trường đều tác dụng lên đoạn dây dẫn nào là nhỏ nhất?"
+            },
+            {
+              "image": "img_6deb78f4f81f.png"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Đoạn a",
+            "Đoạn b",
+            "Đoạn c",
+            "Đoạn d"
+          ],
+          "correct_answer": "A"
+        },
+        {
+          "id": "5",
+          "type": "single_choice",
+          "content": "Tính chất cơ bản của từ trường là gây ra",
+          "points": 0.25,
+          "options": [
+            "sự biến đổi về tính chất điện của môi trường xung quanh.",
+            "lực điện trường tác dụng lên các dòng điện và nam châm đặt trong nó.",
+            "lực hấp dẫn lên các vật đặt trong nó.",
+            "lực từ tác dụng lên nam châm hoặc lên dòng điện đặt trong nó."
+          ],
+          "correct_answer": "D"
+        },
+        {
+          "id": "6",
+          "type": "single_choice",
+          "content": "Ở nhiệt độ bao nhiêu trong thang Celsius thì giá trị nhiệt độ bằng một nửa nhiệt độ tuyệt đối của nó?",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "0",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "C"
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "100",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "C"
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "273",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "C"
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "546",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "C"
+              }
+            ]
+          ],
+          "correct_answer": "C"
+        },
+        {
+          "id": "7",
+          "type": "single_choice",
+          "content": "Quá trình đẳng nhiệt là quá trình biến đổi trạng thái trong đó",
+          "points": 0.25,
+          "options": [
+            "áp suất được giữ không đổi.",
+            "thể tích được giữ không đổi.",
+            "nhiệt độ được giữ không đổi.",
+            "nhiệt độ và thể tích được giữ không đổi."
+          ],
+          "correct_answer": "C"
+        },
+        {
+          "id": "8",
+          "type": "single_choice",
+          "content": "Chỉ ra câu ",
+          "points": 0.25,
+          "options": [
+            "Các đường mạt sắt của từ phổ cho biết dạng của đường sức từ.",
+            "Các đường sức từ của từ trường đều là những đường thẳng song song, cách đều nhau.",
+            "Các đường sức từ là những đường cong không kín.",
+            "Tại mỗi điểm trong từ trường, chỉ có thể vẽ được một và chỉ một đường sức từ đi qua."
+          ],
+          "correct_answer": "C"
+        },
+        {
+          "id": "9",
+          "type": "single_choice",
+          "content": [
+            "Một bình chứa khí có áp suất bằng áp suất khí quyển và có nhiệt độ là 27",
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            "C. Khối lượng khí trong bình là 150 gam. Người ta tăng nhiệt độ của bình thêm 10",
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            "C và mở một lỗ nhỏ cho khí thông với khí quyển. Khối lượng khí trong bình giảm đi"
+          ],
+          "points": 0.25,
+          "options": [
+            "5,85 gam.",
+            "6,28 gam.",
+            "4,84 gam.",
+            "3,76 gam."
+          ],
+          "correct_answer": "C"
+        },
+        {
+          "id": "10",
+          "type": "single_choice",
+          "content": [
+            "Một chiếc lốp ô tô chứa không khí ở áp suất 5 atm, nhiệt độ 27",
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            "C. Khi xe chạy, nhiệt độ của khí trong lốp tăng lên đến 54",
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            "C, coi thể tích lốp xe không thay đổi, áp suất không khí trong lốp khi đó là"
+          ],
+          "points": 0.25,
+          "options": [
+            "10 atm.",
+            "5,45 atm.",
+            "4,55 atm.",
+            "10,45 atm."
+          ],
+          "correct_answer": "B"
+        },
+        {
+          "id": "11",
+          "type": "single_choice",
+          "content": "Trong hệ đơn vị SI, đơn vị của chiều dài là mét (m), đơn vị của lực là N (Newton), đơn vị cường độ dòng điện là A (Ampe) và đơn vị của cảm ứng từ là T (Tesla), 1 T bằng:",
+          "points": 0.25,
+          "options": [
+            "1 A.m/N.",
+            "1 N/(A.m).",
+            "1 N.m/A",
+            "1 AN/m."
+          ],
+          "correct_answer": "B"
+        },
+        {
+          "id": "12",
+          "type": "single_choice",
+          "content": "Một đoạn dây dẫn đặt trong từ trường đều và vuông góc với đường sức từ. Nếu chiều dài dây dẫn và cường độ dòng điện qua dây dẫn tăng 2 lần thì độ lớn lực từ tác dụng lên dây dẫn",
+          "points": 0.25,
+          "options": [
+            "tăng 2 lần.",
+            "giảm 2 lần.",
+            "tăng 4 lần.",
+            "không đổi."
+          ],
+          "correct_answer": "C"
+        },
+        {
+          "id": "13",
+          "type": "single_choice",
+          "content": "Một bình có thể tích 10 lít chứa 1 chất khí dưới áp suất 30 at. Cho biết thể tích của chất khí khi ta mở nút bình? Coi nhiệt độ của khí là không đổi, áp suất của khí quyển là 1 at.",
+          "points": 0.25,
+          "options": [
+            "300 lít.",
+            "20 lít.",
+            "100 lít.",
+            "30 lít."
+          ],
+          "correct_answer": "A"
+        },
+        {
+          "id": "14",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Một lượng khí có thể tích 10 m"
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " và áp suất 1 atm. Người ta nén đẳng nhiệt khí tới áp suất 2,5 atm. Thể tích của khí nén lúc này là"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "4,00 m"
+              },
+              {
+                "type": "text",
+                "text": "3",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "25,00 m"
+              },
+              {
+                "type": "text",
+                "text": "3",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "0,25 m"
+              },
+              {
+                "type": "text",
+                "text": "3",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "0,35 m"
+              },
+              {
+                "type": "text",
+                "text": "3",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "."
+              }
+            ]
+          ],
+          "correct_answer": "A"
+        },
+        {
+          "id": "15",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Một chậu bằng nhôm khối lượng 500 g đựng 2 lít nước sôi ở 100"
+            },
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "C. Phải thêm vào chậu xấp xỉ bao nhiêu lít nước ở 20"
+            },
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "C để có nước ở 35"
+            },
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "C? Biết nhiệt dung riêng của nước là 4200 J/kg.K, của nhôm là 880 J/kg.K. Khối lượng riêng của nước là 1000 g/dm"
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "9,1 lít.",
+            "10,5 lít.",
+            "12,8 lít.",
+            "8,4 lít."
+          ],
+          "correct_answer": "A"
+        },
+        {
+          "id": "16",
+          "type": "single_choice",
+          "content": "Trong quá trình hít vào, cơ hoành và cơ liên sườn của một người co lại, mở rộng khoang ngực và hạ thấp áp suất không khí bên trong xuống dưới môi trường xung quanh để không khí đi vào qua miệng và mũi đến phổi. Giả sử phổi của một người chứa 6000 ml không khí ở áp suất 1 atm. Nếu người đó mở rộng khoang ngực thêm 500 ml bằng cách giữ mũi và miệng đóng lại để không hít không khí vào phổi thì áp suất không khí trong phổi theo atm sẽ là bao nhiêu? Giả sử nhiệt độ không khí không đổi.",
+          "points": 0.25,
+          "options": [
+            "0,92 atm.",
+            "1,08 atm.",
+            "1,20 atm.",
+            "0,85 atm."
+          ],
+          "correct_answer": "A"
+        },
+        {
+          "id": "17",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Một lượng không khí có thể tích 240 cm"
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " chứa trong một xilanh có pittông đóng kín, diện tích của pit-tông là 24 cm"
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " (xem hình vẽ bên). Áp suất của không khí trong xilanh bằng áp suất ngoài là 100 kPa. Cần một lực tối thiểu bằng bao nhiêu để dịch chuyển pit-tông 2 cm theo chiều làm thể tích khí trong xilanh giảm? Bỏ qua ma sát giữa pit-tông và thành xilanh. Coi trong quá trình chuyển động nhiệt độ không thay đổi."
+            },
+            {
+              "image": "img_2fa6f8b73765.png"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "20 N.",
+            "80 N.",
+            "60 N.",
+            "70 N."
+          ],
+          "correct_answer": "C"
+        },
+        {
+          "id": "18",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Một dây dẫn thẳng MN chiều dài ℓ, khối lượng của một đơn vị dài của dây là D = 0,04 kg/m. Dây được treo bằng hai dây dẫn nhẹ thẳng đứng và đặt trong từ trường đều có B vuông góc với mặt phẳng chứa MN và dây treo, B = 0,04 T. Cho dòng điện I qua dây. Xác định chiều và độ lớn của I để lực căng của các dây treo bằng \"không\". Lấy g = 10 m/s"
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "."
+            },
+            {
+              "image": "img_f6f9d9289031.png"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "I có chiều từ M đến N và có độ Iớn I = 5 A",
+            "I có chiều từ M đến N và có độ Iớn I = 10 A",
+            "I có chiều từ N đến M và có độ lớn I = 5 A",
+            "I có chiều từ N đến M và có độ lớn I = 10 A"
+          ],
+          "correct_answer": "B"
+        }
+      ]
+    },
+    {
+      "id": "part-2",
+      "name": "PHẦN II",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Mỗi câu ý a), b), c), d) ở mỗi câu, thí sinh",
+      "questions": [
+        {
+          "id": "1",
+          "type": "true_false",
+          "content": "Cho một dây dẫn mang dòng điện I = 8 A đặt trong từ trường B = 1,2 T.",
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Góc giữa dây dẫn và từ trường là 30"
+                },
+                {
+                  "type": "text",
+                  "text": "0",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": " nếu đoạn dây 50,0 cm chịu một lực từ 2,4 N."
+                }
+              ],
+              "correct": true
+            },
+            {
+              "id": "b",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Lực tác dụng lên sợi dây là 4,8 N nếu nó quay để tạo thành một góc 90"
+                },
+                {
+                  "type": "text",
+                  "text": "0",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": " với từ trường."
+                }
+              ],
+              "correct": true
+            },
+            {
+              "id": "c",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Lực tác dụng lên sợi dây không đổi khi góc giữa dây và từ trường thay đổi từ 30"
+                },
+                {
+                  "type": "text",
+                  "text": "0",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": " sang 90"
+                },
+                {
+                  "type": "text",
+                  "text": "0",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ],
+              "correct": false
+            },
+            {
+              "id": "d",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Lực tác dụng lên đoạn dây là không đổi bất kể cường độ dòng điện qua dây, biết góc giữa dây dẫn và vector cảm ứng từ có giá trị nằm trong khoảng từ 0"
+                },
+                {
+                  "type": "text",
+                  "text": "0",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": " đến 90"
+                },
+                {
+                  "type": "text",
+                  "text": "0",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ],
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Bạn An đang thực hiện một thí nghiệm về từ tính giữa hai nam châm A và B. An đang muốn biểu diễn lực tương tác giữa hai nam châm. Vì vậy An đã vẽ đường sức từ như hình. Từ hình cho biết:"
+            },
+            {
+              "image": "img_688e803a21a9.png"
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Các cực Nam (S) hướng đối diện nhau.",
+              "correct": false
+            },
+            {
+              "id": "b",
+              "content": "Đường sức từ sẽ xuất phát từ điểm có từ trường mạnh nhất và kết thúc ở điểm có từ trường yếu nhất.",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "content": "Khi hai nam châm cùng cực đặt đối diện nhau, đường sức từ sẽ bị biến dạng bởi vì sự tương tác giữa hai từ trường sẽ làm cho các đường sức từ bị uốn cong và hướng ra xa nhau.",
+              "correct": true
+            },
+            {
+              "id": "d",
+              "content": "Nếu các cực cùng tên của hai nam châm đặt đối diện nhau nhưng không chạm, có thể quan sát thấy một số đường sức từ cắt nhau tại điểm giữa hai nam châm.",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Một lượng khí xác định có thể tích V = 100 cm"
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ", nhiệt độ T = 27"
+            },
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "C và áp suất P = 10"
+            },
+            {
+              "type": "text",
+              "text": "5",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " Pa. Hằng số khí: R = 8,31 J/mol.K."
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Nếu kết quả được làm tròn đến chữ số thứ ba sau dấu phẩy thập phân thì số mol của khối khí bằng 0,004 mol.",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Giữ nhiệt độ không đổi, tăng áp suất tới 1,25.10"
+                },
+                {
+                  "type": "text",
+                  "text": "5",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": " Pa thì thể tích khí khi đó bằng 80 cm"
+                },
+                {
+                  "type": "text",
+                  "text": "3",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ],
+              "correct": true
+            },
+            {
+              "id": "c",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Từ trạng thái ban đầu, nén khí để thể tích giảm đi 20 cm"
+                },
+                {
+                  "type": "text",
+                  "text": "3",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ", nhiệt độ khí tăng lên đến 39"
+                },
+                {
+                  "type": "text",
+                  "text": "0",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "C thì áp suất khí lúc này bằng 1,3.10"
+                },
+                {
+                  "type": "text",
+                  "text": "5",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": " Pa."
+                }
+              ],
+              "correct": true
+            },
+            {
+              "id": "d",
+              "content": "Nếu thể tích giảm còn bằng 1/3 thể tích ban đầu và áp suất tăng 20% so với áp suất ban đầu thì nhiệt độ của khối khí sau khi nén bằng 120 K.",
+              "correct": true
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Một xilanh có pit-tông rất nhẹ, bên trong chứa một lượng khí có thể tích ban đầu 500 cm"
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ". Biết diện tích của pit-tông là 50 cm"
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ". Áp suất khí quyển là p"
+            },
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " = 10"
+            },
+            {
+              "type": "text",
+              "text": "5",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " Pa. Xem nhiệt độ khối khí không đổi, bỏ qua ma sát giữa pit-tông và thành xilanh. Lấy g = 10 m/s"
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "."
+            },
+            {
+              "image": "img_1fe2fb7e64f2.png"
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Ban đầu chiều cao cột khí trong xilanh là 10 cm.",
+              "correct": false
+            },
+            {
+              "id": "b",
+              "content": "Đặt lên pit-tông một quả cân khối lượng m thì pittông dịch chuyển xuống một đoạn x cm, khi đó áp suất khí giảm.",
+              "correct": true
+            },
+            {
+              "id": "c",
+              "content": "Đặt lên pit-tông một quả cân có khối lượng 10 kg thì pit-tông dịch chuyển xuống dưới một đoạn 1,5 cm.",
+              "correct": true
+            },
+            {
+              "id": "d",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Khối khí đang ở trạng thái cân bằng như khi có thêm quả cân 10 kg đặt lên pit-tông, nếu cung cấp cho khối khí nhiệt lượng 150 J, khối khí trở về thể tích ban đầu 500 cm"
+                },
+                {
+                  "type": "text",
+                  "text": "3",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ". Trong quá trình đó áp suất khí không đổi. Độ biến thiên nội năng của khối khí khi đó là 140 J."
+                }
+              ],
+              "correct": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part-3",
+      "name": "PHẦN III",
+      "description": "Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 1 đến câu 6.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Một cái bơm chứa 120 cm"
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " không khí ở nhiệt độ 27"
+            },
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "C và áp suất 10"
+            },
+            {
+              "type": "text",
+              "text": "5",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " Pa. Áp suất của không khí trong bơm khi nó bị nén xuống còn 40 cm"
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " và tăng nhiệt độ lên tới 37"
+            },
+            {
+              "type": "text",
+              "text": "0",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "C là x.10"
+            },
+            {
+              "type": "text",
+              "text": "5",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " Pa. Giá trị của x bằng bao nhiêu (Làm tròn kết quả đến một chữ số thập phân)?"
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": "3,1"
+        },
+        {
+          "id": "2",
+          "type": "short_answer",
+          "content": "Một đoạn dây dẫn thẳng dài 89 cm được đặt vuông góc với các đường sức từ trong một từ trường đều. Cho biết khi dòng điện chạy qua đoạn dây dẫn có cường độ 2,3 A thì đoạn dây dẫn này bị tác dụng một lực từ bằng 1,6 N. Xác định cảm ứng từ của từ trường đều (Làm tròn kết quả đến một chữ số có nghĩa).",
+          "points": 0.25,
+          "correct_answer": "0,8"
+        },
+        {
+          "id": "3",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Một dây dẫn thẳng, cứng, dài 20 cm, có khối lượng 50 g được giữ nằm yên theo phương ngang trong một từ trường có độ lớn cảm ứng từ là 0,49 T và có hướng nằm ngang, vuông góc với dây. Cường độ dòng điện chạy trong dây là bao nhiêu Ampe để khi dây được thả ra thì nó vẫn nằm yên? Lấy g = 9,8 m/s"
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " (Làm tròn kết quả đến phần nguyên)."
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": "5"
+        },
+        {
+          "id": "4",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Một bình đựng khí có dung tích 6.10"
+            },
+            {
+              "type": "text",
+              "text": "‒3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " (m"
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ") đựng khí áp suất 10"
+            },
+            {
+              "type": "text",
+              "text": "6",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " Pa. Người ta dùng khí trong bình để thổi các quả bóng bay (bằng van xả khí) sao cho bóng có thể tích tiêu chuẩn là 3,3.10"
+            },
+            {
+              "type": "text",
+              "text": "‒3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " (m"
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ") và khí trong bóng có áp suất 10"
+            },
+            {
+              "type": "text",
+              "text": "5",
+              "marks": [
+                "sup"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " Pa. Nếu coi nhiệt độ của khí không đổi thì số lượng bóng có thể tích tiêu chuẩn thổi được tối đa là bao nhiêu?"
+            },
+            {
+              "image": "img_5ff6d13bfe8a.png"
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": "16"
+        },
+        {
+          "id": "5",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Có hai bình khí, một bình có thể tích 22,4 lít chứa 1 mol khí H"
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " và một bình có thể tích 44,8 lít chứa 1 mol khí O"
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ". Biết rằng áp suất trong hai bình bằng nhau. Giá trị trung bình của bình phương vận tốc phân tử H"
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " gấp mấy lần giá trị trung bình của bình phương vận tốc phân tử O"
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "?"
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": "1"
+        },
+        {
+          "id": "6",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Hai thanh ray nằm ngang, song song và cách nhau một đoạn 12 cm đặt trong từ trường đều B hướng thẳng đứng và có độ lớn cảm ứng từ B = 0,15 T. Một thanh kim loại đặt trên ray, vuông góc với ray. Nối hai đầu thanh kim loại này với nguồn điện có suất điện động là 9 V và điện trở trong 1 Ω như hình vẽ. Biết điện trở của kim loại, thanh ray và dây nối là 2 Ω. Lực từ tác dụng lên thanh là bao nhiêu N (Làm tròn kết quả đến hai chữ số sau dấu phẩy thập phân)?"
+            },
+            {
+              "image": "img_a03cfc6c3ca2.png"
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": "0,05"
+        }
+      ]
+    }
+  ],
+  "answer_key": {
+    "part-1.1": "A",
+    "part-1.2": "C",
+    "part-1.3": "A",
+    "part-1.4": "A",
+    "part-1.5": "D",
+    "part-1.6": "C",
+    "part-1.7": "C",
+    "part-1.8": "C",
+    "part-1.9": "C",
+    "part-1.10": "B",
+    "part-1.11": "B",
+    "part-1.12": "C",
+    "part-1.13": "A",
+    "part-1.14": "A",
+    "part-1.15": "A",
+    "part-1.16": "A",
+    "part-1.17": "C",
+    "part-1.18": "B",
+    "part-2.1": {
+      "a": true,
+      "b": true,
+      "c": false,
+      "d": false
+    },
+    "part-2.2": {
+      "a": false,
+      "b": false,
+      "c": true,
+      "d": false
+    },
+    "part-2.3": {
+      "a": true,
+      "b": true,
+      "c": true,
+      "d": true
+    },
+    "part-2.4": {
+      "a": false,
+      "b": true,
+      "c": true,
+      "d": true
+    },
+    "part-3.1": "3,1",
+    "part-3.2": "0,8",
+    "part-3.3": "5",
+    "part-3.4": "16",
+    "part-3.5": "1",
+    "part-3.6": "0,05"
+  }
+}

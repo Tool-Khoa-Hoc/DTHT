@@ -6,12 +6,12 @@
   "description": null,
   "parts": [
     {
-      "id": "part1",
+      "id": "part-1",
       "name": "PHẦN I. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn 1 phương án.",
       "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "single_choice",
           "content": [
             "Ở người, bệnh cơ ti thể (",
@@ -33,7 +33,7 @@
           ]
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "single_choice",
           "content": "Để tạo thành công con la có sức làm việc cao, các nhà tạo giống đã cho lai con ngựa cái với lừa đực. Con la đã được tạo ra bằng phương pháp",
           "points": 0.25,
@@ -45,7 +45,7 @@
           ]
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "single_choice",
           "content": [
             [
@@ -77,7 +77,7 @@
           ]
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "single_choice",
           "content": "Trong quy trình tách chiết DNA, chất tẩy rửa được sử dụng nhằm mục đích",
           "points": 0.25,
@@ -89,7 +89,7 @@
           ]
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "single_choice",
           "content": "Dạng đột biến điểm làm tăng số liên kết hydrogen của gene là",
           "points": 0.25,
@@ -101,7 +101,7 @@
           ]
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "single_choice",
           "content": [
             [
@@ -161,7 +161,7 @@
           ]
         },
         {
-          "id": "q7",
+          "id": "7",
           "type": "single_choice",
           "content": "Khi nghiên cứu 1 dòng đột biến ở 1 loài côn trùng được tạo ra từ phòng thí nghiệm, người ta quan sát thấy trên NST số 2 có số lượng gene tăng lên, các NST khác bình thường. Hiện tượng trên là do đột biến",
           "points": 0.25,
@@ -173,7 +173,7 @@
           ]
         },
         {
-          "id": "q8",
+          "id": "8",
           "type": "single_choice",
           "content": "Phân tử không tham gia trực tiếp vào quá trình dịch mã là",
           "points": 0.25,
@@ -185,7 +185,7 @@
           ]
         },
         {
-          "id": "q9",
+          "id": "9",
           "type": "single_choice",
           "content": "Ở ruồi giấm, tính trạng màu mắt do 1 gene có 2 allele nằm trên NST giới tính X không có allele tương ứng trên Y quy định. Sự di truyền tính trạng màu mắt trên tuân theo quy luật",
           "points": 0.25,
@@ -197,7 +197,7 @@
           ]
         },
         {
-          "id": "q10",
+          "id": "10",
           "type": "single_choice",
           "content": "Các codon UUA, UUG, CUU, CUC, CUA, CUG cùng mã hóa cho amino acid leucine, khi đó mã di truyền có",
           "points": 0.25,
@@ -209,7 +209,7 @@
           ]
         },
         {
-          "id": "q11",
+          "id": "11",
           "type": "single_choice",
           "content": "Mendel với công trình nghiên cứu trên đậu Hà lan, ông đã sử dụng phép lai nào sau đây để kiểm tra giả thuyết của mình?",
           "points": 0.25,
@@ -221,7 +221,7 @@
           ]
         },
         {
-          "id": "q12",
+          "id": "12",
           "type": "single_choice",
           "content": [
             "Loài cáo tuyết bắc cực (",
@@ -243,7 +243,7 @@
           ]
         },
         {
-          "id": "q13",
+          "id": "13",
           "type": "single_choice",
           "content": "Sinh vật nào sau đây là thành tựu của tạo giống bằng lai hữu tính?",
           "points": 0.25,
@@ -255,7 +255,7 @@
           ]
         },
         {
-          "id": "q14",
+          "id": "14",
           "type": "single_choice",
           "content": "Gà mái có cặp NST giới tính là",
           "points": 0.25,
@@ -267,7 +267,7 @@
           ]
         },
         {
-          "id": "q15",
+          "id": "15",
           "type": "single_choice",
           "content": "Quá trình tổng hợp DNA dựa trên mạch khuôn RNA được gọi là",
           "points": 0.25,
@@ -279,7 +279,7 @@
           ]
         },
         {
-          "id": "q16",
+          "id": "16",
           "type": "single_choice",
           "content": [
             "Trên một cây hoa phù dung (",
@@ -301,7 +301,7 @@
           ]
         },
         {
-          "id": "q17",
+          "id": "17",
           "type": "single_choice",
           "content": "Mức phản ứng là tập hợp…(1)…của các cá thể có…(2)…trong các điều kiện môi trường khác nhau. (1) và (2) lần lượt là",
           "points": 0.25,
@@ -313,7 +313,7 @@
           ]
         },
         {
-          "id": "q18",
+          "id": "18",
           "type": "single_choice",
           "content": "Một số giống cây ăn quả như: nho, dưa hấu... có quả to, không hạt được tạo ra bằng phương pháp đột biến. Trong tế bào sinh dưỡng của những giống cây trên có bộ NST thuộc dạng",
           "points": 0.25,
@@ -327,12 +327,12 @@
       ]
     },
     {
-      "id": "part2",
+      "id": "part-2",
       "name": "PHẦN II. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "true_false",
           "content": [
             [
@@ -352,25 +352,25 @@
           ],
           "statements": [
             {
-              "id": "q1a",
+              "id": "a",
               "content": "Quá trình (1), (2), (3) lần lượt là tự nhân đôi DNA, phiên mã, dịch mã."
             },
             {
-              "id": "q1b",
+              "id": "b",
               "content": "Quá trình (1) được thực hiện theo nguyên tắc bổ sung và nguyên tắc bán bảo toàn."
             },
             {
-              "id": "q1c",
+              "id": "c",
               "content": "Quá trình (1), (2) và (3) diễn ra đồng thời."
             },
             {
-              "id": "q1d",
+              "id": "d",
               "content": "Nếu chuỗi polypeptide trong hình có 15 loại amino acid thì quá trình (3) có 15 loại tRNA tham gia hoạt động."
             }
           ]
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "true_false",
           "content": [
             [
@@ -393,25 +393,25 @@
           ],
           "statements": [
             {
-              "id": "q2a",
+              "id": "a",
               "content": "Tiêu bản 1 là tế bào bình thường, tiêu bản 2 là tế bào đột biến số lượng NST."
             },
             {
-              "id": "q2b",
+              "id": "b",
               "content": "Tiêu bản 2 là tế bào của người mắc hội chứng Klinefelter."
             },
             {
-              "id": "q2c",
+              "id": "c",
               "content": "Nếu 1 tế bào có bộ NST giống tiêu bản 1 phân bào bị rối loạn phân chia ở tất cả các cặp NST thì tạo ra tế bào có bộ NST giống tiêu bản 2."
             },
             {
-              "id": "q2d",
+              "id": "d",
               "content": "Một người nam có bộ NST giống tiêu bản 2 kết hôn với người vợ bình thường có khả năng sinh con bình thường với xác suất cao."
             }
           ]
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "true_false",
           "content": [
             [
@@ -489,25 +489,25 @@
           ],
           "statements": [
             {
-              "id": "q3a",
+              "id": "a",
               "content": "Các phép lai nhằm mục đích xác định quy luật di truyền chi phối các tính trạng."
             },
             {
-              "id": "q3b",
+              "id": "b",
               "content": "Tần số hoán vị gene giữa các gene quy định tính trạng đang xét chỉ xác định được từ kết quả phép lai 4."
             },
             {
-              "id": "q3c",
+              "id": "c",
               "content": "Từ kết quả phép lai 3 cho phép nhận định ở con ♂ F1-1 các gene quy định các tính trạng đang xét liên kết gen."
             },
             {
-              "id": "q3d",
+              "id": "d",
               "content": "Nếu dựa vào kết quả của các phép lai để xây dựng bản đồ di truyền thì khoảng cách giữa gene quy định màu thân và gene quy định dạng cánh là 10cM."
             }
           ]
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "true_false",
           "content": [
             "Ở một loài vi khuẩn, trên phân tử DNA nằm ở vùng nhân có các gene E, F, G, H, K, R trong đó các gene cấu trúc E, F, G thuộc cùng 1 operon với vùng P (Promoter) và O (Operator) chịu sự điều khiển của gene R như hình bên.",
@@ -525,19 +525,19 @@
           ],
           "statements": [
             {
-              "id": "q4a",
+              "id": "a",
               "content": "P là nơi liên kết với Protein ức chế."
             },
             {
-              "id": "q4b",
+              "id": "b",
               "content": "Khi gene K nhân đôi 3 lần thì gene G cũng nhân đôi 3 lần."
             },
             {
-              "id": "q4c",
+              "id": "c",
               "content": "Các gene E, F, G được phiên mã sẽ tạo ra 3 loại mRNA khác nhau để tổng hợp ra 3 loại protein khác nhau."
             },
             {
-              "id": "q4d",
+              "id": "d",
               "content": "Nếu gene R bị đột biến thì sản phẩm protein của gene G tạo ra có thể nhiều hơn."
             }
           ]
@@ -545,18 +545,18 @@
       ]
     },
     {
-      "id": "part3",
+      "id": "part-3",
       "name": "PHẦN III. Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào mỗi ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
       "description": "Thí sinh trả lời từ câu 1 đến câu 5. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "short_answer",
           "content": "Ở đậu Hà Lan, allele A quy định hoa tím trội hoàn toàn so với allele a quy định hoa trắng. Cho cây hoa tím thuần chủng lai với cây hoa trắng thu được F1. Cho cây F1 tự thụ phấn, thu được được 4800 cây F2 với tỉ lệ phân ly kiểu hình 75% hoa tím: 25% hoa trắng. Trong số các cây hoa tím ở F2, số lượng cây khi tự thụ phấn cho F3 không xuất hiện cây hoa trắng là bao nhiêu?",
           "points": 0.25
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "short_answer",
           "content": [
             {
@@ -579,7 +579,7 @@
           "points": 0.25
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "short_answer",
           "content": [
             [
@@ -625,7 +625,7 @@
           "points": 0.25
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "short_answer",
           "content": [
             [
@@ -702,7 +702,7 @@
           "points": 0.25
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "short_answer",
           "content": [
             "Một loài thực vật, hình dạng quả là do sự tác động của 2 cặp gene (A, a và B, b) phân li độc lập. Allele A và allele B tác động đến sự hình thành hình dạng quả theo sơ đồ hình bên. Allele a và allele b không tạo được các enzyme tương ứng. Khi cho cây quả dạng dẹt dị hợp 2 cặp gene giao phấn với cây quả dài, đời con thu được tỉ lệ cây quả dạng dẹt là bao nhiêu?",

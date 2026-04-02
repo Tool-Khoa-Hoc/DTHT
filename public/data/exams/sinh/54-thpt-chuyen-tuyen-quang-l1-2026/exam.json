@@ -6,12 +6,12 @@
   "description": null,
   "parts": [
     {
-      "id": "part1",
+      "id": "part-1",
       "name": "PHẦN I. TRẮC NGHIỆM NHIỀU PHƯƠNG ÁN LỰC CHỌN",
       "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "single_choice",
           "content": [
             {
@@ -41,7 +41,7 @@
           "correct_answer": null
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "single_choice",
           "content": [
             [
@@ -63,7 +63,7 @@
           "correct_answer": null
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "single_choice",
           "content": [
             [
@@ -96,7 +96,7 @@
           "correct_answer": null
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "single_choice",
           "content": [
             "Ở cà chua, gene",
@@ -159,7 +159,7 @@
           "correct_answer": null
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "single_choice",
           "content": "Ở người, bệnh máu khó đông do một allele lặn (m) nằm trên nhiễm sắc thể X không có allele tương ứng trên nhiễm sắc thể Y quy định. Cặp bố mẹ nào sau đây có thể sinh con trai bị bệnh máu khó đông với xác suất 25%?",
           "points": 0.25,
@@ -283,7 +283,7 @@
           "correct_answer": null
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "single_choice",
           "content": "Khi nghiên cứu 1 dòng đột biến ở 1 loài côn trùng được tạo ra từ phòng thí nghiệm, người ta quan sát thấy trên NST số 2 có số lượng gene tăng lên, các NST khác bình thường. Hiện tượng trên là do đột biến",
           "points": 0.25,
@@ -296,7 +296,7 @@
           "correct_answer": null
         },
         {
-          "id": "q7",
+          "id": "7",
           "type": "single_choice",
           "content": [
             [
@@ -321,7 +321,7 @@
           "correct_answer": null
         },
         {
-          "id": "q8",
+          "id": "8",
           "type": "single_choice",
           "content": [
             "Nghiên cứu cơ chế tái bản DNA ở một loài sinh vật trong phòng thí nghiệm, các nhà khoa học thu được kết quả như hình bên dưới. Có 3 phân tử DNA chứa $^{15}N$ cùng tiến hành tái bản trong môi trường chỉ chứa $^{14}N$. Sau thời gian 2 giờ nuôi cấy thu được số phân tử DNA chứa $^{14}N$ gấp 31 lần số phân tử DNA chứa $^{15}N/^{14}N$. Nhận định nào sau đây về quá trình tái bản DNA này là sai?",
@@ -341,7 +341,7 @@
           "correct_answer": null
         },
         {
-          "id": "q9",
+          "id": "9",
           "type": "single_choice",
           "content": [
             [
@@ -366,7 +366,7 @@
           "correct_answer": null
         },
         {
-          "id": "q10",
+          "id": "10",
           "type": "single_choice",
           "content": [
             [
@@ -413,7 +413,7 @@
           "correct_answer": null
         },
         {
-          "id": "q11",
+          "id": "11",
           "type": "single_choice",
           "content": "Khi nói về quá trình phiên mã, có bao nhiêu phát biểu sau đây đúng? Quá trình phiên mã diễn ra theo nguyên tắc bổ sung. Enzyme RNA polymerase chỉ sử dụng mạch 3’− 5’ làm mạch khuôn. Một gene phiên mã 10 lần sẽ tổng hợp được 10 phân tử RNA. Quá trình phiên mã sử dụng mạch khuôn của gene làm khuôn mẫu.",
           "points": 0.25,
@@ -426,7 +426,7 @@
           "correct_answer": null
         },
         {
-          "id": "q12",
+          "id": "12",
           "type": "single_choice",
           "content": [
             [
@@ -451,7 +451,7 @@
           "correct_answer": null
         },
         {
-          "id": "q13",
+          "id": "13",
           "type": "single_choice",
           "content": [
             "Cho biết allele",
@@ -512,7 +512,7 @@
           "correct_answer": null
         },
         {
-          "id": "q14",
+          "id": "14",
           "type": "single_choice",
           "content": [
             [
@@ -544,7 +544,7 @@
           "correct_answer": null
         },
         {
-          "id": "q15",
+          "id": "15",
           "type": "single_choice",
           "content": "Trong quy trình tách chiết DNA, chất tẩy rửa được sử dụng nhằm mục đích",
           "points": 0.25,
@@ -557,7 +557,7 @@
           "correct_answer": null
         },
         {
-          "id": "q16",
+          "id": "16",
           "type": "single_choice",
           "content": "Mendel với công trình nghiên cứu trên đậu Hà Lan, ông đã sử dụng phép lai nào sau đây để kiểm tra giả thuyết của mình?",
           "points": 0.25,
@@ -570,7 +570,7 @@
           "correct_answer": null
         },
         {
-          "id": "q17",
+          "id": "17",
           "type": "single_choice",
           "content": "Quá trình tổng hợp DNA dựa trên mạch khuôn RNA được gọi là",
           "points": 0.25,
@@ -583,7 +583,7 @@
           "correct_answer": null
         },
         {
-          "id": "q18",
+          "id": "18",
           "type": "single_choice",
           "content": "Trong chu kì hoạt động của tim người bình thường, ngăn nào sau đây của tim trực tiếp nhận máu giàu O2 từ tĩnh mạch phổi?",
           "points": 0.25,
@@ -598,12 +598,12 @@
       ]
     },
     {
-      "id": "part2",
+      "id": "part-2",
       "name": "PHẦN II. TRẮC NGHIỆM ĐÚNG / SAI",
       "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "true_false",
           "content": [
             [
@@ -626,12 +626,12 @@
           ],
           "statements": [
             {
-              "id": "q1a",
+              "id": "a",
               "content": "Thuốc X: lượng mRNA và protein tạo ra ít hơn hẳn so với mẫu đối chứng.",
               "correct": null
             },
             {
-              "id": "q1b",
+              "id": "b",
               "content": [
                 {
                   "type": "text",
@@ -644,19 +644,19 @@
               "correct": null
             },
             {
-              "id": "q1c",
+              "id": "c",
               "content": "Thuốc X: ngăn cản quá trình phiên mã của virus dẫn đến giảm mRNA và giảm protein.",
               "correct": null
             },
             {
-              "id": "q1d",
+              "id": "d",
               "content": "Thuốc Y: lượng mRNA tương đương mẫu đối chứng nhưng lượng protein tạo ra tăng.",
               "correct": null
             }
           ]
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "true_false",
           "content": [
             [
@@ -740,7 +740,7 @@
           ],
           "statements": [
             {
-              "id": "q2a",
+              "id": "a",
               "content": [
                 "Đột biến thay thế nucleotide thứ nhất của triplet mã hóa Gly ở allele",
                 {
@@ -763,7 +763,7 @@
               "correct": null
             },
             {
-              "id": "q2b",
+              "id": "b",
               "content": [
                 "Các allele",
                 {
@@ -794,7 +794,7 @@
               "correct": null
             },
             {
-              "id": "q2c",
+              "id": "c",
               "content": [
                 "Đột biến thay thế nucleotide thứ hai của triplet mã hóa Gly ở allele",
                 {
@@ -817,7 +817,7 @@
               "correct": null
             },
             {
-              "id": "q2d",
+              "id": "d",
               "content": [
                 "Đột biến thay thế nucleotide thứ nhất của triplet mã hóa Gly ở allele",
                 {
@@ -842,7 +842,7 @@
           ]
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "true_false",
           "content": [
             [
@@ -862,29 +862,29 @@
           ],
           "statements": [
             {
-              "id": "q3a",
+              "id": "a",
               "content": "Cơ chế hoạt động của hệ dẫn truyền tim: Nút xoang nhĩ tự phát xung thần kinh, xung thần kinh truyền xuống tâm nhĩ làm tâm nhĩ co, xung thần kinh từ tâm nhĩ truyền đến bó His và các sợi Purkinje làm cho cơ tâm thất co.",
               "correct": null
             },
             {
-              "id": "q3b",
+              "id": "b",
               "content": "Một bệnh nhân bị bệnh tim được lắp máy trợ tim có chức năng phát xung điện cho tim. Máy trợ tim này có chức năng tương tự nút xoang nhĩ trong hệ dẫn truyền tim.",
               "correct": null
             },
             {
-              "id": "q3c",
+              "id": "c",
               "content": "Các chú thích trên hình là các thành phần của hệ dẫn truyền tim: (1) Nút xoang nhĩ, (3) nút nhĩ thất, (5) bó His, (2) nhánh bó His và (4) sợi Purkinje.",
               "correct": null
             },
             {
-              "id": "q3d",
+              "id": "d",
               "content": "Khi tâm nhĩ co thì van động mạch phổi và van nhĩ thất trái mở, khi tâm thất co thì van động mạch chủ và van nhĩ thất phải mở.",
               "correct": null
             }
           ]
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "true_false",
           "content": [
             [
@@ -928,22 +928,22 @@
           ],
           "statements": [
             {
-              "id": "q4a",
+              "id": "a",
               "content": "Phép lai P3 và P4 có thể có kiểu gene giống nhau.",
               "correct": null
             },
             {
-              "id": "q4b",
+              "id": "b",
               "content": "Ở phép lai P1, nếu cho F1 lai phân tích thì F2 kiểu hình mang hai tính trạng trội chiếm tỉ lệ 24/25.",
               "correct": null
             },
             {
-              "id": "q4c",
+              "id": "c",
               "content": "Ở phép lai P4, trong số kiểu hình trội về hai tính trạng ở F1, kiểu gene ba allele trội chiếm tỉ lệ 24/59.",
               "correct": null
             },
             {
-              "id": "q4d",
+              "id": "d",
               "content": "Có 5 sơ đồ lai thỏa mãn dữ kiện của phép lai P2.",
               "correct": null
             }
@@ -952,12 +952,12 @@
       ]
     },
     {
-      "id": "part3",
+      "id": "part-3",
       "name": "PHẦN III. TRẮC NGHIỆM TRẢ LỜI NGẮN",
       "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "short_answer",
           "content": [
             "Allele",
@@ -998,7 +998,7 @@
           "correct_answer": null
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "short_answer",
           "content": [
             "Ở một loài động vật, khi cho giao phối hai dòng thuần chủng thân đen với thân xám thu được F1. Cho F1 giao phối với nhau được F2 có tỉ lệ: \nỞ giới đực: 3 thân đen: 1 thân xám. \nỞ giới cái: 3 thân xám: 1 thân đen.\n Cho biết allele",
@@ -1030,7 +1030,7 @@
           "correct_answer": null
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "short_answer",
           "content": [
             [
@@ -1056,14 +1056,14 @@
           "correct_answer": null
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "short_answer",
           "content": "Ở một loài thực vật, xét 2 tính trạng, mỗi tính trạng đều do một gene có 2 allele quy định, allele trội là trội hoàn toàn. Hai cặp gene này cùng nằm trên một cặp NST thường, hoán vị gene xảy ra ở cả quá trình phát sinh giao tử đực và giao tử cái. Giao phấn cây thuần chủng có kiểu hình trội về cả 2 tính trạng với cây có kiểu hình lặn về cả 2 tính trạng (P), thu được F1. Cho F1 giao phấn với nhau, thu được F2. Biết rằng không xảy ra đột biến. Theo lí thuyết, có tối đa bao nhiêu kiểu gene ở F2?",
           "points": 0.25,
           "correct_answer": null
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "short_answer",
           "content": [
             "Ở một loài thực vật allele",
@@ -1095,7 +1095,7 @@
           "correct_answer": null
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "short_answer",
           "content": [
             "Một gene ở sinh vật nhân thực có chiều dài 272 nm và có tỉ lệ (A+T)/(G+C) = 1. Một 4 đột biến không làm thay đổi chiều dài của gene nhưng làm cho số liên kết hydrogen giảm 3 liên kết. Tỉ lệ số nucleotide loại A của gene ban đầu so với số nucleotide loại A của gene đột biến là bao nhiêu?",

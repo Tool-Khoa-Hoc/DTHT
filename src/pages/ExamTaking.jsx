@@ -6,6 +6,7 @@ import { useExamAccess } from '../hooks/useExamAccess';
 import RichTextRenderer from '../components/exam/RichTextRenderer';
 import { questionHasOptionContent, questionHasStatementContent } from '../utils/examQuestionLayout';
 import { getExamIndex } from '../utils/examIndexCache';
+import { resolveMediaPath } from '../utils/mediaPath';
 
 const AUTOSAVE_DEBOUNCE_MS = 2000; // 2s sau khi chọn đáp án
 const AUTOSAVE_INTERVAL_MS = 30000; // 30s định kỳ
@@ -28,12 +29,12 @@ const normalizeExamMediaPaths = (value, basePath) => {
 
     const next = { ...value };
 
-    if (typeof next.image === 'string' && !/^(?:https?:)?\//.test(next.image)) {
-        next.image = `${basePath}/${next.image}`;
+    if (typeof next.image === 'string') {
+        next.image = resolveMediaPath(next.image, basePath);
     }
 
-    if (typeof next.src === 'string' && !/^(?:https?:)?\//.test(next.src)) {
-        next.src = `${basePath}/${next.src}`;
+    if (typeof next.src === 'string') {
+        next.src = resolveMediaPath(next.src, basePath);
     }
 
     for (const key of Object.keys(next)) {
@@ -62,6 +63,9 @@ const sanitizeQuestionPayloadForTaking = (question) => {
 
     if (Array.isArray(nextQuestion.options)) {
         nextQuestion.options = nextQuestion.options.map((option) => {
+            if (Array.isArray(option)) {
+                return option;
+            }
             if (!option || typeof option !== 'object') {
                 return option;
             }
@@ -288,21 +292,32 @@ export default function ExamTaking() {
     }, [progressId, submitted, saveProgress]);
 
     // ─── Đồng hồ đếm ngược ──────────────────────────────────
+    const autoSubmittedRef = useRef(false);
     useEffect(() => {
-        if (loading || timeLeft <= 0 || submitted) return;
+        if (loading || submitted || autoSubmittedRef.current) return;
+        if (timeLeft <= 0) return;
+
         const timer = setInterval(() => {
             setTimeLeft(prev => {
-                timeLeftRef.current = prev - 1;
-                if (prev <= 1) {
+                const next = prev - 1;
+                timeLeftRef.current = next;
+                if (next <= 0) {
                     clearInterval(timer);
-                    handleAutoSubmit();
+                    if (!autoSubmittedRef.current) {
+                        autoSubmittedRef.current = true;
+                        setTimeout(() => {
+                            alert('⏰ Hết giờ làm bài! Hệ thống tự động thu bài.');
+                            submitExam();
+                        }, 0);
+                    }
                     return 0;
                 }
-                return prev - 1;
+                return next;
             });
         }, 1000);
         return () => clearInterval(timer);
-    }, [loading, submitted]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loading, submitted, timeLeft > 0]);
 
     // ─── Cảnh báo thoát khi chưa nộp bài ───────────────────
     useEffect(() => {
@@ -525,10 +540,10 @@ export default function ExamTaking() {
                 </div>
             </header>
 
-            <div className="flex-1 flex flex-col md:flex-row max-w-[1600px] w-full mx-auto relative overflow-hidden">
+            <div className="flex-1 flex flex-col md:flex-row w-full relative overflow-hidden">
                 {/* Left: Question content */}
                 <div className="flex-1 overflow-y-auto h-full">
-                    <div className="max-w-4xl mx-auto bg-white md:rounded-t-3xl p-6 md:p-12 shadow-sm border border-slate-200 border-b-0 min-h-full space-y-12 pb-24 md:pb-12">
+                    <div className="max-w-6xl mx-auto bg-white md:rounded-t-3xl p-6 md:p-12 shadow-sm border border-slate-200 border-b-0 min-h-full space-y-12 pb-24 md:pb-12">
                         {examData?.parts?.map((part) => (
                             <div key={part.id}>
                                 <div className="mb-6 pb-4 border-b border-slate-100">

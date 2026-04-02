@@ -4,8 +4,10 @@ import json
 import os
 import queue
 import re
+import subprocess
 import sys
 import threading
+import time
 import traceback
 import unicodedata
 from dataclasses import dataclass
@@ -25,6 +27,8 @@ try:
         DEFAULT_PROVIDER,
         convert_exam_file,
         default_model_for_provider,
+        infer_provider_from_api_key,
+        list_available_models,
     )
 except ImportError:
     from scripts.convert_exam_with_llm import (
@@ -32,6 +36,8 @@ except ImportError:
         DEFAULT_PROVIDER,
         convert_exam_file,
         default_model_for_provider,
+        infer_provider_from_api_key,
+        list_available_models,
     )
 
 
@@ -121,6 +127,9 @@ class ExamConverterGUI:
         self.worker_thread: threading.Thread | None = None
         self.stop_event = threading.Event()
         self.running = False
+        self._model_refresh_seq = 0
+        self._model_refresh_after_id: str | None = None
+        self._active_model_provider = DEFAULT_PROVIDER
 
         self.provider_var = tk.StringVar(value=DEFAULT_PROVIDER)
         self.auto_model_var = tk.BooleanVar(value=True)
@@ -249,8 +258,14 @@ class ExamConverterGUI:
             return resolved.parent.name
         return resolved.stem
 
+    def _output_source_name(self, input_path: Path) -> str:
+        if input_path.suffix.lower() == ".docx":
+            # For Word files, output folder follows the Word filename.
+            return input_path.stem
+        return self._outer_folder_name(input_path)
+
     def _output_bucket_name(self, input_path: Path) -> str:
-        return self._slugify_folder(self._outer_folder_name(input_path))
+        return self._slugify_folder(self._output_source_name(input_path))
 
     def _resolve_result_base_dir(self, input_path: Path) -> Path:
         output_dir_raw = self.output_dir_var.get().strip()
@@ -391,8 +406,14 @@ class ExamConverterGUI:
         self.provider_combo.grid(row=0, column=1, sticky="ew", pady=5)
 
         self._label(card, "Model").grid(row=0, column=2, sticky="w", padx=(14, 8), pady=5)
-        self.model_entry = self._entry(card, self.model_var)
-        self.model_entry.grid(row=0, column=3, sticky="ew", pady=5)
+        self.model_combo = ttk.Combobox(
+            card,
+            textvariable=self.model_var,
+            state="readonly",
+            values=[self.model_var.get()],
+            width=28,
+        )
+        self.model_combo.grid(row=0, column=3, sticky="ew", pady=5)
 
         self.auto_model_check = tk.Checkbutton(
             card,
@@ -489,8 +510,8 @@ class ExamConverterGUI:
         )
 
         hint = (
-            "Output folder name is derived from the outer input folder, slugified "
-            "(bo-dau, bo-ky-tu-dac-biet, space -> '-')."
+            "For .docx, output folder uses the Word filename (slugified). "
+            "Other file types still use outer input folder naming."
         )
         tk.Label(
             card,
@@ -598,9 +619,11 @@ class ExamConverterGUI:
     def _wire_events(self) -> None:
         self.provider_var.trace_add("write", self._on_provider_change)
         self.auto_model_var.trace_add("write", self._on_auto_model_change)
+        self.api_key_var.trace_add("write", self._on_api_key_input_change)
         self.show_key_var.trace_add("write", self._on_show_key_change)
         self.output_dir_var.trace_add("write", self._refresh_output_paths)
         self._on_auto_model_change()
+        self._schedule_model_list_refresh()
         self._refresh_output_paths()
 
     def _label(self, parent: tk.Widget, text: str) -> tk.Label:
@@ -625,18 +648,94 @@ class ExamConverterGUI:
         height = max(600, event.height - 48)
         self.bg.itemconfigure(self.surface_window, width=width, height=height)
 
+    def _provider_for_default_model(self) -> str:
+        selected = self.provider_var.get().strip() or DEFAULT_PROVIDER
+        if selected != "auto":
+            return selected
+        inferred = infer_provider_from_api_key(self.api_key_var.get())
+        return inferred or DEFAULT_PROVIDER
+
+    def _provider_for_model_listing(self) -> str:
+        selected = self.provider_var.get().strip() or DEFAULT_PROVIDER
+        if selected != "auto":
+            return selected
+        inferred = infer_provider_from_api_key(self.api_key_var.get())
+        return inferred or DEFAULT_PROVIDER
+
+    def _set_model_choices(self, provider: str, models: list[str]) -> None:
+        current = self.model_var.get().strip()
+        choices: list[str] = []
+        seen: set[str] = set()
+
+        for name in models:
+            value = str(name or "").strip()
+            if not value or value in seen:
+                continue
+            seen.add(value)
+            choices.append(value)
+
+        if not choices:
+            default_name = default_model_for_provider(provider)
+            choices = [default_name]
+
+        self.model_combo.configure(values=choices)
+        if current and current in choices and not self.auto_model_var.get():
+            self.model_var.set(current)
+        else:
+            self.model_var.set(choices[0])
+
+    def _schedule_model_list_refresh(self) -> None:
+        if self._model_refresh_after_id:
+            try:
+                self.root.after_cancel(self._model_refresh_after_id)
+            except Exception:
+                pass
+            self._model_refresh_after_id = None
+        self._model_refresh_after_id = self.root.after(450, self._start_model_list_refresh)
+
+    def _start_model_list_refresh(self) -> None:
+        self._model_refresh_after_id = None
+        self._model_refresh_seq += 1
+        seq = self._model_refresh_seq
+        provider = self._provider_for_model_listing()
+        self._active_model_provider = provider
+        api_key = self.api_key_var.get().strip() or None
+        requested_model = self.model_var.get().strip() or None
+
+        def _worker() -> None:
+            started = time.time()
+            live_provider, models = list_available_models(
+                provider=provider,
+                api_key=api_key,
+                requested_model=requested_model,
+            )
+            self.queue_from_worker.put(
+                {
+                    "type": "model_list",
+                    "seq": seq,
+                    "provider": live_provider,
+                    "models": models,
+                    "elapsed_ms": int((time.time() - started) * 1000),
+                }
+            )
+
+        threading.Thread(target=_worker, daemon=True).start()
+
     def _on_provider_change(self, *_: object) -> None:
-        if self.auto_model_var.get():
-            provider = self.provider_var.get().strip() or DEFAULT_PROVIDER
-            self.model_var.set(default_model_for_provider(provider))
+        self._schedule_model_list_refresh()
 
     def _on_auto_model_change(self, *_: object) -> None:
         auto_model = self.auto_model_var.get()
-        state = "disabled" if auto_model else "normal"
-        self.model_entry.configure(state=state)
+        state = "disabled" if auto_model else "readonly"
+        self.model_combo.configure(state=state)
         if auto_model:
-            provider = self.provider_var.get().strip() or DEFAULT_PROVIDER
+            provider = self._provider_for_default_model()
             self.model_var.set(default_model_for_provider(provider))
+        else:
+            self._schedule_model_list_refresh()
+
+    def _on_api_key_input_change(self, *_: object) -> None:
+        self._schedule_model_list_refresh()
 
     def _on_show_key_change(self, *_: object) -> None:
         self.api_key_entry.configure(show="" if self.show_key_var.get() else "*")
@@ -792,11 +891,11 @@ class ExamConverterGUI:
         self.provider_combo.configure(state="disabled" if running else "readonly")
         self.auto_model_check.configure(state=normal_state)
         if running:
-            self.model_entry.configure(state="disabled")
+            self.model_combo.configure(state="disabled")
         elif self.auto_model_var.get():
-            self.model_entry.configure(state="disabled")
+            self.model_combo.configure(state="disabled")
         else:
-            self.model_entry.configure(state="normal")
+            self.model_combo.configure(state="readonly")
         self.api_key_entry.configure(state=normal_state)
         self.show_key_check.configure(state=normal_state)
         self.remember_key_check.configure(state=normal_state)
@@ -1002,6 +1101,15 @@ class ExamConverterGUI:
         if event_type == "log":
             self._log(str(event.get("message", "")))
             return
+        if event_type == "model_list":
+            seq = int(event.get("seq", 0))
+            if seq != self._model_refresh_seq:
+                return
+            provider = str(event.get("provider", "") or self._provider_for_model_listing())
+            models = [str(x) for x in event.get("models", []) if str(x).strip()]
+            self._active_model_provider = provider
+            self._set_model_choices(provider, models)
+            return
         if event_type == "debug":
             self._log_debug(str(event.get("message", "")))
             return
@@ -1016,6 +1124,7 @@ class ExamConverterGUI:
             if stopped:
                 summary += " Batch stopped by user."
             self._log(summary)
+            self._refresh_public_exam_index()
             self.progress_text_var.set(summary)
             if failed > 0:
                 messagebox.showwarning("Batch finished with errors", summary)
@@ -1057,6 +1166,29 @@ class ExamConverterGUI:
         if len(preview) > 1200:
             preview = preview[:1200] + "\n... (truncated)"
         self._log(f"DEBUG: {preview}")
+
+    def _refresh_public_exam_index(self) -> None:
+        script_path = PROJECT_ROOT / "scripts" / "generate-exam-index.mjs"
+        if not script_path.exists():
+            self._log("Index refresh skipped: scripts/generate-exam-index.mjs not found.")
+            return
+        try:
+            proc = subprocess.run(
+                ["node", str(script_path), "--root", str(PROJECT_ROOT)],
+                capture_output=True,
+                text=True,
+                check=False,
+                cwd=str(PROJECT_ROOT),
+            )
+        except Exception as exc:
+            self._log(f"Index refresh failed: {exc}")
+            return
+
+        output = (proc.stdout or "").strip() or (proc.stderr or "").strip()
+        if proc.returncode == 0:
+            self._log(f"Exam index refreshed. {output}".strip())
+            return
+        self._log(f"Index refresh failed (code {proc.returncode}). {output}".strip())
 
     def _on_close(self) -> None:
         if self.running:

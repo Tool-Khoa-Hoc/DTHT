@@ -6,12 +6,12 @@
   "description": "THPT Lương Tài - Bắc Ninh",
   "parts": [
     {
-      "id": "part1",
+      "id": "part-1",
       "name": "PHẦN I. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án",
       "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "single_choice",
           "content": "Mendel đã tiến hành bảy phép lai một cặp tính trạng với bảy tính trạng ở cây đậu Hà Lan là màu hoa, hình dạng hạt, chiều cao cây, màu hạt, hình dạng quả, màu quả và vị trí hoa trên cây. Mỗi tính trạng đều có hai đặc tính khác biệt nhau. Thí nghiệm nào sau đây đúng với cách bố trí thí nghiệm của Mendel?",
           "points": 0.25,
@@ -23,7 +23,7 @@
           ]
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "single_choice",
           "content": "Loại nucleic acid nào sau đây không có liên kết hydrogen trong phân tử?",
           "points": 0.25,
@@ -35,7 +35,7 @@
           ]
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "single_choice",
           "content": [
             [
@@ -59,7 +59,7 @@
           ]
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "single_choice",
           "content": [
             [
@@ -107,7 +107,7 @@
           ]
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "single_choice",
           "content": "Cơ thể có kiểu gene nào sau đây được gọi là thể đồng hợp 2 cặp gene?",
           "points": 0.25,
@@ -119,7 +119,7 @@
           ]
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "single_choice",
           "content": [
             [
@@ -135,7 +135,7 @@
           ]
         },
         {
-          "id": "q7",
+          "id": "7",
           "type": "single_choice",
           "content": [
             [
@@ -156,7 +156,7 @@
           ]
         },
         {
-          "id": "q8",
+          "id": "8",
           "type": "single_choice",
           "content": [
             [
@@ -188,7 +188,7 @@
           ]
         },
         {
-          "id": "q9",
+          "id": "9",
           "type": "single_choice",
           "content": [
             "Carotenoid có vai trò gì trong quá trình quang hợp?"
@@ -202,7 +202,7 @@
           ]
         },
         {
-          "id": "q10",
+          "id": "10",
           "type": "single_choice",
           "content": [
             [
@@ -232,7 +232,7 @@
           ]
         },
         {
-          "id": "q11",
+          "id": "11",
           "type": "single_choice",
           "content": [
             "Khi thủy phân đến cùng protein đơn giản sẽ thu được sản phẩm nào sau đây?"
@@ -246,7 +246,7 @@
           ]
         },
         {
-          "id": "q12",
+          "id": "12",
           "type": "single_choice",
           "content": "Streptomycin là một loại kháng sinh có khả năng giết chết vi khuẩn bằng cách ức chế hoạt động của ribosome. Nguyên tắc cơ bản của loại kháng sinh này là ngăn chặn vi khuẩn tiến hành quá trình tổng hợp",
           "points": 0.25,
@@ -258,7 +258,7 @@
           ]
         },
         {
-          "id": "q13",
+          "id": "13",
           "type": "single_choice",
           "content": [
             "Ở tế bào nhân thực, tổ chức nào sau đây không chứa DNA?"
@@ -272,7 +272,7 @@
           ]
         },
         {
-          "id": "q14",
+          "id": "14",
           "type": "single_choice",
           "content": "Trên mạch khuôn thuộc vùng mã hoá của gene mã hoá protein ở sinh vật nhân sơ có bộ ba là 5’-GCT-3’ thì trình tự nucleotide của anticodon trên phân tử tRNA tương ứng là",
           "points": 0.25,
@@ -284,7 +284,7 @@
           ]
         },
         {
-          "id": "q15",
+          "id": "15",
           "type": "single_choice",
           "content": "Ở Gà (2n = 78), số nhiễm sắc thể trong 1 tế bào sau khi kết thúc kì cuối I của giảm phân là bao nhiêu?",
           "points": 0.25,
@@ -296,7 +296,7 @@
           ]
         },
         {
-          "id": "q16",
+          "id": "16",
           "type": "single_choice",
           "content": [
             [
@@ -320,7 +320,7 @@
           ]
         },
         {
-          "id": "q17",
+          "id": "17",
           "type": "single_choice",
           "content": "Để chứng minh các nhân tố di truyền không hoà trộn vào nhau, Mendel đã thực hiện phép lai nào?",
           "points": 0.25,
@@ -332,7 +332,7 @@
           ]
         },
         {
-          "id": "q18",
+          "id": "18",
           "type": "single_choice",
           "content": "Một loài thực vật giao phấn ngẫu nhiên, allele A bị đột biến thành allele a, allele B bị đột biến thành allele b. Cho biết mỗi gene quy định một tính trạng, các allele trội là trội hoàn toàn. Cơ thể có kiểu gene nào sau đây là thể đột biến?",
           "points": 0.25,
@@ -346,12 +346,12 @@
       ]
     },
     {
-      "id": "part2",
+      "id": "part-2",
       "name": "PHẦN II. Thí sinh trả lời từ câu 1 đến 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "true_false",
           "content": [
             [
@@ -371,25 +371,25 @@
           ],
           "statements": [
             {
-              "id": "q1a",
+              "id": "a",
               "content": "Nếu quá trình 4 diễn ra không theo nguyên tắc bổ sung thì dẫn đến đột biến gene."
             },
             {
-              "id": "q1b",
+              "id": "b",
               "content": "Nhờ cơ chế 4 mà thông tin di truyền được di truyền lại cho các thế hệ sau."
             },
             {
-              "id": "q1c",
+              "id": "c",
               "content": "Các chú thích 1, 2, 3, 7 lần lượt là phân tử tRNA, chuỗi polypeptide, bộ ba đối mã, ribosome."
             },
             {
-              "id": "q1d",
+              "id": "d",
               "content": "Tế bào đang xét là một tế bào nhân thực."
             }
           ]
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "true_false",
           "content": [
             [
@@ -412,25 +412,25 @@
           ],
           "statements": [
             {
-              "id": "q2a",
+              "id": "a",
               "content": "Bố bị bệnh PKU, mẹ bị bệnh AKU có thể sinh con không mắc cả hai bệnh."
             },
             {
-              "id": "q2b",
+              "id": "b",
               "content": "Người bị bệnh PKU và người bị bệnh AKU có số loại kiểu gene khác nhau."
             },
             {
-              "id": "q2c",
+              "id": "c",
               "content": "Trẻ bị bệnh AKU có thể cho ăn kiêng tyrosine và phenylalanine từ nhỏ thì trẻ sẽ không biểu hiện bệnh."
             },
             {
-              "id": "q2d",
+              "id": "d",
               "content": "Bố mẹ dị hợp 2 cặp gene xác suất sinh 1 con chỉ bị bệnh PKU mà không bị bệnh AKU bằng 3/16."
             }
           ]
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "true_false",
           "content": [
             [
@@ -461,25 +461,25 @@
           ],
           "statements": [
             {
-              "id": "q3a",
+              "id": "a",
               "content": "Nếu allele A và allele A1 có số nucleotide bằng nhau thì chuỗi polypeptide do hai allele này mã hóa có thể sẽ có số amino acid khác nhau."
             },
             {
-              "id": "q3b",
+              "id": "b",
               "content": "Nếu phân tử protein do allele A1 mã hóa có chức năng bị thay đổi so với phân tử protein do allele A mã hóa thì cơ thể mang allele A1 là thể đột biến."
             },
             {
-              "id": "q3c",
+              "id": "c",
               "content": "Nếu gene A1 là allele trội so với allele A thì thể đột biến có kiểu gene là AA ."
             },
             {
-              "id": "q3d",
+              "id": "d",
               "content": "Allele A và allele A1 có thể có số lượng nucleotide bằng nhau hoặc hơn kém nhau một nucleotide."
             }
           ]
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "true_false",
           "content": [
             [
@@ -523,19 +523,19 @@
           ],
           "statements": [
             {
-              "id": "q4a",
+              "id": "a",
               "content": "B và A chứa máu giàu O2; E và D chứa máu nghèo O2."
             },
             {
-              "id": "q4b",
+              "id": "b",
               "content": "(1), (2), (3) và (4) lần lượt là tâm nhĩ trái, tâm nhĩ phải, tâm thất phải và tâm thất trái."
             },
             {
-              "id": "q4c",
+              "id": "c",
               "content": "Áp lực của máu từ C đến mao mạch giảm dần"
             },
             {
-              "id": "q4d",
+              "id": "d",
               "content": "Sự chêch lệch giữa áp suất máu tối đa và tối thiểu trong buồng tim (3) thấp hơn trong mao mạch."
             }
           ]
@@ -543,18 +543,18 @@
       ]
     },
     {
-      "id": "part3",
+      "id": "part-3",
       "name": "PHẦN III. Thí sinh trả lời từ câu 1 đến câu 6.",
       "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "short_answer",
           "content": "Với 3 loại ribonucleotide là A, U, G có thể tạo ra được bao nhiêu codon có chứa G mã hóa cho amino acid trong chuỗi polipeptide?",
           "points": 0.25
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "short_answer",
           "content": [
             "Cho các cây hoa đỏ (P) có kiểu gene AaBb tự thụ phấn thu được F",
@@ -578,13 +578,13 @@
           "points": 0.25
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "short_answer",
           "content": "Một đoạn đầu của vùng mã hóa gene cấu trúc của sinh vật nhân sơ có trật tự nucleotide trên mạch gốc như sau: 3’TAC - AAG - AAT - GTT- TTA - CCT - CGG - GCG - GCC - GAA – AAT... 5' Nếu đột biến thay thế nucleotide thứ 16 là C thay bằng A, thì số amino acid trong phân tử protein do gen đột biến tổng hợp là bao nhiêu?",
           "points": 0.25
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "short_answer",
           "content": [
             [
@@ -602,7 +602,7 @@
           "points": 0.25
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "short_answer",
           "content": [
             [
@@ -617,7 +617,7 @@
           "points": 0.25
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "short_answer",
           "content": [
             [

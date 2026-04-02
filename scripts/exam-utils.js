@@ -142,13 +142,18 @@ export function createTrueFalseQuestion(index) {
     };
 }
 
-export function createShortAnswerQuestion(index) {
+export function getDefaultShortAnswerPoints(subjectFolder) {
+    const normalized = String(subjectFolder || '').trim().toLowerCase();
+    return normalized === 'toan' || normalized === 'math' ? 0.5 : 0.25;
+}
+
+export function createShortAnswerQuestion(index, subjectFolder = '') {
     return {
         id: `q${index}`,
         type: 'short_answer',
         content: [''],
         correct_answer: null,
-        points: 0.5
+        points: getDefaultShortAnswerPoints(subjectFolder)
     };
 }
 

@@ -6,12 +6,12 @@
   "description": "Chuyển từ PDF đáp án chi tiết; chỉ giữ phần đề, bỏ toàn bộ lời giải.",
   "parts": [
     {
-      "id": "part1",
+      "id": "part-1",
       "name": "PHẦN I",
       "description": "Thí sinh trả lời từ câu 1 đến câu 12. Mỗi câu hỏi chỉ chọn 1 phương án.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "single_choice",
           "content": [
             "Tập xác định của hàm số ",
@@ -45,7 +45,7 @@
           "points": 0.25
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "single_choice",
           "content": [
             "Cấp số cộng ",
@@ -71,7 +71,7 @@
           "points": 0.25
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "single_choice",
           "content": [
             "Cho các hàm số: ",
@@ -109,7 +109,7 @@
           "points": 0.25
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "single_choice",
           "content": [
             "Khối chóp ",
@@ -147,7 +147,7 @@
           "points": 0.25
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "single_choice",
           "content": [
             "Cho hàm số ",
@@ -192,7 +192,7 @@
           "points": 0.25
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "single_choice",
           "content": [
             "Cho hàm số ",
@@ -230,7 +230,7 @@
           "points": 0.25
         },
         {
-          "id": "q7",
+          "id": "7",
           "type": "single_choice",
           "content": [
             "Trong không gian với hệ tọa độ ",
@@ -276,7 +276,7 @@
           "points": 0.25
         },
         {
-          "id": "q8",
+          "id": "8",
           "type": "single_choice",
           "content": [
             "Họ tất cả các nguyên hàm của hàm số ",
@@ -310,7 +310,7 @@
           "points": 0.25
         },
         {
-          "id": "q9",
+          "id": "9",
           "type": "single_choice",
           "content": [
             "Cho hàm số ",
@@ -360,7 +360,7 @@
           "points": 0.25
         },
         {
-          "id": "q10",
+          "id": "10",
           "type": "single_choice",
           "content": [
             "Thống kê điểm thi tốt nghiệp môn Toán THPT năm 2024 của một lớp 12 thu được kết quả như sau:",
@@ -389,7 +389,7 @@
           "points": 0.25
         },
         {
-          "id": "q11",
+          "id": "11",
           "type": "single_choice",
           "content": [
             "Trong không gian với hệ tọa độ ",
@@ -425,7 +425,7 @@
           "points": 0.25
         },
         {
-          "id": "q12",
+          "id": "12",
           "type": "single_choice",
           "content": [
             "Trong không gian với hệ tọa độ ",
@@ -465,12 +465,12 @@
       ]
     },
     {
-      "id": "part2",
+      "id": "part-2",
       "name": "PHẦN II",
       "description": "Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "questions": [
         {
-          "id": "q13",
+          "id": "1",
           "type": "true_false",
           "content": [
             "Hộp thứ nhất có 8 viên bi gồm màu xanh và màu đỏ, hộp thứ hai có 2 viên bi màu xanh và một số viên bi màu đỏ. Chọn ngẫu nhiên từ mỗi hộp 2 viên bi. Gọi ",
@@ -493,7 +493,7 @@
           ],
           "statements": [
             {
-              "id": "q13a",
+              "id": "a",
               "content": [
                 {
                   "math": "A"
@@ -506,7 +506,7 @@
               ]
             },
             {
-              "id": "q13b",
+              "id": "b",
               "content": [
                 "Xác suất để đồng thời cả hai hộp đều lấy được 2 viên bi màu xanh bằng ",
                 {
@@ -516,7 +516,7 @@
               ]
             },
             {
-              "id": "q13c",
+              "id": "c",
               "content": [
                 "Xác suất để chọn được ít nhất 1 viên bi màu đỏ ở hộp thứ nhất bằng ",
                 {
@@ -526,7 +526,7 @@
               ]
             },
             {
-              "id": "q13d",
+              "id": "d",
               "content": [
                 "Tổng số viên bi màu đỏ ở hai hộp bằng 8."
               ]
@@ -540,7 +540,7 @@
           ]
         },
         {
-          "id": "q14",
+          "id": "2",
           "type": "true_false",
           "content": [
             "Trong buổi tổng duyệt văn nghệ tại sân trường, một drone được sử dụng để ghi hình toàn cảnh. Trong 15 giây đầu kể từ khi cất cánh, độ cao của drone (tính bằng mét) tại thời điểm ",
@@ -559,7 +559,7 @@
           ],
           "statements": [
             {
-              "id": "q14a",
+              "id": "a",
               "content": [
                 "Vận tốc của drone tại thời điểm ",
                 {
@@ -573,13 +573,13 @@
               ]
             },
             {
-              "id": "q14b",
+              "id": "b",
               "content": [
                 "Drone luôn bay lên trong 12 giây đầu."
               ]
             },
             {
-              "id": "q14c",
+              "id": "c",
               "content": [
                 "Trong khoảng ",
                 {
@@ -589,7 +589,7 @@
               ]
             },
             {
-              "id": "q14d",
+              "id": "d",
               "content": [
                 "Độ cao lớn nhất mà drone đạt được trong 15 giây đầu không vượt quá ",
                 {
@@ -607,7 +607,7 @@
           ]
         },
         {
-          "id": "q15",
+          "id": "3",
           "type": "true_false",
           "content": [
             "Để đảm bảo an toàn khi lưu thông trên đường, các xe ô tô khi dừng đèn đỏ phải cách nhau tối thiểu ",
@@ -650,7 +650,7 @@
           ],
           "statements": [
             {
-              "id": "q15a",
+              "id": "a",
               "content": [
                 "Quãng đường ô tô ",
                 {
@@ -664,7 +664,7 @@
               ]
             },
             {
-              "id": "q15b",
+              "id": "b",
               "content": [
                 "Kể từ lúc đạp phanh, sau thời gian ",
                 {
@@ -678,7 +678,7 @@
               ]
             },
             {
-              "id": "q15c",
+              "id": "c",
               "content": [
                 "Quãng đường ô tô ",
                 {
@@ -692,7 +692,7 @@
               ]
             },
             {
-              "id": "q15d",
+              "id": "d",
               "content": [
                 "Để đảm bảo khoảng cách an toàn tối thiểu ",
                 {
@@ -726,7 +726,7 @@
           ]
         },
         {
-          "id": "q16",
+          "id": "4",
           "type": "true_false",
           "content": [
             "Trong không gian với hệ tọa độ ",
@@ -741,7 +741,7 @@
           ],
           "statements": [
             {
-              "id": "q16a",
+              "id": "a",
               "content": [
                 "Mặt phẳng ",
                 {
@@ -763,7 +763,7 @@
               ]
             },
             {
-              "id": "q16b",
+              "id": "b",
               "content": [
                 "Điểm đối xứng của ",
                 {
@@ -781,7 +781,7 @@
               ]
             },
             {
-              "id": "q16c",
+              "id": "c",
               "content": [
                 "Gọi ",
                 {
@@ -803,7 +803,7 @@
               ]
             },
             {
-              "id": "q16d",
+              "id": "d",
               "content": [
                 "Xét hai điểm ",
                 {
@@ -835,12 +835,12 @@
       ]
     },
     {
-      "id": "part3",
+      "id": "part-3",
       "name": "PHẦN III",
       "description": "Thí sinh trả lời từ câu 1 đến câu 6.",
       "questions": [
         {
-          "id": "q17",
+          "id": "1",
           "type": "short_answer",
           "content": [
             "Lớp 10C có 45 học sinh trong đó có 25 em thích môn Văn, 20 em thích môn Toán, 18 em thích môn Sử, 6 em không thích môn nào, 5 em thích cả ba môn. Có bao nhiêu học sinh thích chỉ một trong ba môn học trên?"
@@ -848,7 +848,7 @@
           "points": 0.5
         },
         {
-          "id": "q18",
+          "id": "2",
           "type": "short_answer",
           "content": [
             "Một hộp chứa 100 cái thẻ được đánh số thứ tự liên tiếp từ 1 đến 100. Hai thẻ khác nhau thì đánh số thứ tự khác nhau. Chọn ngẫu nhiên 3 thẻ trong hộp. Có bao nhiêu cách chọn 3 thẻ có số thứ tự lập thành cấp số cộng, đồng thời có tổng không vượt quá 150?"
@@ -856,7 +856,7 @@
           "points": 0.5
         },
         {
-          "id": "q19",
+          "id": "3",
           "type": "short_answer",
           "content": [
             "Hằng năm, trường THPT M tổ chức các đoàn đi thăm hỏi và chúc Tết tứ thân phụ mẫu cao tuổi của cán bộ, giáo viên và nhân viên trong trường. Đoàn số 1 có nhiệm vụ đến thăm 4 gia đình tại các địa điểm A, B, C, D. Đoàn xuất phát từ trường THPT M, đến thăm đủ 4 gia đình (mỗi gia đình đúng một lần). Sau khi thăm xong gia đình cuối cùng, đoàn kết thúc hành trình tại đó (không quay về trường). Do điều kiện giao thông dịp cuối năm, đoạn đường AB chỉ có thể đi theo chiều từ A đến B, không đi được theo chiều ngược lại (hình vẽ). Đoàn số 1 đã chọn được lộ trình di chuyển có tổng quãng đường ngắn nhất. Tổng quãng đường ngắn nhất đó dài bao nhiêu km?",
@@ -870,7 +870,7 @@
           "points": 0.5
         },
         {
-          "id": "q20",
+          "id": "4",
           "type": "short_answer",
           "content": [
             "Cho hình lăng trụ ",
@@ -910,7 +910,7 @@
           "points": 0.5
         },
         {
-          "id": "q21",
+          "id": "5",
           "type": "short_answer",
           "content": [
             "Một doanh nghiệp sản xuất độc quyền một loại sản phẩm. Giả sử khi sản xuất và bán hết ",
@@ -946,7 +946,7 @@
           "points": 0.5
         },
         {
-          "id": "q22",
+          "id": "6",
           "type": "short_answer",
           "content": [
             "Trong giờ thể dục học về kỹ thuật chuyền bóng hơi, Bình và An tập chuyền bóng cho nhau. Ở một động tác Bình chuyền bóng cho An, quả bóng bay lên cao nhưng lại lệch sang bên trái của An và rơi xuống vị trí cách chỗ An đứng ",

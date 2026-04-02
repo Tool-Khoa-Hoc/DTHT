@@ -4,10 +4,10 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
 const COUNTDOWN_MINUTES = 15;
-const BANK_CODE = 'CIMB';
-const BANK_LABEL = 'CIMB Viet Nam';
-const ACCOUNT_NO = '00336515620449';
-const ACCOUNT_NAME = 'Nguyễn Thanh Tâm';
+const BANK_CODE = 'vietcombank';
+const BANK_LABEL = 'Vietcombank';
+const ACCOUNT_NO = '9356026163';
+const ACCOUNT_NAME = 'NGUYEN THANH TAM';
 const FIXED_TRANSFER_CONTENT = 'Mo khoa tai lieu hoc';
 const PACKAGE_FALLBACKS = {
     '1m': { id: '1m', label: '1 Tháng', price: 39000, days: 30 },
@@ -67,7 +67,7 @@ export default function PaymentWaiting() {
     const paymentImageUrl = useMemo(() => {
         const search = new URLSearchParams({
             addInfo: transferContent,
-            accountName: 'Nguyen Thanh Tam',
+            accountName: ACCOUNT_NAME,
             ...(resolvedAmount ? { amount: String(resolvedAmount) } : {}),
         });
 
@@ -198,11 +198,11 @@ export default function PaymentWaiting() {
                 {/* Main card */}
                 <div className="bg-[#1a0f12]/80 backdrop-blur border border-white/10 rounded-3xl p-6 shadow-2xl">
                     {/* Payment image */}
-                    <div className="bg-white rounded-[28px] p-3 mb-5 shadow-lg shadow-black/10 overflow-hidden">
+                    <div className="bg-white rounded-[28px] p-3 mb-5 shadow-lg shadow-black/10 flex justify-center overflow-hidden">
                         <img
                             src={paymentImageUrl}
-                            alt="Ảnh chuyển khoản CIMB"
-                            className="w-full rounded-[22px] object-contain"
+                            alt="Ảnh chuyển khoản Vietcombank"
+                            className="w-full max-w-[280px] rounded-[22px] object-contain"
                         />
                     </div>
 
@@ -262,7 +262,7 @@ export default function PaymentWaiting() {
 
                 {/* Note */}
                 <div className="mt-4 text-center text-slate-500 text-xs space-y-1">
-                    <p>📌 Dùng đúng ảnh chuyển khoản CIMB ở trên để quét mã QR hoặc nhập tay thông tin.</p>
+                    <p>📌 Dùng đúng tỷ lệ ảnh để có thể quét mã QR chính xác trên app ngân hàng.</p>
                     <p>📋 <strong className="text-slate-400">Nội dung chuyển khoản:</strong> {transferContent}</p>
                     <p>📞 Sau khi chuyển khoản xong, vui lòng liên hệ qua Zalo admin <strong className="text-slate-300">0862370152</strong> để yêu cầu truy cập tài liệu.</p>
                 </div>

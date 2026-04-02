@@ -5,13 +5,67 @@ import { InlineMath, BlockMath } from 'react-katex';
 export default function RichTextRenderer({ content }) {
     if (!content) return null;
 
+    const resolveNodeImageSource = (node) => {
+        if (!node || typeof node !== 'object') return '';
+        const candidates = [node.image, node.src, node.url, node.source];
+        for (const candidate of candidates) {
+            if (typeof candidate === 'string' && candidate.trim()) return candidate.trim();
+        }
+        return '';
+    };
+
+    const normalizeLatex = (input) => {
+        let latex = String(input ?? '').trim();
+        if (!latex) return '';
+        if (latex.startsWith('[math:$') && latex.endsWith('$]')) {
+            latex = latex.slice(7, -2);
+        } else if (latex.startsWith('[!m:$') && latex.endsWith('$]')) {
+            latex = latex.slice(5, -2);
+        } else if (latex.startsWith('$') && latex.endsWith('$') && latex.length >= 2) {
+            latex = latex.slice(1, -1);
+        } else if (latex.startsWith('\\(') && latex.endsWith('\\)') && latex.length >= 4) {
+            latex = latex.slice(2, -2);
+        } else if (latex.startsWith('\\[') && latex.endsWith('\\]') && latex.length >= 4) {
+            latex = latex.slice(2, -2);
+        }
+        return latex.trim();
+    };
+
+    const renderInlineMathNode = (rawMath, key) => {
+        const math = normalizeLatex(rawMath);
+        return (
+            <InlineMath
+                key={key}
+                math={math}
+                renderError={() => (
+                    <code className="px-1 rounded bg-slate-100 text-slate-700">{`$${math}$`}</code>
+                )}
+            />
+        );
+    };
+
+    const renderBlockMathNode = (rawMath, key) => {
+        const math = normalizeLatex(rawMath);
+        return (
+            <BlockMath
+                key={key}
+                math={math}
+                renderError={() => (
+                    <pre className="whitespace-pre-wrap px-3 py-2 rounded bg-slate-100 text-slate-700">{`$${math}$`}</pre>
+                )}
+            />
+        );
+    };
+
     const renderFormattedText = (text, keyPrefix) => {
         // Handle literal newlines or escaped \n
         const lines = String(text).split(/\\n|\n/);
 
         return lines.map((line, lIdx) => {
-            // Match bold (**...**) and inline math ($...$)
-            const parts = line.split(/(\*\*.*?\*\*|\$.*?\$)/g).filter(Boolean);
+            // Match bold, inline math, and legacy inline style/math tokens.
+            const parts = line
+                .split(/(\*\*.*?\*\*|\[(?:math|!m):\$[\s\S]*?\$\]|\[!(?:sup|sub|b|i):\$[\s\S]*?\$\]|\[img:\$[^$]+\$\]|\$.*?\$)/g)
+                .filter(Boolean);
 
             const renderedLine = parts.map((part, idx) => {
                 const boldMatch = part.match(/^\*\*(.*)\*\*$/s);
@@ -19,9 +73,42 @@ export default function RichTextRenderer({ content }) {
                     return <strong key={`${keyPrefix}-${lIdx}-bold-${idx}`}>{boldMatch[1]}</strong>;
                 }
 
+                const inlineMathToken = part.match(/^\[(?:math|!m):\$(.*)\$\]$/s);
+                if (inlineMathToken) {
+                    return renderInlineMathNode(inlineMathToken[1], `${keyPrefix}-${lIdx}-math-token-${idx}`);
+                }
+
+                const styleToken = part.match(/^\[!(sup|sub|b|i):\$(.*)\$\]$/s);
+                if (styleToken) {
+                    const mark = styleToken[1];
+                    const inner = renderFormattedText(styleToken[2], `${keyPrefix}-${lIdx}-style-${idx}`);
+                    if (mark === 'sup') return <sup key={`${keyPrefix}-${lIdx}-sup-${idx}`}>{inner}</sup>;
+                    if (mark === 'sub') return <sub key={`${keyPrefix}-${lIdx}-sub-${idx}`}>{inner}</sub>;
+                    if (mark === 'b') return <strong key={`${keyPrefix}-${lIdx}-b-${idx}`}>{inner}</strong>;
+                    if (mark === 'i') return <em key={`${keyPrefix}-${lIdx}-i-${idx}`}>{inner}</em>;
+                }
+
                 const mathMatch = part.match(/^\$(.*)\$$/s);
                 if (mathMatch) {
-                    return <InlineMath key={`${keyPrefix}-${lIdx}-math-${idx}`} math={mathMatch[1]} />;
+                    return renderInlineMathNode(mathMatch[1], `${keyPrefix}-${lIdx}-math-${idx}`);
+                }
+
+                const imageMatch = part.match(/^\[img:\$([^$]+)\$\]$/i);
+                if (imageMatch) {
+                    const imageSrc = imageMatch[1]?.trim();
+                    if (!imageSrc) return null;
+                    // Render when token already contains a real path/url; keep token text otherwise.
+                    if (/^(?:[a-z][a-z\d+.-]*:|\/\/|\/)/i.test(imageSrc) || /\.[a-z0-9]{2,5}(?:[?#].*)?$/i.test(imageSrc)) {
+                        return (
+                            <img
+                                key={`${keyPrefix}-${lIdx}-img-${idx}`}
+                                src={imageSrc}
+                                alt="Question Resource"
+                                className="inline-block max-w-full rounded border border-slate-200 align-middle"
+                            />
+                        );
+                    }
+                    return <code key={`${keyPrefix}-${lIdx}-img-token-${idx}`} className="px-1 rounded bg-slate-100 text-slate-700">{part}</code>;
                 }
 
                 return <React.Fragment key={`${keyPrefix}-${lIdx}-text-${idx}`}>{part}</React.Fragment>;
@@ -108,9 +195,9 @@ export default function RichTextRenderer({ content }) {
         // Shorthand formats
         if (node.math !== undefined) {
             if (node.display === 'block') {
-                return <BlockMath key={index} math={node.math || ''} />;
+                return renderBlockMathNode(node.math || '', index);
             }
-            return <InlineMath key={index} math={node.math || ''} />;
+            return renderInlineMathNode(node.math || '', index);
         }
         if (node.blank !== undefined) {
             return (
@@ -134,10 +221,23 @@ export default function RichTextRenderer({ content }) {
             return <span key={index}>{rendered}</span>;
         }
         if (node.type === 'math') {
+            const mathValue = node.text || node.latex || node.math || '';
             if (node.display === 'block') {
-                return <BlockMath key={index} math={node.text || ''} />;
+                return renderBlockMathNode(mathValue, index);
             }
-            return <InlineMath key={index} math={node.text || ''} />;
+            return renderInlineMathNode(mathValue, index);
+        }
+        if (node.type === 'image') {
+            const src = resolveNodeImageSource(node);
+            if (!src) return null;
+            return (
+                <img
+                    key={index}
+                    src={src}
+                    alt={node.alt || "Question Resource"}
+                    className="inline-block max-w-full rounded border border-slate-200 align-middle"
+                />
+            );
         }
         if (node.type === 'blank') {
             return (
@@ -171,6 +271,8 @@ export default function RichTextRenderer({ content }) {
 
         // Shorthand for image
         if (block.image !== undefined) {
+            const source = resolveNodeImageSource(block);
+            if (!source) return null;
             const style = {
                 width: block.width && block.width !== 'none' ? `${block.width}%` : 'auto',
                 maxWidth: '100%',
@@ -179,7 +281,7 @@ export default function RichTextRenderer({ content }) {
             return (
                 <div key={index} className={`my-6 w-full flex ${block.align === 'center' || !block.align ? 'justify-center' : ''}`}>
                     <img
-                        src={block.image}
+                        src={source}
                         alt={block.alt || "Question Resource"}
                         style={style}
                         className={`rounded-xl shadow-md border border-slate-200 object-contain ${alignClass}`}
@@ -197,6 +299,8 @@ export default function RichTextRenderer({ content }) {
             );
         }
         if (block.type === 'image') {
+            const source = resolveNodeImageSource(block);
+            if (!source) return null;
             const style = {
                 width: block.width && block.width !== 'none' ? `${block.width}%` : 'auto',
                 maxWidth: '100%',
@@ -205,7 +309,7 @@ export default function RichTextRenderer({ content }) {
             return (
                 <div key={index} className={`my-6 w-full flex ${block.align === 'center' || !block.align ? 'justify-center' : ''}`}>
                     <img
-                        src={block.src}
+                        src={source}
                         alt={block.alt || "Question Resource"}
                         style={style}
                         className={`rounded-xl shadow-md border border-slate-200 object-contain ${alignClass}`}

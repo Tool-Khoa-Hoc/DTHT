@@ -90,7 +90,8 @@ function ExamCard({ exam, onJoin }) {
     }
     const displayBadge = examMeta.subject ? `${examMeta.subject.toUpperCase()} THPT` : 'ĐÁNH GIÁ NĂNG LỰC';
 
-    const bgImage = (examMeta.subject && examMeta.subject.toLowerCase() === 'sinh') ? '/y.png' : '/bk.png';
+    const SUBJECT_BG_IMAGES = { sinh: '/y.png', ly: '/ly.png' };
+    const bgImage = SUBJECT_BG_IMAGES[examMeta.subject?.toLowerCase()] || '/bk.png';
 
     let actionLabel = 'XEM LẠI';
     let actionClass = 'bg-transparent border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/5 focus:ring-white/15';

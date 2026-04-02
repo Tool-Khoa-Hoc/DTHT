@@ -6,12 +6,12 @@
   "description": "Đề thi thử TN THPT 2026 môn Toán - Trường Lê Thánh Tông TP.HCM",
   "parts": [
     {
-      "id": "part1",
+      "id": "part-1",
       "name": "PHẦN I",
       "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 12. Mỗi câu hỏi chỉ chọn một phương án.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "single_choice",
           "content": [
             "Cho hàm số ",
@@ -47,7 +47,7 @@
           "points": 0.25
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "single_choice",
           "content": [
             "Tập nghiệm của bất phương trình ",
@@ -81,7 +81,7 @@
           "points": 0.25
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "single_choice",
           "content": [
             "Mỗi ngày bác Tùng đều đi bộ để rèn luyện sức khỏe. Quãng đường đi bộ mỗi ngày (đơn vị: km) của bác trong 20 ngày được thống kê lại ở bảng sau. Phương sai của mẫu số liệu ghép nhóm là",
@@ -109,7 +109,7 @@
           "points": 0.25
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "single_choice",
           "content": [
             "Cho hàm số ",
@@ -153,7 +153,7 @@
           "points": 0.25
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "single_choice",
           "content": [
             "Thể tích ",
@@ -195,7 +195,7 @@
           "points": 0.25
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "single_choice",
           "content": [
             "Cho hình hộp ",
@@ -237,7 +237,7 @@
           "points": 0.25
         },
         {
-          "id": "q7",
+          "id": "7",
           "type": "single_choice",
           "content": [
             "Cho ",
@@ -273,7 +273,7 @@
           "points": 0.25
         },
         {
-          "id": "q8",
+          "id": "8",
           "type": "single_choice",
           "content": [
             "Cho hàm số ",
@@ -311,7 +311,7 @@
           "points": 0.25
         },
         {
-          "id": "q9",
+          "id": "9",
           "type": "single_choice",
           "content": [
             "Trong không gian ",
@@ -367,7 +367,7 @@
           "points": 0.25
         },
         {
-          "id": "q10",
+          "id": "10",
           "type": "single_choice",
           "content": [
             "Biết rằng đồ thị hàm số ",
@@ -405,7 +405,7 @@
           "points": 0.25
         },
         {
-          "id": "q11",
+          "id": "11",
           "type": "single_choice",
           "content": [
             "Trong không gian ",
@@ -471,7 +471,7 @@
           "points": 0.25
         },
         {
-          "id": "q12",
+          "id": "12",
           "type": "single_choice",
           "content": [
             "Mặt cắt của một tổ ong có hình lưới được tạo bởi các ô hình lục giác đều. Từ một ô lục giác đầu tiên, các ong thợ tạo ra vòng 1 gồm 6 ô lục giác bao quanh; tiếp theo các ong thợ sẽ tạo ra vòng 2 có 12 ô lục giác bao quanh vòng 1; vòng 3 gồm 18 ô lục giác bao quanh vòng 2; cứ tiếp tục theo quy luật đó tổ ong được hình thành. Số ô trên các vòng theo thứ tự tạo thành cấp số cộng có công sai ",
@@ -505,12 +505,12 @@
       ]
     },
     {
-      "id": "part2",
+      "id": "part-2",
       "name": "PHẦN II",
       "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "questions": [
         {
-          "id": "q13",
+          "id": "1",
           "type": "true_false",
           "content": [
             "Cho hai hàm số ",
@@ -525,7 +525,7 @@
           ],
           "statements": [
             {
-              "id": "q13a",
+              "id": "a",
               "content": [
                 "Phương trình ",
                 {
@@ -535,7 +535,7 @@
               ]
             },
             {
-              "id": "q13b",
+              "id": "b",
               "content": [
                 "Phương trình ",
                 {
@@ -549,7 +549,7 @@
               ]
             },
             {
-              "id": "q13c",
+              "id": "c",
               "content": [
                 "Phương trình ",
                 {
@@ -559,7 +559,7 @@
               ]
             },
             {
-              "id": "q13d",
+              "id": "d",
               "content": [
                 "Phương trình ",
                 {
@@ -577,7 +577,7 @@
           ]
         },
         {
-          "id": "q14",
+          "id": "2",
           "type": "true_false",
           "content": [
             "Trong không gian ",
@@ -630,7 +630,7 @@
           ],
           "statements": [
             {
-              "id": "q14a",
+              "id": "a",
               "content": [
                 "Hai quỹ đạo chuyển động ",
                 {
@@ -644,7 +644,7 @@
               ]
             },
             {
-              "id": "q14b",
+              "id": "b",
               "content": [
                 "Góc giữa hai quỹ đạo chuyển động của tàu vũ trụ và tiểu hành tinh bằng ",
                 {
@@ -654,13 +654,13 @@
               ]
             },
             {
-              "id": "q14c",
+              "id": "c",
               "content": [
                 "Đúng 10 giây sau thì khoảng cách giữa chúng bằng 48,31 km (làm tròn đến hàng phần trăm)."
               ]
             },
             {
-              "id": "q14d",
+              "id": "d",
               "content": [
                 "Khoảng cách ngắn nhất giữa tàu vũ trụ và tiểu hành tinh trong quá trình chuyển động là ",
                 {
@@ -678,7 +678,7 @@
           ]
         },
         {
-          "id": "q15",
+          "id": "3",
           "type": "true_false",
           "content": [
             "Tại một thị trấn thuộc hòn đảo Greenland xinh đẹp, thống kê cho biết: có 70% hộ gia đình có người trưởng thành đang đi làm; trong các hộ có người trưởng thành đi làm, có 40% hộ có thu nhập lớn hơn 200000 DKK/năm; trong các hộ không có người trưởng thành đang đi làm, có 10% hộ có thu nhập lớn hơn 200000 DKK/năm. Chọn ngẫu nhiên 1 hộ gia đình thuộc thị trấn nói trên. Xét tính đúng sai các mệnh đề sau:",
@@ -691,25 +691,25 @@
           ],
           "statements": [
             {
-              "id": "q15a",
+              "id": "a",
               "content": [
                 "Biết hộ được chọn không có người trưởng thành đi làm, xác suất hộ đó có thu nhập lớn hơn 200000 DKK/năm là 15%."
               ]
             },
             {
-              "id": "q15b",
+              "id": "b",
               "content": [
                 "Tỉ lệ hộ vừa có người trưởng thành đi làm vừa có thu nhập hộ lớn hơn 200000 DKK/năm là 30%."
               ]
             },
             {
-              "id": "q15c",
+              "id": "c",
               "content": [
                 "Tỉ lệ hộ có thu nhập lớn hơn 200000 DKK/năm là 29%."
               ]
             },
             {
-              "id": "q15d",
+              "id": "d",
               "content": [
                 "Biết hộ có thu nhập lớn hơn 200000 DKK/năm, xác suất hộ đó có người trưởng thành đi làm bằng ",
                 {
@@ -727,7 +727,7 @@
           ]
         },
         {
-          "id": "q16",
+          "id": "4",
           "type": "true_false",
           "content": [
             "Tháp giải nhiệt tại nhà máy Nhiệt điện Phả Lại (Tỉnh Hải Dương, Việt Nam) có mặt cắt qua trục theo phương thẳng đứng là một hình hypebol ",
@@ -760,7 +760,7 @@
           ],
           "statements": [
             {
-              "id": "q16a",
+              "id": "a",
               "content": [
                 "Diện tích đáy dưới của tháp bằng 5027 ",
                 {
@@ -770,7 +770,7 @@
               ]
             },
             {
-              "id": "q16b",
+              "id": "b",
               "content": [
                 "Các điểm ",
                 {
@@ -784,7 +784,7 @@
               ]
             },
             {
-              "id": "q16c",
+              "id": "c",
               "content": [
                 "Phương trình ",
                 {
@@ -798,7 +798,7 @@
               ]
             },
             {
-              "id": "q16d",
+              "id": "d",
               "content": [
                 "Thể tích của tháp giải nhiệt này bằng 214414 ",
                 {
@@ -818,12 +818,12 @@
       ]
     },
     {
-      "id": "part3",
+      "id": "part-3",
       "name": "PHẦN III",
       "description": "Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 1 đến câu 6.",
       "questions": [
         {
-          "id": "q17",
+          "id": "1",
           "type": "short_answer",
           "content": [
             "Cho hình chóp ",
@@ -881,7 +881,7 @@
           "points": 0.5
         },
         {
-          "id": "q18",
+          "id": "2",
           "type": "short_answer",
           "content": [
             "Một nhà mạng cần phủ sóng 5G dọc theo một tuyến đường thẳng dài 100 km nối hai thành phố ",
@@ -913,7 +913,7 @@
           "points": 0.5
         },
         {
-          "id": "q19",
+          "id": "3",
           "type": "short_answer",
           "content": [
             "Từ một tấm nhôm hình vuông có cạnh bằng 8 dm, người ta cắt bỏ bốn tứ giác bằng nhau (cùng bằng tứ giác ",
@@ -951,7 +951,7 @@
           "points": 0.5
         },
         {
-          "id": "q20",
+          "id": "4",
           "type": "short_answer",
           "content": [
             "Một quả bóng được phát lên từ vị trí gốc tọa độ ",
@@ -1001,7 +1001,7 @@
           "points": 0.5
         },
         {
-          "id": "q21",
+          "id": "5",
           "type": "short_answer",
           "content": [
             "Một đường hầm hiện đại được thiết kế với mặt đáy là hình thang ",
@@ -1115,7 +1115,7 @@
           "points": 0.5
         },
         {
-          "id": "q22",
+          "id": "6",
           "type": "short_answer",
           "content": [
             "Có 15 quả bóng được đánh số từ 1 tới 15 được bỏ vào 3 chiếc hộp mất nhãn (giống nhau), mỗi hộp có 6 ngăn được đánh số từ 1 tới 6 như hình vẽ, mỗi ngăn chứa tối đa 1 quả bóng. Biết rằng sau khi các quả bóng này được bỏ ngẫu nhiên vào các ngăn của mỗi hộp thì còn 3 ngăn trống (ngăn nào cũng có thể trống); gọi ",

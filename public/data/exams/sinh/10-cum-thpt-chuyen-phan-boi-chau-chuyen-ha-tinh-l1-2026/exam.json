@@ -6,12 +6,12 @@
   "description": null,
   "parts": [
     {
-      "id": "part1",
+      "id": "part-1",
       "name": "PHẦN I. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
       "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "single_choice",
           "content": [
             "Hình sau đây thể hiện bào quan",
@@ -30,7 +30,7 @@
           ]
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "single_choice",
           "content": [
             "Hình sau mô tả hoạt động của Operon Lac ở vi khuẩn E.coli trong môi trường nuôi cấy. Phân tích hình và cho biết phát biểu nào sau đây đúng?",
@@ -49,7 +49,7 @@
           ]
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "single_choice",
           "content": "Một tế bào sinh tinh có kiểu gene $\\frac{AB}{ab}Dd$ giảm phân bình thường tạo tinh trùng, trong quá trình đó có xảy ra trao đổi chéo giữa A và a. Loại giao tử nào sau đây có thể tạo ra.",
           "points": 0.25,
@@ -61,7 +61,7 @@
           ]
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "single_choice",
           "content": "Ở tế bào nhân thực, quá trình tái bản DNA xảy ra trong pha nào của chu kỳ tế bào?",
           "points": 0.25,
@@ -73,7 +73,7 @@
           ]
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "single_choice",
           "content": [
             [
@@ -105,7 +105,7 @@
           ]
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "single_choice",
           "content": [
             "Sơ đồ hình sau thể hiện con đường chuyển hóa đường galactose (galactosemi a) ở chuột nuôi thí nghiệm. Allele đột biến a làm enzyme A bị bất hoạt dẫn đến galactose bị tích lũy gây bệnh Galactosemia Type II (GALK). Allele đột biến b làm enzyme B bị bất hoạt sẽ tích lũy galactose-1-phosphate gây bệnh Galactosemia Type I (GALT). Cho rằng trong sữa nuôi chuột thí nghiệm chỉ có galactose, theo lí thuyết, nhận định nào sau đây đúng?",
@@ -124,7 +124,7 @@
           ]
         },
         {
-          "id": "q7",
+          "id": "7",
           "type": "single_choice",
           "content": "Biết bộ NST lưỡng bội của gà là 78, kí hiệu bộ NST của gà mái là",
           "points": 0.25,
@@ -136,7 +136,7 @@
           ]
         },
         {
-          "id": "q8",
+          "id": "8",
           "type": "single_choice",
           "content": [
             "Ở tế bào nhân thực, bào quan nào sau đây",
@@ -158,7 +158,7 @@
           ]
         },
         {
-          "id": "q9",
+          "id": "9",
           "type": "single_choice",
           "content": [
             "Sơ đồ hình sau thể hiện các giai đoạn khi nuôi cấy quần thể vi khuẩn trong môi trường nuôi cấy không liên tục Giai đoạn nào tốc độ sinh trưởng của quần thể bằng 0 do số tế bào sinh ra bằng số tế bào chết đi?",
@@ -177,7 +177,7 @@
           ]
         },
         {
-          "id": "q10",
+          "id": "10",
           "type": "single_choice",
           "content": "Động vật nào sau đây có túi tiêu hóa?",
           "points": 0.25,
@@ -189,7 +189,7 @@
           ]
         },
         {
-          "id": "q11",
+          "id": "11",
           "type": "single_choice",
           "content": "Một đột biến điểm làm gene đột biến giảm 1 liên kết hydrogen so với gene ban đầu, đó là dạng đột biến",
           "points": 0.25,
@@ -201,7 +201,7 @@
           ]
         },
         {
-          "id": "q12",
+          "id": "12",
           "type": "single_choice",
           "content": "Nguyên lí chung của việc tạo thực vật, động vật biến đổi gene là",
           "points": 0.25,
@@ -213,7 +213,7 @@
           ]
         },
         {
-          "id": "q13",
+          "id": "13",
           "type": "single_choice",
           "content": "Trong quá trình phiên mã ở sinh vật nhân thực, nhận định nào sau đây đúng?",
           "points": 0.25,
@@ -225,7 +225,7 @@
           ]
         },
         {
-          "id": "q14",
+          "id": "14",
           "type": "single_choice",
           "content": [
             [
@@ -272,7 +272,7 @@
           ]
         },
         {
-          "id": "q15",
+          "id": "15",
           "type": "single_choice",
           "content": [
             "Vào những năm 1890 – 1904, nhà sinh lý học Ivan Petrovich Pavlov đã tiến hành thí nghiệm hình thành phản xạ nghe tiếng chuông thì ttiết nước bọt ở loài chó nhà. Quá trình thí nghiệm được mô tả tóm tắt như hình sau: Nhận định nào sau đây không đúng",
@@ -291,7 +291,7 @@
           ]
         },
         {
-          "id": "q16",
+          "id": "16",
           "type": "single_choice",
           "content": "Trong hoạt động của tim ở người, cấu trúc nào sau đây phát xung điện làm tâm nhĩ co?",
           "points": 0.25,
@@ -303,7 +303,7 @@
           ]
         },
         {
-          "id": "q17",
+          "id": "17",
           "type": "single_choice",
           "content": "Trong chu trình nhân lên của virus, quá trình virus bám vào tế bào chủ một cách đặc hiệu thuộc giai đoạn",
           "points": 0.25,
@@ -315,7 +315,7 @@
           ]
         },
         {
-          "id": "q18",
+          "id": "18",
           "type": "single_choice",
           "content": [
             [
@@ -341,12 +341,12 @@
       ]
     },
     {
-      "id": "part2",
+      "id": "part-2",
       "name": "PHẦN II. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai",
       "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "true_false",
           "content": [
             [
@@ -385,25 +385,25 @@
           ],
           "statements": [
             {
-              "id": "q1a",
+              "id": "a",
               "content": "Xác suất sinh 1 người con trai bị bệnh của I-1 và I-2 là 25%."
             },
             {
-              "id": "q1b",
+              "id": "b",
               "content": "Nếu II-1 lấy chồng bình thường thì xác sinh sinh con bị bệnh là 50%."
             },
             {
-              "id": "q1c",
+              "id": "c",
               "content": "Cả 2 người phụ nữ trong phả hệ đều dị hợp về gene đang xét."
             },
             {
-              "id": "q1d",
+              "id": "d",
               "content": "Bệnh này do gene lặn nằm trên NST thường quy định."
             }
           ]
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "true_false",
           "content": [
             [
@@ -426,25 +426,25 @@
           ],
           "statements": [
             {
-              "id": "q2a",
+              "id": "a",
               "content": "Khi đột biến xảy ra tại vùng Q, enzyme 1 và enzyme 2 vẫn được tổng hợp ngay cả khi không có chất X, chứng tỏ đây là đột biến làm mất sự kiểm soát của operon."
             },
             {
-              "id": "q2b",
+              "id": "b",
               "content": "Đột biến mất chức năng ở vùng M sẽ dẫn đến việc enzyme 2 không được tổng hợp trong môi trường có chất X, nhưng enzyme 1 vẫn có thể được tổng hợp bình thường."
             },
             {
-              "id": "q2c",
+              "id": "c",
               "content": "Vùng P mã hóa enzyme 2, do đó đột biến tại vùng P sẽ khiến enzyme 2 không thể được tổng hợp trong mọi điều kiện."
             },
             {
-              "id": "q2d",
+              "id": "d",
               "content": "Đột biến ở vùng N làm cho enzyme 1 và enzyme 2 không được tổng hợp ngay cả khi có hoặc không có chất X, chứng tỏ đây là đột biến làm mất chức năng của vùng O."
             }
           ]
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "true_false",
           "content": [
             [
@@ -464,25 +464,25 @@
           ],
           "statements": [
             {
-              "id": "q3a",
+              "id": "a",
               "content": "Khi vận động, nhịp tim và nhịp thở tăng để tăng thải CO2 và tăng hấp thu O2."
             },
             {
-              "id": "q3b",
+              "id": "b",
               "content": "Khi nhiệt độ môi trường giảm, chuột cần tăng nhịp tim để tăng cường độ trao đổi nhiệt với môi trường ngoài.."
             },
             {
-              "id": "q3c",
+              "id": "c",
               "content": "Với mỗi yếu tố thí nghiệm, nếu dùng các giống chuột khác nhau thì thí nghiệm vẫn cho kết quả như nhau."
             },
             {
-              "id": "q3d",
+              "id": "d",
               "content": "Việc tiêm adrenaline gây đáp ứng nhanh, mạnh nên nhịp tim của chuột có thể đạt mức tối đa dù ở liều lượng nào."
             }
           ]
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "true_false",
           "content": [
             "Hình dưới đây minh họa cường độ quang hợp (tính theo lượng CO2 hấp thu) của 4 lô cây cùng loài khi sinh trưởng trong cùng điều kiện ánh sáng nhưng khác nhau về nhiệt độ và nồng độ CO2 môi trường.",
@@ -500,19 +500,19 @@
           ],
           "statements": [
             {
-              "id": "q4a",
+              "id": "a",
               "content": "Ở cường độ ánh sáng 1 - 2 kilolux thì cường độ quang hợp sẽ tăng nhanh hơn khi ở cường độ ánh sáng 3 - 4 kilolux."
             },
             {
-              "id": "q4b",
+              "id": "b",
               "content": "Nếu tiếp tục tăng ánh sáng lên 10 kilolux, cường độ quang hợp của lô I sẽ tiếp tục tăng."
             },
             {
-              "id": "q4c",
+              "id": "c",
               "content": "Ở nhiệt độ 25°C và cường độ ánh sáng 2 kilolux, việc tăng nồng độ CO2 từ 0,04% lên 0,1% sẽ làm tăng lượng glucose tạo ra."
             },
             {
-              "id": "q4d",
+              "id": "d",
               "content": "Trong điều kiện ánh sáng dưới 1 kilolux, cường độ quang hợp của các lô thí nghiệm luôn bằng nhau."
             }
           ]
@@ -520,12 +520,12 @@
       ]
     },
     {
-      "id": "part3",
+      "id": "part-3",
       "name": "PHẦN III. Thí sinh trả lời từ câu 1 đến câu 6.",
       "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "short_answer",
           "content": [
             [
@@ -550,7 +550,7 @@
           "points": 0.25
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "short_answer",
           "content": [
             [
@@ -565,7 +565,7 @@
           "points": 0.25
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "short_answer",
           "content": [
             "Hình sau thể hiện bản đồ gene ở NST số II của ruồi giấm (",
@@ -589,13 +589,13 @@
           "points": 0.25
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "short_answer",
           "content": "Một tế bào thực vật có bộ NST 2n = 14 (khi chưa nhân đôi) thực hiện quá trình giảm phân tạo giao tử. Số chromatide trong tế bào này ở kì sau giảm phân I bằng bao nhiêu?",
           "points": 0.25
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "short_answer",
           "content": [
             [
@@ -636,7 +636,7 @@
           "points": 0.25
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "short_answer",
           "content": [
             "Các hình sau thể hiện các giai đoạn (chưa theo thứ tự) của quá trình phân bào ở tế bào rễ cây hành ta (",

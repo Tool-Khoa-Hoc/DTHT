@@ -1,6 +1,5 @@
-const API_TEMPLATE_URL = 'https://thueapibank.vn/historyapivcbv3/password/sotaikhoan/token';
-const DEFAULT_API_TOKEN = 'd5259d1f01433a8068f98b935d2b48aa';
-const DEFAULT_API_PASSWORD = 'password';
+const API_TOKEN = 'd5259d1f01433a8068f98b935d2b48aa';
+const API_PASSWORD = 'password';
 const VCB_BANK_CODE = 'vietcombank';
 
 const toPositiveInteger = (value) => {
@@ -13,18 +12,8 @@ const toPositiveInteger = (value) => {
 
 const pickFirstDefined = (...values) => values.find((value) => value !== undefined && value !== null && value !== '');
 
-const getApiToken = () => import.meta.env.VITE_PAYMENT_API_TOKEN || DEFAULT_API_TOKEN;
-const getApiPassword = () => import.meta.env.VITE_PAYMENT_API_PASSWORD || DEFAULT_API_PASSWORD;
-const getApiTemplateUrl = () => import.meta.env.VITE_PAYMENT_API_URL || API_TEMPLATE_URL;
-
 const resolveApiUrl = (accountNo) => {
-  const password = getApiPassword();
-  const token = getApiToken();
-
-  return getApiTemplateUrl()
-    .replace(/\/password(?=\/|$)/i, `/${encodeURIComponent(password)}`)
-    .replace(/\/sotaikhoan(?=\/|$)/i, `/${encodeURIComponent(accountNo)}`)
-    .replace(/\/token(?=\/|$)/i, `/${encodeURIComponent(token)}`);
+  return `https://thueapibank.vn/historyapivcbv3/${encodeURIComponent(API_PASSWORD)}/${encodeURIComponent(accountNo)}/${encodeURIComponent(API_TOKEN)}`;
 };
 
 export function buildVietQrUrl({ accountNo, amount, transferContent }) {
@@ -128,30 +117,12 @@ const normalizePaymentInfo = (payload, { orderId, amount, accountNo, transferCon
   };
 };
 
-const buildRequestOptions = (orderId) => {
-  const token = getApiToken();
-  const payload = JSON.stringify({ order_id: orderId, token });
-
+const buildRequestOptions = () => {
   return [
     {
       method: 'GET',
       headers: { Accept: 'application/json' },
-    },
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: payload,
-    },
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ order_id: orderId }),
-    },
+    }
   ];
 };
 
@@ -170,7 +141,7 @@ export async function getPaymentInfo(input) {
   }
 
   const apiUrl = resolveApiUrl(accountNo);
-  const requestOptionsList = buildRequestOptions(orderId);
+  const requestOptionsList = buildRequestOptions();
 
   for (const requestOptions of requestOptionsList) {
     try {

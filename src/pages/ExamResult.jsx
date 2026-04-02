@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import RichTextRenderer from '../components/exam/RichTextRenderer';
 import { sanitizeExternalUrl } from '../utils/urlSecurity';
 import { getExamIndex } from '../utils/examIndexCache';
+import { resolveMediaPath } from '../utils/mediaPath';
 import {
     formatTrueFalseValue,
     hasKnownTrueFalseValue,
@@ -15,6 +16,30 @@ import {
 const getQuestionKey = (partId, questionId) => `${partId}.${questionId}`;
 const CHOICE_LABELS = ['A', 'B', 'C', 'D'];
 const TRUE_FALSE_LABELS = ['a', 'b', 'c', 'd'];
+
+const normalizeSubjectFolder = (value) => String(value || '').trim().toLowerCase();
+const getDefaultShortAnswerPoints = (subjectFolder) => {
+    const normalized = normalizeSubjectFolder(subjectFolder);
+    return normalized === 'toan' || normalized === 'math' ? 0.5 : 0.25;
+};
+
+// Normalize statement ID to canonical single-letter form
+// "q13a" → "a", "1a" → "a", "stmt-a" → "a", "a" → "a"
+const normalizeStatementId = (stmtId) => {
+    const s = String(stmtId ?? '').toLowerCase().trim();
+    const m = s.match(/^(?:stmt[_-]?)?(?:q?[0-9]+)?([a-d])$/);
+    return m ? m[1] : s;
+};
+
+// Lookup a value from an answer object by statement ID,
+// trying both the canonical form and the raw form as fallback
+const pickStatementValue = (answerObj, stmtId) => {
+    if (!answerObj || typeof answerObj !== 'object') return undefined;
+    const canonical = normalizeStatementId(stmtId);
+    if (Object.prototype.hasOwnProperty.call(answerObj, canonical)) return answerObj[canonical];
+    if (Object.prototype.hasOwnProperty.call(answerObj, stmtId)) return answerObj[stmtId];
+    return undefined;
+};
 
 const toChoiceIndex = (value) => {
     if (Number.isInteger(value) && value >= 0 && value <= 3) return value;
@@ -188,12 +213,12 @@ const normalizeExamMediaPaths = (value, basePath) => {
 
     const next = { ...value };
 
-    if (typeof next.image === 'string' && !/^(?:https?:)?\//.test(next.image)) {
-        next.image = `${basePath}/${next.image}`;
+    if (typeof next.image === 'string') {
+        next.image = resolveMediaPath(next.image, basePath);
     }
 
-    if (typeof next.src === 'string' && !/^(?:https?:)?\//.test(next.src)) {
-        next.src = `${basePath}/${next.src}`;
+    if (typeof next.src === 'string') {
+        next.src = resolveMediaPath(next.src, basePath);
     }
 
     for (const key of Object.keys(next)) {
@@ -558,6 +583,13 @@ export default function ExamResult() {
     const canOpenEditLink = Boolean(profile?.is_vip);
     const showLockedEditLink = Boolean(editExamUrl) && !canOpenEditLink;
     const isVip = Boolean(profile?.is_vip);
+    const scoreSubjectFolder = normalizeSubjectFolder(
+        examMeta?.subjectFolder ||
+        routeSubjectFolder ||
+        location.state?.subjectFolder ||
+        resultMetrics?.subjectFolder
+    );
+    const defaultShortAnswerPoints = getDefaultShortAnswerPoints(scoreSubjectFolder);
 
     if (loading) {
          return (
@@ -581,7 +613,12 @@ export default function ExamResult() {
 
     // 2025 THPTQG Scoring Logic
     let totalScore = 0;
-    const details = { part1: { correct: 0, total: 0 }, part2: { correct: 0, total: 0 }, part3: { correct: 0, total: 0 } };
+    const DEFAULT_TF_POINTS_LADDER = [0, 0.1, 0.25, 0.5, 1.0];
+    const details = {
+        part1: { correct: 0, total: 0, score: 0 },
+        part2: { correct: 0, total: 0, score: 0 },
+        part3: { correct: 0, total: 0, score: 0 }
+    };
 
     examData.parts.forEach(part => {
         part.questions.forEach(q => {
@@ -593,7 +630,9 @@ export default function ExamResult() {
                   const expectedChoiceIndex = toChoiceIndex(expectedAnswer);
                   const userChoiceIndex = toChoiceIndex(userAnswer);
                   if (expectedChoiceIndex !== null && userChoiceIndex === expectedChoiceIndex) {
-                      totalScore += q.points ?? 0.25;
+                      const pts = q.points ?? 0.25;
+                      totalScore += pts;
+                      details.part1.score += pts;
                       details.part1.correct += 1;
                   }
               } else if (q.type === 'true_false') {
@@ -602,20 +641,26 @@ export default function ExamResult() {
                   let correctCount = 0;
                 
                  q.statements.forEach((stmt, idx) => {
-                     const expectedStmtAnswer = Array.isArray(expectedAnswer) 
-                         ? expectedAnswer[idx] 
-                         : expectedAnswer?.[stmt.id];
+                     const expectedStmtAnswer = Array.isArray(expectedAnswer)
+                         ? expectedAnswer[idx]
+                         : pickStatementValue(expectedAnswer, stmt.id);
 
-                     if (qAnswers[stmt.id] === expectedStmtAnswer && expectedStmtAnswer !== undefined && expectedStmtAnswer !== null) {
+                     const userStmtAns = pickStatementValue(qAnswers, stmt.id);
+                     if (userStmtAns === expectedStmtAnswer && expectedStmtAnswer !== undefined && expectedStmtAnswer !== null) {
                          correctCount += 1;
                      }
                  });
 
-                 if (correctCount === 1) { totalScore += 0.1; }
-                 else if (correctCount === 2) { totalScore += 0.25; }
-                 else if (correctCount === 3) { totalScore += 0.5; }
-                 else if (correctCount === 4) { 
-                     totalScore += 1.0; 
+                 // Use q.points array from exam data, fallback to standard 2025 THPT ladder
+                 const pointsLadder = Array.isArray(q.points) && q.points.length >= 4
+                     ? [0, ...q.points.slice(0, 4)]
+                     : DEFAULT_TF_POINTS_LADDER;
+                 const earnedPts = correctCount >= 0 && correctCount < pointsLadder.length
+                     ? pointsLadder[correctCount]
+                     : (correctCount >= pointsLadder.length ? pointsLadder[pointsLadder.length - 1] : 0);
+                 totalScore += earnedPts;
+                 details.part2.score += earnedPts;
+                 if (correctCount === (q.statements?.length || 4)) {
                      details.part2.correct += 1;
                  }
               } else if (q.type === 'short_answer') {
@@ -624,7 +669,9 @@ export default function ExamResult() {
                   const expectAns = String(expectedAnswer ?? '').replace(',', '.').trim().toLowerCase();
                  
                  if (userAns && userAns === expectAns) {
-                     totalScore += q.points ?? 0.5;
+                     const pts = q.points ?? defaultShortAnswerPoints;
+                     totalScore += pts;
+                     details.part3.score += pts;
                      details.part3.correct += 1;
                  }
              }
@@ -658,7 +705,7 @@ export default function ExamResult() {
                 </header>
 
                 <div className="flex-1 overflow-y-auto w-full">
-                    <div className="max-w-4xl mx-auto bg-white p-6 md:p-12 shadow-sm border-x border-slate-200 min-h-full space-y-12 pb-24">
+                    <div className="max-w-6xl mx-auto bg-white p-6 md:p-12 shadow-sm border-x border-slate-200 min-h-full space-y-12 pb-24">
                         <ResultResourceActions
                             editExamUrl={editExamUrl}
                             canOpenEditLink={canOpenEditLink}
@@ -728,10 +775,10 @@ export default function ExamResult() {
                                                     {q.type === 'true_false' && (
                                                         <div className="space-y-3">
                                                             {q.statements?.map((stmt, stmtIdx) => {
-                                                                const userStmtAns = userAns?.[stmt.id];
+                                                                const userStmtAns = pickStatementValue(userAns, normalizeStatementId(stmt.id));
                                                                 const expectedStmtAnswer = Array.isArray(expectedAnswer) 
                                                                     ? expectedAnswer[stmtIdx] 
-                                                                    : expectedAnswer?.[stmt.id];
+                                                                    : pickStatementValue(expectedAnswer, normalizeStatementId(stmt.id));
 
                                                                 const hasKnownExpected = hasKnownTrueFalseValue(expectedStmtAnswer);
                                                                 const isCorrect = userStmtAns === expectedStmtAnswer && hasKnownExpected;
@@ -864,21 +911,24 @@ export default function ExamResult() {
                             {hasReviewAnswerKey ? (
                                 <>
                                     {details.part1.total > 0 && (
-                                        <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-40">
+                                        <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-44">
                                             <p className="text-xs font-bold text-slate-400 uppercase mb-1">P.I: Trắc nghiệm</p>
                                             <p className="text-xl font-black text-blue-600">{details.part1.correct}/{details.part1.total} <span className="text-sm text-slate-500 font-medium">câu đúng</span></p>
+                                            <p className="text-xs font-bold text-blue-400 mt-1">{details.part1.score.toFixed(2).replace(/\.?0+$/, '').replace('.', ',')} điểm</p>
                                         </div>
                                     )}
                                     {details.part2.total > 0 && (
-                                        <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-40">
+                                        <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-44">
                                             <p className="text-xs font-bold text-slate-400 uppercase mb-1">P.II: Đúng/Sai</p>
                                             <p className="text-xl font-black text-amber-600">{details.part2.correct}/{details.part2.total} <span className="text-sm text-slate-500 font-medium">câu đúng hết</span></p>
+                                            <p className="text-xs font-bold text-amber-400 mt-1">{details.part2.score.toFixed(2).replace(/\.?0+$/, '').replace('.', ',')} điểm</p>
                                         </div>
                                     )}
                                     {details.part3.total > 0 && (
-                                        <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-40">
+                                        <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-44">
                                             <p className="text-xs font-bold text-slate-400 uppercase mb-1">P.III: Trả lời ngắn</p>
                                             <p className="text-xl font-black text-emerald-600">{details.part3.correct}/{details.part3.total} <span className="text-sm text-slate-500 font-medium">câu đúng</span></p>
+                                            <p className="text-xs font-bold text-emerald-400 mt-1">{details.part3.score.toFixed(2).replace(/\.?0+$/, '').replace('.', ',')} điểm</p>
                                         </div>
                                     )}
                                 </>

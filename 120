@@ -1,0 +1,1 @@
+s=len(lines)-120 if len(lines) else  

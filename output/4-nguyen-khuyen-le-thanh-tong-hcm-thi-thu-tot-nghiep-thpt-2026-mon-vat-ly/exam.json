@@ -1,0 +1,870 @@
+{
+  "id": "4-nguyen-khuyen-le-thanh-tong-hcm-thi-thu-tot-nghiep-thpt-2026-mon-vat-ly",
+  "title": "4. Nguyễn Khuyến - Lê Thánh Tông - HCM -  [Thi thử Tốt Nghiệp THPT 2026 Môn VẬT LÝ ]",
+  "subject": "khac",
+  "time": 0,
+  "description": "4. Nguyễn Khuyến - Lê Thánh Tông - HCM -  [Thi thử Tốt Nghiệp THPT 2026 Môn VẬT LÝ ]",
+  "parts": [
+    {
+      "id": "part-1",
+      "name": "PHẦN I",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án",
+      "questions": [
+        {
+          "id": "1",
+          "type": "single_choice",
+          "content": "Cách nào sau đây không làm thay đổi nội năng của vật?",
+          "points": 0.25,
+          "options": [
+            "Cọ xát vật với mặt bàn.",
+            "Đốt nóng vật.",
+            "Đưa vật lên cao.",
+            "Làm lạnh vật."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "single_choice",
+          "content": "Trong hệ SI, đơn vị của cảm ứng từ là",
+          "points": 0.25,
+          "options": [
+            "tesla (T).",
+            "weber (Wb).",
+            "vôn trên mét (V/m).",
+            "henry (H)."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "single_choice",
+          "content": [
+            "Cho p là áp suất, V là thể tích, ",
+            {
+              "math": "TK()"
+            },
+            " là nhiệt độ tuyệt đối của một lượng khí lí tưởng xác định. Hình nào dưới đây biểu diễn quá trình biến đổi trạng thái của lượng khí đó khác với các hình còn lại?\n",
+            {
+              "image": "img_dd63ae624304.png"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Hình 4.",
+            "Hình 3.",
+            "Hình 2.",
+            "Hình 1."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "single_choice",
+          "content": [
+            "Cho một nam châm thẳng rơi theo phương thẳng đứng qua tâm O của vòng dây dẫn tròn nằm ngang như hình vẽ. Trong quá trình nam châm rơi, trong vòng dây xuất hiện dòng điện cảm ứng có chiều\n",
+            {
+              "image": "img_166257d882fb.jpg"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "là chiều dương quy ước trên hình.",
+            "ngược với chiều dương quy ước trên hình.",
+            "ngược với chiều dương quy ước khi nam châm ở phía trên vòng dây và chiều ngược lại khi nam châm ở phía dưới.",
+            "là chiều dương quy ước khi nam châm ở phía trên vòng dây và chiều ngược lại khi nam châm ở phía dưới."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "single_choice",
+          "content": "Ở nhiệt độ bao nhiêu trong thang Celsius thì giá trị nhiệt độ bằng một nửa nhiệt độ tuyệt đối?",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "0C"
+              }
+            ],
+            [
+              {
+                "math": "100C"
+              }
+            ],
+            [
+              {
+                "math": "273C"
+              }
+            ],
+            [
+              {
+                "math": "546C"
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "single_choice",
+          "content": [
+            "Trong sạc điện thoại không dây có cuộn dây được nối với nguồn điện xoay chiều. Phía sau của điện thoại có cuộn dây được nối với pin. Khi đặt mặt sau của điện thoại lên mặt trên của sạc, thì điện thoại được sạc pin. Nguyên lí của sạc điện thoại không dây dựa trên\n",
+            {
+              "image": "img_38e36743fa16.jpg"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "hiện tượng cảm ứng điện từ.",
+            "hiện tượng nhiệt điện.",
+            "tác dụng nhiệt của dòng điện.",
+            "tác dụng của lực từ lên dòng điện."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "7",
+          "type": "single_choice",
+          "content": [
+            "Gọi ",
+            {
+              "math": "pV"
+            },
+            " và T lần lượt là áp suất, thể tích và nhiệt độ tuyệt đối của một khối khí lí tưởng xác định. Công thức nào sau đây mô tả đúng định luật Boyle?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "pV="
+              },
+              " hằng số."
+            ],
+            [
+              {
+                "math": "VT="
+              },
+              " hằng số."
+            ],
+            [
+              {
+                "math": "pV="
+              },
+              " hằng số."
+            ],
+            [
+              {
+                "math": "pT="
+              },
+              " hằng số."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "8",
+          "type": "single_choice",
+          "content": "Chuyển động của các hạt phấn hoa trong thí nghiệm của Brown chứng tỏ:",
+          "points": 0.25,
+          "options": [
+            "Hạt phấn hoa hút và đẩy các phân tử nước.",
+            "Các phân tử nước hút và đẩy hạt phấn hoa.",
+            "Các phân tử nước lúc thì đứng yên, lúc thì chuyển động",
+            "Các phân tử nước không đứng yên mà chuyển động không ngừng."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "9",
+          "type": "single_choice",
+          "content": "Chất rắn nào sau đây thuộc dạng chất rắn vô định hình?",
+          "points": 0.25,
+          "options": [
+            "Muối ăn.",
+            "Kim loại.",
+            "Thạch anh.",
+            "Nhựa đường."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "10",
+          "type": "single_choice",
+          "content": [
+            {
+              "image": "img_df178cb6952a.jpg"
+            },
+            "Dùng các thông tin sau cho câu 10 và câu 11: Một khung dây phẳng có diện tích ",
+            {
+              "math": "25cm2"
+            },
+            ", gồm 10 vòng dây đặt trong từ trường đều, mặt phẳng vòng dây vuông góc với các đường sức từ. Hình bên là đồ thị biểu diễn sự phụ thuộc của độ lớn cảm ứng từ B vào thời gian t.\nĐộ lớn từ thông gửi qua khung dây tại thời điểm ",
+            {
+              "math": "t=02s"
+            },
+            " là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "100Wb"
+              },
+              "."
+            ],
+            "100 mWb.",
+            [
+              {
+                "math": "90Wb"
+              },
+              "."
+            ],
+            "90 mWb."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "11",
+          "type": "single_choice",
+          "content": [
+            "Độ lớn của suất điện động cảm ứng xuất hiện trong khung từ thời điểm ",
+            {
+              "math": "t1=0"
+            },
+            " đến thời điểm ",
+            {
+              "math": "t2=05s"
+            },
+            " là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "02V"
+              },
+              "."
+            ],
+            "8 V.",
+            [
+              {
+                "math": "210-4V"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "210-3V"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "12",
+          "type": "single_choice",
+          "content": [
+            "Trong các hình sau, hình nào diễn tả đúng phương và chiều của vectơ cường độ điện trường ",
+            {
+              "math": "E"
+            },
+            ", vectơ cảm ứng từ ",
+            {
+              "math": "B"
+            },
+            " và vận tốc truyền sóng ",
+            {
+              "math": "v"
+            },
+            " tại một điểm của một sóng điện từ?\n",
+            {
+              "image": "img_8d4a25c5a607.png"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "Hình 1.",
+            "Hình 2.",
+            "Hình 3.",
+            "Hình 4"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "13",
+          "type": "single_choice",
+          "content": [
+            "Dùng các thông tin sau cho câu 13 và câu 14: Trong một bình 5 lít chứa khí nitrogen ở ",
+            {
+              "math": "27C"
+            },
+            " và áp suất 3 atm. Biết ",
+            {
+              "math": "1atm=101325Pa"
+            },
+            ".\nĐộng năng tịnh tiến trung bình của mỗi phân tử khí là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "62110-21J"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "27610-21J"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "55910-22J"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "61210-21J"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "14",
+          "type": "single_choice",
+          "content": "Tổng động năng tịnh tiến trung bình của các phân tử khí trong bình là",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "15195J"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "373842J"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "75975J"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "22798J"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "15",
+          "type": "single_choice",
+          "content": [
+            {
+              "image": "img_6fee198599a5.png"
+            },
+            "Việc phân loại chất thải rắn sinh hoạt (lon nước ngọt, kim loại nói chung) nhằm thúc đẩy tăng cường tái sử dụng, tái chế chất thải, sản phẩm thải bỏ, tận dụng tối đa giá trị, kéo dài vòng đời của sản phẩm, vật liệu. Hình bên là dây chuyền xử lí rác thải bằng từ tính (bên trong có nam châm). Hãy cho biết những chất thải rắn ở trên dây chuyền khi rơi xuống vị trí 1 thuộc loại chất thải rắn của kim loại nào?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Sắt.",
+            "Nhôm.",
+            "Chì.",
+            "Đồng."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "16",
+          "type": "single_choice",
+          "content": [
+            "Một đoạn dây dẫn dài 5 cm đặt trong từ trường đều và vuông góc với vectơ cảm ứng từ. Dòng điện chạy qua dây có cường độ ",
+            {
+              "math": "075A"
+            },
+            ". Lực từ tác dụng lên đoạn dây đó là ",
+            {
+              "math": "310-2N"
+            },
+            ". Cảm ứng từ của từ trường đó có độ lớn là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "04T"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "08T"
+              },
+              "."
+            ],
+            "1 T.",
+            [
+              {
+                "math": "12T"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "17",
+          "type": "single_choice",
+          "content": "Khi nói về từ trường, phát biểu nào sau đây là đúng?",
+          "points": 0.25,
+          "options": [
+            "Từ trường tác dụng lực từ lên một điện tích đứng yên ở trong đó.",
+            "Từ trường tác dụng lực từ lên một nam châm đặt trong đó.",
+            "Một dòng điện tạo ra một từ trường đều xung quanh nó.",
+            "Một kim nam châm tạo ra một từ trường đều xung quanh nó."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "18",
+          "type": "single_choice",
+          "content": [
+            {
+              "image": "img_ad904fcc9664.jpg"
+            },
+            "Hình bên mô tả một chiếc cân làm bằng vật liệu không nhiễm từ. Đĩa trái của cân có vật A là một khối sắt, B là nam châm điện. Khi k hông có dòng điện, cân ở trạng thái cân bằng. Khi cấp điện cho B, khối sắt A sẽ bị hút vào B. Trong quá trình khối sắt A chuyển động lên trên mà chưa chạm vào B thì"
+          ],
+          "points": 0.25,
+          "options": [
+            "cân vẫn cân bằng.",
+            "cân nghiêng về bên phải.",
+            "cân nghiêng về bên trái.",
+            "cân dao động nhẹ."
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part-2",
+      "name": "PHẦN II",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_34f17a82ae42.jpg"
+            },
+            "Một bộ thiết bị bao gồm một sợi dây dẫn điện đồng chất, tiết diện đều, một nam châm, một chiếc cân, một bộ nguồn điện có suất điện động không đổi (có gắn sẵn các đầu và một công tắc điện K điện trở không đáng kể). Sợi dây có tiết diện ",
+            {
+              "math": "S=3510-9m2"
+            },
+            ", chiều dài ",
+            {
+              "math": "L=720cm"
+            },
+            " và điện trở được xác định bằng công thức ",
+            {
+              "math": "R=1710-8LS"
+            },
+            ", trong do L tính bằng m, S tính bằng ",
+            {
+              "math": "m2"
+            },
+            " và R tính bằng ",
+            {
+              "math": "\\text{mathtype_de3714380ff6}"
+            },
+            ". Bộ nguồn điện có suất điện động ",
+            {
+              "math": "E=120V"
+            },
+            " và điện trở trong ",
+            {
+              "math": "r=05"
+            },
+            ". Nối sợi dây vào bộ nguồn điện qua công tắc K. Để xác định cảm ứng từ giữa hai cực của nam châm, một học sinh đã uốn sợi dây dẫn điện thành khung dây và bố trí thí nghiệm như hình vẽ bên (khung dây được giữ bởi hai chốt ",
+            {
+              "math": "AB"
+            },
+            "). Biết phần nằm ngang của sợi dây nằm giữa hai cực nam châm có chiều dài là ",
+            {
+              "math": "100cm"
+            },
+            ". Khi bật công tắc cho dòng điện chạy trong mạch điện thì thấy số chỉ của cân thay đổi ",
+            {
+              "math": "40g"
+            },
+            ". Lấy gia tốc trọng trường ",
+            {
+              "math": "g=98ms2"
+            },
+            "."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                "Điện trở của sợi dây dẫn là ",
+                {
+                  "math": "35"
+                },
+                " (làm tròn kết quả đến chữ số hàng phần mười)."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Khi bật công tắc K để dòng diện chạy trong sợi dây dẫn điện thì cường độ dòng điện chạy trong mạch điện là 3 V.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Lực từ tác dụng vào đoạn dây dẫn nằm giữa hai cực nam châm hướng thẳng đứng lên trên.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Độ lớn cảm ứng từ giữa hai cực của nam châm xác định được từ thí nghiệm trên là 98 mT.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_f13fe0ffff55.jpg"
+            },
+            "Một học sinh thiết kế một chiếc chuông cửa đơn giản như hình bên.\nKhi nhấn công tắc (S) rồi thả ra, sẽ nghe thấy hai tiếng \"đinh đoong\"."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Khi nhấn công tắc S, lõi sắt non trở thành một nam châm với đầu Q là cực nam, còn đầu P là cực bắc.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Nếu thay lõi sắt non bằng lõi thép thì sẽ chỉ nghe thấy một tiếng \"đinh\".",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Nếu thay thanh sắt đàn hồi bằng thanh nhôm đàn hồi thì chuông vẫn sẽ hoạt động bình thường.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Nếu đảo hai cực của nguồn điện thì chuông sẽ không hoạt động.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_03725cdc88d3.jpg"
+            },
+            "Một bình tích áp được sử dụng trong máy lọc nước có hai phần: bóng chứa nước và bóng chứa khí như hình bên. Khi chưa chứa nước, bóng chứa khí chiếm toàn bộ thể tích trong bình là 10 lít, áp suất 120 kPa. Đường ống dẫn nước vào, ra bóng chứa nước có gắn rơle áp suất điều khiển đóng mở mạch điện. Khi lượng nước trong bóng chứa nước tăng đến 8 lít thì áp suất nước đạt cực đại, rơle ngắt mạch, máy ngừng cung cấp nước vào bình. Khi lượng nước trong bình giảm đến 5 lít, rơle tự động đóng mạch để máy cung cấp nước trở lại. Coi nhiệt độ trong bóng chứa khí không đổi, các bóng mềm, tổng thể tích nước và khí bằng thể tích bình, bỏ qua áp suất do trọng lượng của nước gây ra."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Khi nước trong bình là 8 lít, áp suất trong túi khí là 600 kPa.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Khi nước trong bình giảm, mật độ phân tử khí trong bóng khí tăng.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Khi nước được bơm vào bình, áp suất trong bóng khí tăng.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                "Một người thợ đã giảm bớt khí trong bóng chứa khí nên khi nước trong bình giảm đến 6 lít rơle đã đóng mạch để máy hoạt động trở lại. Lượng khí thoát ra chiếm ",
+                {
+                  "math": "20%"
+                },
+                " lượng khí ban đầu."
+              ],
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "type": "true_false",
+          "content": [
+            {
+              "image": "img_eb18838d58eb.png"
+            },
+            "Một học sinh dùng một ấm điện có thông số như hình 1 để đun 1,2 lít nước ở nhiệt độ phòng. Ấm được nối với nguồn điện xoay chiều có điện áp ",
+            {
+              "math": "220V-50Hz"
+            },
+            ". Học sinh này dùng nhiệt kế và đồng hồ để nghiên cứu sự thay đổi nhiệt độ của nước theo thời gian và thu được đồ thị như hình 2. Biết nhiệt dung riêng của nước là ",
+            {
+              "math": "4200JkgK()"
+            },
+            ", nhiệt hóa hơi riêng của nước là ",
+            {
+              "math": "23106Jkg"
+            },
+            "; khối lượng riêng của nước là ",
+            {
+              "math": "10kg"
+            },
+            " lít. Vỏ ấm làm bằng inox có khối lượng 800 g và nhiệt dung riêng là ",
+            {
+              "math": "500JkgK()"
+            },
+            ". Cho rằng tỉ lệ nhiệt lượng tỏa ra môi trường so với điện năng tiêu thụ là không đổi trong quá trình đun nước. Biết ấm điện chỉ ngắt điện khi cạn nước."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Nhiệt độ phòng là 298 K.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": [
+                "Nhiệt lượng nước thu vào để tăng đến nhiệt độ sôi là ",
+                {
+                  "math": "387105J"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                "Trong quá trình đun cho đến khi nước bắt đầu sôi thì hiệu suất làm nóng nước là ",
+                {
+                  "math": "92%"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Kể từ khi nước bắt đầu sôi, nếu tiếp tục đun nước thì sau khoảng thời gian 1,8 giờ ấm sẽ tự ngắt điện.",
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part-3",
+      "name": "PHẦN III",
+      "description": "Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 1 đến câu 6.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "short_answer",
+          "content": [
+            "Biết nhiệt dung riêng của nước là ",
+            {
+              "math": "c=4190JkgK()"
+            },
+            " và nhiệt hóa hơi riêng của nước là ",
+            {
+              "math": "L=226106Jkg"
+            },
+            ". Để làm cho ",
+            {
+              "math": "m=200g"
+            },
+            " nước lấy ở ",
+            {
+              "math": "t1=10C"
+            },
+            " sôi ở ",
+            {
+              "math": "t2=100C"
+            },
+            " và ",
+            {
+              "math": "10%"
+            },
+            " khối lượng của nó đã hóa hơi khi sôi thì cần cung cấp một nhiệt lượng bằng bao nhiêu kJ (làm tròn kết quả đến chữ số hàng đơn vị)?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "short_answer",
+          "content": [
+            "Một vòng dây tròn đặt trong từ trường đều có cảm ứng từ ",
+            {
+              "math": "B=06T"
+            },
+            ". Mặt phẳng vòng dây vuông góc với đường sức từ. Nếu đường kính vòng dây giảm từ 100 cm xuống 80 cm trong ",
+            {
+              "math": "02s"
+            },
+            " thì độ lớn suất điện động cảm ứng xuất hiện trong vòng dây bằng bao nhiêu V (làm tròn kết quả đến chữ số hàng phần trăm)?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "short_answer",
+          "content": [
+            "Xét khối khí chứa trong một bình kín, biết tổng động năng tịnh tiến trung bình của các phân tử khí trong ",
+            {
+              "math": "1m3"
+            },
+            " thể tích khí có giá trị ",
+            {
+              "math": "70Jm3"
+            },
+            ". Áp suất khí trong bình là ",
+            {
+              "math": "x10-6Nm2"
+            },
+            ". Tìm ",
+            {
+              "type": "text",
+              "text": "x",
+              "marks": [
+                "italic"
+              ]
+            },
+            " (làm tròn kết quả đến chữ số hàng phần mười)"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "short_answer",
+          "content": [
+            {
+              "image": "img_78090564f3fe.jpg"
+            },
+            "Một phần của khung dây hình chữ nhật có kích thước như hình bên được đặt trong một vùng từ trường đều có cảm ứng từ ",
+            {
+              "math": "07T"
+            },
+            ". Tổng điện trở của vòng dây là ",
+            {
+              "math": "03"
+            },
+            ". Bỏ qua tác dụng của trọng lực. Lực cần thiết để kéo khung dây ra khỏi từ trường (sang phải) với tốc độ không đổi ",
+            {
+              "math": "43ms"
+            },
+            " là bao nhiêu mN (làm tròn kết quả đến chữ số hàng đơn vị)?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "short_answer",
+          "content": [
+            {
+              "image": "img_fa90e4f471da.jpg"
+            },
+            {
+              "image": "img_aa48605e62b7.jpeg"
+            },
+            "Như hình bên, xilanh A và B giống nhau đều được đặt cố định, nằm ngang, hai pit-tông cách nhiệt được nối bằng một thanh cứng nhẹ có thể chuyển động không ma sát với thành các xilanh. Trong xilanh A và B chứa lần lượt ",
+            {
+              "math": "02mol"
+            },
+            " và ",
+            {
+              "math": "05mol"
+            },
+            " khí lí tưởng. Ban đầu, khí trong xilanh A và B có cùng nhiệt độ. Bây giờ, giữ nhiệt độ khí trong xilanh B không đổi, đồng thời đốt nóng từ từ khí trong xilanh A cho đến khi thể tích của khí trong xilanh A tăng gấp 1,5 lần giá trị ban đầu. Nhiệt độ tuyệt đối của khí trong xilanh A đã tăng bao nhiêu lần (làm tròn kết quả đến chữ số hàng phần mười)?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "short_answer",
+          "content": [
+            "Một thanh dẫn điện MN trượt trên khung dây kim loại kín hình chữ nhật ABCD đặt trong từ trường đều có độ lớn cảm ứng từ ",
+            {
+              "math": "B=04T"
+            },
+            " được mô tả như hình bên. Khung dây ABCD có tiết diện đều, đồng chất và có điện trở ",
+            {
+              "math": "RABCD=6"
+            },
+            ". Thanh MN trượt đều với tốc độ ",
+            {
+              "math": "8ms"
+            },
+            " sao cho M tiếp xúc với cạnh ",
+            {
+              "math": "ADN"
+            },
+            " tiếp xúc với cạnh BC và MN song song với AB. Biết điện trở của thanh MN là ",
+            {
+              "math": "RMN=05MN=AB=CD=18cm"
+            },
+            ". Khi thanh MN chuyển động từ AB tới CD thì cường độ dòng điện cực tiểu chạy qua thanh MN bằng bao nhiêu ampe (làm tròn kết quả đến chữ số hàng phần mươi)"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

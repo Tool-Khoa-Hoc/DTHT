@@ -6,12 +6,12 @@
   "description": null,
   "parts": [
     {
-      "id": "part1",
+      "id": "part-1",
       "name": "PHẦN I. TRẮC NGHIỆM NHIỀU PHƯƠNG ÁN LỰC CHỌN",
       "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "single_choice",
           "content": [
             [
@@ -36,7 +36,7 @@
           "correct_answer": null
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "single_choice",
           "content": "Trong chu kì tế bào, quá trình nhân đôi nhiễm sắc thể diễn ra ở pha",
           "points": 0.25,
@@ -49,7 +49,7 @@
           "correct_answer": null
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "single_choice",
           "content": "Trên 1 đoạn của phân tử DNA, mạch thứ nhất có trình tự nucleotide là ATCCTAGTA, mạch thứ hai tương ứng sẽ có trình tự nucleotide như thế nào?",
           "points": 0.25,
@@ -62,7 +62,7 @@
           "correct_answer": null
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "single_choice",
           "content": "Loại nitrogenous base Uracil (U) là thành phần của phân tử nào sau đây?",
           "points": 0.25,
@@ -75,7 +75,7 @@
           "correct_answer": null
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "single_choice",
           "content": [
             [
@@ -97,7 +97,7 @@
           "correct_answer": null
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "single_choice",
           "content": "Ở người, cặp gene Aa nằm trên nhiễm sắc thể giới tính X, không có allele tương ứng trên nhiễm sắc thể Y, trong đó allele A quy định mắt nhìn màu bình thường là trội hoàn toàn so với allele a quy định bệnh mù màu. Người nữ bị mù màu có kiểu gene là",
           "points": 0.25,
@@ -110,7 +110,7 @@
           "correct_answer": null
         },
         {
-          "id": "q7",
+          "id": "7",
           "type": "single_choice",
           "content": "Vùng kết thúc của gene là vùng",
           "points": 0.25,
@@ -123,7 +123,7 @@
           "correct_answer": null
         },
         {
-          "id": "q8",
+          "id": "8",
           "type": "single_choice",
           "content": "Nhiễm sắc thể trong tế bào của cơ thể người được cấu tạo từ",
           "points": 0.25,
@@ -136,7 +136,7 @@
           "correct_answer": null
         },
         {
-          "id": "q9",
+          "id": "9",
           "type": "single_choice",
           "content": "Dạng đột biến nào sau đây làm cho gene ban đầu ít hơn gene đột biến 2 liên kết hydrogen?",
           "points": 0.25,
@@ -149,7 +149,7 @@
           "correct_answer": null
         },
         {
-          "id": "q10",
+          "id": "10",
           "type": "single_choice",
           "content": "Thành phần nào sau đây KHÔNG có trong hệ gene của sinh vật nhân thực?",
           "points": 0.25,
@@ -162,7 +162,7 @@
           "correct_answer": null
         },
         {
-          "id": "q11",
+          "id": "11",
           "type": "single_choice",
           "content": "Hóa chất gây đột biến 5-BU (5-brom uracil) khi thấm vào tế bào gây đột biến thay thế cặp A–T thành cặp G– C. Quá trình thay thế được mô tả theo sơ đồ:",
           "points": 0.25,
@@ -175,7 +175,7 @@
           "correct_answer": null
         },
         {
-          "id": "q12",
+          "id": "12",
           "type": "single_choice",
           "content": [
             "Hình bên mô tả một thí nghiệm về quá trình quang hợp. Bọt khí xuất hiện trong bình thủy tinh là khí nào sau đây?",
@@ -195,7 +195,7 @@
           "correct_answer": null
         },
         {
-          "id": "q13",
+          "id": "13",
           "type": "single_choice",
           "content": [
             [
@@ -217,7 +217,7 @@
           "correct_answer": null
         },
         {
-          "id": "q14",
+          "id": "14",
           "type": "single_choice",
           "content": "Ở cây ngô, quá trình thoát hơi nước chủ yếu diễn ra tại cơ quan nào sau đây?",
           "points": 0.25,
@@ -230,7 +230,7 @@
           "correct_answer": null
         },
         {
-          "id": "q15",
+          "id": "15",
           "type": "single_choice",
           "content": "Ở đậu hà lan, allele A quy định hoa đỏ trội hoàn toàn so với allele a quy định hoa trắng. Phép lai nào sau đây cho đời con có 100% kiểu hình hoa đỏ?",
           "points": 0.25,
@@ -243,7 +243,7 @@
           "correct_answer": null
         },
         {
-          "id": "q16",
+          "id": "16",
           "type": "single_choice",
           "content": [
             "Phép lai P:",
@@ -281,7 +281,7 @@
           "correct_answer": null
         },
         {
-          "id": "q17",
+          "id": "17",
           "type": "single_choice",
           "content": "Mã mở đầu trên mạch gốc của gene là",
           "points": 0.25,
@@ -294,7 +294,7 @@
           "correct_answer": null
         },
         {
-          "id": "q18",
+          "id": "18",
           "type": "single_choice",
           "content": [
             "Một cơ thể sinh vật có kiểu gene",
@@ -327,12 +327,12 @@
       ]
     },
     {
-      "id": "part2",
+      "id": "part-2",
       "name": "PHẦN II. TRẮC NGHIỆM ĐÚNG / SAI",
       "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "true_false",
           "content": "Insulin là một loại protein (hormone) tham gia điều hoà lượng đường trong máu ở người. Để thu được protein này của người trong tế bào vi sinh vật, người ta tiến hành hai thí nghiệm như sau: \nThí nghiệm 1: Tách gene mã hoá insulin từ DNA hệ gene người và nối vào plasmid tạo ra DNA tái tổ hợp A1. \nThí nghiệm 2: Tổng hợp gene mã hoá insulin bằng cách phiên mã ngược phân tử mRNA trưởng thành. Sau đó, nối gene này vào plasmid tạo ra DNA tái tổ hợp B1. \nSau đó chuyển riêng rẽ các DNA tái tổ hợp A1 và B1 vào các tế bào vi khuẩn E.coli khác nhau thu được dòng vi khuẩn mang DNA tái tổ hợp A1 và dòng vi khuẩn mang DNA tái tổ hợp B1. Tiếp tục nuôi những dòng vi khuẩn này nhằm mục đích thu hoạch insulin trong tế bào của chúng.",
           "points": [
@@ -343,29 +343,29 @@
           ],
           "statements": [
             {
-              "id": "q1a",
+              "id": "a",
               "content": "Cả hai dòng vi khuẩn chứa DNA tái tổ hợp A1 và B1 đều tạo ra insulin có chức năng bình thường.",
               "correct": null
             },
             {
-              "id": "q1b",
+              "id": "b",
               "content": "Gene mã hoá insulin ở thí nghiệm 2 dài hơn so với gene mã hoá insulin ở thí nghiệm 1.",
               "correct": null
             },
             {
-              "id": "q1c",
+              "id": "c",
               "content": "Gene mã hóa insulin trong DNA tái tổ hợp A1 có số lần tái bản và số lần phiên mã bằng nhau.",
               "correct": null
             },
             {
-              "id": "q1d",
+              "id": "d",
               "content": "Đây là ứng dụng của phương pháp tạo giống bằng công nghệ DNA tái tổ hợp.",
               "correct": null
             }
           ]
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "true_false",
           "content": [
             "Ở một loài động vật có vú, thực hiện phép lai (P) giữa một cá thể đực mắt đỏ, đuôi dài với một cá thể cái mắt đỏ, đuôi dài, F₁ thu được tỉ lệ như sau:",
@@ -381,29 +381,29 @@
           ],
           "statements": [
             {
-              "id": "q2a",
+              "id": "a",
               "content": "Hoán vị gene đã xảy ra ở con cái đời P với tần số 10%.",
               "correct": null
             },
             {
-              "id": "q2b",
+              "id": "b",
               "content": "Tính trạng màu mắt di truyền theo quy luật tương tác bổ sung.",
               "correct": null
             },
             {
-              "id": "q2c",
+              "id": "c",
               "content": "Cả hai tính trạng đều liên kết với giới tính.",
               "correct": null
             },
             {
-              "id": "q2d",
+              "id": "d",
               "content": "3",
               "correct": null
             }
           ]
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "true_false",
           "content": [
             [
@@ -423,29 +423,29 @@
           ],
           "statements": [
             {
-              "id": "q3a",
+              "id": "a",
               "content": "Các quá trình truyền đạt thông tin di truyền được mô tả trong hình đều xảy ra ở tế bào chất.",
               "correct": null
             },
             {
-              "id": "q3b",
+              "id": "b",
               "content": "Các thành phần (1) giúp tăng hiệu suất phiên mã.",
               "correct": null
             },
             {
-              "id": "q3c",
+              "id": "c",
               "content": "Z là đầu 5’ của phân tử số (2).",
               "correct": null
             },
             {
-              "id": "q3d",
+              "id": "d",
               "content": "Enzyme RNA polymerase trực tiếp tham gia vào quá trình tổng hợp phân tử (3).",
               "correct": null
             }
           ]
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "true_false",
           "content": [
             [
@@ -465,22 +465,22 @@
           ],
           "statements": [
             {
-              "id": "q4a",
+              "id": "a",
               "content": "Khi xung điện lan đến thành phần số (4) làm cho tâm nhĩ co.",
               "correct": null
             },
             {
-              "id": "q4b",
+              "id": "b",
               "content": "Hệ dẫn truyền tim hoạt động do sự điều khiển của hệ thần kinh.",
               "correct": null
             },
             {
-              "id": "q4c",
+              "id": "c",
               "content": "Một bệnh nhân bị bệnh tim được lắp máy trợ tim có chức năng phát xung điện cho tim. Máy trợ tim này có chức năng tương tự nút xoang nhĩ trong hệ dẫn truyền tim.",
               "correct": null
             },
             {
-              "id": "q4d",
+              "id": "d",
               "content": "1: Nút xoang nhĩ; 2: Nút nhĩ thất; 3: Bó His; 4: Mạng lưới Purkinje.",
               "correct": null
             }
@@ -489,19 +489,19 @@
       ]
     },
     {
-      "id": "part3",
+      "id": "part-3",
       "name": "PHẦN III. TRẮC NGHIỆM TRẢ LỜI NGẮN",
       "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "short_answer",
           "content": "Khi nghiên cứu sự di truyền của hai gene quy định hai tính trạng ở một loài động vật có cặp nhiễm sắc thể giới tính là XX và XY, một nhóm học sinh nhận thấy rằng các gene phân li độc lập, mỗi gene quy định một tính trạng, các allele trội là trội hoàn toàn, cả hai gene đều biểu hiện ở cả hai giới và nếu không xét tính dục, cái thì loài này có tối đa sáu loại kiểu hình và số loại kiểu gene ở giới đực gấp hai lần số loại kiểu gene ở giới cái. Theo lí thuyết, trong quần thể có tối đa bao nhiêu loại kiểu gene về hai gene trên?",
           "points": 0.25,
           "correct_answer": null
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "short_answer",
           "content": [
             "Một phân tử DNA có cấu trúc xoắn kép, giả sử phân tử DNA này có tỉ lệ (?+?)/(?+?) = 1/4 thì tỉ lệ nucleotide loại G của phân tử DNA này là bao nhiêu phần trăm?",
@@ -517,7 +517,7 @@
           "correct_answer": null
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "short_answer",
           "content": [
             [
@@ -543,7 +543,7 @@
           "correct_answer": null
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "short_answer",
           "content": [
             "Phân tử DNA ở vùng nhân của vi khuẩn",
@@ -576,7 +576,7 @@
           "correct_answer": null
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "short_answer",
           "content": [
             "Ở một loài thực vật, xét hai gene quy định hai tính trạng. Nếu đem lai cây thuần chủng thân cao, quả vàng với cây thân thấp, quả đỏ (P) thì thu được F₁ gồm toàn cây thân cao, quả đỏ. Cho các cây F₁ tự thụ phấn thu được F₂ có 4% cây thân thấp, quả vàng. Biết rằng mọi diễn biến trong quá trình giảm phân tạo giao tử đực và cái là như nhau. Theo lí thuyết, trong số cây thân cao, quả đỏ ở F₂, cây có kiểu gene dị hợp 1 cặp gene chiếm tỉ lệ bao nhiêu phần trăm?",
@@ -592,7 +592,7 @@
           "correct_answer": null
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "short_answer",
           "content": [
             [

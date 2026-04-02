@@ -6,12 +6,12 @@
   "description": null,
   "parts": [
     {
-      "id": "part1",
+      "id": "part-1",
       "name": "PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
       "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 17. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "single_choice",
           "content": [
             "Trong chọn, tạo giống vật nuôi, cây trồng, phương pháp lai hữu tính",
@@ -33,7 +33,7 @@
           ]
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "single_choice",
           "content": [
             [
@@ -86,7 +86,7 @@
           ]
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "single_choice",
           "content": "Ở ruồi giấm, allele A quy định thân xám trội hoàn toàn so với allele a quy định thân đen; allele B quy định cánh dài trội hoàn toàn so với allele b quy định cánh cụt. Kiểu gene nào sau đây quy định kiểu hình thân xám, cánh cụt?",
           "points": 0.25,
@@ -98,7 +98,7 @@
           ]
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "single_choice",
           "content": "Trong các tế bào sinh dưỡng của người mắc hội chứng Klinfelter có số lượng NST là:",
           "points": 0.25,
@@ -110,7 +110,7 @@
           ]
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "single_choice",
           "content": "Ở một quần thể cà chua, xét một gen có hai alen (B, b), tần số alen b là 0,20. Theo lí thuyết, tần số alen B của quần thể này là",
           "points": 0.25,
@@ -122,7 +122,7 @@
           ]
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "single_choice",
           "content": "Cánh chim tương đồng với cơ quan nào sau đây?",
           "points": 0.25,
@@ -134,7 +134,7 @@
           ]
         },
         {
-          "id": "q7",
+          "id": "7",
           "type": "single_choice",
           "content": [
             "Hình 2 mô tả một quá trình sinh học diễn ra trong tế bào, biết rằng kí hiệu mạch [1] chính là mạch [3]. Có bao nhiêu nhận định sau đây sai?",
@@ -158,7 +158,7 @@
           ]
         },
         {
-          "id": "q8",
+          "id": "8",
           "type": "single_choice",
           "content": [
             [
@@ -179,7 +179,7 @@
           ]
         },
         {
-          "id": "q9",
+          "id": "9",
           "type": "single_choice",
           "content": [
             "Phả hệ dưới đây ghi lại sự di truyền một bệnh ở người. Biết bệnh do 1 trong 2 allele của 1 gene quy định, không phát sinh đột biến mới. Gene gây bệnh là gene",
@@ -198,7 +198,7 @@
           ]
         },
         {
-          "id": "q10",
+          "id": "10",
           "type": "single_choice",
           "content": "Ở thực vật, pha tối của quá trình quang hợp diễn ra ở",
           "points": 0.25,
@@ -210,7 +210,7 @@
           ]
         },
         {
-          "id": "q11",
+          "id": "11",
           "type": "single_choice",
           "content": "Bằng chứng nào sau đây được xem là bằng chứng tiến hóa trực tiếp?",
           "points": 0.25,
@@ -222,7 +222,7 @@
           ]
         },
         {
-          "id": "q12",
+          "id": "12",
           "type": "single_choice",
           "content": "Một số gene gây bệnh trong cơ thể người có thể được thay thế bằng các gene lành là nội dung của",
           "points": 0.25,
@@ -234,7 +234,7 @@
           ]
         },
         {
-          "id": "q13",
+          "id": "13",
           "type": "single_choice",
           "content": [
             [
@@ -255,7 +255,7 @@
           ]
         },
         {
-          "id": "q14",
+          "id": "14",
           "type": "single_choice",
           "content": "Một quần thể thực vật tự thụ phấn, xét 1 gene có 2 allele là H và h. Theo lí thuyết, quần thể có cấu trúc di truyền nào sau đây có tần số các kiểu gene không đổi qua các thế hệ?",
           "points": 0.25,
@@ -267,7 +267,7 @@
           ]
         },
         {
-          "id": "q15",
+          "id": "15",
           "type": "single_choice",
           "content": [
             "Trong hình bên, hình nào mô tả đúng trình tự các gene (X, Y, Z) nằm trên cặp nhiễm sắc thể tương đồng của tế bào sinh dưỡng bình thường?",
@@ -286,7 +286,7 @@
           ]
         },
         {
-          "id": "q16",
+          "id": "16",
           "type": "single_choice",
           "content": "Phép lai P: $\\frac{\\underline{Ab}}{aB} \\times \\frac{\\underline{Ab}}{aB}$. Cho biết quá trình giảm phân bình thường và không xảy ra hoán vị gen. Theo lí thuyết, F1 có tối đa bao nhiêu loại kiểu gen?",
           "points": 0.25,
@@ -298,7 +298,7 @@
           ]
         },
         {
-          "id": "q17",
+          "id": "17",
           "type": "single_choice",
           "content": [
             "Hình 1 thể hiện một cơ chế di truyền ở cấp phân tử. Tên gọi cơ chế di truyền và chú thích X lần lượt là: ",
@@ -317,7 +317,7 @@
           ]
         },
         {
-          "id": "q18",
+          "id": "18",
           "type": "single_choice",
           "content": [
             "Công nghệ DNA có nhiều ứng dụng trong y học để điều trị các bệnh di truyền ở người. Hiện nay, việc nào sau đây không được thực hiện vì vi phạm đạo đức sinh học?"
@@ -333,12 +333,12 @@
       ]
     },
     {
-      "id": "part2",
+      "id": "part-2",
       "name": "PHẦN II. Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "true_false",
           "content": [
             [
@@ -361,25 +361,25 @@
           ],
           "statements": [
             {
-              "id": "q1a",
+              "id": "a",
               "content": "II > I> IV > III."
             },
             {
-              "id": "q1b",
+              "id": "b",
               "content": "Nếu cho các cây hoa đỏ ở quần thể I giao phối ngẫu nhiên với các cây hoa đỏ ở quần thể IV thì đời con phân li tỉ lệ kiểu hình 23 hoa đỏ: 1 hoa trắng."
             },
             {
-              "id": "q1c",
+              "id": "c",
               "content": "Nếu những cây có kiểu gene AA trong loài không ra hoa nên không tham gia sinh sản thì khi cho quần thể II giao phối ngẫu nhiên với quần thể III thì ở đời con tỉ lệ hoa đỏ là 9/21."
             },
             {
-              "id": "q1d",
+              "id": "d",
               "content": "Quần thể II là quần thể đang ở trạng thái cân bằng."
             }
           ]
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "true_false",
           "content": [
             [
@@ -510,25 +510,25 @@
           ],
           "statements": [
             {
-              "id": "q2a",
+              "id": "a",
               "content": "Phép lai 1, ruồi mẹ có kiểu gene dị hợp tử."
             },
             {
-              "id": "q2b",
+              "id": "b",
               "content": "Kết quả các phép lai phủ nhận kiểu hình màu mắt được quy định bởi một gene nằm trong ti thể."
             },
             {
-              "id": "q2c",
+              "id": "c",
               "content": "Nếu phép lai giữa ruồi mẹ có kiểu hình mắt đỏ và ruồi bố có kiểu hình mắt trắng thì đời con không thể xuất hiện kiểu hình mắt trắng."
             },
             {
-              "id": "q2d",
+              "id": "d",
               "content": "Phép lai 3 và phép lai 4 là phép lai thuận và phép lai nghịch."
             }
           ]
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "true_false",
           "content": [
             "Hình bên mô tả cấu trúc tim và hệ dẫn truyền tim ở người với các thành phần được kí hiệu từ (1) đến (5).",
@@ -546,25 +546,25 @@
           ],
           "statements": [
             {
-              "id": "q3a",
+              "id": "a",
               "content": "Khi tâm thất co, mỏm tim co trước do xung thần kinh được truyền đến mỏm tim trước."
             },
             {
-              "id": "q3b",
+              "id": "b",
               "content": "Một bệnh nhân bị bệnh tim được lắp máy trợ tim có chức năng phát xung điện cho tim, máy trợ tim này co chức năng tương tự cấu trúc (3)."
             },
             {
-              "id": "q3c",
+              "id": "c",
               "content": "Người bị hẹp van động mạch chủ có tần số phát nhịp của nút xoang nhĩ giảm so với bình thường."
             },
             {
-              "id": "q3d",
+              "id": "d",
               "content": "Các kí hiệu (1), (2), (3) lần lượt là nút xoang nhĩ, mạng Purkinje, nút nhĩ thất."
             }
           ]
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "true_false",
           "content": [
             [
@@ -671,19 +671,19 @@
           ],
           "statements": [
             {
-              "id": "q4a",
+              "id": "a",
               "content": "ra S2."
             },
             {
-              "id": "q4b",
+              "id": "b",
               "content": "Trong cùng điều kiện phản ứng, người ta nhận thấy hiệu quả xúc tác của biến thể E2 thấp hơn E1, chứng tỏ đột biến này đã làm thay đổi cấu trúc, chức năng của protein nên hiệu quả xúc tác phản ứng của E2 kém hơn."
             },
             {
-              "id": "q4c",
+              "id": "c",
               "content": "Tỉ lệ A/G của đoạn gene mã hóa S1 là 5/3."
             },
             {
-              "id": "q4d",
+              "id": "d",
               "content": "Nếu thực hiện giải xoắn và tách hoàn toàn 2 mạch của đoạn gene mã hóa S1 và S2, sau đó trộn lẫn và cho hạ nhiệt độ để các mạch đơn liên kết bổ sung trở lại, số loại phân tử DNA kép tối đa có thể tạo ra là 4 loại."
             }
           ]
@@ -691,12 +691,12 @@
       ]
     },
     {
-      "id": "part3",
+      "id": "part-3",
       "name": "PHẦN III. Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào mỗi ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
       "description": "Thí sinh trả lời từ câu 1 đến câu 6. Thí sinh điền kết quả mỗi câu vào ô trả lời tương ứng theo hướng dẫn của phiếu trả lời.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "short_answer",
           "content": [
             "Ở một quần thể thực vật giao phấn ngẫu nhiên, allele quy định thân cao trội hoàn toàn so với allele quy định thân thấp. Ở thế hệ xuất phát (P), số cây thân thấp chiếm tỉ lệ 10%. Ở F1, số cây thân thấp chiếm tỉ lệ 9%. Biết rằng quần thể không chịu tác động của các nhân tố tiến hóa. Theo lí thuyết, trong tổng số cây thân cao ở P, số cây không mang allele lặn chiếm tỉ lệ bao nhiêu? (",
@@ -712,7 +712,7 @@
           "points": 0.25
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "short_answer",
           "content": [
             [
@@ -727,7 +727,7 @@
           "points": 0.25
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "short_answer",
           "content": [
             "Ở người, gene quy định dạng tóc nằm trên nhiễm sắc thể thường có 2 allele, allele A quy định tóc quăn trội hoàn toàn so với allele a quy định tóc thẳng. Bệnh mù màu đỏ - xanh lục do allele lặn b nằm trên vùng không tương đồng của nhiễm sắc thể giới tính X quy định, allele trội B quy định mắt nhìn màu bình thường. Cho sơ đồ phả hệ sau: Biết rằng không phát sinh các đột biến mới ở tất cả các cá thể trong phả hệ. Cặp vợ chồng (10) – (11) trong phả hệ này sinh con, xác suất đứa con đầu lòng có tóc quăn và không bị mù màu là bao nhiêu? (",
@@ -743,7 +743,7 @@
           "points": 0.25
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "short_answer",
           "content": [
             [
@@ -769,7 +769,7 @@
           "points": 0.25
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "short_answer",
           "content": [
             [
@@ -921,7 +921,7 @@
           "points": 0.25
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "short_answer",
           "content": [
             [

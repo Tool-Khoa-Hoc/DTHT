@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+import os
 import shutil
 import sys
 import uuid
@@ -38,6 +40,15 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=6000,
         help="Chunk size used by the import pipeline.",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=max(1, min(8, os.cpu_count() or 1)),
+        help=(
+            "Number of parallel workers for processing files. "
+            "Use 1 to disable parallel execution."
+        ),
     )
     return parser
 
@@ -134,6 +145,76 @@ def _resolve_output_dir(input_dir: Path, output_dir_arg: str | None) -> Path:
     return (input_dir.parent / export_dir_name).resolve()
 
 
+def _process_single_file(
+    *,
+    index: int,
+    group_dir: Path,
+    source_path: Path,
+    slug: str,
+    output_dir: Path,
+    temp_root_dir: Path,
+    subject: str,
+    time_minutes: int,
+    max_chunk_chars: int,
+) -> tuple[int, dict[str, object]]:
+    title = source_path.stem
+    if output_dir.exists():
+        shutil.rmtree(output_dir, ignore_errors=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    report_item: dict[str, object] = {
+        "source_file": str(source_path),
+        "source_group_dir": str(group_dir),
+        "status": "failed",
+        "slug": slug,
+        "title": title,
+        "output_dir": str(output_dir),
+        "converted_from_doc": source_path.suffix.lower() == ".doc",
+    }
+
+    temp_root = temp_root_dir / f"exam-batch-{index}-{uuid.uuid4().hex}"
+    temp_root.mkdir(parents=True, exist_ok=True)
+    try:
+        pipeline_docx_path = source_path
+        if source_path.suffix.lower() == ".doc":
+            pipeline_docx_path = convert_doc_to_docx(source_path, temp_root / "converted")
+            report_item["converted_docx"] = str(pipeline_docx_path)
+
+        result = run_import_pipeline(
+            docx_path=pipeline_docx_path,
+            asset_dir=temp_root / "assets",
+            title=title,
+            max_chunk_chars=max_chunk_chars,
+        )
+
+        payload = write_public_exam_package(
+            exam_public_json=result.exam_public_json,
+            exam_private_json=result.exam_private_json,
+            output_dir=output_dir,
+            subject=subject,
+            time_minutes=time_minutes,
+            slug=slug,
+            title=title,
+        )
+
+        report_item["status"] = "success"
+        report_item["question_count"] = sum(
+            len(part.get("questions", [])) for part in payload.get("parts", [])
+        )
+        report_item["validation"] = {
+            "errors": list(result.validation.errors),
+            "warnings": list(result.validation.warnings),
+            "stats": dict(result.validation.stats),
+        }
+    except Exception as exc:
+        shutil.rmtree(output_dir, ignore_errors=True)
+        report_item["error"] = str(exc)
+    finally:
+        shutil.rmtree(temp_root, ignore_errors=True)
+
+    return index, report_item
+
+
 def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         try:
@@ -158,75 +239,57 @@ def main(argv: list[str] | None = None) -> int:
     temp_root_dir.mkdir(parents=True, exist_ok=True)
 
     seen_slugs: dict[str, int] = {}
-    report_items: list[dict[str, object]] = []
-    success_count = 0
-    failure_count = 0
+    report_items_by_index: dict[int, dict[str, object]] = {}
 
     single_export_dir = args.output_dir is None and len(selected_files) == 1
 
-    for group_dir, source_path in selected_files:
+    jobs: list[tuple[int, Path, Path, str, Path]] = []
+    for index, (group_dir, source_path) in enumerate(selected_files):
         title = source_path.stem
         slug_base = output_dir.name if single_export_dir else normalize_slug(group_dir.name)
         slug = _allocate_slug(slug_base, seen_slugs)
         exam_output_dir = output_dir if single_export_dir else output_dir / slug
-        if exam_output_dir.exists():
-            shutil.rmtree(exam_output_dir, ignore_errors=True)
-        exam_output_dir.mkdir(parents=True, exist_ok=True)
+        jobs.append((index, group_dir, source_path, slug, exam_output_dir))
 
-        report_item: dict[str, object] = {
-            "source_file": str(source_path),
-            "source_group_dir": str(group_dir),
-            "status": "failed",
-            "slug": slug,
-            "title": title,
-            "output_dir": str(exam_output_dir),
-            "converted_from_doc": source_path.suffix.lower() == ".doc",
-        }
-
-        try:
-            temp_root = temp_root_dir / f"exam-batch-{uuid.uuid4().hex}"
-            temp_root.mkdir(parents=True, exist_ok=True)
-            try:
-                pipeline_docx_path = source_path
-                if source_path.suffix.lower() == ".doc":
-                    pipeline_docx_path = convert_doc_to_docx(source_path, temp_root / "converted")
-                    report_item["converted_docx"] = str(pipeline_docx_path)
-
-                result = run_import_pipeline(
-                    docx_path=pipeline_docx_path,
-                    asset_dir=temp_root / "assets",
-                    title=title,
-                    max_chunk_chars=args.max_chunk_chars,
-                )
-
-                payload = write_public_exam_package(
-                    exam_public_json=result.exam_public_json,
-                    exam_private_json=result.exam_private_json,
-                    output_dir=exam_output_dir,
-                    subject=args.subject,
-                    time_minutes=args.time,
+    workers = max(1, int(args.workers))
+    if workers == 1 or len(jobs) <= 1:
+        for index, group_dir, source_path, slug, exam_output_dir in jobs:
+            result_index, report_item = _process_single_file(
+                index=index,
+                group_dir=group_dir,
+                source_path=source_path,
+                slug=slug,
+                output_dir=exam_output_dir,
+                temp_root_dir=temp_root_dir,
+                subject=args.subject,
+                time_minutes=int(args.time),
+                max_chunk_chars=int(args.max_chunk_chars),
+            )
+            report_items_by_index[result_index] = report_item
+    else:
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            future_map = {
+                executor.submit(
+                    _process_single_file,
+                    index=index,
+                    group_dir=group_dir,
+                    source_path=source_path,
                     slug=slug,
-                    title=title,
-                )
+                    output_dir=exam_output_dir,
+                    temp_root_dir=temp_root_dir,
+                    subject=args.subject,
+                    time_minutes=int(args.time),
+                    max_chunk_chars=int(args.max_chunk_chars),
+                ): index
+                for index, group_dir, source_path, slug, exam_output_dir in jobs
+            }
+            for future in as_completed(future_map):
+                result_index, report_item = future.result()
+                report_items_by_index[result_index] = report_item
 
-                report_item["status"] = "success"
-                report_item["question_count"] = sum(
-                    len(part.get("questions", [])) for part in payload.get("parts", [])
-                )
-                report_item["validation"] = {
-                    "errors": list(result.validation.errors),
-                    "warnings": list(result.validation.warnings),
-                    "stats": dict(result.validation.stats),
-                }
-                success_count += 1
-            finally:
-                shutil.rmtree(temp_root, ignore_errors=True)
-        except Exception as exc:
-            failure_count += 1
-            shutil.rmtree(exam_output_dir, ignore_errors=True)
-            report_item["error"] = str(exc)
-
-        report_items.append(report_item)
+    report_items = [report_items_by_index[idx] for idx in sorted(report_items_by_index)]
+    success_count = sum(1 for item in report_items if item.get("status") == "success")
+    failure_count = len(report_items) - success_count
 
     report = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -234,6 +297,7 @@ def main(argv: list[str] | None = None) -> int:
         "output_dir": str(output_dir),
         "subject": args.subject,
         "time": int(args.time),
+        "workers": workers,
         "summary": {
             "total_files": len(selected_files),
             "success_count": success_count,

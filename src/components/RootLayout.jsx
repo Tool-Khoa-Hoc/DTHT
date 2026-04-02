@@ -37,7 +37,7 @@ export default function RootLayout() {
       {/* --- MOBILE TOP HEADER --- */}
       <header className="md:hidden sticky top-0 left-0 right-0 z-40 bg-white/80 dark:bg-[#201216]/80 backdrop-blur-xl border-b border-[#e36488]/10 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center">
-          <h2 className="text-[#e36488] font-[900] tracking-tighter uppercase text-base">Đấu Trường <span className="text-slate-800 dark:text-white font-medium opacity-80">Học Tập</span></h2>
+          <img src="/logo.png" alt="Đấu Trường Học Tập" className="h-8 rounded-xl object-contain" />
         </div>
         <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
           <span className="material-symbols-outlined">menu</span>
@@ -85,6 +85,10 @@ export default function RootLayout() {
           <Link to="/library" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/library') ? 'bg-[#e36488] text-white shadow-lg shadow-[#e36488]/20 font-semibold' : 'text-slate-500 hover:bg-[#e36488]/10 hover:text-[#e36488]'}`}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/library') ? "'FILL' 1" : "'FILL' 0" }}>folder_open</span>
             Tài Liệu Học Free
+          </Link>
+          <Link to="/pricing" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/pricing') ? 'bg-[#e36488] text-white shadow-lg shadow-[#e36488]/20 font-semibold' : 'text-slate-500 hover:bg-[#e36488]/10 hover:text-[#e36488]'}`}>
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/pricing') ? "'FILL' 1" : "'FILL' 0" }}>workspace_premium</span>
+            Nâng cấp VIP
           </Link>
           <Link to="/arena" className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${isActive('/arena') ? 'bg-[#fe5f36] text-white shadow-lg shadow-[#fe5f36]/20 font-semibold' : 'text-slate-500 hover:bg-[#fe5f36]/10 hover:text-[#fe5f36]'}`}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive('/arena') ? "'FILL' 1" : "'FILL' 0" }}>local_fire_department</span>

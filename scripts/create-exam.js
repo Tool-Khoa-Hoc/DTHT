@@ -96,7 +96,13 @@ async function main() {
     const parts = [
         createPart('part1', 'PHẦN I', DEFAULT_PART_DESCRIPTIONS.part1, part1Count, createSingleChoiceQuestion),
         createPart('part2', 'PHẦN II', DEFAULT_PART_DESCRIPTIONS.part2, part2Count, createTrueFalseQuestion),
-        createPart('part3', 'PHẦN III', DEFAULT_PART_DESCRIPTIONS.part3, part3Count, createShortAnswerQuestion)
+        createPart(
+            'part3',
+            'PHẦN III',
+            DEFAULT_PART_DESCRIPTIONS.part3,
+            part3Count,
+            (index) => createShortAnswerQuestion(index, subjectFolder)
+        )
     ].filter((part) => part.questions.length > 0);
 
     const exam = {

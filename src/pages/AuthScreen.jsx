@@ -66,10 +66,7 @@ export default function AuthScreen() {
       <div className="relative z-10 flex flex-col h-full max-w-md mx-auto w-full">
         {/* Header Section */}
         <div className="flex flex-col items-center mb-12">
-          <div className="w-16 h-16 bg-[#e36488]/20 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(227,100,136,0.3)] border border-[#e36488]/30 mb-6">
-            <span className="material-symbols-outlined text-[#e36488] text-4xl">school</span>
-          </div>
-          <h2 className="text-[#e36488] text-lg font-bold tracking-widest uppercase mb-4 drop-shadow-[0_0_8px_rgba(227,100,136,0.5)]">Đấu Trường Học Tập</h2>
+          <img src="/logo.png" alt="Đấu Trường Học Tập" className="h-20 rounded-2xl object-contain mb-4 drop-shadow-[0_0_15px_rgba(227,100,136,0.4)]" />
           <h1 className="text-3xl font-bold text-center mb-2">{isLogin ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}</h1>
           <p className="text-slate-400 text-center px-4 leading-relaxed">
             {isLogin ? 'Đăng nhập để đồng bộ và lưu bảng điểm của bạn.' : 'Đăng ký để bắt đầu theo dõi lộ trình học tập.'}

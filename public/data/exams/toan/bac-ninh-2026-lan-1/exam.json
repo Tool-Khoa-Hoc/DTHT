@@ -6,12 +6,12 @@
   "description": "Đề khảo sát Toán 12 lần 1 năm 2025 – 2026 cụm các trường THPT – Bắc Ninh",
   "parts": [
     {
-      "id": "part1",
+      "id": "part-1",
       "name": "PHẦN I",
       "description": "Thí sinh trả lời từ câu 1 đến câu 12. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
       "questions": [
         {
-          "id": "q1",
+          "id": "1",
           "type": "single_choice",
           "content": [
             "Một khối chóp có đường cao ",
@@ -49,7 +49,7 @@
           "points": 0.25
         },
         {
-          "id": "q2",
+          "id": "2",
           "type": "single_choice",
           "content": [
             "Tập nghiệm của bất phương trình ",
@@ -83,7 +83,7 @@
           "points": 0.25
         },
         {
-          "id": "q3",
+          "id": "3",
           "type": "single_choice",
           "content": [
             "Thống kê điểm trung bình môn Toán của một số học sinh lớp 12 được mẫu số liệu sau:",
@@ -111,7 +111,7 @@
           "points": 0.25
         },
         {
-          "id": "q4",
+          "id": "4",
           "type": "single_choice",
           "content": [
             "Cho hình chóp tứ giác đều ",
@@ -161,7 +161,7 @@
           "points": 0.25
         },
         {
-          "id": "q5",
+          "id": "5",
           "type": "single_choice",
           "content": [
             "Trong không gian ",
@@ -215,7 +215,7 @@
           "points": 0.25
         },
         {
-          "id": "q6",
+          "id": "6",
           "type": "single_choice",
           "content": [
             "Gọi ",
@@ -261,7 +261,7 @@
           "points": 0.25
         },
         {
-          "id": "q7",
+          "id": "7",
           "type": "single_choice",
           "content": [
             [
@@ -299,7 +299,7 @@
           "points": 0.25
         },
         {
-          "id": "q8",
+          "id": "8",
           "type": "single_choice",
           "content": [
             "Tập xác định của hàm số ",
@@ -333,7 +333,7 @@
           "points": 0.25
         },
         {
-          "id": "q9",
+          "id": "9",
           "type": "single_choice",
           "content": [
             "Cấp số cộng ",
@@ -375,7 +375,7 @@
           "points": 0.25
         },
         {
-          "id": "q10",
+          "id": "10",
           "type": "single_choice",
           "content": [
             "Trong không gian ",
@@ -413,7 +413,7 @@
           "points": 0.25
         },
         {
-          "id": "q11",
+          "id": "11",
           "type": "single_choice",
           "content": [
             "Họ nguyên hàm của hàm số ",
@@ -447,7 +447,7 @@
           "points": 0.25
         },
         {
-          "id": "q12",
+          "id": "12",
           "type": "single_choice",
           "content": [
             "Trong không gian ",
@@ -487,12 +487,12 @@
       ]
     },
     {
-      "id": "part2",
+      "id": "part-2",
       "name": "PHẦN II",
       "description": "Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
       "questions": [
         {
-          "id": "q13",
+          "id": "1",
           "type": "true_false",
           "content": [
             [
@@ -530,7 +530,7 @@
           ],
           "statements": [
             {
-              "id": "q13a",
+              "id": "a",
               "content": [
                 "Đường cong qua 3 điểm ",
                 {
@@ -548,7 +548,7 @@
               ]
             },
             {
-              "id": "q13b",
+              "id": "b",
               "content": [
                 "Biết khối lượng riêng của đá Moissanite là ",
                 {
@@ -562,7 +562,7 @@
               ]
             },
             {
-              "id": "q13c",
+              "id": "c",
               "content": [
                 "Đoạn thẳng ",
                 {
@@ -580,7 +580,7 @@
               ]
             },
             {
-              "id": "q13d",
+              "id": "d",
               "content": [
                 "Thể tích mặt dây chuyền lớn hơn ",
                 {
@@ -598,14 +598,14 @@
           ]
         },
         {
-          "id": "q14",
+          "id": "2",
           "type": "true_false",
           "content": [
             "Một túi chứa ba quả bóng được đánh số 1, 2 và 3. Bạn An chọn ngẫu nhiên một trong các quả bóng này và ghi lại số trên quả bóng được chọn. Sau đó, An tung một số đồng xu cân đối đồng chất bằng với số trên quả bóng đã chọn."
           ],
           "statements": [
             {
-              "id": "q14a",
+              "id": "a",
               "content": [
                 "Xác suất để không có mặt ngửa nào xuất hiện là ",
                 {
@@ -615,7 +615,7 @@
               ]
             },
             {
-              "id": "q14b",
+              "id": "b",
               "content": [
                 "Xác suất để 2 đồng xu xuất hiện mặt ngửa và 1 đồng xu xuất hiện mặt sấp là ",
                 {
@@ -625,7 +625,7 @@
               ]
             },
             {
-              "id": "q14c",
+              "id": "c",
               "content": [
                 "Biết rằng không có mặt ngửa nào xuất hiện, xác suất An tung 2 đồng xu là ",
                 {
@@ -635,7 +635,7 @@
               ]
             },
             {
-              "id": "q14d",
+              "id": "d",
               "content": [
                 "Biết rằng luôn có ít nhất một đồng xu xuất hiện mặt ngửa, xác suất để An bốc được quả bóng đánh số 3 là ",
                 {
@@ -653,7 +653,7 @@
           ]
         },
         {
-          "id": "q15",
+          "id": "3",
           "type": "true_false",
           "content": [
             "Trong không gian với hệ tọa độ ",
@@ -684,7 +684,7 @@
           ],
           "statements": [
             {
-              "id": "q15a",
+              "id": "a",
               "content": [
                 "Giá trị nhỏ nhất của độ dài đoạn ",
                 {
@@ -698,7 +698,7 @@
               ]
             },
             {
-              "id": "q15b",
+              "id": "b",
               "content": [
                 "Phương trình mặt phẳng chứa ",
                 {
@@ -716,7 +716,7 @@
               ]
             },
             {
-              "id": "q15c",
+              "id": "c",
               "content": [
                 "Điều kiện cần và đủ để điểm ",
                 {
@@ -738,7 +738,7 @@
               ]
             },
             {
-              "id": "q15d",
+              "id": "d",
               "content": [
                 "Côsin góc giữa hai vectơ ",
                 {
@@ -764,7 +764,7 @@
           ]
         },
         {
-          "id": "q16",
+          "id": "4",
           "type": "true_false",
           "content": [
             "Cho hàm số ",
@@ -787,7 +787,7 @@
           ],
           "statements": [
             {
-              "id": "q16a",
+              "id": "a",
               "content": [
                 "Đồ thị hàm số đi qua điểm ",
                 {
@@ -797,7 +797,7 @@
               ]
             },
             {
-              "id": "q16b",
+              "id": "b",
               "content": [
                 "Điểm ",
                 {
@@ -819,7 +819,7 @@
               ]
             },
             {
-              "id": "q16c",
+              "id": "c",
               "content": [
                 {
                   "math": "f'(x) = 3x^2 + 2bx + c,\\ \\forall x \\in \\mathbb{R}"
@@ -828,7 +828,7 @@
               ]
             },
             {
-              "id": "q16d",
+              "id": "d",
               "content": [
                 "Đồ thị hàm số có hai điểm cực trị là ",
                 {
@@ -852,12 +852,12 @@
       ]
     },
     {
-      "id": "part3",
+      "id": "part-3",
       "name": "PHẦN III",
       "description": "Thí sinh trả lời từ câu 1 đến câu 6.",
       "questions": [
         {
-          "id": "q17",
+          "id": "1",
           "type": "short_answer",
           "content": [
             "Trong một cuộc thi về \"bữa ăn dinh dưỡng\", ban tổ chức yêu cầu để đảm bảo lượng dinh dưỡng hằng ngày thì mỗi gia đình có 4 thành viên cần ít nhất ",
@@ -913,7 +913,7 @@
           "points": 0.5
         },
         {
-          "id": "q18",
+          "id": "2",
           "type": "short_answer",
           "content": [
             "Cho hình chóp ",
@@ -973,7 +973,7 @@
           "points": 0.5
         },
         {
-          "id": "q19",
+          "id": "3",
           "type": "short_answer",
           "content": [
             "Để trang bị hệ thống làm mát cho nhà thi đấu đa năng mới khánh thành, ban quản lý dự kiến lắp đặt một mạng lưới vòi phun nước thông minh. Hệ thống sử dụng hai loại vòi:",
@@ -996,7 +996,7 @@
           "points": 0.5
         },
         {
-          "id": "q20",
+          "id": "4",
           "type": "short_answer",
           "content": [
             "Trong giờ thực hành, một học sinh được giao một thanh gỗ thẳng dài ",
@@ -1024,7 +1024,7 @@
           "points": 0.5
         },
         {
-          "id": "q21",
+          "id": "5",
           "type": "short_answer",
           "content": [
             "Nhà máy ",
@@ -1068,7 +1068,7 @@
           "points": 0.5
         },
         {
-          "id": "q22",
+          "id": "6",
           "type": "short_answer",
           "content": [
             "Những ngày giáp Tết Nguyên Đán cũng là dịp bước vào vụ Đông Xuân, cây lúa sau khi được cấy trải qua quá trình tăng trưởng để nhánh và phát triển chiều cao trước khi làm đòng, trổ bông. Qua nghiên cứu một giống lúa mới, các nhà khoa học nhận thấy một cây lúa tính từ lúc được cấy bằng một cây mạ với chiều cao ",
