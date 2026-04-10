@@ -1,133 +1,114 @@
 /**
  * useExamAccess.js
- * Logic kiểm soát quyền truy cập đề thi:
- * - Admin / VIP: không giới hạn
- * - User Free: tối đa 3 đề MỚI/ngày; đề đã làm trước → cho vào tự do
+ * Logic kiểm soát quyền truy cập đề thi.
+ * 
+ * ✅ Bảo mật: Toàn bộ logic thời gian (VIP expiry, giới hạn ngày) chạy server-side.
+ * Tuyệt đối không tự tính new Date() hay todayStart ở client nữa.
+ * 
+ * Hook này chỉ làm đúng 1 việc: gọi RPC check_and_log_exam_access và cache kết quả.
  */
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
-const FREE_DAILY_LIMIT = 3; // Số đề mới tối đa mỗi ngày cho user Free
+// Cache trong session (1 giờ) để tránh gọi lại DB khi user navigate qua lại
+const CACHE_TTL_MS = 3_600_000;
 
 /**
- * @param {string} examId  - ID của đề thi (duy nhất, từ file JSON)
- * @returns {{ loading, allowed, isRevisit, reason }}
+ * @param {string} examId  - ID của đề thi
+ * @returns {{ loading: boolean, allowed: boolean, isRevisit: boolean, reason: string|null }}
  */
 export function useExamAccess(examId) {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const cacheKey = `access_cache_${examId}_${user?.id}`;
-  
-  const getInitialState = useCallback(() => {
-      try {
-          const cached = sessionStorage.getItem(cacheKey);
-          if (cached) {
-              const parsed = JSON.parse(cached);
-              if (Date.now() - parsed.ts < 3600000) return parsed;
-          }
-      } catch (e) {}
-      return null;
+
+  // Đọc cache một lần khi khởi tạo
+  const getCache = useCallback(() => {
+    try {
+      const raw = sessionStorage.getItem(cacheKey);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (Date.now() - parsed.ts < CACHE_TTL_MS) return parsed;
+    } catch (_) {}
+    return null;
   }, [cacheKey]);
 
-  const initial = getInitialState();
+  const cached = getCache();
 
-  const [loading, setLoading] = useState(initial ? false : true);
-  const [allowed, setAllowed] = useState(initial ? initial.allowed : false);
-  const [isRevisit, setIsRevisit] = useState(initial ? initial.isRevisit : false);
-  const [reason, setReason] = useState(initial ? initial.reason : null);
+  const [loading,   setLoading]   = useState(!cached);
+  const [allowed,   setAllowed]   = useState(cached?.allowed   ?? false);
+  const [isRevisit, setIsRevisit] = useState(cached?.isRevisit ?? false);
+  const [reason,    setReason]    = useState(cached?.reason    ?? null);
+
+  const setCache = useCallback((data) => {
+    try {
+      sessionStorage.setItem(cacheKey, JSON.stringify({ ...data, ts: Date.now() }));
+    } catch (_) {}
+  }, [cacheKey]);
 
   useEffect(() => {
-    if (!examId) return;
-    checkAccess();
-  }, [examId, user, profile]);
-
-  const checkAccess = async () => {
-    const currentCache = getInitialState();
-    if (currentCache) {
-      setAllowed(currentCache.allowed);
-      setIsRevisit(currentCache.isRevisit);
-      setReason(currentCache.reason);
+    if (!examId || !user) {
+      // Chưa đăng nhập hoặc chưa có examId → chặn ngay, không gọi DB
+      setAllowed(false);
+      setReason(user ? null : 'not_logged_in');
       setLoading(false);
       return;
     }
 
+    // Còn trong TTL cache → dùng luôn, không gọi DB
+    const hit = getCache();
+    if (hit) {
+      setAllowed(hit.allowed);
+      setIsRevisit(hit.isRevisit);
+      setReason(hit.reason);
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
     setLoading(true);
 
-    // Chưa đăng nhập → chặn
-    if (!user) {
-      setAllowed(false);
-      setReason('not_logged_in');
-      setLoading(false);
-      return;
-    }
+    (async () => {
+      try {
+        // ← 1 lần gọi duy nhất. Mọi logic thời gian chạy ở PostgreSQL server.
+        const { data, error } = await supabase.rpc('check_and_log_exam_access', {
+          p_user_id: user.id,
+          p_exam_id: examId,
+        });
 
-    // VIP hoặc Admin → luôn được vào không giới hạn
-    if (profile?.is_vip || profile?.role === 'admin') {
-      try { sessionStorage.setItem(cacheKey, JSON.stringify({ allowed: true, isRevisit: false, reason: null, ts: Date.now() })); } catch (e) {}
-      setAllowed(true);
-      setIsRevisit(false);
-      setLoading(false);
-      return;
-    }
+        if (cancelled) return;
 
-    try {
-      // Bước 1: Kiểm tra xem đề này đã có trong access log của user chưa (đề CŨ)
-      const { data: existingLog } = await supabase
-        .from('user_access_log')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('exam_id', examId)
-        .maybeSingle();
+        if (error) {
+          console.error('[useExamAccess] RPC error:', error.message);
+          setAllowed(false);
+          setReason('error');
+          return;
+        }
 
-      if (existingLog) {
-        // Đề cũ → cho vào tự do, không tính vào giới hạn ngày
-        try { sessionStorage.setItem(cacheKey, JSON.stringify({ allowed: true, isRevisit: true, reason: null, ts: Date.now() })); } catch (e) {}
-        setAllowed(true);
-        setIsRevisit(true);
-        setLoading(false);
-        return;
+        const result = {
+          allowed:   Boolean(data?.allowed),
+          isRevisit: Boolean(data?.isRevisit),
+          reason:    data?.reason ?? null,
+        };
+
+        setCache(result);
+        setAllowed(result.allowed);
+        setIsRevisit(result.isRevisit);
+        setReason(result.reason);
+
+      } catch (err) {
+        if (!cancelled) {
+          console.error('[useExamAccess] Unexpected error:', err);
+          setAllowed(false);
+          setReason('error');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
+    })();
 
-      // Bước 2: Đề MỚI → đếm số đề mới đã mở hôm nay
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-
-      const { count } = await supabase
-        .from('user_access_log')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('created_at', todayStart.toISOString());
-
-      if ((count ?? 0) >= FREE_DAILY_LIMIT) {
-        // Đã đạt giới hạn → chặn
-        try { sessionStorage.setItem(cacheKey, JSON.stringify({ allowed: false, isRevisit: false, reason: 'daily_limit', ts: Date.now() })); } catch (e) {}
-        setAllowed(false);
-        setReason('daily_limit');
-        setLoading(false);
-        return;
-      }
-
-      // Bước 3: Còn slot → ghi log và cho vào
-      const { error: insertError } = await supabase
-        .from('user_access_log')
-        .insert({ user_id: user.id, exam_id: examId });
-
-      if (insertError) {
-        // Lỗi insert (hiếm gặp) → vẫn cho vào để tránh UX xấu
-        console.error('[useExamAccess] Insert log error:', insertError.message);
-      }
-
-      try { sessionStorage.setItem(cacheKey, JSON.stringify({ allowed: true, isRevisit: false, reason: null, ts: Date.now() })); } catch (e) {}
-      setAllowed(true);
-      setIsRevisit(false);
-    } catch (err) {
-      console.error('[useExamAccess] Unexpected error:', err);
-      setAllowed(false);
-      setReason('error');
-    } finally {
-      setLoading(false);
-    }
-  };
+    return () => { cancelled = true; };
+  }, [examId, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { loading, allowed, isRevisit, reason };
 }

@@ -70,9 +70,22 @@ const toSafeFilePart = (value) => String(value || '')
 
 export async function adminDeleteStorageFile(bucket, path) {
   if (!bucket || !path) return false;
-  const { error } = await supabase.storage.from(bucket).remove([path]);
+
+  let storagePath = path;
+  if (storagePath.startsWith('http')) {
+     const pattern = new RegExp(`/storage/v1/object/public/${bucket}/(.+)$`);
+     const match = storagePath.match(pattern);
+     if (match && match[1]) {
+       storagePath = match[1];
+     } else {
+       // Cannot determine relative path from this external URL
+       return false;
+     }
+  }
+
+  const { error } = await supabase.storage.from(bucket).remove([storagePath]);
   if (error) {
-    console.error(`[StorageCleanup] Failed to delete ${path} in ${bucket}:`, error);
+    console.error(`[StorageCleanup] Failed to delete ${storagePath} in ${bucket}:`, error);
     return false;
   }
   return true;

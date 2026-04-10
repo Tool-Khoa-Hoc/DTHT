@@ -13,6 +13,7 @@ import {
   normalizeExamResources,
   upsertAdminExamKeyBundle,
   uploadExamAnswerFile,
+  uploadExamDocumentFile,
 } from '../services/adminExamApi';
 
 const CATEGORIES = [
@@ -43,10 +44,10 @@ const DEFAULT_EXAM_EDIT_FORM = {
   questions: '',
   status: 'ongoing',
   answer_key: '{}',
-  solution_url: '',
-  video_url: '',
+  folder_url: '',
+  lecture_url: '',
+  document_url: '',
   answer_file_url: '',
-  answer_file_name: '',
 };
 
 const EXAM_STATUS_OPTIONS = [
@@ -118,10 +119,12 @@ export default function Admin() {
   // Exam Management State
   const [exams, setExams] = useState([]);
   const [loadingExams, setLoadingExams] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState('ALL');
   const [examSearch, setExamSearch] = useState('');
   const [editingExam, setEditingExam] = useState(null);
   const [examEditForm, setExamEditForm] = useState(DEFAULT_EXAM_EDIT_FORM);
   const [selectedAnswerFile, setSelectedAnswerFile] = useState(null);
+  const [selectedExamFile, setSelectedExamFile] = useState(null);
   const [savingExam, setSavingExam] = useState(false);
   const [vipMembers, setVipMembers] = useState([]);
   const [vipMembersLoading, setVipMembersLoading] = useState(false);
@@ -827,10 +830,10 @@ export default function Admin() {
       ),
       status: toTrimmedString(mergedResources.status || ex.status || 'ongoing') || 'ongoing',
       answer_key: JSON.stringify(answerKeySource, null, 2),
-      solution_url: toTrimmedString(mergedResources.solution_url || ex.solution_url),
-      video_url: toTrimmedString(mergedResources.video_url || ex.video_url),
+      folder_url: toTrimmedString(mergedResources.folder_url || ex.folder_url),
+      lecture_url: toTrimmedString(mergedResources.lecture_url || ex.lecture_url),
+      document_url: toTrimmedString(mergedResources.document_url || ex.document_url),
       answer_file_url: toTrimmedString(mergedResources.answer_file_url || ex.answer_file_url),
-      answer_file_name: toTrimmedString(mergedResources.answer_file_name || ex.answer_file_name),
     });
   };
 
@@ -859,15 +862,10 @@ export default function Admin() {
         time: String(toOptionalPositiveInteger(data.time) ?? examEditForm.time ?? ''),
         questions: String(questionCount || toOptionalPositiveInteger(examEditForm.questions) || ''),
         answer_key: JSON.stringify(data.answer_key || {}, null, 2),
-        solution_url: toTrimmedString(
-          resources.solution_url ||
-          resources.answer_file_url ||
-          data.solution_url ||
-          data.solutionUrl,
-        ),
-        video_url: toTrimmedString(resources.video_url || data.video_url || data.videoUrl),
+        folder_url: toTrimmedString(resources.folder_url || examEditForm.folder_url),
+        lecture_url: toTrimmedString(resources.lecture_url || data.lecture_url || data.lectureUrl),
+        document_url: toTrimmedString(resources.document_url || examEditForm.document_url),
         answer_file_url: toTrimmedString(resources.answer_file_url || examEditForm.answer_file_url),
-        answer_file_name: toTrimmedString(resources.answer_file_name || examEditForm.answer_file_name || 'Dap an'),
       });
 
       toast('Đã nạp dữ liệu từ file JSON thành công!');
@@ -971,15 +969,15 @@ export default function Admin() {
         duration_minutes: durationMinutes,
         questions: questionCount,
         question_count: questionCount,
-        folder_url: examEditForm.folder_url,
-        lecture_url: examEditForm.lecture_url,
-        document_url: examEditForm.document_url || identityResources.document_url,
-        answer_file_url: examEditForm.answer_file_url || identityResources.answer_file_url,
+        folder_url: toTrimmedString(examEditForm.folder_url) || identityResources.folder_url,
+        lecture_url: toTrimmedString(examEditForm.lecture_url) || identityResources.lecture_url,
+        document_url: identityResources.document_url,
+        answer_file_url: identityResources.answer_file_url,
       });
 
       if (selectedExamFile) {
         if (identityResources.document_url) {
-          if (!window.confirm("Đề thi này đã có bản PDF đề bài lưu trong máy chủ. Bạn có CHẮC CHẮN muốn ghi đè bằng file mới không? (File cũ sẽ bị xoá vĩnh viễn)")) {
+          if (!window.confirm('Đề thi này đã có bản PDF đề bài lưu trong máy chủ.\nBạn có CHẮC CHẮN muốn ghi đè bằng file mới không?\n(File cũ sẽ bị xoá vĩnh viễn)')) {
             setSavingExam(false);
             return;
           }
@@ -990,7 +988,7 @@ export default function Admin() {
 
       if (selectedAnswerFile) {
         if (identityResources.answer_file_url) {
-          if (!window.confirm("Đề thi này đã có bản PDF đáp án lưu trong máy chủ. Bạn có CHẮC CHẮN muốn ghi đè bằng file mới không? (File cũ sẽ bị xoá vĩnh viễn)")) {
+          if (!window.confirm('Đề thi này đã có bản PDF đáp án lưu trong máy chủ.\nBạn có CHẮC CHẮN muốn ghi đè bằng file mới không?\n(File cũ sẽ bị xoá vĩnh viễn)')) {
             setSavingExam(false);
             return;
           }
@@ -1020,7 +1018,14 @@ export default function Admin() {
   };
 
   const normalizedExamSearch = examSearch.trim().toLowerCase();
+  
+  // Extract unique subject folders from all exams
+  const uniqueSubjects = [...new Set(exams.map(ex => toTrimmedString(ex.subjectFolder || ex.subject || 'khac')))].filter(Boolean).sort();
+
   const filteredExams = exams.filter((item) => {
+    const sFolder = toTrimmedString(item.subjectFolder || item.subject || 'khac');
+    if (selectedSubject !== 'ALL' && sFolder !== selectedSubject) return false;
+
     if (!normalizedExamSearch) return true;
     return (
       item.id.toLowerCase().includes(normalizedExamSearch) ||
@@ -1313,6 +1318,28 @@ export default function Admin() {
               </div>
 
               <div className="mb-6">
+                {/* Subject Tabs */}
+                <div className="flex bg-slate-100 dark:bg-[#1a0f12] p-1.5 rounded-2xl w-full overflow-x-auto scrollbar-hide mb-4 gap-2 border border-slate-200 dark:border-white/5 shadow-inner snap-x">
+                  <button 
+                    onClick={() => setSelectedSubject('ALL')}
+                    className={`snap-start whitespace-nowrap px-4 py-2 text-xs font-black rounded-xl transition-all ${selectedSubject === 'ALL' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/5'}`}
+                  >
+                    TẤT CẢ ({exams.length})
+                  </button>
+                  {uniqueSubjects.map(sub => {
+                    const count = exams.filter(e => toTrimmedString(e.subjectFolder || e.subject || 'khac') === sub).length;
+                    return (
+                      <button 
+                        key={sub}
+                        onClick={() => setSelectedSubject(sub)}
+                        className={`snap-start whitespace-nowrap px-4 py-2 text-xs font-black uppercase rounded-xl transition-all flex items-center gap-1.5 ${selectedSubject === sub ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/5'}`}
+                      >
+                        {sub} <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${selectedSubject === sub ? 'bg-white/20 dark:bg-black/10' : 'bg-slate-200 dark:bg-white/10'}`}>{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
                 <div className="relative">
                   <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400">
                     <span className="material-symbols-outlined text-[20px]">search</span>
@@ -1425,61 +1452,104 @@ export default function Admin() {
                     </div>
                   </div>
 
+                  {/* Links Row */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">folder_open</span> Link Folder đề
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://drive.google.com/drive/folders/..."
+                        value={examEditForm.folder_url}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, folder_url: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">play_circle</span> Link bài giảng
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://youtube.com/... hoặc https://..."
+                        value={examEditForm.lecture_url}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, lecture_url: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
+                      />
+                    </div>
+                  </div>
+
+                  {/* PDF Uploads + JSON Answer Key Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Left: 2 PDF Uploads */}
                     <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Link bài giải (PDF/Web)</label>
-                        <input
-                          type="text"
-                          placeholder="https://..."
-                          value={examEditForm.solution_url}
-                          onChange={(e) => setExamEditForm({ ...examEditForm, solution_url: e.target.value })}
-                          className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Link Video bài giải</label>
-                        <input
-                          type="text"
-                          placeholder="https://youtube.com/..."
-                          value={examEditForm.video_url}
-                          onChange={(e) => setExamEditForm({ ...examEditForm, video_url: e.target.value })}
-                          className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Link file đáp án</label>
-                        <input
-                          type="text"
-                          placeholder="https://..."
-                          value={examEditForm.answer_file_url}
-                          onChange={(e) => setExamEditForm({ ...examEditForm, answer_file_url: e.target.value })}
-                          className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Tên file đáp án</label>
-                        <input
-                          type="text"
-                          placeholder="VD: Dap an ma 101"
-                          value={examEditForm.answer_file_name}
-                          onChange={(e) => setExamEditForm({ ...examEditForm, answer_file_name: e.target.value })}
-                          className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Upload file đáp án</label>
+                      {/* Upload file đề thi */}
+                      <div className="p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-black text-slate-600 dark:text-slate-300 uppercase flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-[16px] text-blue-500">description</span>
+                            PDF Đề thi
+                          </label>
+                          {examEditForm.document_url && (
+                            <span className="text-[10px] font-bold text-green-500 flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[12px]">check_circle</span>
+                              Đã có file
+                            </span>
+                          )}
+                        </div>
                         <input
                           type="file"
-                          accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.rar"
-                          onChange={(e) => setSelectedAnswerFile(e.target.files?.[0] || null)}
-                          className="w-full text-xs px-3 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10"
+                          accept=".pdf"
+                          id="exam-doc-file"
+                          onChange={(e) => setSelectedExamFile(e.target.files?.[0] || null)}
+                          className="hidden"
                         />
-                        {selectedAnswerFile && (
-                          <p className="text-[11px] text-blue-500 mt-1 font-medium">Đã chọn: {selectedAnswerFile.name}</p>
+                        <label
+                          htmlFor="exam-doc-file"
+                          className="block w-full text-center px-4 py-3 rounded-xl border border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10 text-blue-500 text-xs font-bold cursor-pointer transition-all"
+                        >
+                          {selectedExamFile ? `✓ ${selectedExamFile.name}` : (examEditForm.document_url ? '🔄 Đổi file đề' : '📂 Chọn file PDF đề thi')}
+                        </label>
+                        {examEditForm.document_url && (
+                          <p className="text-[10px] text-slate-400 truncate" title={examEditForm.document_url}>📁 {examEditForm.document_url}</p>
+                        )}
+                      </div>
+
+                      {/* Upload file đáp án */}
+                      <div className="p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-black text-slate-600 dark:text-slate-300 uppercase flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-[16px] text-amber-500">key</span>
+                            PDF Đáp án
+                          </label>
+                          {examEditForm.answer_file_url && (
+                            <span className="text-[10px] font-bold text-green-500 flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[12px]">check_circle</span>
+                              Đã có file
+                            </span>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          id="exam-answer-file"
+                          onChange={(e) => setSelectedAnswerFile(e.target.files?.[0] || null)}
+                          className="hidden"
+                        />
+                        <label
+                          htmlFor="exam-answer-file"
+                          className="block w-full text-center px-4 py-3 rounded-xl border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 text-amber-500 text-xs font-bold cursor-pointer transition-all"
+                        >
+                          {selectedAnswerFile ? `✓ ${selectedAnswerFile.name}` : (examEditForm.answer_file_url ? '🔄 Đổi file đáp án' : '📂 Chọn file PDF đáp án')}
+                        </label>
+                        {examEditForm.answer_file_url && (
+                          <p className="text-[10px] text-slate-400 truncate" title={examEditForm.answer_file_url}>📁 {examEditForm.answer_file_url}</p>
                         )}
                       </div>
                     </div>
+
+                    {/* Right: JSON Answer Key */}
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <label className="block text-xs font-bold text-slate-500 uppercase">Đáp án (JSON Answer Key)</label>
@@ -1499,6 +1569,7 @@ export default function Admin() {
                       onClick={() => {
                         setEditingExam(null);
                         setSelectedAnswerFile(null);
+                        setSelectedExamFile(null);
                         setExamEditForm(DEFAULT_EXAM_EDIT_FORM);
                       }}
                       className="px-4 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-white/5 transition-all"
