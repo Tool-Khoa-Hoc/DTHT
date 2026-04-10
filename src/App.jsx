@@ -49,6 +49,7 @@ const ExamResult = lazyRetry(() => import('./pages/ExamResult'));
 const Pricing = lazyRetry(() => import('./pages/Pricing'));
 const PaymentWaiting = lazyRetry(() => import('./pages/PaymentWaiting'));
 const PaymentSuccess = lazyRetry(() => import('./pages/PaymentSuccess'));
+const Notes = lazyRetry(() => import('./pages/Notes'));
 
 // App Loading Fallback
 const PageLoader = () => {
@@ -100,6 +101,7 @@ function App() {
                   <Route path="pricing" element={<Pricing />} />
                   <Route path="payment/waiting/:orderId" element={<PaymentWaiting />} />
                   <Route path="payment/success" element={<PaymentSuccess />} />
+                  <Route path="notes" element={<Notes />} />
                 </Route>
               </Routes>
             </Suspense>

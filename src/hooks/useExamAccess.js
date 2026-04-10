@@ -4,7 +4,7 @@
  * - Admin / VIP: không giới hạn
  * - User Free: tối đa 3 đề MỚI/ngày; đề đã làm trước → cho vào tự do
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -16,10 +16,25 @@ const FREE_DAILY_LIMIT = 3; // Số đề mới tối đa mỗi ngày cho user F
  */
 export function useExamAccess(examId) {
   const { user, profile } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [allowed, setAllowed] = useState(false);
-  const [isRevisit, setIsRevisit] = useState(false);
-  const [reason, setReason] = useState(null); // 'daily_limit' | 'not_logged_in'
+  const cacheKey = `access_cache_${examId}_${user?.id}`;
+  
+  const getInitialState = useCallback(() => {
+      try {
+          const cached = sessionStorage.getItem(cacheKey);
+          if (cached) {
+              const parsed = JSON.parse(cached);
+              if (Date.now() - parsed.ts < 3600000) return parsed;
+          }
+      } catch (e) {}
+      return null;
+  }, [cacheKey]);
+
+  const initial = getInitialState();
+
+  const [loading, setLoading] = useState(initial ? false : true);
+  const [allowed, setAllowed] = useState(initial ? initial.allowed : false);
+  const [isRevisit, setIsRevisit] = useState(initial ? initial.isRevisit : false);
+  const [reason, setReason] = useState(initial ? initial.reason : null);
 
   useEffect(() => {
     if (!examId) return;
@@ -27,6 +42,15 @@ export function useExamAccess(examId) {
   }, [examId, user, profile]);
 
   const checkAccess = async () => {
+    const currentCache = getInitialState();
+    if (currentCache) {
+      setAllowed(currentCache.allowed);
+      setIsRevisit(currentCache.isRevisit);
+      setReason(currentCache.reason);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     // Chưa đăng nhập → chặn
@@ -39,6 +63,7 @@ export function useExamAccess(examId) {
 
     // VIP hoặc Admin → luôn được vào không giới hạn
     if (profile?.is_vip || profile?.role === 'admin') {
+      try { sessionStorage.setItem(cacheKey, JSON.stringify({ allowed: true, isRevisit: false, reason: null, ts: Date.now() })); } catch (e) {}
       setAllowed(true);
       setIsRevisit(false);
       setLoading(false);
@@ -56,6 +81,7 @@ export function useExamAccess(examId) {
 
       if (existingLog) {
         // Đề cũ → cho vào tự do, không tính vào giới hạn ngày
+        try { sessionStorage.setItem(cacheKey, JSON.stringify({ allowed: true, isRevisit: true, reason: null, ts: Date.now() })); } catch (e) {}
         setAllowed(true);
         setIsRevisit(true);
         setLoading(false);
@@ -74,6 +100,7 @@ export function useExamAccess(examId) {
 
       if ((count ?? 0) >= FREE_DAILY_LIMIT) {
         // Đã đạt giới hạn → chặn
+        try { sessionStorage.setItem(cacheKey, JSON.stringify({ allowed: false, isRevisit: false, reason: 'daily_limit', ts: Date.now() })); } catch (e) {}
         setAllowed(false);
         setReason('daily_limit');
         setLoading(false);
@@ -90,6 +117,7 @@ export function useExamAccess(examId) {
         console.error('[useExamAccess] Insert log error:', insertError.message);
       }
 
+      try { sessionStorage.setItem(cacheKey, JSON.stringify({ allowed: true, isRevisit: false, reason: null, ts: Date.now() })); } catch (e) {}
       setAllowed(true);
       setIsRevisit(false);
     } catch (err) {

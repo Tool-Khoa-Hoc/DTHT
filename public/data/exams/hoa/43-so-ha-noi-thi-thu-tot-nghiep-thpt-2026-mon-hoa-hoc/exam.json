@@ -1,0 +1,411 @@
+{
+  "id": "43-so-ha-noi-thi-thu-tot-nghiep-thpt-2026-mon-hoa-hoc",
+  "title": "43. SỞ HÀ NỘI - [Thi thử Tốt Nghiệp THPT 2026 - Môn Hóa Học ]",
+  "subject": "hoa",
+  "time": 50,
+  "description": "43. SỞ HÀ NỘI - [Thi thử Tốt Nghiệp THPT 2026 - Môn Hóa Học ]",
+  "parts": [
+    {
+      "id": "part-1",
+      "name": "PHẦN I",
+      "description": "Học sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi học sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "single_choice",
+          "content": [
+            "Chất nào dưới đây thuộc loại ester?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "",
+              {
+                "math": "\\mathrm{CH}_3 \\mathrm{OH}"
+              }
+            ],
+            [
+              "",
+              {
+                "math": "\\mathrm{CH}_3 \\mathrm{COOH}"
+              }
+            ],
+            [
+              "",
+              {
+                "math": "\\mathrm{CH}_3 \\mathrm{CHO}"
+              }
+            ],
+            [
+              "",
+              {
+                "math": "\\mathrm{HCOOCH}_3"
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "single_choice",
+          "content": [
+            "Polypropylene (PP) là một polymer nhiệt dẻo, được dùng làm hộp đựng thực phẩm, bao gói, ống nước,... PP được điều chế từ monomer nào sau đây?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Ethylene."
+            ],
+            [
+              "Styrene."
+            ],
+            [
+              "Vinyl chloride."
+            ],
+            [
+              "Propylene."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "single_choice",
+          "content": [
+            "Nghề dát vàng, bạc ở Kiêu Ky nổi tiếng với các sản phẩm trang trí như hoành phi, câu đối, tượng thờ,... Để tạo ra quỳ vàng, người thợ đập vàng thành những lá cực mỏng trên giấy gió. Những miếng quỳ vàng được tạo ra dựa trên tính chất nào sau đây của vàng?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Tính dẻo."
+            ],
+            [
+              "Tính ánh kim."
+            ],
+            [
+              "Tính dẫn nhiệt."
+            ],
+            [
+              "Tính dẫn điện."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "single_choice",
+          "content": [
+            "Chất nào sau đây thuộc loại disaccharide?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Saccharose."
+            ],
+            [
+              "Cellulose."
+            ],
+            [
+              "Glucose."
+            ],
+            [
+              "Fructose."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "single_choice",
+          "content": [
+            "Phương pháp thích hợp để tách kim loại sodium (Na) từ hợp chất sodium chloride (NaCl) là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "nhiệt luyện."
+            ],
+            [
+              "điện phân nóng chảy."
+            ],
+            [
+              "thủy luyện."
+            ],
+            [
+              "điện phân dung dịch."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "single_choice",
+          "content": [
+            "Chất nào sau đây không phải hợp chất hữu cơ?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "",
+              {
+                "math": "\\mathrm{CH}_4"
+              }
+            ],
+            [
+              "KCN."
+            ],
+            [
+              "",
+              {
+                "math": "\\mathrm{C}_2 \\mathrm{H}_5 \\mathrm{OH}"
+              }
+            ],
+            [
+              "",
+              {
+                "math": "\\mathrm{C}_2 \\mathrm{H}_7 \\mathrm{~N}"
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "7",
+          "type": "single_choice",
+          "content": [
+            "Kim loại nào sau đây thuộc nhóm IA trong bảng tuần hoàn?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "",
+              {
+                "math": "\\mathrm{Mg}(\\mathrm{Z}=12)"
+              }
+            ],
+            [
+              "",
+              {
+                "math": "\\mathrm{K}(\\mathrm{Z}=19)"
+              }
+            ],
+            [
+              "",
+              {
+                "math": "\\mathrm{Al}(\\mathrm{Z}=13)"
+              }
+            ],
+            [
+              "",
+              {
+                "math": "\\mathrm{Ca}(\\mathrm{Z}=20)"
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "8",
+          "type": "single_choice",
+          "content": [
+            "Phân tử chất nào sau đây chứa liên kết cộng hóa trị không phân cực?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "",
+              {
+                "math": "\\mathrm{Al}_2 \\mathrm{O}_3"
+              }
+            ],
+            [
+              "HCl."
+            ],
+            [
+              "NaCl."
+            ],
+            [
+              "",
+              {
+                "math": "\\mathrm{Cl}_2"
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "9",
+          "type": "single_choice",
+          "content": [
+            "Chất nào dưới đây có phản ứng với thuốc thử Tollens (phản ứng tráng bạc)?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Glucose."
+            ],
+            [
+              "Glycerol."
+            ],
+            [
+              "Saccharose."
+            ],
+            [
+              "Tinh bột."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "10",
+          "type": "single_choice",
+          "content": [
+            "Phản ứng chuyển hóa chất béo lỏng (chứa nhiều gốc acid không no) thành chất béo rắn (chứa nhiều gốc acid no) là phản ứng"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "hydrogen hóa."
+            ],
+            [
+              "ester hóa."
+            ],
+            [
+              "xà phòng hóa."
+            ],
+            [
+              "hydrate hóa."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "11",
+          "type": "single_choice",
+          "content": [
+            "Propyl tiglate là một chất có mùi táo. Cho công thức cấu tạo của propyl tiglate và số sóng hấp thụ của một số liên kết trên phổ hồng ngoại như sau:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  {
+                    "rowspan": 2,
+                    "content": [
+                      {
+                        "image": "img_b512a0e7cfce.png"
+                      }
+                    ]
+                  },
+                  [
+                    "Liên kết"
+                  ],
+                  [
+                    {
+                      "math": "\\mathrm{O}-\\mathrm{H}"
+                    },
+                    {
+                      "type": "text",
+                      "text": "(alcohol)",
+                      "marks": []
+                    }
+                  ],
+                  [
+                    {
+                      "math": "\\mathrm{O}-\\mathrm{H}"
+                    },
+                    {
+                      "type": "text",
+                      "text": "(carboxylic acid)",
+                      "marks": []
+                    }
+                  ],
+                  [
+                    {
+                      "math": "\\mathrm{C}=\\mathrm{O}"
+                    },
+                    {
+                      "type": "text",
+                      "text": "(ester, carboxylic acid)",
+                      "marks": []
+                    }
+                  ]
+                ],
+                [
+                  [
+                    "Số sóng (cm",
+                    {
+                      "type": "text",
+                      "text": "-1",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    ")"
+                  ],
+                  [
+                    {
+                      "math": "3650-3200"
+                    }
+                  ],
+                  [
+                    {
+                      "math": "3300-2500"
+                    }
+                  ],
+                  [
+                    {
+                      "math": "1780-1650"
+                    }
+                  ]
+                ]
+              ]
+            },
+            "Phát biểu nào sau đây không đúng?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Propyl tiglate có công thức phân tử là ",
+              {
+                "math": "\\mathrm{C}_8 \\mathrm{H}_{16} \\mathrm{O}_2"
+              },
+              "."
+            ],
+            [
+              "Thủy phân propyl tiglate thu được alcohol bậc I."
+            ],
+            [
+              "Trên phổ hồng ngoại, propyl tiglate có peak đặc trưng với số sóng thuộc vùng ",
+              {
+                "math": "1780-1650 \\mathrm{~cm}^{-1}"
+              },
+              "."
+            ],
+            [
+              "Propyl tiglate có đồng phân hình học."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "12",
+          "type": "single_choice",
+          "content": [
+            "Hai kim loại X, Y và các dung dịch muối chloride của chúng có các phản ứng hóa học sau:",
+            {
+              "math": "X +2 \\mathrm{YCl}_3 \\rightarrow \\mathrm{XCl}_2+2 \\mathrm{YCl}_2"
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            ".",
+            ".",
+            ".",
+            "."
+          ],
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

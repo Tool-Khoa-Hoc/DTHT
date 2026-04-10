@@ -1,0 +1,1958 @@
+{
+  "id": "ky-thi-thu-tot-nghiep-thpt-quoc-gia-nam-hoc-2025-2026",
+  "title": "KỲ THI THỬ TỐT NGHIỆP THPT QUỐC GIA NĂM HỌC 2025 – 2026",
+  "subject": "hoa",
+  "time": 50,
+  "description": "SỞ GD&ĐT THANH HÓA THPT HẬU LỘC 1 (LẦN 1) (Đề thi có __ trang) KỲ THI THỬ TỐT NGHIỆP THPT QUỐC GIA NĂM HỌC 2025 – 2026 Môn thi: HÓA HỌC Thời gian làm bài: 50 phút (không kể thời gian phát đề)",
+  "parts": [
+    {
+      "id": "part-1",
+      "name": "Phần I",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 1.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Hợp chất hữu cơ chỉ có carbon và hydrogen trong thành phần phân tử thuộc loại"
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': 'dẫn xuất hydrocarbon.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'carbonate.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'carbohydrate.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'hydrocarbon.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 2.",
+              "marks": [
+                "bold"
+              ]
+            },
+            "Chất nào sau thuộc chất giặt rửa tổng hợp ?"
+          ],
+          "points": 0.25,
+          "options": [
+            "{'math': '\\\\mathrm{C}_{17}\\\\mathrm{H}_{33}\\\\mathrm{COOK}'}",
+            "{'math': '\\\\mathrm{C}_{15}\\\\mathrm{H}_{31}\\\\mathrm{COONa}'}",
+            "{'math': '\\\\mathrm{CH}_3(\\\\mathrm{CH}_2)_{11}\\\\mathrm{OSO}_3\\\\mathrm{Na}'}",
+            "{'math': '\\\\mathrm{C}_{17}\\\\mathrm{H}_{35}\\\\mathrm{COONa}'}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 3.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Cho phản ứng hoá học xảy ra ở điều kiện chuẩn sau:",
+            {
+              "math": "2\\mathrm{NO}_2(\\mathrm{g}) \\text{ (đỏ nâu)} \\to \\mathrm{N}_2\\mathrm{O}_4(\\mathrm{g}) \\text{ (không màu)}"
+            },
+            {
+              "type": "text",
+              "text": "Biết NO",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " và N",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "O",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "4",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " có ",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "math": "\\ce{fH298o}"
+            },
+            {
+              "type": "text",
+              "text": " tương ứng là 33,18 kJ/mol và 9,16 kJ/mol. Điều này chứng tỏ phản ứng",
+              "marks": [
+                "bold"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "thu nhiệt, N",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "O",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "4",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " bền vững hơn NO",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": ".",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "thu nhiệt, NO",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " bền vững hơn N",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "O",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "4",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": ".",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "toả nhiệt, NO",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " bền vững hơn N",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "O",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "4",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": ".",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "toả nhiệt, N",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "O",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "4",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " bền vững hơn NO",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": ".",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 4.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Cho các carbohydrate: glucose, fructose, saccharose, maltose, và các phát biểu.",
+            "(a) Cả 4 chất ở điều kiện thường đều là chất rắn, có vị ngọt, dễ tan trong nước.",
+            "(b) Có 2 cặp chất là đồng phân của nhau.",
+            "(c) Có 3 chất có tính khử và phản ứng được với thuốc thử tollens.",
+            {
+              "type": "text",
+              "text": "(d) Có 3 chất phản ứng được với Cu(OH)",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " trong môi trường kiềm, tạo thành dung dịch có màu xanh lam.",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Số phát biểu đúng là",
+              "marks": [
+                "bold"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': '1.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': '4.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': '2.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': '3.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 5.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Tên gọi theo danh pháp thay thế của chất có công thức cấu tạo ",
+            {
+              "math": "\\mathrm{CH}_3\\text{-}\\mathrm{CH}_2\\text{-}\\mathrm{Br}"
+            },
+            " là"
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': 'bromomethane.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'methylbromide.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'bromoethane.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'ethylbromide.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 6.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Một trong các hướng của phản ứng cracking nhiệt với butane là:",
+            {
+              "math": "\\mathrm{CH}_3\\text{–}\\mathrm{CH}_2\\text{–}\\mathrm{CH}_2\\text{–}\\mathrm{CH}_3 \\xrightarrow{\\mathrm{t}^\\circ} \\mathrm{CH}_2=\\mathrm{CH}_2 + \\mathrm{CH}_3\\text{–}\\mathrm{CH}_3 \\text{ (*)}"
+            },
+            {
+              "type": "text",
+              "text": "Giai đoạn đầu tiên của phản ứng trên xảy ra như sau:",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "math": "\\mathrm{CH}_3\\mathrm{CH}_2\\mathrm{CH}_2\\mathrm{CH}_3 \\to 2\\mathrm{CH}_3\\text{=}\\mathrm{CH}_2 \\text{ (1)}"
+            },
+            {
+              "type": "text",
+              "text": "Nhận định nào sau đây ",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "không",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": " đúng?",
+              "marks": [
+                "bold"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': 'Sản phẩm của giai đoạn (1) có chứa 5 liên kết sigma.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Trong giai đoạn (1), phản ứng xảy ra theo hướng thu nhiệt.', 'marks': ['bold']}",
+            [
+              {
+                "type": "text",
+                "text": "Giai đoạn (1) xảy ra sự phân cắt liên kết σ",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "C-C",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " trong phân tử butane.",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            "{'type': 'text', 'text': 'Sản phẩm của giai đoạn (1) có chứa electron độc thân.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "7",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 7.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Phản ứng điều chế ethene từ ethanol theo phương trình hóa học",
+            {
+              "math": "\\mathrm{C}_2\\mathrm{H}_5\\mathrm{OH} \\xrightarrow{\\mathrm{H}_{2}\\mathrm{SO}_{4 \\text{ đặc}}, 170\\degree\\mathrm{C}} \\mathrm{CH}_2=\\mathrm{CH}_2 + \\mathrm{H}_2\\mathrm{O}"
+            },
+            {
+              "type": "text",
+              "text": " là phản ứng",
+              "marks": [
+                "bold"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': 'trùng ngưng.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Dehydrogen hoá.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'hydrate hoá.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'dehydrate hoá.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "8",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 8.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Tơ tằm thoáng, nhẹ, hấp thụ nhiệt kém, ít bám bụi, bề mặt mịn và được dùng để may trang phục. Phát biểu nào sau đây đúng?"
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': 'Tơ tằm là tơ tổng hợp có thành phần chính là protein.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Tơ tằm là tơ bán tổng hợp có thành phần chính là protein.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Tơ tằm là tơ tự nhiên có thành phần chính là protein.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Tơ tằm là tơ tự nhiên có thành phần chính là cellulose.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "9",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 9.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Từ phổ khối lượng, phân tử khối của ester X được xác định là 74. Công thức phù hợp với X là"
+          ],
+          "points": 0.25,
+          "options": [
+            "{'math': '\\\\mathrm{HOCH}_2\\\\mathrm{CH}_2\\\\mathrm{CHO}'}",
+            "{'math': '\\\\mathrm{CH}_3\\\\mathrm{COOC}_2\\\\mathrm{H}_5'}",
+            "{'math': '\\\\mathrm{C}_2\\\\mathrm{H}_5\\\\mathrm{COOH}'}",
+            "{'math': '\\\\mathrm{HCOOC}_2\\\\mathrm{H}_5'}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "10",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 10.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Thế điện cực chuẩn của cặp oxi hoá - khử Fe",
+            {
+              "type": "text",
+              "text": "3+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "/Fe",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            " và Cu",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "/Cu lần lượt là +0,771 V và +0,340 V. Nhận định nào sau đây là đúng?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "Ở điều kiện chuẩn, ion Fe",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "3+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " có thể bị khử về ion Fe",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " bởi kim loại Cu.",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "Ở điều kiện chuẩn, ion Fe",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " có thể khử ion Cu",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " về Cu và bản thân nó bị oxi hoá lên Fe",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "3+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": ".",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "Tính khử của Cu yếu hơn tính khử của ion Fe",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": ".",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "Tính oxi hoá của ion Cu",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " mạnh hơn tính oxi hoá của ion Fe",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "3+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              {
+                "type": "text",
+                "text": ".",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "11",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 11.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Khi hoà tan vào nước, toàn bộ số phân tử hoà tan của chất nào sau đây đều phân li ra ion?"
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': 'Ethanol.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Glucose.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Acetic acid.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Hydrochloric acid.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "12",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 12.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Khi trồng cây trên đất có tính kiềm, nông dân thường phải sử dụng các chất có khả năng giảm độ pH của đất. Một trong những chất giúp giảm độ pH này là:"
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': 'Magnesium sulfate.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Ammonium sulfate.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Potassium nitrate.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Vôi sống.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "13",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 13.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Cho các phát biểu sau về sulfuric acid đặc (H",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            "SO",
+            {
+              "type": "text",
+              "text": "4",
+              "marks": [
+                "sub"
+              ]
+            },
+            " đặc), hãy chọn phát biểu ",
+            {
+              "type": "text",
+              "text": "s",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "ai",
+              "marks": [
+                "bold"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "Khi bị bỏng bởi H",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "SO",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "4",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " đặc cần nhanh chóng rửa sạch vị trí dính acid nhiều lần với dung dịch sodium hydroxide (NaOH), sau đó băng bó tạm thời bằng băng sạch rồi đến ngay cơ sở y tế gần nhất.",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "text": "Khi pha loãng H",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "SO",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "4",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " đặc cần rót từ từ acid đặc theo đũa thuỷ tinh vào nước, sau đó khuấy đều.",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ],
+            "{'type': 'text', 'text': 'Sulfuric acid đặc gây bỏng khi rơi vào da, do vậy cần tuân thủ các nguyên tắc trước khi thực hành thínghiệm.', 'marks': ['bold']}",
+            [
+              {
+                "type": "text",
+                "text": "Không pha loãng H",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "SO",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "text": "4",
+                "marks": [
+                  "sub"
+                ]
+              },
+              {
+                "type": "text",
+                "text": " đặc bằng cách đổ trực tiếp nước vào acid đặc vì phản ứng tỏa nhiệt mạnh, làm nước sôi đột ngột kéo theo những giọt acid bắn ra ngoài gây nguy hiểm.",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "14",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 14.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Ở điều kiện chuẩn, kim loại có giá trị thế điện cực chuẩn (",
+            {
+              "math": "E_{\\mathrm{Mn+Mo}}"
+            },
+            ") như thế nào thì có thể tác dụng với các dung dịch acid (như HCl, H",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            "SO",
+            {
+              "type": "text",
+              "text": "4",
+              "marks": [
+                "sub"
+              ]
+            },
+            " loãng) giải phóng H",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sub"
+              ]
+            },
+            "?"
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': '< -0,414 V.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': '> 0V.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': '> -0,414 V.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': '< 0V.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "15",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 15.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Để đề phòng nguy cơ gây cháy, nổ cần kiểm soát chặt chẽ các nguồn lửa, chất cháy, chất oxi hoá. Cho các biện pháp sau:",
+            "(a) Không bật lửa ở nơi cấm lửa, không đốt lửa trong rừng, không đốt rác bừa bãi; đổ nước vào khu vực lửa trại ngay khi kết thúc.",
+            "(b) Tập trung khi nấu nướng để tránh thiết bị quá nóng gây cháy hoặc quên tắt thiết bị gây chập điện.",
+            "(c) Không tàng trữ, chế tạo trái phép thuốc nổ, thuốc pháo.",
+            "(d) Sắp xếp hàng hoá, vật dụng dễ cháy cách xa nguồn lửa, nguồn nhiệt.",
+            {
+              "type": "text",
+              "text": "Các biện pháp nhằm loại trừ khả năng phát sinh ra nguồn lửa có khả năng gây hoả hoạn là",
+              "marks": [
+                "bold"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': '(a) và (b).', 'marks': ['bold']}",
+            "{'type': 'text', 'text': '(c) và (d).', 'marks': ['bold']}",
+            "{'type': 'text', 'text': '(b) và (c).', 'marks': ['bold']}",
+            "{'type': 'text', 'text': '(a) và (d).', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "16",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 16.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Dịch dạ dày (pH = 1,5 – 3,5) có môi trường gì?"
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': 'Trung tính.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Acid.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Lưỡng tính.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Base.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "17",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 17.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Cho các pin điện hoá và sức điện động chuẩn tương ứng:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Pin điện hóa",
+                        "marks": [
+                          "bold"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Cu – X"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Y – Cu"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Z – Cu"
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Sức điện động chuẩn (V)",
+                        "marks": [
+                          "bold"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "0,46"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "1,1"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "1,47"
+                      }
+                    ]
+                  }
+                ]
+              ]
+            },
+            {
+              "type": "text",
+              "text": "(X, Y, Z là ba kim loại.)",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Dãy các kim loại xếp theo chiều tăng dần tính khử từ trái sang phải là",
+              "marks": [
+                "bold"
+              ]
+            }
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': 'X, Cu, Z, Y.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Z, Y, Cu, X.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Y, Z, Cu, X.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'X, Cu, Y, Z.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "18",
+          "type": "single_choice",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 18.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " \"...(1)... là những hợp chất hữu cơ trong phân tử có nhóm hydroxyl liên kết trực tiếp với nguyên tử carbon của vòng benzene”. Nội dung phù hợp trong chỗ trống (1) là"
+          ],
+          "points": 0.25,
+          "options": [
+            "{'type': 'text', 'text': 'Alcohol thơm.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Alcohol.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Phenol.', 'marks': ['bold']}",
+            "{'type': 'text', 'text': 'Ketone.', 'marks': ['bold']}"
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part-2",
+      "name": "PHẦN II",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 19 đến câu 22. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 1.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường. Thuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly. Cho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid:",
+            {
+              "image": "img_757f1d6ee914.png"
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Trong phân tử X, nhóm NH",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "2",
+                  "marks": [
+                    "sub"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": " số (2) của Arg đã tham gia tạo liên kết peptide.",
+                  "marks": [
+                    "bold"
+                  ]
+                }
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Tách biệt được hỗn hợp Glu, Arg, Gly bằng phương pháp điện di.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Trong phân tử X còn nhóm carboxyl số (2) của Glu.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "X có khả năng hình thành sản phẩm rắn màu vàng với dung dịch nitric acid đặc.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 2.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Hiện nay người ta dùng thiết bị breathalyzer để đo nồng độ cồn trong khí thở của người tham gia giao thông. Khi có nồng độ cồn trong khí thở sẽ xảy ra phản ứng:",
+            {
+              "math": "\\mathrm{C}_2\\mathrm{H}_5\\mathrm{OH} + \\mathrm{K}_2\\mathrm{Cr}_2\\mathrm{O}_7 + \\mathrm{H}_2\\mathrm{SO}_4 \\xrightarrow{\\mathrm{Ag}^+} \\mathrm{CH}_3\\mathrm{COOH} + \\mathrm{Cr}_2(\\mathrm{SO}_4)_3 + \\mathrm{K}_2\\mathrm{SO}_4 + \\mathrm{H}_2\\mathrm{O} \\text{ (*)}"
+            },
+            "Tùy thuộc vào lượng ",
+            {
+              "math": "\\mathrm{K}_2\\mathrm{Cr}_2\\mathrm{O}_7"
+            },
+            " phản ứng, trên màn hình thiết bị sẽ xuất hiện số chỉ nồng độ cồn tương ứng. Người đi xe máy có nồng độ cồn trong khí thở sẽ bị xử phạt theo khung sau đây (",
+            {
+              "type": "text",
+              "text": "trích từ Nghị định 168/ 2024/NĐ-CP",
+              "marks": [
+                "italic"
+              ]
+            },
+            "):",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Nồng độ cồn",
+                        "marks": [
+                          "bold"
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "text": " (mg/1L khí thở)"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Mức tiền phạt",
+                        "marks": [
+                          "bold"
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "text": " (VNĐ)"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Hình phạt bổ sung",
+                        "marks": [
+                          "bold"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Trừ điểm GPLX",
+                        "marks": [
+                          "bold"
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "content": [
+                      "≤ 0,25"
+                    ]
+                  },
+                  {
+                    "content": [
+                      "2 triệu - 3 triệu"
+                    ]
+                  },
+                  {
+                    "content": [
+                      "–"
+                    ]
+                  },
+                  {
+                    "content": [
+                      "Trừ 04 điểm"
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "content": [
+                      "0,25 đến 0,4"
+                    ]
+                  },
+                  {
+                    "content": [
+                      "6 triệu - 8 triệu"
+                    ]
+                  },
+                  {
+                    "content": [
+                      "–"
+                    ]
+                  },
+                  {
+                    "content": [
+                      "Trừ 10 điểm"
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "content": [
+                      "> 0,4"
+                    ]
+                  },
+                  {
+                    "content": [
+                      "8 triệu - 10 triệu"
+                    ]
+                  },
+                  {
+                    "content": [
+                      "Tước quyền sử dụng GPLX từ 22-24 tháng"
+                    ]
+                  },
+                  {
+                    "content": [
+                      "–"
+                    ]
+                  }
+                ]
+              ]
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                "Một mẫu khí thở của một người điều khiển xe máy tham gia giao thông có thể tích 36,3 mL được thổi vào thiết bị breathalyzer thì có 0,0588 mg ",
+                {
+                  "math": "\\mathrm{K}_2\\mathrm{Cr}_2\\mathrm{O}_7"
+                },
+                " phản ứng (trong môi trường ",
+                {
+                  "math": "\\mathrm{H}_2\\mathrm{SO}_4"
+                },
+                " và ion ",
+                {
+                  "type": "text",
+                  "text": "Ag",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "+",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " xúc tác). Người điều khiển xe máy đã vi phạm giao thông với mức tiền phạt (6 triệu - 8 triệu), tước giấy phép lái xe (22 – 24 tháng)."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": [
+                "Theo khuyến cáo của ngành y tế, để đảm bảo sức khỏe mỗi người trưởng thành không nên uống quá 2 đơn vị cồn (Một đơn vị cồn tương đương 10 mL ethanol nguyên chất). Vì vậy mỗi người trưởng thành không nên uống quá 50 mL rượu 40",
+                {
+                  "type": "text",
+                  "text": "o",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " một ngày."
+              ],
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Phương pháp sản xuất các đồ uống có cồn được sử dụng phổ biến là hydrate hóa alkane.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Sau khi uống đồ uống có cồn, ethanol sẽ được hấp thụ vào cơ thể thông qua hệ tiêu hóa.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu ",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ".",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Các phát biểu sau về ứng dụng của tinh bột và cellulose là đúng hay sai"
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Tinh bột được dùng trong sản xuất giấy.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Tinh bột được sử dụng làm chất kết dính trong công nghiệp thực phẩm.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Cellulose có thể là nguyên liệu chính trong sản xuất ethanol.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Cellulose không thể dùng làm vật liệu xây dựng",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "type": "true_false",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu ",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "4",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ".",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Vật liệu polymer đã và đang được sử dụng rộng rãi trong rất nhiều lĩnh vực. Với những ưu điểm vượt trội về tính chất, độ bền,... vật liệu polymer được ứng dụng rộng rãi trong đời sống làm vật liệu cách điện và đặc biệt là vật liệu xây dựng mới như: sơn chống thấm, bê tông siêu nhẹ, gỗ công nghiệp,... Các polymer được điều chế bằng phản ứng trùng hợp hoặc trùng ngưng. Những phát biểu sau đây là đúng hay sai ?"
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Nylon-6,6 được sử dụng phổ biến trong ngành dệt may và được điều chế từ phản ứng trùng ngưng.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": [
+                "Poly(vinyl acetate) (PVA) được dùng chế tạo sơn, keo dán. Monomer dùng để trùng hợp tạo PVA là ",
+                {
+                  "math": "\\mathrm{CH}_2=\\mathrm{CHCOOCH}_3"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Sự khác biệt cơ bản giữa hai loại phản ứng điều chế polymer là: phản ứng trùng ngưng có tạo ra các phân tử nhỏ, còn trùng hợp thì không tạo ra phân tử nhỏ.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Trùng hợp buta-1,3-diene thu được polymer có cấu trúc tương tự cao su tự nhiên.",
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part-3",
+      "name": "PHẦN III",
+      "description": "Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 23 đến câu 28.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu ",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "1",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ".",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Pin nhiên liệu sử dụng ethanol được đặc biệt quan tâm do có nguồn nhiên liệu sinh học dồi dào. Phản ứng xảy ra khi một pin ethanol oxygen phóng điện ở 25 ",
+            {
+              "type": "text",
+              "text": "o",
+              "marks": [
+                "sup"
+              ]
+            },
+            "C trong dung dịch chất điện li là potassium hydroxide như sau: ",
+            {
+              "math": "\\mathrm{C}_2\\mathrm{H}_5\\mathrm{OH}(\\mathrm{l}) + 3\\mathrm{O}_2 (\\mathrm{g}) \\to 2\\mathrm{CO}_2(\\mathrm{g}) + 3\\mathrm{H}_2\\mathrm{O}(\\mathrm{l})"
+            },
+            "Một pin ethanol – oxygen được dùng để thắp sáng 7 bóng đèn LED, mỗi bóng có công suất là 3 W (3 J/s) liên tục trong t giờ, tiêu thụ hết 34,5 gam ethanol với hiệu suất quá trình oxi hoá ethanol là 70%. Cho biết nhiệt tạo thành chuẩn của các chất:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Chất",
+                        "marks": [
+                          "bold"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "math": "\\mathrm{C}_2\\mathrm{H}_5\\mathrm{OH}(\\mathrm{l})"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "math": "\\mathrm{O}_2 (\\mathrm{g})"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "math": "\\mathrm{CO}_2(\\mathrm{g})"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "math": "\\mathrm{H}_2\\mathrm{O}(\\mathrm{l})"
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "content": [
+                      {
+                        "math": "\\ce{fH298o}"
+                      },
+                      {
+                        "type": "text",
+                        "text": " (kJ/mol)",
+                        "marks": [
+                          "bold"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "-277,6"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "0"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "-393,5"
+                      }
+                    ]
+                  },
+                  {
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "-285,8"
+                      }
+                    ]
+                  }
+                ]
+              ]
+            },
+            "Giá trị của t bằng bao nhiêu? (",
+            {
+              "type": "text",
+              "text": "Làm tròn kết quả đến hàng phần mười",
+              "marks": [
+                "italic"
+              ]
+            },
+            ")."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu 2.",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Bia, rượu, giấm ăn đều có thể được sản xuất từ nguyên liệu ban đầu là tinh bột trong ngũ cốc theo sơ đồ phản ứng sau:",
+            {
+              "math": "\\text{Tinh bột} \\xrightarrow{1} \\text{maltose} \\xrightarrow{2} \\text{glucose} \\xrightarrow{3} \\text{ethanol} \\xrightarrow{4} \\text{acetic acid}."
+            },
+            "Phản ứng nào trong chuỗi phản ứng trên thuộc loại phản ứng thuỷ phân? (Liệt kê đáp án theo số thứ tự phản ứng tăng dần)."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu ",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ".",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Mùi tanh của cá là do hỗn hợp các amine (nhiều nhất là trimethylamine (",
+            {
+              "math": "(\\mathrm{CH}_3)_3\\mathrm{N}"
+            },
+            ")) gây nên. Trimethylamine là amine bậc mấy?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu ",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "4",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ".",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Một oleum có công thức ",
+            {
+              "math": "\\mathrm{H}_2\\mathrm{SO}_4\\cdot\\mathrm{nSO}_3"
+            },
+            ". Hoà tan 7,362 gam oleum vào nước thành 1,0 L dung dịch sulfuric acid. Sau đó, rút 10,0 mL dung dịch acid cho vào bình tam giác, thêm vài giọt dung dịch phenolphathalein. Nhỏ từ từ dung dịch NaOH 0,10 M chứa trên burette vào bình tam giác đến khi dung dịch xuất hiện màu hồng nhạt, đọc thể tích NaOH đã dùng trên burette. Lặp lại thí nghiệm nhiều lần tính được giá trị thể tích NaOH trung bình là 18,0 mL. Giá trị của n là bao nhiêu?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu ",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "5",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ".",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Peptide có nhiều vai trò quan trọng, đặc biệt trong chăm sóc da và tóc, như chống lão hóa, tăng cường sản xuất collagen và elastin, giảm nếp nhăn, sửa chữa các tổn thương... Một peptide A có công thức sau:",
+            {
+              "image": "img_79be73fe3925.png"
+            },
+            "Cho các phát biểu về peptide A:",
+            "(1) Peptide A có công thức phân tử là ",
+            {
+              "math": "\\mathrm{C}_7\\mathrm{H}_{14}\\mathrm{O}_5\\mathrm{N}_2"
+            },
+            ".",
+            "(2) Peptide A không có phản ứng màu biuret.",
+            "(3) Phân tử khối của peptide A là 236.",
+            "(4) Peptide A được cấu tạo bởi ba loại α-amino acid khác nhau.",
+            "(5) Khi thủy phân hoàn toàn 8,72 gam peptide A với dung dịch hydrochloric acid, thu được 12,36 gam hỗn hợp các muối Z, T.",
+            "Sắp xếp các phát biểu đúng theo chiều tăng dần ?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "short_answer",
+          "content": [
+            {
+              "type": "text",
+              "text": "Câu ",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": "6",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "text": ".",
+              "marks": [
+                "bold"
+              ]
+            },
+            " Một học sinh làm thí nghiệm: Điện phân dung dịch NaCl",
+            "- Lắp thiết bị thí nghiệm điện phân dung dịch NaCl với điện cực trơ như hình bên dưới.",
+            {
+              "image": "img_c6cd932c29b3.png"
+            },
+            "- Rót khoảng 80 mL dung dịch NaCl bão hoà vào cốc rồi nhúng hai điện cực graphite vào dung dịch.",
+            "- Nối hai điện cực graphite với hai cực của nguồn điện và tiến hành điện phân trong khoảng 5 phút.",
+            "- Cho một mẫu cánh hoa màu hồng vào cốc chứa khoảng 5 mL dung dịch sau điện phân.",
+            "Quan sát hiện tượng thí nghiệm, học sinh có nhận xét:",
+            "(1) Tại điện cực anode có khí ",
+            {
+              "math": "\\mathrm{H}_2"
+            },
+            " thoát ra.",
+            "(2) Tại điện cực cathode xảy ra quá trình oxi hoá nước:",
+            "(3) Cánh hoa hồng bị mất màu.",
+            "(4) Dùng nắp đậy trong quá trình điện phân để hạn chế sự thoát ",
+            {
+              "math": "\\mathrm{Cl}_2"
+            },
+            " ra ngoài môi trường gây độc hại cho người làm thí nghiệm và ô nhiễm môi trường.",
+            "Sắp xếp các phát biểu đúng theo thứ tự tăng dần"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

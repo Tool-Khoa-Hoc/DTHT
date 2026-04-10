@@ -1,0 +1,756 @@
+{
+  "id": "39-lien-truong-nghe-an-2-lan-2-m-42-2026",
+  "title": "39 - LIÊN TRƯỜNG NGHỆ AN 2 (LẦN 2) - MĐ42 - 2026",
+  "subject": "hoa",
+  "time": 50,
+  "description": "39 - LIÊN TRƯỜNG NGHỆ AN 2 (LẦN 2) - MĐ42 - 2026",
+  "parts": [
+    {
+      "id": "part-1",
+      "name": "Phần I",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "single_choice",
+          "content": "Trùng hợp chất nào sau đây thu được polyacrylonitrile dùng để sản xuất tơ nitron?",
+          "points": 0.25,
+          "options": [
+            "{'math': '\\\\mathrm{CH}_2=\\\\mathrm{CHCl}'}",
+            "{'math': '\\\\mathrm{CH}_2=\\\\mathrm{CHCH}_3'}",
+            "{'math': '\\\\mathrm{CH}_2=\\\\mathrm{CHCN}'}",
+            "{'math': '\\\\mathrm{CH}_2=\\\\mathrm{CH}_2'}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "single_choice",
+          "content": "Acid béo omega-3 là acid béo không no mà vị trí liên kết đôi đầu tiên nằm ở nguyên tử carbon số mấy khi đánh số từ nhóm methyl?",
+          "points": 0.25,
+          "options": [
+            "Vị trí số 6.",
+            "Vị trí số 3.",
+            "Vị trí số 9.",
+            "Vị trí số 1."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "single_choice",
+          "content": "Cao su là vật liệu polymer có tính nào sau đây?",
+          "points": 0.25,
+          "options": [
+            "Tính dẻo.",
+            "Dễ kéo thành sợi.",
+            "Dễ tan trong nước.",
+            "Tính đàn hồi."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "single_choice",
+          "content": "Nhóm chức đặc trưng của amine?",
+          "points": 0.25,
+          "options": [
+            "-CHO.",
+            [
+              {
+                "type": "text",
+                "text": "-NH",
+                "marks": []
+              },
+              {
+                "type": "text",
+                "text": "2",
+                "marks": [
+                  "sub"
+                ]
+              },
+              "."
+            ],
+            "-COOH.",
+            "-OH."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "single_choice",
+          "content": "Khi nhỏ dung dịch iodine vào mặt cắt của củ khoai lang tươi, thấy xuất hiện màu xanh tím. Hiện tượng này chứng tỏ trong củ khoai lang có chứa chất nào sau đây?",
+          "points": 0.25,
+          "options": [
+            "Fructose.",
+            "Glucose.",
+            "Cellulose.",
+            "Tinh bột."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "single_choice",
+          "content": "Trong pin Galvani Zn – Cu, ở anode xảy ra quá trình:",
+          "points": 0.25,
+          "options": [
+            [
+              "Khử Cu",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ],
+            "Oxi hóa Cu.",
+            "Oxi hóa Zn.",
+            [
+              "Khử Zn",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "7",
+          "type": "single_choice",
+          "content": [
+            "Glutathione là một chất chống oxy hóa tự nhiên trong cơ thể, có khả năng loại bỏ các chất độc hại và các gốc tự do gây hại cho tế bào. Công thức cấu tạo như sau:\n",
+            {
+              "image": "img_24192ce40c8c.png"
+            },
+            "\nPhát biểu nào sau đây là đúng khi nói về cấu tạo và tính chất của Glutathione?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Dung dịch Glutathione không phản ứng được với ",
+              {
+                "math": "\\mathrm{Cu(OH)}_2"
+              },
+              " ở điều kiện thường."
+            ],
+            "Glutathione là hợp chất lưỡng tính, vừa tác dụng với dung dịch NaOH, vừa tác dụng với dung dịch HCl.",
+            "Glutathione là một dipeptide vì phân tử có chứa 2 liên kết peptide.",
+            "Trong một phân tử Glutathione có 4 nguyên tử oxygen."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "8",
+          "type": "single_choice",
+          "content": [
+            "Cho các phát biểu sau:\n(1) Phản ứng thủy phân chất béo trong môi trường kiềm được gọi là phản ứng xà phòng hóa.\n(2) Các ester thường có nhiệt độ sôi thấp hơn so với các acid và alcohol có cùng phân tử khối.\n(3) Hydrogen hóa hoàn toàn dầu thực vật (lỏng) thu được mỡ động vật (rắn).\n(4) Vinyl acetate có công thức cấu tạo là ",
+            {
+              "math": "\\mathrm{CH}_3\\mathrm{COOCH}=\\mathrm{CH}_2"
+            },
+            ".\n(5) Tất cả các ester đều có thể tham gia phản ứng tráng gương.\nSố phát biểu đúng là:"
+          ],
+          "points": 0.25,
+          "options": [
+            "2.",
+            "5.",
+            "3.",
+            "4."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "9",
+          "type": "single_choice",
+          "content": "Khi pin điện hóa đang hoạt động, ở cầu muối chủ yếu có sự di chuyển của phần tử nào sau đây?",
+          "points": 0.25,
+          "options": [
+            "Các electron tự do.",
+            "Các nguyên tử kim loại từ điện cực tan vào.",
+            "Các ion dương và ion âm.",
+            "Các phân tử nước của dung dịch điện li."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "10",
+          "type": "single_choice",
+          "content": [
+            "Cấu hình electron của nguyên tử Oxygen là 1s",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sup"
+              ]
+            },
+            " 2s",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sup"
+              ]
+            },
+            " 2p",
+            {
+              "type": "text",
+              "text": "4",
+              "marks": [
+                "sup"
+              ]
+            },
+            ". Trong bảng tuần hoàn các nguyên tố hóa học, Oxygen thuộc chu kì:"
+          ],
+          "points": 0.25,
+          "options": [
+            "6.",
+            "1.",
+            "2.",
+            "4."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "11",
+          "type": "single_choice",
+          "content": "Đun nóng methyl acetate với dung dịch NaOH vừa đủ, thu được sodium acetate và alcohol X. Công thức của X là:",
+          "points": 0.25,
+          "options": [
+            "{'math': '\\\\mathrm{CH}_3\\\\mathrm{COOH}'}",
+            "{'math': '\\\\mathrm{C}_2\\\\mathrm{H}_5\\\\mathrm{OH}'}",
+            "{'math': '\\\\mathrm{CH}_3\\\\mathrm{OH}'}",
+            "{'math': '\\\\mathrm{C}_3\\\\mathrm{H}_7\\\\mathrm{OH}'}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "12",
+          "type": "single_choice",
+          "content": [
+            "Trong quá trình xả điện của acquy chì, phản ứng tổng quát là: ",
+            {
+              "math": "\\mathrm{Pb(s)} + \\mathrm{PbO}_2\\mathrm{(s)} + 2\\mathrm{H}_2\\mathrm{SO}_4\\mathrm{(aq)} \\rightarrow 2\\mathrm{PbSO}_4\\mathrm{(s)} + 2\\mathrm{H}_2\\mathrm{O(l)}"
+            },
+            ". Phát biểu nào sau đây mô tả đúng quá trình xảy ra tại các điện cực?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Tại cực dương (cathode), chì dioxide (",
+              {
+                "math": "\\mathrm{PbO}_2"
+              },
+              ") bị khử thành ",
+              {
+                "math": "\\mathrm{PbSO}_4"
+              },
+              "."
+            ],
+            [
+              "Tại cực âm (anode), Pb bị khử bởi ion ",
+              {
+                "math": "\\mathrm{SO}_4^{2-}"
+              },
+              "."
+            ],
+            [
+              "Tại cực dương (cathode), ",
+              {
+                "math": "\\mathrm{PbO}_2"
+              },
+              " đóng vai trò là chất khử."
+            ],
+            [
+              "Tại cực âm (anode), chì (Pb) nhận electron để tạo thành ",
+              {
+                "math": "\\mathrm{PbSO}_4"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "13",
+          "type": "single_choice",
+          "content": [
+            "Cho phản ứng hóa học : ",
+            {
+              "math": "\\mathrm{C(s)} + \\mathrm{O}_2\\mathrm{(g)} \\rightarrow \\mathrm{CO}_2\\mathrm{(g)}"
+            },
+            ". Yếu tố nào sau đây không ảnh hưởng đến tốc độ phản ứng trên."
+          ],
+          "points": 0.25,
+          "options": [
+            "Nhiệt độ.",
+            "Hàm lượng carbon.",
+            [
+              "Áp suất ",
+              {
+                "math": "\\mathrm{O}_2"
+              },
+              "."
+            ],
+            "Diện tích bề mặt carbon."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "14",
+          "type": "single_choice",
+          "content": [
+            "Cho phổ sau:\n",
+            {
+              "image": "img_41b8078698f4.png"
+            },
+            "\nDựa vào phổ hồng ngoại của hợp chất hữu cơ có cấu trúc như hình bên, số sóng hấp thụ đặc trưng cho nhóm carbonyl (C=O) của Ketone là:"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "3067 cm",
+              {
+                "type": "text",
+                "text": "-1",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ],
+            [
+              "1270 cm",
+              {
+                "type": "text",
+                "text": "-1",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ],
+            [
+              "1601 cm",
+              {
+                "type": "text",
+                "text": "-1",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ],
+            [
+              "1686 cm",
+              {
+                "type": "text",
+                "text": "-1",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "15",
+          "type": "single_choice",
+          "content": "Khi cây trồng thiếu nguyên tố Phosphorus, cây thường có biểu hiện sinh trưởng chậm, lá nhỏ, màu xanh đậm đôi khi chuyển sang tím đỏ, bộ rễ phát triển kém. Để khắc phục tình trạng này, người nông dân nên ưu tiên bón loại phân nào sau đây?",
+          "points": 0.25,
+          "options": [
+            "{'math': '\\\\mathrm{NH}_4\\\\mathrm{NO}_3'}",
+            "{'math': '\\\\mathrm{Ca(H}_2\\\\mathrm{PO}_4)_2'}",
+            "KCl.",
+            "{'math': '\\\\mathrm{(NH}_2)_2\\\\mathrm{CO}'}"
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "16",
+          "type": "single_choice",
+          "content": "Thủy phân chất hữu cơ X trong môi trường acid thu được hai loại monosaccharide khác nhau. X là?",
+          "points": 0.25,
+          "options": [
+            "Saccharose.",
+            "Cellulose.",
+            "Maltose.",
+            "Tinh bột."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "17",
+          "type": "single_choice",
+          "content": "Ở nhiệt độ thấp (0 – 5°C), amine X tác dụng với nitrous acid tạo thành muối diazonium. X là:",
+          "points": 0.25,
+          "options": [
+            "Dimethylamine.",
+            "Trimethylamine.",
+            "Methylamine.",
+            "Aniline."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "18",
+          "type": "single_choice",
+          "content": "Chất nào sau đây có giá trị pH thấp nhất?",
+          "points": 0.25,
+          "options": [
+            "Nước Baking soda.",
+            "Nước ép quả chanh.",
+            "Nước rửa chén bát.",
+            "Nước biển."
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part-2",
+      "name": "PHẦN II",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 19 đến câu 22. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "19",
+          "type": "true_false",
+          "content": "Một nhóm học sinh thực hiện thí nghiệm xà phòng hóa tristearin với dung dịch NaOH theo quy trình:\n• Bước 1: Cho 2 gam chất béo và khoảng 4 mL dung dịch NaOH 40% vào bát sứ.\n• Bước 2: Đun hỗn hợp khoảng 10 phút và liên tục khuấy bằng đũa thủy tinh. Nếu thể tích nước giảm cần bổ sung thêm nước. Kết thúc phản ứng, đổ hỗn hợp vào cốc thủy tinh chứa khoảng 30 mL dung dịch NaCl bão hòa, khuấy nhẹ để nguội. Khi kết thúc, họ thu được hỗn hợp gồm hai phần riêng biệt: phần chất rắn màu trắng nổi trên bề mặt và phần dung dịch ở phía dưới.\nHãy xem xét các nhận định sau:",
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Tổng khối lượng xà phòng thu được theo lý thuyết luôn cao hơn khối lượng tristearin ban đầu tham gia phản ứng.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Việc bổ sung dung dịch NaCl bão hòa có tác dụng làm giảm độ tan của muối sodium của acid béo, giúp chúng kết tinh và tách khỏi dung dịch.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                "Phần dung dịch ở dưới sau khi tách hết xà phòng có khả năng hòa tan ",
+                {
+                  "math": "\\mathrm{Cu(OH)}_2"
+                },
+                " ở nhiệt độ phòng, tạo ra dung dịch màu xanh lam đậm."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Ở bước 1, nếu thay thế tristearin bằng dầu bôi trơn máy thì sau khi cho thêm NaCl bão hòa vẫn thu được chất rắn màu trắng nổi lên trên.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "20",
+          "type": "true_false",
+          "content": [
+            "Một nhóm học sinh thực hành thí nghiệm tính tan của cellulose trong nước Schweizer theo các bước.\n• Bước 1: Cho khoảng 50 mL dung dịch ",
+            {
+              "math": "\\mathrm{CuSO}_4"
+            },
+            " 1M vào cốc thủy tinh dung tích 250 mL. Thêm 20 mL dung dịch NaOH 20% vào, khuấy đều.\n• Bước 2: Lọc tách kết tủa, cho kết tủa vào cốc thủy tinh dung tích 250 mL. Thêm khoảng 50 mL dung dịch ",
+            {
+              "math": "\\mathrm{NH}_3"
+            },
+            " đặc, khuấy đều đến khi kết tủa tan hết thu được nước Schweizer.\n• Bước 3. Thêm một lượng nhỏ bông vào khoảng 30 mL nước Schweizer và khuấy đều trong khoảng 3 phút.\nNhận xét các phát biểu sau:"
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Hiện tượng ở bước cuối cùng là bông (cellulose) bị hòa tan hết, tạo thành một dung dịch đồng nhất màu xanh thẫm.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": [
+                "Ở bước đầu tiên, khi cho dung dịch NaOH vào dung dịch ",
+                {
+                  "math": "\\mathrm{CuSO}_4"
+                },
+                " sẽ xuất hiện kết tủa màu xanh lam của ",
+                {
+                  "math": "\\mathrm{Cu(OH)}_2"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                "Nước Schweizer được tạo ra ở bước thứ hai thực chất là phức chất hòa tan có công thức ",
+                {
+                  "math": "\\mathrm{[Cu(NH}_3)_4\\mathrm{](OH)}_2"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Thí nghiệm này chứng minh cellulose có tính chất của một monoalcohol (alcohol đơn chức).",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "21",
+          "type": "true_false",
+          "content": "Cho các nhận định sau về protein:",
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Độ đặc trong sữa chua là do protein có tên casein bị đông tụ bởi lactic acid.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Thành phần tạo nên vị ngọt đặc trưng của nước mắm (được sản xuất từ cá) và nước tương (được sản xuất từ đậu nành) là các amino acid tạo thành từ sự thuỷ phân hoàn toàn của protein có trong cá hoặc đậu nành.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Khi chế biến một số loại thực phẩm từ thịt, cá,... người ta có thể thêm gia vị chua như giấm ăn, chanh,... do chúng có chứa các acid hữu cơ. Trong môi trường acid, protein ở thịt, cá bị thủy phân thành các chuỗi polypeptide nhỏ hơn giúp thịt, cá mềm nhanh hơn. Đồng thời thêm gia vị chua làm tăng hương vị của món ăn.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Độ đạm của nước tương, nước mắm tương đương với hàm lượng nitrogen có trong nước tương, nước mắm. Nitrogen có trong thành phần của amino acid. Hàm lượng nitrogen càng lớn thường tương ứng với hàm lượng amino acid càng lớn thì độ đạm càng thấp.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "22",
+          "type": "true_false",
+          "content": [
+            "Cho các giá trị thế điện cực chuẩn (E°) của các cặp oxi hóa – khử sau: ",
+            {
+              "math": "\\ce{EMg2 + Mgo = -237V}"
+            },
+            "; ",
+            {
+              "math": "\\ce{ECu2 + Cuo = + 034V}"
+            },
+            "; ",
+            {
+              "math": "\\ce{EZn2 + Zno = -076V}"
+            },
+            "; ",
+            {
+              "math": "\\ce{EAg + Ago =}"
+            },
+            "+0,80V\nXét hai pin Galvani: Pin (I) gồm cặp Mg",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "/Mg và Zn",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "/Zn; Pin (II) gồm cặp Zn",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "/Zn và Cu",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "/Cu. Các pin đều hoạt động ở điều kiện chuẩn."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                "Khi nối cực Zn của Pin (I) với cực Zn của Pin (II) bằng một dây dẫn, nồng độ ion Zn",
+                {
+                  "type": "text",
+                  "text": "2+",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " trong dung dịch ở cả hai pin đều tăng lên khi mạch kín."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Trong cả hai pin (I) và (II), thanh Zn đều đóng vai trò là cực âm (anode) và bị ăn mòn điện hóa.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Sức điện động chuẩn của Pin (I) lớn hơn sức điện động chuẩn của Pin (II).",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                "Nếu thiết lập một pin mới từ cặp Mg",
+                {
+                  "type": "text",
+                  "text": "2+",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                "/Mg và Ag",
+                {
+                  "type": "text",
+                  "text": "+",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                "/Ag, sức điện động chuẩn của pin này sẽ đạt giá trị 3,17V."
+              ],
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part-3",
+      "name": "PHẦN III",
+      "description": "Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 23 đến câu 28.",
+      "questions": [
+        {
+          "id": "23",
+          "type": "short_answer",
+          "content": "Một nhóm học sinh đo được hàm lượng nitrogen (bao gồm ion nitrate, nitrite, ammonium) trong một hồ nước là 0,0015 mol/L. Biết khối lượng nguyên tử của Nitrogen là 14 g/mol. Hãy cho biết nồng độ nitrogen đo được trong hồ này cao gấp bao nhiêu lần so với ngưỡng bắt đầu gây ra hiện tượng phú dưỡng (300 μg/L)?",
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "24",
+          "type": "short_answer",
+          "content": [
+            "Cho pin điện hóa tạo bởi hai cặp oxi hóa – khử ở điều kiện chuẩn: Mg",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "/Mg và M",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "/M với thế điện cực chuẩn lần lượt là -2,37V và -aV. Sức điện động chuẩn của pin là 2,11V trong đó Mg đóng vai trò cực âm. Giá trị của a bằng bao nhiêu?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "25",
+          "type": "short_answer",
+          "content": [
+            "Ammonia là chất khí mùi khai. Hít phải khí ",
+            {
+              "math": "\\mathrm{NH}_3"
+            },
+            " nồng độ cao có thể gây bỏng niêm mạc mũi, họng, gây khó thở hoặc thậm chí tử vong. Tiếp xúc trực tiếp có thể gây bỏng da và hỏng mắt. Số oxi hóa của Nitrogen trong ammonia là bao nhiêu?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "26",
+          "type": "short_answer",
+          "content": [
+            "Methane là thành phần chính của khí thiên nhiên. Xét phản ứng đốt cháy methane:\n",
+            {
+              "math": "\\mathrm{CH}_4\\mathrm{(g)} + 2\\mathrm{O}_2\\mathrm{(g)} \\rightarrow \\mathrm{CO}_2\\mathrm{(g)} + 2\\mathrm{H}_2\\mathrm{O(l)}"
+            },
+            "; ",
+            {
+              "math": "\\ce{DrH298o = -890kJ}"
+            },
+            "\nKhi đốt cháy hoàn toàn 8 gam ",
+            {
+              "math": "\\mathrm{CH}_4"
+            },
+            ", nhiệt tỏa ra môi trường là a kJ. Giá trị của a là bao nhiêu?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "27",
+          "type": "short_answer",
+          "content": "Cho dãy các nguyên liệu: (1) ω-aminoenanthic acid; (2) caprolactam; (3) ethylene glycol và terephthalic acid; (4) hexamethylenediamine và adipic acid. Số nguyên liệu có phản ứng trùng ngưng tạo polymer là bao nhiêu?",
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "28",
+          "type": "short_answer",
+          "content": "Cho 6 carbohydrate sau: glucose, fructose, maltose, saccharose, tinh bột và cellulose. Có bao nhiêu carbohydrate đã cho thuộc nhóm monosaccharide?",
+          "points": 0.25,
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

@@ -9,7 +9,9 @@ import {
     createSingleChoiceQuestion,
     createTrueFalseQuestion,
     ensureDirectory,
+    getCanonicalExamTimeMinutes,
     inferSubjectLabel,
+    normalizeExamTimeMinutes,
     resolveExamDir,
     resolveExamJsonPath,
     saveExamJson
@@ -23,7 +25,7 @@ Options:
   --title <text>         Exam title
   --subject <text>       Subject label shown in UI
   --description <text>   Exam description
-  --time <minutes>       Duration in minutes (default: 50)
+  --time <minutes>       Duration in minutes (default by subject: Toan 90, Hoa/Ly/Sinh 50)
   --part1 <count>        Single-choice question count (default: 18)
   --part2 <count>        True/false question count (default: 4)
   --part3 <count>        Short-answer question count (default: 6)
@@ -92,6 +94,7 @@ async function main() {
     const part2Count = toPositiveInteger(flags.part2, 4);
     const part3Count = toPositiveInteger(flags.part3, 6);
     const subjectLabel = flags.subject || inferSubjectLabel(subjectFolder);
+    const defaultTime = getCanonicalExamTimeMinutes(subjectFolder) ?? 50;
 
     const parts = [
         createPart('part1', 'PHẦN I', DEFAULT_PART_DESCRIPTIONS.part1, part1Count, createSingleChoiceQuestion),
@@ -109,7 +112,7 @@ async function main() {
         id: examPath,
         title: flags.title || `Đề thi ${subjectLabel} - ${examPath}`,
         subject: subjectLabel,
-        time: toPositiveInteger(flags.time, 50),
+        time: normalizeExamTimeMinutes(subjectFolder, flags.time, defaultTime) ?? defaultTime,
         description: flags.description || '',
         resources: createDefaultExamResources(),
         answer_key: buildAnswerKeyFromParts(parts),

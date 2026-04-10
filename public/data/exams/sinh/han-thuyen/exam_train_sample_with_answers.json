@@ -1,6 +1,6 @@
 {
   "id": "han-thuyen-2026-lan-1",
-  "title": "Đề thi thử tốt nghiệp THPT lần 1 năm học 2025-2026 Trường THPT Hàn Thuyên - Sinh học",
+  "title": "Đề thi thử tốt nghiệp THPT năm học 2025-2026 Thành phố Huế - Sinh học",
   "subject": "Sinh học",
   "time": 50,
   "answer_key": {
@@ -60,7 +60,7 @@
     "video_url": null,
     "edit_link": null
   },
-  "description": "Đề thi thử tốt nghiệp THPT lần 1 năm học 2025-2026 - Trường THPT Hàn Thuyên - Bắc Ninh",
+  "description": "Đề thi thử tốt nghiệp THPT năm học 2025-2026 - Thành phố Huế - Môn Sinh học",
   "parts": [
     {
       "id": "part1",
@@ -908,5 +908,5 @@
         }
       ]
     }
-  ],
+  ]
 }

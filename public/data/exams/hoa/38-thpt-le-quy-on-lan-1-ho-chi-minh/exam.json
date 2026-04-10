@@ -1,0 +1,1465 @@
+{
+  "id": "ky-thi-thu-tot-nghiep-thpt-quoc-gia-nam-hoc-2025-2026",
+  "title": "KỲ THI THỬ TỐT NGHIỆP THPT QUỐC GIA NĂM HỌC 2025 – 2026",
+  "subject": "hoa",
+  "time": 50,
+  "description": "Đề thi có __ trang",
+  "parts": [
+    {
+      "id": "part-1",
+      "name": "PHẦN I",
+      "description": "Phần I: Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "single_choice",
+          "content": [
+            "Thực hiện tách hỗn hợp hexene và nước như hình vẽ sau (khối lượng riêng hexene là 0,66 g/cm",
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            "):",
+            {
+              "image": "img_4e5401428384.png"
+            },
+            "Phát biểu nào sau đây là đúng?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Vì hexene và nước không tan vào nhau nên có thể dùng phễu chiết để tách chúng ra khỏi nhau."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Dụng cụ để tách hỗn hợp gọi là phễu tách."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Lớp X là lớp nước và lớp Y là lớp hexene."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Phương pháp dùng để tách hỗn hợp là phương pháp chưng cất chất lỏng."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "single_choice",
+          "content": "Công thức cấu tạo của ethyl formate là",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "math": "\\mathrm{CH}_3\\mathrm{COOC}_2\\mathrm{H}_5"
+              },
+              "."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "math": "\\mathrm{HCOOCH}_3"
+              },
+              "."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "math": "\\mathrm{HCOOC}_2\\mathrm{H}_5"
+              },
+              "."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "math": "\\mathrm{CH}_3\\mathrm{COOCH}_3"
+              }
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "single_choice",
+          "content": [
+            "Trong các ion sau: ",
+            {
+              "math": "\\mathrm{Na}^{+}"
+            },
+            ", ",
+            {
+              "math": "\\mathrm{Mg}^{2+}"
+            },
+            ", ",
+            {
+              "math": "\\mathrm{Fe}^{3+}"
+            },
+            ", ",
+            {
+              "math": "\\mathrm{Zn}^{2+}"
+            },
+            ", số ion có thể điện phân trong dung dịch nước là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 1."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 2."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 3."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 4."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "single_choice",
+          "content": "Chất nào sau đây không có khả năng tham gia phản ứng trùng hợp?",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Toluene."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Styrene."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Propene."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Isoprene."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "single_choice",
+          "content": [
+            "Cho các chất lỏng sau: formic acid, glucose, triolein, maltose, glycerol, dimethyl oxalate. Số lượng chất có thể hòa tan ",
+            {
+              "math": "\\mathrm{Cu(OH)}_2"
+            },
+            " ở điều kiện thường là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 4."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 5."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 3."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 2."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "single_choice",
+          "content": [
+            "Sodium carbonate là chất rắn, màu trắng, dễ tan trong nước, có công thức hóa học là ",
+            {
+              "math": "\\mathrm{Na}_2\\mathrm{CO}_3"
+            },
+            ", dùng trong xử lí nước, sản xuất xà phòng, chất tẩy rửa,... ",
+            {
+              "math": "\\mathrm{Na}_2\\mathrm{CO}_3"
+            },
+            " còn được gọi là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " soda."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " xút."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " thạch cao."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " baking soda."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "7",
+          "type": "single_choice",
+          "content": [
+            "Phản ứng giữa albumin (có trong lòng trắng trứng) với ",
+            {
+              "math": "\\mathrm{Cu(OH)}_2"
+            },
+            " trong môi trường kiềm còn được gọi là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " phản ứng trùng ngưng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " sự đông tụ protein."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " phản ứng thủy phân."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " phản ứng màu biuret."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "8",
+          "type": "single_choice",
+          "content": [
+            "Cho chu trình enthalpy sau:",
+            {
+              "image": "img_53bee3af5d50.png"
+            },
+            "Giá trị của x là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 74,9 kJ."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " 149,8 kJ."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " -149,8 kJ."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " -74,9 kJ."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "9",
+          "type": "single_choice",
+          "content": "Bước sơ cứu đầu tiên cần làm ngay khi một người bị bỏng sulfuric acid đặc ở bàn tay là",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " rửa với nước lạnh nhiều lần tại chỗ bỏng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " đưa đến cơ sở y tế gần nhất."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " băng bó tạm thời vết bỏng."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " trung hòa acid bằng ",
+              {
+                "math": "\\mathrm{NaHCO}_3"
+              },
+              " tại chỗ bỏng."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "10",
+          "type": "single_choice",
+          "content": [
+            "Cho 16,2 gam kim loại M (hóa trị không đổi) tác dụng với 0,15 mol ",
+            {
+              "math": "\\mathrm{O}_2"
+            },
+            ". Hòa tan hết chất rắn sau phản ứng bằng dung dịch HCl dư thu được 0,6 mol ",
+            {
+              "math": "\\mathrm{H}_2"
+            },
+            ". Kim loại M là"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Fe."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Al."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Mg."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Ca."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "11",
+          "type": "single_choice",
+          "content": "Phổ khối lượng (MS) là phương pháp hiện đại để xác định phân tử khối của các hợp chất hữu cơ. Kết quả phân tích phổ khối lượng cho thấy phân tử khối của hợp chất hữu cơ X là 58. Chất X có thể là",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " methyl formate."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " ethyl acetate."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " acetone."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " acetic acid."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "12",
+          "type": "single_choice",
+          "content": "Tơ là những vật liệu polymer hình sợi dài và mảnh với độ bền nhất định. Sợi bông được lấy từ quả của cây bông thuộc loại tơ nào sau đây?",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Tơ tự nhiên."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Tơ bán tổng hợp."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Tơ tổng hợp."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Tơ hóa học."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "13",
+          "type": "single_choice",
+          "content": [
+            "Cellulose ",
+            {
+              "type": "text",
+              "text": "không",
+              "marks": [
+                "bold"
+              ]
+            },
+            " có tính chất nào sau đây?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Phản ứng với iodine."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Tan trong nước Schweizer."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Thuỷ phân."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Phản ứng với nitric acid (có mặt ",
+              {
+                "math": "\\mathrm{H}_2\\mathrm{SO}_4"
+              },
+              " đặc)."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "14",
+          "type": "single_choice",
+          "content": "Chất nào sau đây là amine bậc một?",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Đimethylamine."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Alanine."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Aniline."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Ethylmethylamine."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "15",
+          "type": "single_choice",
+          "content": "Công thức cấu tạo thu gọn của N-methylethanamine là",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "math": "\\mathrm{CH}_3\\mathrm{NH}_2"
+              },
+              "."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "math": "\\mathrm{CH}_3\\mathrm{CH}_2\\mathrm{NH}_2"
+              },
+              "."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "math": "\\mathrm{CH}_3\\mathrm{NHCH}_2\\mathrm{CH}_3"
+              },
+              "."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "math": "\\mathrm{CH}_3\\mathrm{NHCH}_3"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "16",
+          "type": "single_choice",
+          "content": [
+            "Chất nào sau đây ",
+            {
+              "type": "text",
+              "text": "không",
+              "marks": [
+                "bold"
+              ]
+            },
+            " có phản ứng thủy phân trong môi trường acid?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Glucose."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Cellulose."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Tinh bột."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Saccharose."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "17",
+          "type": "single_choice",
+          "content": "Chất nào sau đây thường được sử dụng để khử trùng nước sinh hoạt (nước máy)?",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Nitrogen."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Oxygen."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Fluorine."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Chlorine."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "18",
+          "type": "single_choice",
+          "content": [
+            "Phát biểu nào sau đây là ",
+            {
+              "type": "text",
+              "text": "sai",
+              "marks": [
+                "bold"
+              ]
+            },
+            "?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "type": "text",
+                "text": "A.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Các kim loại nhóm IIA đều phản ứng với nước tạo ra khí hydrogen và hydroxide kim loại."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "B.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Thành phần chính của khoáng vật dolomite là ",
+              {
+                "math": "\\mathrm{CaCO}_3\\cdot\\mathrm{MgCO}_3"
+              },
+              "."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "C.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Khi đốt đơn chất hay hợp chất của Ca cho ngọn lửa có màu đỏ cam."
+            ],
+            [
+              {
+                "type": "text",
+                "text": "D.",
+                "marks": [
+                  "bold"
+                ]
+              },
+              " Nguyên tố calcium có nhiều trong sữa, ngũ cốc, các loại hạt, rau cải, hải sản,..."
+            ]
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part-2",
+      "name": "PHẦN II",
+      "description": "PHẦN II. Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 19 đến câu 22. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "true_false",
+          "content": [
+            "Cho các thông tin các chất trong bảng sau:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    {
+                      "type": "text",
+                      "text": "Chất",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "type": "text",
+                      "text": "Benzyl chloride",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "type": "text",
+                      "text": "Benzyl alcohol",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "type": "text",
+                      "text": "o-Cresol",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ]
+                ],
+                [],
+                [],
+                [],
+                []
+              ]
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Benzyl chloride rất ít tan do không tạo được liên kết hydrogen với nước.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Ở điều kiện thường (25°C), cả 3 chất trên tồn tại trạng thái lỏng.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Nhiệt độ sôi của benzyl alcohol lớn hơn nhiệt độ sôi của benzyl chloride là do benzyl alcohol có liên kết hydrogen giữa các phân tử.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Khi đốt cháy cùng lượng benzyl alcohol hoặc o-Cresol đều cần lượng oxygen như nhau và phát sinh lượng nhiệt bằng nhau.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "type": "true_false",
+          "content": [
+            "Một học sinh tiến hành thí nghiệm điện phân 100 mL dung dịch ",
+            {
+              "math": "\\mathrm{CuSO}_4"
+            },
+            " 0,5M, sử dụng bộ dụng cụ được mô tả như hình bên.",
+            {
+              "image": "img_fb5f40842b70.png"
+            },
+            "Cho biết trong thí nghiệm: hiệu điện thế được giữ cố định, đảm bảo nước không bị điện phân ở cả hai điện cực, bỏ qua sự bay hơi của nước trong quá trình điện phân. Cho các phát biểu sau:"
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Giá trị pH của dung dịch sẽ tăng dần trong quá trình điện phân.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": [
+                "Sau một thời gian điện phân nồng độ dung dịch ",
+                {
+                  "math": "\\mathrm{CuSO}_4"
+                },
+                " giảm."
+              ],
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Sau một thời gian điện phân, điện cực Cu (B) có khối lượng tăng lên.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                "Nếu thay 100 mL dung dịch ",
+                {
+                  "math": "\\mathrm{CuSO}_4"
+                },
+                " 0,5M bằng 100 mL dung dịch ",
+                {
+                  "math": "\\mathrm{CuSO}_4"
+                },
+                " có nồng độ nhỏ hơn 0,5M thì tốc độ điện phân sẽ tăng."
+              ],
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "type": "true_false",
+          "content": "Ở nước ta, nước mắm truyền thống được sản xuất thủ công từ cá cơm theo các giai đoạn chính như sau:\n+ Giai đoạn 1: rửa sạch cá cơm rồi trộn cá với muối ăn theo tỉ lệ nhất định.\n+ Giai đoạn 2: ủ hỗn hợp (cá cơm và muối ăn) trong các thùng gỗ, chum, sành từ 6 đến 24 tháng\n+ Giai đoạn 3: thu được nước cốt của mắm (gọi là mắm nhĩ) có hàm lượng đạm rất cao.\n+ Giai đoạn 4: lọc mắm nhĩ, pha chế và đóng chai. Trước đây, người ta thường dùng than củi sạch trong quá trình lọc mắm.",
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Để đánh giá chất lượng của nước mắm, người ta thường dựa vào độ đạm (số gam nitrogen trên 100 mL nước mắm). Khi dùng 100 kg cá cơm (chứa 70% nước, 20% protein và 10% lipid và các chất khác) để làm nước mắm thì thu được 90 lít nước mắm có độ đạm là 20,05. Biết rằng: 1 gam protein chứa trung bình 16% khối lượng nitrogen.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Muối ăn trong giai đoạn 1 giúp bảo quản, ức chế sự phát triển của vi khuẩn gây hư hỏng, tạo điều kiện thuận lợi cho quá trình lên men.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Giai đoạn 2 protein trong cá cơm sẽ bị thủy phân thành các amino acid và các sản phẩm chứa nitrogen khác.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Than củi sạch được sử dụng trong giai đoạn 4 ở quá trình lọc mắm có tác dụng hấp phụ tạp chất, giúp nước mắm trong hơn, sạch hơn; góp phần loại bỏ các mùi không mong muốn, cải thiện chất lượng nước mắm.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "type": "true_false",
+          "content": [
+            "Khi tiến hành thí nghiệm cho mẩu kim loại Na vào cốc ",
+            {
+              "math": "\\mathrm{H}_2\\mathrm{O}"
+            },
+            " (dư) ở nhiệt độ thường có nhỏ thêm vài giọt phenolphthalein."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Trong phản ứng trên sodium đóng vai trò là chất bị khử.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Nước trong cốc từ không màu chuyển sang màu hồng.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                "Phản ứng xảy ra trong thí nghiệm trên là: ",
+                {
+                  "math": "2\\mathrm{Na(s)} + 2\\mathrm{H}_2\\mathrm{O(l)} \\rightarrow 2\\mathrm{NaOH(aq)} + \\mathrm{H}_2\\mathrm{(g)}"
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                "Cho 4,6 gam kim loại Na tác dụng với nước dư, sau phản ứng hoàn toàn thu được tối đa V lít khí ",
+                {
+                  "math": "\\mathrm{H}_2"
+                },
+                " (đkc). Giá trị của V là 2,479 lít."
+              ],
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part-3",
+      "name": "PHẦN III",
+      "description": "PHẦN III. Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 23 đến câu 28.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "short_answer",
+          "content": [
+            "Từ một loại quặng người ta tách ra được hợp chất vô cơ X chỉ có hai nguyên tố là Cu và S. Từ 4,8 gam X có thể tạo ra lượng tối đa là 0,96 gam S. Người ta điều chế chất rắn copper (II) sulfate pentahydrate theo sơ đồ sau:\nX ",
+            {
+              "math": "\\ce{+ O2to}"
+            },
+            " CuO (s) ",
+            {
+              "math": "\\ce{+ ddH2SO4loang}"
+            },
+            " ",
+            {
+              "math": "\\mathrm{CuSO}_4"
+            },
+            " (aq) ",
+            {
+              "math": "kettinh"
+            },
+            " ",
+            {
+              "math": "\\mathrm{CuSO}_4 \\cdot 5\\mathrm{H}_2\\mathrm{O}"
+            },
+            " (S)\nTừ 1,0 tấn nguyên liệu chứa 80% X về khối lượng (còn lại là tạp chất trơ) sẽ điều chế được m kg copper (II) sulfate pentahydrate, biết hiệu suất cả quá trình là 85%. Giá trị của m là bao nhiêu kg ",
+            {
+              "type": "text",
+              "text": "(kết quả làm tròn đến hàng đơn vị",
+              "marks": [
+                "italic"
+              ]
+            },
+            ")?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "short_answer",
+          "content": "Cho các polymer: tinh bột; tơ nitron; tơ tằm; tơ capron; polyethylene; polypropylene; poly(vinyl chloride); nylon-6,6. Trong số các polymer trên, có bao nhiêu polymer tổng hợp?",
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "short_answer",
+          "content": [
+            "Cho các cặp oxi hóa – khử và thế điện cực chuẩn tương ứng như sau:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    {
+                      "type": "text",
+                      "text": "Cặp oxi hóa – khử",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "math": "\\mathrm{Sn}^{2+}/\\mathrm{Sn}"
+                    }
+                  ],
+                  [
+                    {
+                      "math": "\\mathrm{Zn}^{2+}/\\mathrm{Zn}"
+                    }
+                  ],
+                  [
+                    {
+                      "math": "\\mathrm{Cu}^{2+}/\\mathrm{Cu}"
+                    }
+                  ],
+                  [
+                    {
+                      "math": "\\mathrm{Ag}^{+}/\\mathrm{Ag}"
+                    }
+                  ]
+                ],
+                [
+                  [
+                    {
+                      "type": "text",
+                      "text": "Thế điện cực chuẩn (V)",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ]
+                ]
+              ]
+            },
+            "Sức điện động chuẩn lớn nhất của một pin điện hóa tạo thành từ hai trong số các cặp oxi hóa – khử trên là bao nhiêu volt?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "short_answer",
+          "content": "Cho hai hợp chất hữu cơ X, Y đều đơn chức, mạch hở, chứa ba nguyên tố (C, H, O) và đều có tỉ lệ % khối lượng oxi trong phân tử là 53,33%. Biết M_X > M_Y và X, Y đều tan trong nước. Biết nhiệt độ sôi của X và Y lần lượt là 118°C và -19,3°C. Tổng phân tử khối của X và Y là bao nhiêu?",
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "short_answer",
+          "content": [
+            "Xăng E5 là một loại xăng sinh học, được tạo thành khi trộn 5 thể tích ",
+            {
+              "math": "\\mathrm{C}_2\\mathrm{H}_5\\mathrm{OH}"
+            },
+            " (D = 0,8 g/mL) với 95 thể tích xăng truyền thống. Giả sử xăng truyền thống chỉ chứa hai alkane ",
+            {
+              "math": "\\mathrm{C}_8\\mathrm{H}_{18}"
+            },
+            " và ",
+            {
+              "math": "\\mathrm{C}_9\\mathrm{H}_{20}"
+            },
+            " (tỉ lệ mol tương ứng 3: 4, D = 0,7 g/mL). Biết nhiệt lượng tỏa ra khi đốt cháy 1 mol các chất trong xăng E5 như sau:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    {
+                      "type": "text",
+                      "text": "Thành phần xăng E5",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      "math": "\\mathrm{C}_2\\mathrm{H}_5\\mathrm{OH}"
+                    }
+                  ],
+                  [
+                    {
+                      "math": "\\mathrm{C}_8\\mathrm{H}_{18}"
+                    }
+                  ],
+                  [
+                    {
+                      "math": "\\mathrm{C}_9\\mathrm{H}_{20}"
+                    }
+                  ]
+                ],
+                [
+                  [
+                    {
+                      "type": "text",
+                      "text": "Nhiệt tỏa ra (kJ/mol)",
+                      "marks": [
+                        "bold"
+                      ]
+                    }
+                  ]
+                ]
+              ]
+            },
+            "Một người đàn ông ngồi trên chiếc xe máy di chuyển trung bình 10 km trên đường bằng phẳng thì cần một nhiệt lượng chuyển thành công cơ học là 2225 kJ. Biết hiệu suất sử dụng nhiên liệu của động cơ xe máy là 32%. Nếu người đàn ông ngồi trên chiếc xe máy đó di chuyển từ Nha Trang đến Phan Rang – Tháp Chàm theo Quốc lộ 1A (đường bằng phẳng) với quãng đường là 100 km thì hết khoảng bao nhiêu lít xăng (",
+            {
+              "type": "text",
+              "text": "kết quả làm tròn đến hàng phần trăm",
+              "marks": [
+                "italic"
+              ]
+            },
+            ")?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "short_answer",
+          "content": [
+            "Đun nóng một loại dầu thực vật với dung dịch NaOH, sản phẩm thu được có chứa muối sodium oleate (",
+            {
+              "math": "\\mathrm{C}_{17}\\mathrm{H}_{33}\\mathrm{COONa}"
+            },
+            "). Phân tử khối của sodium oleate là bao nhiêu?"
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

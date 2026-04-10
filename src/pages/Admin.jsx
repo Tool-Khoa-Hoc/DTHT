@@ -899,52 +899,108 @@ export default function Admin() {
         throw new Error('Đáp án JSON không hợp lệ. Vui lòng kiểm tra lại cú pháp.');
       }
 
-      const safeExamId = toTrimmedString(editingExam);
-      if (!safeExamId) {
+      const currentExamId = toTrimmedString(editingExam);
+      if (!currentExamId) {
         throw new Error('Thiếu mã đề thi để lưu.');
       }
+      const nextExamId = toTrimmedString(examEditForm.next_exam_id || examEditForm.id || currentExamId);
 
       const subjectFolder = toTrimmedString(examEditForm.subject_folder).toLowerCase();
       if (!subjectFolder) {
         throw new Error('Vui lòng nhập môn học (subject_folder) trước khi lưu.');
       }
 
-      const examPath = toTrimmedString(examEditForm.exam_path || safeExamId);
-      const title = toTrimmedString(examEditForm.title || safeExamId);
+      const examPath = toTrimmedString(examEditForm.exam_path || currentExamId);
+      const title = toTrimmedString(examEditForm.title || currentExamId);
       const durationMinutes = toOptionalPositiveInteger(examEditForm.time);
       const questionCount = toOptionalPositiveInteger(examEditForm.questions);
       const status = toTrimmedString(examEditForm.status || 'ongoing') || 'ongoing';
 
-      const ex = exams.find((item) => item.id.toLowerCase() === safeExamId.toLowerCase());
+      const ex = exams.find((item) => item.id.toLowerCase() === currentExamId.toLowerCase());
       const currentResources = normalizeExamResources(ex?.resources || {});
+      const currentExamPath = toTrimmedString(
+        currentResources.exam_path ||
+        currentResources.examPath ||
+        currentResources.path ||
+        ex?.examPath ||
+        currentExamId,
+      );
+      const currentBundlePath = toTrimmedString(
+        currentResources.bundle_path ||
+        currentResources.bundlePath ||
+        currentExamPath ||
+        currentExamId,
+      );
+      const needsIdentityUpdate = (
+        currentExamId.toLowerCase() !== nextExamId.toLowerCase() ||
+        currentExamPath.toLowerCase() !== examPath.toLowerCase()
+      );
+
+      let identityPayload = null;
+      if (needsIdentityUpdate) {
+        identityPayload = await updateAdminExamIdentity({
+          currentExamId,
+          nextExamId,
+          subjectFolder,
+          examPath,
+          bundlePath: currentBundlePath,
+        });
+      }
+
+      const identityResources = normalizeExamResources(identityPayload?.resources || currentResources);
+      const canonicalBundlePath = toTrimmedString(
+        identityPayload?.bundle_path ||
+        identityResources.bundle_path ||
+        identityResources.bundlePath ||
+        currentBundlePath,
+      );
 
       const nextResources = normalizeExamResources({
-        ...currentResources,
+        ...identityResources,
         title,
         subject_folder: subjectFolder,
         subjectFolder,
         subject: subjectFolder,
         exam_path: examPath,
         examPath,
+        path: examPath,
+        bundle_path: canonicalBundlePath,
+        bundlePath: canonicalBundlePath,
         status,
         time: durationMinutes,
         duration_minutes: durationMinutes,
         questions: questionCount,
         question_count: questionCount,
-        solution_url: examEditForm.solution_url,
-        video_url: examEditForm.video_url,
-        answer_file_url: examEditForm.answer_file_url || currentResources.answer_file_url || examEditForm.solution_url,
-        answer_file_name: examEditForm.answer_file_name || currentResources.answer_file_name || 'Dap an',
+        folder_url: examEditForm.folder_url,
+        lecture_url: examEditForm.lecture_url,
+        document_url: examEditForm.document_url || identityResources.document_url,
+        answer_file_url: examEditForm.answer_file_url || identityResources.answer_file_url,
       });
 
+      if (selectedExamFile) {
+        if (identityResources.document_url) {
+          if (!window.confirm("Đề thi này đã có bản PDF đề bài lưu trong máy chủ. Bạn có CHẮC CHẮN muốn ghi đè bằng file mới không? (File cũ sẽ bị xoá vĩnh viễn)")) {
+            setSavingExam(false);
+            return;
+          }
+        }
+        const uploadDocResult = await uploadExamDocumentFile(nextExamId, subjectFolder, selectedExamFile, identityResources.document_url);
+        nextResources.document_url = uploadDocResult.path;
+      }
+
       if (selectedAnswerFile) {
-        const uploadResult = await uploadExamAnswerFile(safeExamId, selectedAnswerFile);
+        if (identityResources.answer_file_url) {
+          if (!window.confirm("Đề thi này đã có bản PDF đáp án lưu trong máy chủ. Bạn có CHẮC CHẮN muốn ghi đè bằng file mới không? (File cũ sẽ bị xoá vĩnh viễn)")) {
+            setSavingExam(false);
+            return;
+          }
+        }
+        const uploadResult = await uploadExamAnswerFile(nextExamId, selectedAnswerFile, identityResources.answer_file_url);
         nextResources.answer_file_url = uploadResult.publicUrl;
-        nextResources.answer_file_name = uploadResult.fileName || nextResources.answer_file_name || 'Dap an';
       }
 
       await upsertAdminExamKeyBundle({
-        examId: safeExamId,
+        examId: nextExamId,
         answerKey: parsedKey,
         resources: nextResources,
       });
@@ -953,6 +1009,7 @@ export default function Admin() {
       setEditingExam(null);
       setExamEditForm(DEFAULT_EXAM_EDIT_FORM);
       setSelectedAnswerFile(null);
+      setSelectedExamFile(null);
       clearExamIndexCache();
       await fetchExams();
     } catch (err) {

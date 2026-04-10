@@ -158,29 +158,93 @@ def _build_rid_lookup(doc) -> dict[str, str]:
 def _omml_to_latex_text(math_elem) -> str:
     """
     Chuyển đổi phần tử OMML (Office Math) sang LaTeX text.
-    
-    Phương pháp: Best-effort text extraction từ XML.
-    Với môi trường có OMML2MML.XSL, có thể nâng cấp lên chuyển đổi đầy đủ.
+
+    Recursive renderer that understands OMML structural elements:
+    frac, sSup, sSub, sSubSup, rad, d (delimiter), nary, func, etc.
     """
-    # Thu thập tất cả text trong OMML element
-    texts = []
-    for elem in math_elem.iter():
-        ns = elem.tag.split("}")[0].lstrip("{") if "}" in elem.tag else ""
-        local = elem.tag.split("}")[-1]
-        
-        # Lấy text từ các phần tử chứa nội dung toán
-        if local in ("r", "t") and elem.text:
-            texts.append(elem.text.strip())
-    
-    raw = " ".join(t for t in texts if t)
-    
-    # Nếu chuỗi trống, thử đọc toàn bộ text
-    if not raw:
-        raw = "".join(math_elem.itertext()).strip()
-    
-    # Escape cơ bản để đưa vào tag [math:...]
-    raw = raw.replace("\n", " ").replace("  ", " ")
-    return raw
+    M_NS = "http://schemas.openxmlformats.org/officeDocument/2006/math"
+
+    def _local(tag: str) -> str:
+        return tag.rsplit("}", 1)[1] if "}" in tag else tag
+
+    def _find_child(node, name: str):
+        for child in list(node):
+            if _local(child.tag) == name:
+                return child
+        return None
+
+    def _node_val(node) -> str:
+        if node is None:
+            return ""
+        return (node.get(f"{{{M_NS}}}val") or node.get("val") or node.get("m:val") or "").strip()
+
+    def _wrap_base(base: str) -> str:
+        c = base.strip()
+        if not c:
+            return ""
+        if len(c) == 1 or c.startswith("\\"):
+            return c
+        return f"{{{c}}}"
+
+    def render(elem) -> str:
+        if elem is None:
+            return ""
+        name = _local(elem.tag)
+        if name == "t":
+            return elem.text or ""
+        if name in {"oMath", "oMathPara", "r", "e", "num", "den", "sub", "sup", "deg", "sPre", "sSubSupPr"}:
+            return "".join(render(child) for child in list(elem))
+        if name == "f":
+            num = render(_find_child(elem, "num"))
+            den = render(_find_child(elem, "den"))
+            return f"\\frac{{{num}}}{{{den}}}"
+        if name == "sSup":
+            base = render(_find_child(elem, "e"))
+            s = render(_find_child(elem, "sup"))
+            return f"{_wrap_base(base)}^{{{s}}}"
+        if name == "sSub":
+            base = render(_find_child(elem, "e"))
+            s = render(_find_child(elem, "sub"))
+            return f"{_wrap_base(base)}_{{{s}}}"
+        if name == "sSubSup":
+            base = render(_find_child(elem, "e"))
+            sub = render(_find_child(elem, "sub"))
+            sup = render(_find_child(elem, "sup"))
+            return f"{_wrap_base(base)}_{{{sub}}}^{{{sup}}}"
+        if name == "rad":
+            base = render(_find_child(elem, "e"))
+            deg = render(_find_child(elem, "deg"))
+            if deg:
+                return f"\\sqrt[{deg}]{{{base}}}"
+            return f"\\sqrt{{{base}}}"
+        if name == "d":
+            dpr = _find_child(elem, "dPr")
+            beg = _node_val(_find_child(dpr, "begChr")) or "("
+            end = _node_val(_find_child(dpr, "endChr")) or ")"
+            body = render(_find_child(elem, "e"))
+            return f"\\left{beg}{body}\\right{end}"
+        if name == "nary":
+            nary_pr = _find_child(elem, "naryPr")
+            op = _node_val(_find_child(nary_pr, "chr")) or "\\sum"
+            op_map = {"∑": "\\sum", "∏": "\\prod", "∫": "\\int"}
+            op_latex = op_map.get(op, op)
+            sub = render(_find_child(elem, "sub"))
+            sup = render(_find_child(elem, "sup"))
+            body = render(_find_child(elem, "e"))
+            if sub or sup:
+                return f"{op_latex}_{{{sub}}}^{{{sup}}} {body}".strip()
+            return f"{op_latex} {body}".strip()
+        if name == "func":
+            fname = render(_find_child(elem, "fName"))
+            farg = render(_find_child(elem, "e"))
+            return f"{fname}{farg}"
+        if name == "fName":
+            return "".join(render(child) for child in list(elem))
+        return "".join(render(child) for child in list(elem))
+
+    import re
+    latex = re.sub(r"\s+", " ", render(math_elem)).strip()
+    return latex or "\\text{}"
 
 
 def _is_enabled_toggle(elem) -> bool:

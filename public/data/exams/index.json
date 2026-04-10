@@ -1,5 +1,53 @@
 [
   {
+    "id": "ky-thi-thu-tot-nghiep-thpt-quoc-gia-nam-hoc-2025-2026",
+    "title": "KỲ THI THỬ TỐT NGHIỆP THPT QUỐC GIA NĂM HỌC 2025 – 2026",
+    "subject": "hoa",
+    "subjectFolder": "hoa",
+    "examPath": "38-thpt-le-quy-on-lan-1-ho-chi-minh",
+    "time": 50,
+    "color": "from-slate-500 to-slate-600",
+    "icon": "quiz",
+    "questions": 28,
+    "updated_at": 1775204825.2176754
+  },
+  {
+    "id": "39-lien-truong-nghe-an-2-lan-2-m-42-2026",
+    "title": "39 - LIÊN TRƯỜNG NGHỆ AN 2 (LẦN 2) - MĐ42 - 2026",
+    "subject": "hoa",
+    "subjectFolder": "hoa",
+    "examPath": "39-lien-truong-nghe-an-2-lan-2-m-42-2026",
+    "time": 50,
+    "color": "from-slate-500 to-slate-600",
+    "icon": "quiz",
+    "questions": 28,
+    "updated_at": 1775204947.194123
+  },
+  {
+    "id": "ky-thi-thu-tn-thpt-lan-ii-nam-hoc-2025-2026",
+    "title": "KỲ THI THỬ TN THPT LẦN II, NĂM HỌC 2025 – 2026",
+    "subject": "hoa",
+    "subjectFolder": "hoa",
+    "examPath": "40-cum-13-truong-hai-phong-lan-2",
+    "time": 50,
+    "color": "from-slate-500 to-slate-600",
+    "icon": "quiz",
+    "questions": 28,
+    "updated_at": 1775204013.5671468
+  },
+  {
+    "id": "43-so-ha-noi-thi-thu-tot-nghiep-thpt-2026-mon-hoa-hoc",
+    "title": "43. SỞ HÀ NỘI - [Thi thử Tốt Nghiệp THPT 2026 - Môn Hóa Học ]",
+    "subject": "hoa",
+    "subjectFolder": "hoa",
+    "examPath": "43-so-ha-noi-thi-thu-tot-nghiep-thpt-2026-mon-hoa-hoc",
+    "time": 50,
+    "color": "from-slate-500 to-slate-600",
+    "icon": "quiz",
+    "questions": 12,
+    "updated_at": 1775204534.358127
+  },
+  {
     "id": "cum-bac-ninh-lan-1-thi-thu-tot-nghiep-thpt-2026-mon-vat-ly",
     "title": "Cụm Bắc Ninh - Lần 1",
     "subject": "ly",
@@ -9,7 +57,7 @@
     "color": "from-slate-500 to-slate-600",
     "icon": "quiz",
     "questions": 28,
-    "updated_at": 1775088667.816748
+    "updated_at": 1775614401.5896475
   },
   {
     "id": "2-e-que-vo-1-lan-1-thi-thu-tot-nghiep-thpt-2026-mon-vat-ly",
@@ -69,7 +117,7 @@
     "color": "from-slate-500 to-slate-600",
     "icon": "quiz",
     "questions": 28,
-    "updated_at": 1775089434.113245
+    "updated_at": 1775091269.5657585
   },
   {
     "id": "01-lien-truong-thpt-so-bac-ninh-kscl-l1-2026",
@@ -205,7 +253,7 @@
   },
   {
     "id": "han-thuyen",
-    "title": "Đề thi thử tốt nghiệp THPT lần 1 năm học 2025-2026 Trường THPT Hàn Thuyên - Sinh học",
+    "title": "Đề thi thử tốt nghiệp THPT năm học 2025-2026 Thành phố Huế - Sinh học",
     "subject": "sinh",
     "subjectFolder": "sinh",
     "examPath": "han-thuyen",
@@ -213,7 +261,7 @@
     "color": "from-green-500 to-lime-600",
     "icon": "biotech",
     "questions": 28,
-    "updated_at": 1774741543.7404065
+    "updated_at": 1775777348.23538
   },
   {
     "id": "bac-ninh-2026-lan-1",

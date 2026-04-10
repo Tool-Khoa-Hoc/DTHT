@@ -1,0 +1,1235 @@
+{
+  "id": "ky-thi-thu-tot-nghiep-thpt-quoc-gia-nam-hoc-2025-2026",
+  "title": "KỲ THI THỬ TỐT NGHIỆP THPT QUỐC GIA NĂM HỌC 2025 – 2026",
+  "subject": "hoa",
+  "time": 50,
+  "description": "SỞ GD&ĐT NGHỆ AN\nCHUYÊN ĐH VINH (LẦN 1)\n(Đề thi có __ trang) | KỲ THI THỬ TỐT NGHIỆP THPT QUỐC GIA\nNĂM HỌC 2025 – 2026\nMôn thi: HÓA HỌC\nThời gian làm bài: 50 phút (không kể thời gian phát đề)",
+  "parts": [
+    {
+      "id": "part-1",
+      "name": "PHẦN I",
+      "description": "Câu trắc nghiệm nhiều phương án lựa chọn. Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.",
+      "questions": [
+        {
+          "id": "1",
+          "type": "single_choice",
+          "content": "Alanine là một chất bổ sung hiệu quả cho việc tăng hiệu suất trong tập luyện thể hình, thể thao, giúp tăng sức mạnh, sức bền, giảm cảm giác mệt mỏi,… Cho 4,45 gam alanine tác dụng vừa đủ với dung dịch NaOH, thu được m gam muối. Phát biểu nào sau đây sai?",
+          "points": 0.25,
+          "options": [
+            "Số nguyên tử hydrogen trong phân tử alanine bằng 9.",
+            "Alanine có tính lưỡng tính.",
+            "Trong dung dịch, alanine chủ yếu tồn tại ở dạng ion lưỡng cực.",
+            "Giá trị của m bằng 5,55."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "2",
+          "type": "single_choice",
+          "content": [
+            "Pin điện hoá Ni-Ag được ứng dụng chủ yếu trong giáo dục, nghiên cứu ăn mòn, mạ bạc và điện hoá học. Trong pin Ni-Ag ở điều kiện chuẩn, phản ứng hoá học xảy ra giữa hai dạng nào của các cặp oxi hoá – khử tương ứng Ni",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "/Ni và Ag",
+            {
+              "type": "text",
+              "text": "+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "/Ag?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Ni và Ag.",
+            [
+              "Ni",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              " và Ag."
+            ],
+            [
+              "Ni và Ag",
+              {
+                "type": "text",
+                "text": "+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ],
+            [
+              "Ni",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              " và Ag",
+              {
+                "type": "text",
+                "text": "+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "3",
+          "type": "single_choice",
+          "content": [
+            "Cho các cặp oxi hoá – khử và thế điện cực chuẩn tương ứng :",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Cặp oxi hoá – khử"
+                  ],
+                  [
+                    "Mg",
+                    {
+                      "type": "text",
+                      "text": "2+",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    "/Mg"
+                  ],
+                  [
+                    "Pb",
+                    {
+                      "type": "text",
+                      "text": "2+",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    "/Pb"
+                  ],
+                  [
+                    "Cu",
+                    {
+                      "type": "text",
+                      "text": "2+",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    "/Cu"
+                  ],
+                  [
+                    "Fe",
+                    {
+                      "type": "text",
+                      "text": "3+",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    "/Fe",
+                    {
+                      "type": "text",
+                      "text": "2+",
+                      "marks": [
+                        "sup"
+                      ]
+                    }
+                  ]
+                ],
+                [
+                  [
+                    "Thế điện cực chuẩn, V"
+                  ],
+                  [
+                    "-2,356"
+                  ],
+                  [
+                    "-0,126"
+                  ],
+                  [
+                    "+0,340"
+                  ],
+                  [
+                    "+0,771"
+                  ]
+                ]
+              ]
+            },
+            "Trong số các ion kim loại trên, ion có tính oxi hoá mạnh nhất ở điều kiện chuẩn là :"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Pb",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ],
+            [
+              "Mg",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ],
+            [
+              "Fe",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ],
+            [
+              "Fe",
+              {
+                "type": "text",
+                "text": "3+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "4",
+          "type": "single_choice",
+          "content": [
+            "Trong các phản ứng hữu cơ thường có sự tạo thành các tiểu phân trung gian hoạt động như gốc tự do, carbanion, carbocation. Carbanion là ion mang điện tích âm trên nguyên tử carbon. Trong các tiểu phân sau đây :",
+            {
+              "image": "img_b239c95139bb.png"
+            },
+            "có bao nhiêu tiểu phân là carbanion?"
+          ],
+          "points": 0.25,
+          "options": [
+            "2.",
+            "1.",
+            "3.",
+            "4."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "5",
+          "type": "single_choice",
+          "content": [
+            "Ở nhiệt độ thường, kim loại nào sau đây không phản ứng hoá học với dung dịch ",
+            {
+              "math": "\\mathrm{H}_2\\mathrm{SO}_4"
+            },
+            " loãng?"
+          ],
+          "points": 0.25,
+          "options": [
+            "Cu.",
+            "Mg.",
+            "Zn.",
+            "Ba."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "6",
+          "type": "single_choice",
+          "content": [
+            "Khi cho ",
+            {
+              "math": "\\mathrm{NH}_3"
+            },
+            " tác dụng với ",
+            {
+              "math": "\\mathrm{H}_2\\mathrm{SO}_4"
+            },
+            " theo tỉ lệ mol n",
+            {
+              "math": "\\mathrm{NH}_3"
+            },
+            " : n",
+            {
+              "math": "\\mathrm{H}_2\\mathrm{SO}_4"
+            },
+            " = 2 : 1 thì thu được chất nào sau đây?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "(\\mathrm{NH}_4)_2\\mathrm{S}"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "(\\mathrm{NH}_4)_2\\mathrm{SO}_4"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "(\\mathrm{NH}_4)_2\\mathrm{SO}_3"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "\\mathrm{NH}_4\\mathrm{HSO}_3"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "7",
+          "type": "single_choice",
+          "content": "Chất nào sau đây có đồng phân hình học?",
+          "points": 0.25,
+          "options": [
+            "But-2-yne.",
+            "But-2-ene.",
+            "Butane.",
+            "Methylpropene."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "8",
+          "type": "single_choice",
+          "content": [
+            "Tên gọi theo danh pháp thay thế của chất có công thức cấu tạo ",
+            {
+              "math": "\\mathrm{CH}_3\\mathrm{CH}_2\\mathrm{CH}_2\\mathrm{NHCH}_3"
+            },
+            " là :"
+          ],
+          "points": 0.25,
+          "options": [
+            "methylpropylamine.",
+            "N-methylpropan-2-amine.",
+            "N-methylpropan-1-amine.",
+            "N-methylpropan-3-amine."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "9",
+          "type": "single_choice",
+          "content": "Chất nào sau đây thuộc loại disaccharide?",
+          "points": 0.25,
+          "options": [
+            "Cellulose.",
+            "Saccharose.",
+            "Fructose.",
+            "Glucose."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "10",
+          "type": "single_choice",
+          "content": [
+            "Cho các phát biểu về tính chất của trimethylamine :",
+            "(a) Dùng giấm ăn có thể khử được mùi tanh của cá do trimethylamine gây ra.",
+            "(b) Dung dịch trimethylamine làm giấy quỳ tím hoá xanh.",
+            "(c) Trimethylamine không phản ứng được với NaOH trong dung dịch.",
+            "(d) Trimethylamine là chất khí ở điều kiện thường.",
+            "Số phát biểu đúng là :"
+          ],
+          "points": 0.25,
+          "options": [
+            "3.",
+            "4.",
+            "2.",
+            "1."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "11",
+          "type": "single_choice",
+          "content": "Cho but-1-ene tác dụng với hydrogen chloride thu được sản phẩm chính là",
+          "points": 0.25,
+          "options": [
+            "1,4-dichlorobutane.",
+            "1-chlorobutane.",
+            "1,3-dichlorobutane.",
+            "2-chlorobutane."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "12",
+          "type": "single_choice",
+          "content": "Butyl acetate được dùng rất phổ biến làm dung môi; ngoài ra, chất này có mùi trái cây dễ chịu nên được ứng dụng làm hương liệu trong mỹ phẩm và nước hoa. Công thức của butyl acetate là",
+          "points": 0.25,
+          "options": [
+            [
+              {
+                "math": "\\mathrm{CH}_3\\mathrm{COOCH}_2\\mathrm{CH}(\\mathrm{CH}_3)_2"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "\\mathrm{C}_2\\mathrm{H}_5\\mathrm{COOCH}_2\\mathrm{CH}_2\\mathrm{CH}_2\\mathrm{CH}_3"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "\\mathrm{CH}_3\\mathrm{CH}_2\\mathrm{CH}_2\\mathrm{COOCH}_2\\mathrm{CH}_3"
+              },
+              "."
+            ],
+            [
+              {
+                "math": "\\mathrm{CH}_3\\mathrm{COOCH}_2\\mathrm{CH}_2\\mathrm{CH}_2\\mathrm{CH}_3"
+              },
+              "."
+            ]
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "13",
+          "type": "single_choice",
+          "content": [
+            "Hiện tượng xảy ra khi nhỏ dung dịch ",
+            {
+              "math": "\\mathrm{BaCl}_2"
+            },
+            " vào ống nghiệm đựng dung dịch ",
+            {
+              "math": "\\mathrm{Na}_2\\mathrm{SO}_4"
+            },
+            " là"
+          ],
+          "points": 0.25,
+          "options": [
+            "có sủi bọt khí không màu, không mùi thoát ra.",
+            "có kết tủa màu trắng xuất hiện.",
+            "có kết tủa màu xanh xuất hiện.",
+            "có sủi bọt khí không màu, mùi hắc thoát ra."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "14",
+          "type": "single_choice",
+          "content": "Sulfur được dùng để sản xuất sulfuric acid, phân bón, thuốc trừ sâu, lưu hoá cao su, diêm, dược phẩm và là nguyên tố cần thiết cho cơ thể sinh vật. Nguyên tử của nguyên tố sulfur có 16 electron. Ở trạng thái cơ bản, sulfur có số orbital chứa electron là",
+          "points": 0.25,
+          "options": [
+            "10.",
+            "6.",
+            "9.",
+            "8."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "15",
+          "type": "single_choice",
+          "content": "Cho dãy các chất: methane, ethylene, acetylene, benzene, ethyl alcohol, phenol, acetaldehyde, fructose, saccharose, aniline. Số chất trong dãy làm mất màu nước bromine là",
+          "points": 0.25,
+          "options": [
+            "3.",
+            "2.",
+            "5.",
+            "4."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "16",
+          "type": "single_choice",
+          "content": [
+            {
+              "math": "\\mathrm{NaHCO}_3"
+            },
+            " được dùng làm bột nở vì khi đun nóng, chất này bị nhiệt phân, giải phóng khí ",
+            {
+              "math": "\\mathrm{CO}_2"
+            },
+            " làm bánh nở xốp.",
+            {
+              "math": "2\\mathrm{NaHCO}_3(\\mathrm{s}) \\xrightarrow{t^{\\circ}} \\mathrm{Na}_2\\mathrm{CO}_3(\\mathrm{s}) + \\mathrm{CO}_2(\\mathrm{g}) + \\mathrm{H}_2\\mathrm{O}(\\mathrm{g}) \\quad \\Delta_{r}H_{298}^{0} = 129,2 \\text{ kJ}"
+            },
+            "Biết nhiệt tạo thành chuẩn của ",
+            {
+              "math": "\\mathrm{Na}_2\\mathrm{CO}_3(\\mathrm{s})"
+            },
+            ", ",
+            {
+              "math": "\\mathrm{CO}_2(\\mathrm{g})"
+            },
+            " và ",
+            {
+              "math": "\\mathrm{H}_2\\mathrm{O}(\\mathrm{g})"
+            },
+            " lần lượt là -1130,9 kJ/mol, -393,5 kJ/mol, -241,8 kJ/mol. Nhiệt tạo thành chuẩn của ",
+            {
+              "math": "\\mathrm{NaHCO}_3(\\mathrm{s})"
+            },
+            " là"
+          ],
+          "points": 0.25,
+          "options": [
+            "-947,7 kJ/mol.",
+            "-1637,0 kJ/mol.",
+            "-818,5 kJ/mol.",
+            "-1895,4 kJ/mol."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "17",
+          "type": "single_choice",
+          "content": [
+            "Hợp chất hữu cơ M có chứa carbon, hydrogen và oxygen. Thành phần phần trăm khối lượng của nguyên tố carbon, hydrogen lần lượt là 66,67% và 11,11%. Từ phổ khối lượng của M xác định được giá trị m/z của peak ion phân tử [M",
+            {
+              "type": "text",
+              "text": "+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "] bằng 72. Chất M có phản ứng tạo iodoform nhưng không có phản ứng với kim loại Na. Số công thức cấu tạo thoả mãn các điều kiện trên của M là"
+          ],
+          "points": 0.25,
+          "options": [
+            "2.",
+            "3.",
+            "4.",
+            "1."
+          ],
+          "correct_answer": null
+        },
+        {
+          "id": "18",
+          "type": "single_choice",
+          "content": [
+            "Cho phản ứng hoá học: Zn(s) + Ni",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "(aq) → Zn",
+            {
+              "type": "text",
+              "text": "2+",
+              "marks": [
+                "sup"
+              ]
+            },
+            "(aq) + Ni(s). Phát biểu nào sau đây về phản ứng trên là đúng?"
+          ],
+          "points": 0.25,
+          "options": [
+            [
+              "Ni",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              " oxi hoá Zn thành Zn",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ],
+            "Ni có tính khử mạnh hơn Zn.",
+            [
+              "Ni",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              " có tính oxi hoá yếu hơn Zn",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              "."
+            ],
+            [
+              "Ni",
+              {
+                "type": "text",
+                "text": "2+",
+                "marks": [
+                  "sup"
+                ]
+              },
+              " là chất khử, Zn là chất oxi hoá."
+            ]
+          ],
+          "correct_answer": null
+        }
+      ]
+    },
+    {
+      "id": "part-2",
+      "name": "PHẦN II",
+      "description": "Câu trắc nghiệm đúng sai. Thí sinh trả lời từ câu 19 đến câu 22. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+      "questions": [
+        {
+          "id": "19",
+          "type": "true_false",
+          "content": [
+            "Trong phòng thí nghiệm, benzyl hexanoate (có mùi hoa nhài) được điều chế theo phương trình hoá học sau:",
+            {
+              "math": "\\mathrm{CH}_3(\\mathrm{CH}_2)_4\\mathrm{COOH} + \\mathrm{C}_6\\mathrm{H}_5\\mathrm{CH}_2\\mathrm{OH}"
+            },
+            {
+              "image": "img_8998f05ae1aa.png"
+            },
+            {
+              "math": "\\mathrm{CH}_3(\\mathrm{CH}_2)_4\\mathrm{COOCH}_2\\mathrm{C}_6\\mathrm{H}_5 + \\mathrm{H}_2\\mathrm{O}"
+            },
+            "Trong một thí nghiệm tổng hợp benzyl heaxanoate theo phản ứng trên, từ 16,2 gam benzyl alcohol và 23,2 gam hexanoic acid, với hiệu suất phản ứng là h% thu được 18,54 gam benzyl heaxanoate. Biết ",
+            {
+              "math": "\\mathrm{H}_2\\mathrm{SO}_4"
+            },
+            " đặc được dùng làm chất xúc tác. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của benzyl hexanoate, hexanoic acid và benzyl alcohol. Cho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như sau:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Liên kết"
+                  ],
+                  [
+                    "O-H (alcohol)"
+                  ],
+                  [
+                    "O-H (carboxylic acid)"
+                  ],
+                  [
+                    "C=O (ester, carboxylic acid)"
+                  ]
+                ],
+                [
+                  [
+                    "Số sóng (cm",
+                    {
+                      "type": "text",
+                      "text": "-1",
+                      "marks": [
+                        "sup"
+                      ]
+                    },
+                    ")"
+                  ],
+                  [
+                    "3650 - 3200"
+                  ],
+                  [
+                    "3300 - 2500"
+                  ],
+                  [
+                    "1780 - 1650"
+                  ]
+                ]
+              ]
+            }
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                "Trên phổ hồng ngoại của hexanoic acid, tín hiệu (peak) ở 1721cm",
+                {
+                  "type": "text",
+                  "text": "-1",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                " đặc trưng cho liên kết O-H."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Giá trị của h là 75.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Trong phản ứng ester hoá ở trên, benzyl alcohol đóng vai trò là một acid theo thuyết Brønsted–Lowry.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Trong phản ứng ester hoá ở trên, hexanoic acid đóng vai trò là chất oxi hoá.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "20",
+          "type": "true_false",
+          "content": [
+            "Cho các pin điện hoá và sức điện động chuẩn tương ứng:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Pin điện hoá"
+                  ],
+                  [
+                    "Cd – Ni"
+                  ],
+                  [
+                    "Zn – Ag"
+                  ],
+                  [
+                    "Zn – Ni"
+                  ]
+                ],
+                [
+                  [
+                    "Sức điện động chuẩn (V)"
+                  ],
+                  [
+                    "0,146"
+                  ],
+                  [
+                    "1,561"
+                  ],
+                  [
+                    "0,505"
+                  ]
+                ]
+              ]
+            },
+            "Cho biết: Điện lượng mà pin đã cung cấp: q = n",
+            {
+              "type": "text",
+              "text": "e",
+              "marks": [
+                "sub"
+              ]
+            },
+            ".F, trong đó: q là điện lượng (C hay As), n",
+            {
+              "type": "text",
+              "text": "e",
+              "marks": [
+                "sub"
+              ]
+            },
+            " là số mol electron đi qua dây dẫn."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "Sức điện động chuẩn của pin Cd – Ag là 1,202 V.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Trong pin Zn – Ni, khối lượng Zn cần sử dụng để pin cung cấp một điện lượng bằng 6948 mAh là 16,848 gam (giả thiết hiệu suất các quá trình đều bằng 100%).",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Trong pin Cd – Ni và pin Zn – Ni thì thanh nickel đều là cathode và xảy ra quá trình oxi hoá kim loại Ni.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": [
+                "Trong pin Zn – Ag, ở anode xảy ra quá trình khử ion Ag",
+                {
+                  "type": "text",
+                  "text": "+",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                "."
+              ],
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "21",
+          "type": "true_false",
+          "content": [
+            "Trong công nghiệp, người ta điều chế poly(vinyl chloride) (PVC) từ ethylene (thu được từ dầu mỏ) theo sơ đồ sau: Ethylene → 1,2-dichloroethane → vinyl chloride → PVC. Từ 74,37 m",
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            " khí ethylene (ở đkc), với hiệu suất của toàn bộ quá trình là 36,4% thu được a kg PVC."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": "PVC được tổng hợp từ vinyl chloride bằng phản ứng trùng ngưng.",
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "PVC có tính cách điện nên được dùng làm vỏ bọc dây điện.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": "Trong mỗi mắt xích của PVC, phần trăm khối lượng carbon là 38,4%.",
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Giá trị của a là 187,5.",
+              "correct": null
+            }
+          ]
+        },
+        {
+          "id": "22",
+          "type": "true_false",
+          "content": [
+            "Để mạ kẽm cho một bu lông sắt hình trụ với độ dày và diện tích lớp mạ lần lượt là 0,02 mm và 15,95 cm",
+            {
+              "type": "text",
+              "text": "2",
+              "marks": [
+                "sup"
+              ]
+            },
+            ", người ta tiến hành điện phân dung dịch ",
+            {
+              "math": "\\mathrm{ZnSO}_4"
+            },
+            " (điện cực âm là chiếc bu lông sắt và điện cực dương là lá kẽm (zinc) thô, hiệu suất điện phân 100%) với cường độ dòng điện 2 A không đổi. Khi kết thúc điện phân (quá trình mạ hoàn thành) thì hết t giây. Cho biết:",
+            "- Khối lượng riêng của kim loại Zn là 7,13 g/cm",
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            " và giả thiết toàn bộ lượng kim loại Zn sinh ra đều bám hết vào bu lông sắt, nước không bị điện phân ở cả hai điện cực.",
+            "- Điện lượng: q = I.t = n",
+            {
+              "type": "text",
+              "text": "e",
+              "marks": [
+                "sub"
+              ]
+            },
+            ".F, trong đó: q là điện lượng (C), n",
+            {
+              "type": "text",
+              "text": "e",
+              "marks": [
+                "sub"
+              ]
+            },
+            " là số mol electron đi qua dây dẫn, I là cường độ dòng điện (A), t là thời gian điện phân (giây)."
+          ],
+          "points": [
+            0.1,
+            0.25,
+            0.5,
+            1.0
+          ],
+          "statements": [
+            {
+              "id": "a",
+              "content": [
+                "Chiếc bu lông sắt đóng vai trò là anode và tại điện cực này xảy ra quá trình khử ion Zn",
+                {
+                  "type": "text",
+                  "text": "2+",
+                  "marks": [
+                    "sup"
+                  ]
+                },
+                "."
+              ],
+              "correct": null
+            },
+            {
+              "id": "b",
+              "content": "Lá kẽm thô đóng vai trò là cathode và tại điện cực này xảy ra quá trình oxi hoá kim loại Zn.",
+              "correct": null
+            },
+            {
+              "id": "c",
+              "content": [
+                "Lượng ",
+                {
+                  "math": "\\mathrm{ZnSO}_4"
+                },
+                " trong dung dịch không đổi trong quá trình điện phân."
+              ],
+              "correct": null
+            },
+            {
+              "id": "d",
+              "content": "Giá trị của t là 675.",
+              "correct": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "part-3",
+      "name": "PHẦN III",
+      "description": "Câu trắc nghiệm trả lời ngắn. Thí sinh trả lời từ câu 23 đến câu 28.",
+      "questions": [
+        {
+          "id": "23",
+          "type": "short_answer",
+          "content": [
+            "Để hàn hai miếng kim loại, người ta có thể sử dụng phương pháp hàn nhiệt nhôm. Trong phương pháp hàn này, hỗn hợp gồm bột oxide kim loại và bột nhôm được đốt cháy để xảy ra phản ứng (phản ứng nhiệt nhôm). Phản ứng này tỏa nhiệt rất lớn, sinh ra kim loại ở trạng thái nóng chảy và aluminium oxide (",
+            {
+              "math": "\\mathrm{Al}_2\\mathrm{O}_3"
+            },
+            "). Kim loại nóng chảy sẽ lấp đầy khe hàn. Phản ứng nhiệt nhôm thường được dùng để hàn hai miếng đồng hoặc hai miếng gang, thép (có thành phần chính là sắt). Để hàn một vết nứt trên ống dẫn bằng đồng có thể tích 15,0 cm",
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            ", người ta dùng 347,5 gam hỗn hợp Y gồm Al và CuO với tỉ lệ mol tương ứng 5 : 7. Giả thiết chỉ xảy ra phản ứng nhiệt nhôm với hiệu suất b% như sau:",
+            {
+              "math": "2\\mathrm{Al}(\\mathrm{s}) + 3\\mathrm{CuO}(\\mathrm{s}) \\xrightarrow{t^{\\circ}} \\mathrm{Al}_2\\mathrm{O}_3(\\mathrm{s}) + 3\\mathrm{Cu}(\\mathrm{l})"
+            },
+            "Biết lượng Cu cần hàn cho vết nứt (lấp đầy vết nứt) bằng 80% lượng Cu sinh ra từ phản ứng nhiệt nhôm trên và khối lượng riêng của đồng là 8,96 g/cm",
+            {
+              "type": "text",
+              "text": "3",
+              "marks": [
+                "sup"
+              ]
+            },
+            ". Giá trị của b bằng bao nhiêu? (Không làm tròn kết quả các phép tính trung gian, chỉ làm tròn kết quả cuối cùng đến hàng đơn vị)."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "24",
+          "type": "short_answer",
+          "content": "Thủy phân hoàn toàn p gam tetrapeptide mạch hở Gly-Ala-Val-Ala bằng dung dịch NaOH vừa đủ, thu được dung dịch Z. Cô cạn toàn bộ dung dịch Z thu được 22,9 gam muối khan. Xác định giá trị của p. (Không làm tròn kết quả các phép tính trung gian, chỉ làm tròn kết quả cuối cùng đến hàng phần mười).",
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "25",
+          "type": "short_answer",
+          "content": "Thủy phân hoàn toàn triglyceride T trong dung dịch NaOH, thu được glycerol, sodium stearate, sodium oleate (tỉ lệ mol n sodium stearate : n sodium oleate = 1 : 2). Xác định phân tử khối của triglyceride T.",
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "26",
+          "type": "short_answer",
+          "content": [
+            "Zinc sulfate (",
+            {
+              "math": "\\mathrm{ZnSO}_4"
+            },
+            ") được dùng làm phân vi lượng bổ sung kẽm cho cây trồng, mạ kẽm, sản xuất dược phẩm, nhuộm – in vải, xử lí nước thải công nghiệp. Trong công nghiệp, zinc sulfate được sản xuất từ zinc(II) sulfide theo sơ đồ sau: ZnS(s) → ZnO(s) → ",
+            {
+              "math": "\\mathrm{ZnSO}_4(\\mathrm{aq})"
+            },
+            "Từ 19,4 tấn quặng zinc blende (chứa 60% zinc sulfide về khối lượng, còn lại là các chất không chứa zinc), với hiệu suất của toàn bộ quá trình là 65,25% thu được x tấn dung dịch ",
+            {
+              "math": "\\mathrm{ZnSO}_4"
+            },
+            " 5% (dùng làm thuốc sát trùng). Xác định giá trị của x. (Không làm tròn kết quả các phép tính trung gian, chỉ làm tròn kết quả cuối cùng đến hàng đơn vị)."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "27",
+          "type": "short_answer",
+          "content": [
+            "Khí thiên nhiên được sử dụng làm nhiên liệu để thắp sáng, đun nấu, chạy máy phát điện,… Một loại khí thiên nhiên X (đã qua xử lí để loại bỏ một số khí vô cơ như nitrogen, carbon dioxide, hydrogen sulfide, hydrogen,…) có thành phần phần trăm về thể tích các khí như sau: 90% methane, 5% ethane, 4% propane và 1% butane. Giả thiết, khi đốt cháy hoàn toàn X ở điều kiện chuẩn chỉ xảy ra các phản ứng hoá học sau:",
+            "(1) ",
+            {
+              "math": "\\mathrm{CH}_4(\\mathrm{g}) + 2\\mathrm{O}_2(\\mathrm{g}) \\xrightarrow{t^{\\circ}} \\mathrm{CO}_2(\\mathrm{g}) + 2\\mathrm{H}_2\\mathrm{O}(\\mathrm{l})"
+            },
+            "(2) ",
+            {
+              "math": "2\\mathrm{C}_2\\mathrm{H}_6(\\mathrm{g}) + 7\\mathrm{O}_2(\\mathrm{g}) \\xrightarrow{t^{\\circ}} 4\\mathrm{CO}_2(\\mathrm{g}) + 6\\mathrm{H}_2\\mathrm{O}(\\mathrm{l})"
+            },
+            "(3) ",
+            {
+              "math": "\\mathrm{C}_3\\mathrm{H}_8(\\mathrm{g}) + 5\\mathrm{O}_2(\\mathrm{g}) \\xrightarrow{t^{\\circ}} 3\\mathrm{CO}_2(\\mathrm{g}) + 4\\mathrm{H}_2\\mathrm{O}(\\mathrm{l})"
+            },
+            "(4) ",
+            {
+              "math": "2\\mathrm{C}_4\\mathrm{H}_{10}(\\mathrm{g}) + 13\\mathrm{O}_2(\\mathrm{g}) \\xrightarrow{t^{\\circ}} 8\\mathrm{CO}_2(\\mathrm{g}) + 10\\mathrm{H}_2\\mathrm{O}(\\mathrm{l})"
+            },
+            "Một nhà máy nhiệt điện có công suất 2400 kW (không đổi trong quá trình hoạt động), sử dụng khí thiên nhiên X làm nhiên liệu. Sau z ngày thì nhà máy nhiệt điện trên tiêu thụ hết (đốt cháy hoàn toàn) 364,8 tấn khí thiên nhiên X ở điều kiện chuẩn. Xác định giá trị của z. (Không làm tròn kết quả các phép tính trung gian, chỉ làm tròn kết quả cuối cùng đến hàng đơn vị).",
+            "Cho biết: Có 25% nhiệt lượng tỏa ra khi đốt cháy hoàn toàn khí thiên nhiên X chuyển hóa thành điện năng và 1 kW = 1 kJ/s; nhiệt tạo thành chuẩn (kJ/mol) của các chất được cho trong bảng sau:",
+            {
+              "type": "table",
+              "rows": [
+                [
+                  [
+                    "Chất"
+                  ],
+                  [
+                    "CH",
+                    {
+                      "type": "text",
+                      "text": "4",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    "(g)"
+                  ],
+                  [
+                    "C",
+                    {
+                      "type": "text",
+                      "text": "2",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    "H",
+                    {
+                      "type": "text",
+                      "text": "6",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    "(g)"
+                  ],
+                  [
+                    "C",
+                    {
+                      "type": "text",
+                      "text": "3",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    "H",
+                    {
+                      "type": "text",
+                      "text": "8",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    "(g)"
+                  ],
+                  [
+                    "C",
+                    {
+                      "type": "text",
+                      "text": "4",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    "H",
+                    {
+                      "type": "text",
+                      "text": "10",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    "(g)"
+                  ],
+                  [
+                    "CO",
+                    {
+                      "type": "text",
+                      "text": "2",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    "(g)"
+                  ],
+                  [
+                    "H",
+                    {
+                      "type": "text",
+                      "text": "2",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    "O(l)"
+                  ],
+                  [
+                    "O",
+                    {
+                      "type": "text",
+                      "text": "2",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    "(g)"
+                  ]
+                ],
+                [
+                  [
+                    "Δ",
+                    {
+                      "type": "text",
+                      "text": "f",
+                      "marks": [
+                        "sub"
+                      ]
+                    },
+                    {
+                      "math": "H_{298}^{0}"
+                    }
+                  ],
+                  [
+                    "-74,9"
+                  ],
+                  [
+                    "-84,7"
+                  ],
+                  [
+                    "-105,0"
+                  ],
+                  [
+                    "-126,1"
+                  ],
+                  [
+                    "-393,5"
+                  ],
+                  [
+                    "-285,8"
+                  ],
+                  [
+                    "0,0"
+                  ]
+                ]
+              ]
+            }
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        },
+        {
+          "id": "28",
+          "type": "short_answer",
+          "content": [
+            "Cho cân bằng hoá học: CO(g) + ",
+            {
+              "math": "\\mathrm{H}_2\\mathrm{O}(\\mathrm{g})"
+            },
+            " ⇋ ",
+            {
+              "math": "\\mathrm{H}_2(\\mathrm{g})"
+            },
+            " + ",
+            {
+              "math": "\\mathrm{CO}_2(\\mathrm{g})"
+            },
+            ". Ở 750°C, hằng số cân bằng K",
+            {
+              "type": "text",
+              "text": "C",
+              "marks": [
+                "sub"
+              ]
+            },
+            " = 1,156. Cho khí CO và hơi nước vào bình kín dung tích không đổi sao cho nồng độ ban đầu của khí CO và hơi nước đều bằng 0,500 mol/L và giữ ở 750°C. Nồng độ khí CO ở trạng thái cân bằng là y mol/L. Xác định giá trị của y. (Kết quả các phép tính trung gian không được làm tròn, chỉ kết quả cuối cùng được làm tròn đến hàng phần trăm)."
+          ],
+          "points": 0.25,
+          "correct_answer": null
+        }
+      ]
+    }
+  ]
+}

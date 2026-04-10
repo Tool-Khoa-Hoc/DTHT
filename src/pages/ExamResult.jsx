@@ -4,7 +4,12 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import RichTextRenderer from '../components/exam/RichTextRenderer';
 import { sanitizeExternalUrl } from '../utils/urlSecurity';
-import { getExamIndex } from '../utils/examIndexCache';
+import {
+    applyCanonicalExamMetadata,
+    getExamBundlePath,
+    getPublicExamResources,
+    resolveCanonicalExamMeta,
+} from '../utils/examIndexCache';
 import { resolveMediaPath } from '../utils/mediaPath';
 import {
     formatTrueFalseValue,
@@ -12,6 +17,7 @@ import {
     questionHasOptionContent,
     questionHasStatementContent
 } from '../utils/examQuestionLayout';
+import { getSecureDocumentUrl } from '../lib/uploadExamFile';
 
 const getQuestionKey = (partId, questionId) => `${partId}.${questionId}`;
 const CHOICE_LABELS = ['A', 'B', 'C', 'D'];
@@ -229,33 +235,6 @@ const normalizeExamMediaPaths = (value, basePath) => {
     return next;
 };
 
-const resolveExamMeta = async (subjectFolder, routePath, examId = null) => {
-    const normalizedSubject = String(subjectFolder || '').trim().toLowerCase();
-    try {
-        const examIndex = await getExamIndex();
-        const matchedExam = examIndex.find((exam) => (
-            String(exam.subjectFolder || exam.subject || '').trim().toLowerCase() === normalizedSubject &&
-            (
-                (routePath && exam.examPath === routePath) ||
-                (routePath && exam.id === routePath) ||
-                (examId && exam.id === examId)
-            )
-        ));
-        if (matchedExam) {
-            return matchedExam;
-        }
-    } catch (error) {
-        console.warn('[ExamResult] Failed to resolve exam metadata from index, using legacy fallback.', error);
-    }
-
-    return {
-        id: examId || routePath,
-        examPath: routePath || examId,
-        subjectFolder: normalizedSubject,
-        subject: normalizedSubject,
-    };
-};
-
 const getNestedValue = (source, fieldPath) => fieldPath.reduce((current, segment) => (
     current && typeof current === 'object' ? current[segment] : undefined
 ), source);
@@ -443,7 +422,42 @@ export default function ExamResult() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
     const [showReview, setShowReview] = useState(false);
-    const [vipResources, setVipResources] = useState(null); // Loaded from DB for VIP only
+    const [vipResources, setVipResources] = useState(null);
+    const [secureAnswerUrl, setSecureAnswerUrl] = useState(null);
+    const [reviewLeftWidth, setReviewLeftWidth] = useState(68);
+    const [isDragging, setIsDragging] = useState(false);
+
+    // Draggable resizer handler
+    const startDrag = React.useCallback((e) => {
+        setIsDragging(true);
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'col-resize';
+    }, []);
+
+    React.useEffect(() => {
+        if (!isDragging) return;
+        const onMove = (e) => {
+            let clientX = e.clientX;
+            if (e.type === 'touchmove') clientX = e.touches[0].clientX;
+            const pct = (clientX / window.innerWidth) * 100;
+            setReviewLeftWidth(Math.max(20, Math.min(pct, 80)));
+        };
+        const onUp = () => {
+            setIsDragging(false);
+            document.body.style.userSelect = '';
+            document.body.style.cursor = '';
+        };
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+        window.addEventListener('touchmove', onMove);
+        window.addEventListener('touchend', onUp);
+        return () => {
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+            window.removeEventListener('touchmove', onMove);
+            window.removeEventListener('touchend', onUp);
+        };
+    }, [isDragging]);
 
     useEffect(() => {
         const subjectFolder = routeSubjectFolder || location.state?.subjectFolder;
@@ -456,7 +470,7 @@ export default function ExamResult() {
         let cancelled = false;
 
         const loadExamMeta = async () => {
-            const resolvedExamMeta = await resolveExamMeta(subjectFolder, routePath, location.state?.examId);
+            const resolvedExamMeta = await resolveCanonicalExamMeta(subjectFolder, routePath, location.state?.examId);
             if (!cancelled) {
                 setExamMeta(resolvedExamMeta);
             }
@@ -480,7 +494,7 @@ export default function ExamResult() {
             try {
                 const searchParams = new URLSearchParams(location.search);
                 const resultId = location.state?.resultId || searchParams.get('resultId');
-                const routeExamMeta = await resolveExamMeta(routeSubjectFolder, routeExamPath, location.state?.examId);
+                const routeExamMeta = await resolveCanonicalExamMeta(routeSubjectFolder, routeExamPath, location.state?.examId);
                 setExamMeta(routeExamMeta);
                 let resultQuery = supabase
                     .from('exam_results')
@@ -490,9 +504,14 @@ export default function ExamResult() {
                 if (resultId) {
                     resultQuery = resultQuery.eq('id', resultId);
                 } else {
+                    const canonicalSubjectFolder = (
+                        routeExamMeta?.subjectFolder ||
+                        location.state?.subjectFolder ||
+                        routeSubjectFolder
+                    );
                     resultQuery = resultQuery
                         .eq('exam_id', location.state?.examId || routeExamMeta.id)
-                        .eq('subject_folder', routeSubjectFolder)
+                        .eq('subject_folder', canonicalSubjectFolder)
                         .order('submitted_at', { ascending: false })
                         .limit(1);
                 }
@@ -507,22 +526,53 @@ export default function ExamResult() {
 
                 const subjectFolder = result.subject_folder || routeSubjectFolder || location.state?.subjectFolder;
                 const examId = result.exam_id || location.state?.examId || routeExamPath;
-                const examMeta = await resolveExamMeta(subjectFolder, routeExamPath || location.state?.examPath, examId);
-                const examBasePath = getExamBasePath(subjectFolder, examMeta.examPath);
+                const examMeta = await resolveCanonicalExamMeta(subjectFolder, routeExamPath || location.state?.examPath, examId);
+                const reviewContentPath = getExamBundlePath(examMeta, routeExamPath || location.state?.examPath || examId);
+                const examBasePath = getExamBasePath(subjectFolder, reviewContentPath);
                 const examRes = await fetch(`${examBasePath}/exam.json`);
-                if (!examRes.ok) throw new Error('Exam not found');
-                const rawExamData = await examRes.json();
+                if (!examRes.ok) {
+                    console.warn("Could not fetch exam.json for review");
+                }
+                const rawExamData = examRes.ok ? await examRes.json() : {
+                    title: examMeta.title || "Đề thi",
+                    subject: subjectFolder,
+                    time: examMeta.time || 50,
+                    parts: [
+                        {
+                            id: "phan_thu_nhat",
+                            type: "multiple_choice",
+                            questions: Array.from({ length: 18 }, (_, i) => ({ id: `cau_${i + 1}`, type: "single_choice" }))
+                        },
+                        {
+                            id: "phan_thu_hai",
+                            type: "true_false",
+                            questions: Array.from({ length: 4 }, (_, i) => ({
+                                id: `cau_${i + 1}`,
+                                type: "true_false",
+                                statements: [{ id: "A" }, { id: "B" }, { id: "C" }, { id: "D" }]
+                            }))
+                        },
+                        {
+                            id: "phan_thu_ba",
+                            type: "short_answer",
+                            questions: Array.from({ length: 6 }, (_, i) => ({ id: `cau_${i + 1}`, type: "short_answer" }))
+                        }
+                    ]
+                };
+
                 const { data: reviewPayload, error: reviewError } = await supabase.rpc('get_exam_review_payload', {
                     p_result_id: result.id
                 });
                 if (reviewError) throw reviewError;
 
                 const mergedAnswerKey = reviewPayload?.answer_key || {};
-
-                setExamData(normalizeExamMediaPaths({
+                const publicResources = await getPublicExamResources([examId, routeExamPath, examMeta?.examPath]);
+                const canonicalExamData = applyCanonicalExamMetadata({
                     ...rawExamData,
                     answer_key: mergedAnswerKey
-                }, examBasePath));
+                }, examMeta, publicResources, subjectFolder);
+
+                setExamData(normalizeExamMediaPaths(canonicalExamData, examBasePath));
                 setAnswers(reviewPayload?.answers_snapshot || result.answers_snapshot || {});
                 setResultMetrics({
                     score: reviewPayload?.score ?? result.score ?? null,
@@ -551,10 +601,22 @@ export default function ExamResult() {
             });
     }, [location.state?.examId, examMeta?.id, user]);
 
+    // Khi mở showReview: lấy signed URL cho file đáp án từ Supabase Storage
+    useEffect(() => {
+        if (!showReview) return;
+        const rawAnswerUrl = vipResources?.answer_file_url || examData?.answer_file_url || examData?.resources?.answer_file_url || null;
+        if (!rawAnswerUrl) { setSecureAnswerUrl(null); return; }
+        if (rawAnswerUrl.startsWith('http')) { setSecureAnswerUrl(rawAnswerUrl); return; }
+        // Đây là path trong bucket exam-answer-files (public) → tạo public URL
+        const { data } = supabase.storage.from('exam-answer-files').getPublicUrl(rawAnswerUrl);
+        setSecureAnswerUrl(data?.publicUrl || null);
+    }, [showReview, vipResources, examData]);
+
     const resolvedSubjectFolder = examMeta?.subjectFolder || routeSubjectFolder || location.state?.subjectFolder;
     const resolvedExamPath = examMeta?.examPath || location.state?.examPath || routeExamPath;
-    const examBasePath = resolvedSubjectFolder && resolvedExamPath
-        ? getExamBasePath(resolvedSubjectFolder, resolvedExamPath)
+    const resolvedContentPath = getExamBundlePath(examMeta, resolvedExamPath);
+    const examBasePath = resolvedSubjectFolder && resolvedContentPath
+        ? getExamBasePath(resolvedSubjectFolder, resolvedContentPath)
         : null;
     // vipResources from DB takes priority; fallback to examData/examMeta (which won't have sensitive URLs after sync)
     const resourceSources = [vipResources ? { resources: vipResources } : null, examData, examMeta].filter(Boolean);
@@ -579,7 +641,7 @@ export default function ExamResult() {
         ? 'Đề và đáp án'
         : examFileUrl
             ? 'Tài liệu đề'
-            : 'File đáp án';
+            : 'Folder đề';
     const canOpenEditLink = Boolean(profile?.is_vip);
     const showLockedEditLink = Boolean(editExamUrl) && !canOpenEditLink;
     const isVip = Boolean(profile?.is_vip);
@@ -590,7 +652,7 @@ export default function ExamResult() {
         resultMetrics?.subjectFolder
     );
     const defaultShortAnswerPoints = getDefaultShortAnswerPoints(scoreSubjectFolder);
-
+                    
     if (loading) {
          return (
              <div className="min-h-screen bg-[#f8f6f6] flex flex-col items-center justify-center">
@@ -620,8 +682,8 @@ export default function ExamResult() {
         part3: { correct: 0, total: 0, score: 0 }
     };
 
-    examData.parts.forEach(part => {
-        part.questions.forEach(q => {
+    examData.parts?.forEach(part => {
+        part.questions?.forEach(q => {
              const expectedAnswer = pickQuestionValue(examData.answer_key, part.id, q.id);
              const userAnswer = pickQuestionValue(answers, part.id, q.id);
 
@@ -640,18 +702,16 @@ export default function ExamResult() {
                   const qAnswers = (userAnswer && typeof userAnswer === 'object') ? userAnswer : {};
                   let correctCount = 0;
                 
-                 q.statements.forEach((stmt, idx) => {
+                 q.statements?.forEach((stmt, idx) => {
                      const expectedStmtAnswer = Array.isArray(expectedAnswer)
                          ? expectedAnswer[idx]
                          : pickStatementValue(expectedAnswer, stmt.id);
-
                      const userStmtAns = pickStatementValue(qAnswers, stmt.id);
                      if (userStmtAns === expectedStmtAnswer && expectedStmtAnswer !== undefined && expectedStmtAnswer !== null) {
                          correctCount += 1;
                      }
                  });
 
-                 // Use q.points array from exam data, fallback to standard 2025 THPT ladder
                  const pointsLadder = Array.isArray(q.points) && q.points.length >= 4
                      ? [0, ...q.points.slice(0, 4)]
                      : DEFAULT_TF_POINTS_LADDER;
@@ -686,200 +746,220 @@ export default function ExamResult() {
     const fallbackCorrectCount = Number(resultMetrics.correct ?? 0);
     const fallbackTotalQuestions = Number(resultMetrics.total ?? 0);
 
+    // ============ SPLIT-PANE REVIEW ============
     if (showReview) {
         return (
-            <div className="min-h-screen bg-[#f8f6f6] text-slate-800 font-display flex flex-col">
-                <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm shrink-0">
+            <div className="h-screen overflow-hidden bg-[#f8f6f6] font-display flex flex-col">
+                {/* Header */}
+                <header className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between z-30 shadow-sm shrink-0">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setShowReview(false)}
                             className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-100 transition-colors text-slate-600"
                         >
-                            <span className="material-symbols-outlined">close</span>
+                            <span className="material-symbols-outlined">arrow_back</span>
                         </button>
                         <div>
-                            <h1 className="text-lg font-black text-slate-800">Chi tiết đáp án</h1>
-                            <p className="text-xs text-slate-500 font-medium">{examData.title}</p>
+                            <h1 className="text-lg font-black text-slate-800 line-clamp-1">{examData.title}</h1>
+                            <p className="text-xs text-slate-500 font-medium">Xem lại đáp án chi tiết</p>
                         </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs font-bold">
+                        <span className="w-3 h-3 rounded-full bg-green-500 inline-block"/><span className="text-green-600 hidden sm:inline">Đúng</span>
+                        <span className="w-3 h-3 rounded-full bg-red-500 inline-block ml-3"/><span className="text-red-500 hidden sm:inline">Sai</span>
+                        <span className="w-3 h-3 rounded-full bg-blue-500 inline-block ml-3"/><span className="text-blue-600 hidden sm:inline">Đáp án đúng</span>
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto w-full">
-                    <div className="max-w-6xl mx-auto bg-white p-6 md:p-12 shadow-sm border-x border-slate-200 min-h-full space-y-12 pb-24">
-                        <ResultResourceActions
-                            editExamUrl={editExamUrl}
-                            canOpenEditLink={canOpenEditLink}
-                            showLockedEditLink={showLockedEditLink}
-                            compact
-                        />
-
-                        {examData.parts.map((part) => (
-                            <div key={part.id}>
-                                <div className="mb-6 pb-4 border-b border-slate-100">
-                                    <h2 className="text-2xl font-black text-[#fe5f36]">{part.name}</h2>
-                                    <p className="text-sm font-medium text-slate-500 mt-2 italic">{part.description}</p>
-                                </div>
-                                <div className="space-y-10">
-                                    {part.questions.map((q, qIndex) => {
-                                        const questionKey = getQuestionKey(part.id, q.id);
-                                        const userAns = pickQuestionValue(answers, part.id, q.id);
-                                        const hasOptionContent = questionHasOptionContent(q);
-                                        const hasStatementContent = questionHasStatementContent(q);
-                                        const expectedAnswer = pickQuestionValue(examData.answer_key, part.id, q.id);
-
-                                        return (
-                                        <div key={questionKey} className="scroll-mt-24">
-                                            <div className="flex gap-4">
-                                                <div className="w-10 h-10 shrink-0 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black text-lg border border-blue-100">
-                                                    {qIndex + 1}
-                                                </div>
-                                                <div className="flex-1">
-                                                    <div className="text-base font-medium leading-relaxed mb-4">
-                                                        <RichTextRenderer content={q.content} />
-                                                    </div>
-
-                                                    {/* Single choice */}
-                                                    {q.type === 'single_choice' && (
-                                                        <div className={`grid gap-3 ${hasOptionContent ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-2 md:grid-cols-4'}`}>
-                                                            {q.options.map((opt, optIdx) => {
-                                                                const expectedChoiceIndex = toChoiceIndex(expectedAnswer);
-                                                                const userChoiceIndex = toChoiceIndex(userAns);
-                                                                const isChecked = userChoiceIndex === optIdx;
-                                                                const hasKnownAnswer = expectedChoiceIndex !== null;
-                                                                const isCorrect = hasKnownAnswer && expectedChoiceIndex === optIdx;
-
-                                                                let bgClass = 'bg-white border-slate-200';
-                                                                let textClass = 'bg-slate-100 text-slate-600';
-
-                                                                if (isCorrect) {
-                                                                    bgClass = 'bg-green-50 border-green-500 font-bold';
-                                                                    textClass = 'bg-green-500 text-white';
-                                                                } else if (isChecked) {
-                                                                    bgClass = hasKnownAnswer ? 'bg-red-50 border-red-500 font-bold' : 'bg-blue-50 border-blue-500 font-bold';
-                                                                    textClass = hasKnownAnswer ? 'bg-red-500 text-white' : 'bg-blue-500 text-white';
-                                                                }
-
-                                                                return (
-                                                                    <div key={optIdx} className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${bgClass}`}>
-                                                                        <span className={`w-8 h-8 shrink-0 rounded-lg flex items-center justify-center font-bold text-sm transition-colors ${textClass}`}>{CHOICE_LABELS[optIdx]}</span>
-                                                                        {hasOptionContent && <div className="flex-1"><RichTextRenderer content={opt} /></div>}
-                                                                        {isCorrect && <span className="material-symbols-outlined text-green-500 ml-auto shrink-0">check_circle</span>}
-                                                                        {hasKnownAnswer && isChecked && !isCorrect && <span className="material-symbols-outlined text-red-500 ml-auto shrink-0">cancel</span>}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    )}
-
-                                                    {/* True/False */}
-                                                    {q.type === 'true_false' && (
-                                                        <div className="space-y-3">
-                                                            {q.statements?.map((stmt, stmtIdx) => {
-                                                                const userStmtAns = pickStatementValue(userAns, normalizeStatementId(stmt.id));
-                                                                const expectedStmtAnswer = Array.isArray(expectedAnswer) 
-                                                                    ? expectedAnswer[stmtIdx] 
-                                                                    : pickStatementValue(expectedAnswer, normalizeStatementId(stmt.id));
-
-                                                                const hasKnownExpected = hasKnownTrueFalseValue(expectedStmtAnswer);
-                                                                const isCorrect = userStmtAns === expectedStmtAnswer && hasKnownExpected;
-                                                                const isAnswered = userStmtAns !== undefined;
-
-                                                                return (
-                                                                    <div key={stmt.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50">
-                                                                        <div className="flex gap-3">
-                                                                            <span className="font-bold text-slate-500 shrink-0">{TRUE_FALSE_LABELS[stmtIdx]})</span>
-                                                                            {hasStatementContent ? (
-                                                                                <span className="font-medium text-slate-800"><RichTextRenderer content={stmt.content} /></span>
-                                                                            ) : (
-                                                                                <span className="font-medium text-slate-700">Mệnh đề {TRUE_FALSE_LABELS[stmtIdx]})</span>
-                                                                            )}
-                                                                        </div>
-                                                                        <div className="flex items-center gap-3 shrink-0">
-                                                                            {/* Hiển thị đáp án của user */}
-                                                                            {isAnswered ? (
-                                                                                <span className={`px-3 py-1 rounded-md text-xs font-bold font-mono ${hasKnownExpected ? (isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') : 'bg-blue-100 text-blue-700'}`}>
-                                                                                    {formatTrueFalseValue(userStmtAns)}
-                                                                                    <span className="material-symbols-outlined text-[14px] align-middle ml-1">
-                                                                                        {hasKnownExpected ? (isCorrect ? 'check' : 'close') : 'info'}
-                                                                                    </span>
-                                                                                </span>
-                                                                            ) : (
-                                                                                <span className="px-3 py-1 rounded-md text-xs font-bold font-mono bg-slate-200 text-slate-500">Chưa chọn</span>
-                                                                            )}
-                                                                            
-                                                                            {/* Đáp án đúng */}
-                                                                            {hasKnownExpected ? (
-                                                                                <span className="px-3 py-1 rounded-md text-xs font-bold font-mono bg-blue-100 text-blue-700">
-                                                                                    Đ/A: {formatTrueFalseValue(expectedStmtAnswer)}
-                                                                                </span>
-                                                                            ) : (
-                                                                                <span className="px-3 py-1 rounded-md text-xs font-bold font-mono bg-slate-200 text-slate-500">
-                                                                                    Chưa có đáp án
-                                                                                </span>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    )}
-
-                                                    {/* Short answer */}
-                                                    {q.type === 'short_answer' && (
-                                                        <div className="mt-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                                                            <div className="bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl min-w-[120px]">
-                                                                <p className="text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Trl của bạn</p>
-                                                                <p className={`font-mono text-lg font-black ${String(userAns || '').replace(',', '.').trim().toLowerCase() === String(expectedAnswer ?? '').replace(',', '.').trim().toLowerCase() ? 'text-green-600' : 'text-red-500'}`}>
-                                                                    {userAns ? String(userAns).replace('.', ',') : <span className="text-slate-400 italic font-normal text-sm">Trống</span>}
-                                                                </p>
-                                                            </div>
-                                                            <span className="material-symbols-outlined hidden sm:block text-slate-300">arrow_right_alt</span>
-                                                            <div className="bg-blue-50 border border-blue-200 px-4 py-3 rounded-xl min-w-[120px]">
-                                                                <p className="text-xs font-bold text-blue-500 mb-1 uppercase tracking-wider">Đáp án đúng</p>
-                                                                <p className="font-mono text-lg font-black text-blue-700">
-                                                                    {(expectedAnswer !== undefined && expectedAnswer !== null && String(expectedAnswer).trim() !== '')
-                                                                        ? String(expectedAnswer).replace('.', ',')
-                                                                        : <span className="text-slate-400 italic font-normal text-sm">Chưa có đáp án</span>}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {q.explanation && (
-                                                        <div className="mt-6 bg-amber-50 rounded-xl p-5 border border-amber-200">
-                                                            <div className="flex items-center gap-2 text-amber-800 font-bold mb-3">
-                                                                <span className="material-symbols-outlined">lightbulb</span>
-                                                                Hướng dẫn giải / Giải thích chi tiết
-                                                            </div>
-                                                            <div className="text-amber-900 leading-relaxed text-sm">
-                                                                <RichTextRenderer content={q.explanation} />
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        );
-                                    })}
-                                </div>
+                <div className="flex-1 flex flex-row w-full relative overflow-hidden">
+                    {/* Left Pane – PDF đáp án */}
+                    <div style={{ width: `calc(${reviewLeftWidth}%)` }} className="h-full border-r border-slate-200 bg-slate-900 flex flex-col items-center justify-center overflow-hidden">
+                        {secureAnswerUrl ? (
+                            <iframe
+                                src={secureAnswerUrl}
+                                title="Folder đề"
+                                className="w-full h-full"
+                                style={{ border: 'none' }}
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center gap-4 text-slate-400 p-10 text-center">
+                                <span className="material-symbols-outlined text-6xl">sentiment_dissatisfied</span>
+                                <p className="text-lg font-bold text-slate-300">Chưa có lời giải</p>
+                                <p className="text-sm text-slate-500">Giáo viên chưa upload file đáp án / bài giải cho đề thi này.</p>
                             </div>
-                        ))}
+                        )}
+                    </div>
+
+                    {/* Resizer */}
+                    <div
+                        className="hidden md:flex flex-col items-center justify-center w-3 bg-slate-200/50 hover:bg-red-400 active:bg-red-500 cursor-col-resize transition-colors z-20 shrink-0"
+                        onMouseDown={startDrag}
+                        onTouchStart={startDrag}
+                        title="Kéo để thay đổi độ rộng"
+                    >
+                        <div className="w-1 h-8 bg-slate-400 rounded-full" />
+                    </div>
+
+                    {/* Right Pane – Phiếu trả lời + đáp án */}
+                    <div style={{ width: `calc(${100 - reviewLeftWidth}%)`, WebkitOverflowScrolling: 'touch' }} className="h-full bg-[#fcecf0] overflow-y-auto overscroll-y-contain scroll-smooth w-full md:w-auto flex-1">
+                        <div className="p-4 md:p-6 space-y-8 pb-20">
+                            {examData?.parts?.map((part, partIndex) => {
+                                const partLabel = ['I', 'II', 'III'][partIndex] || (partIndex + 1);
+                                const partTypeLabel = part.questions[0]?.type === 'single_choice' ? 'Trắc nghiệm nhiều lựa chọn'
+                                    : part.questions[0]?.type === 'true_false' ? 'Trắc nghiệm Đúng/Sai'
+                                    : 'Trả lời ngắn';
+
+                                return (
+                                    <div key={part.id}>
+                                        <div className="mb-3 pb-2 border-b-2 border-red-300">
+                                            <h2 className="text-sm font-black text-[#fe5f36] uppercase tracking-widest">PHẦN {partLabel} – {partTypeLabel}</h2>
+                                        </div>
+
+                                        {/* Part 1: single_choice */}
+                                        {part.questions[0]?.type === 'single_choice' && (
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {part.questions.map((q, qIdx) => {
+                                                    const userAns = pickQuestionValue(answers, part.id, q.id);
+                                                    const expected = pickQuestionValue(examData.answer_key, part.id, q.id);
+                                                    const userIdx = toChoiceIndex(userAns);
+                                                    const expIdx = toChoiceIndex(expected);
+                                                    const hasKey = expIdx !== null;
+                                                    return (
+                                                        <div key={q.id} className="bg-white rounded-xl border border-slate-200 p-3 flex items-center gap-3">
+                                                            <span className="w-7 h-7 shrink-0 rounded-lg bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center font-black text-sm">{qIdx + 1}</span>
+                                                            <div className="flex gap-2 flex-wrap flex-1">
+                                                                {['A','B','C','D'].map((label, idx) => {
+                                                                    const isUser = userIdx === idx;
+                                                                    const isCorrect = hasKey && expIdx === idx;
+                                                                    const isWrong = isUser && hasKey && !isCorrect;
+                                                                    let cls = 'w-9 h-9 rounded-lg border-2 flex items-center justify-center font-bold text-sm transition-all ';
+                                                                    if (isCorrect) cls += 'bg-green-500 border-green-500 text-white';
+                                                                    else if (isWrong) cls += 'bg-red-500 border-red-500 text-white';
+                                                                    else if (isUser) cls += 'bg-blue-500 border-blue-500 text-white';
+                                                                    else cls += 'bg-white border-slate-200 text-slate-400';
+                                                                    return <div key={label} className={cls}>{label}</div>;
+                                                                })}
+                                                            </div>
+                                                            {!hasKey && <span className="text-[10px] text-slate-400 font-bold italic shrink-0 hidden sm:block">Chưa có đáp án</span>}
+                                                            {hasKey && userIdx === expIdx && <span className="material-symbols-outlined text-green-500 shrink-0 text-[18px]">check_circle</span>}
+                                                            {hasKey && userIdx !== null && userIdx !== expIdx && <span className="material-symbols-outlined text-red-500 shrink-0 text-[18px]">cancel</span>}
+                                                            {hasKey && userIdx === null && <span className="material-symbols-outlined text-slate-400 shrink-0 text-[18px]">radio_button_unchecked</span>}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+
+                                        {/* Part 2: true_false */}
+                                        {part.questions[0]?.type === 'true_false' && (
+                                            <div className="space-y-3">
+                                                {part.questions.map((q, qIdx) => {
+                                                    const userAns = pickQuestionValue(answers, part.id, q.id);
+                                                    const expected = pickQuestionValue(examData.answer_key, part.id, q.id);
+                                                    const stmts = q.statements || [{id:'A'},{id:'B'},{id:'C'},{id:'D'}];
+                                                    return (
+                                                        <div key={q.id} className="bg-white rounded-xl border border-slate-200 p-3">
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <span className="w-7 h-7 shrink-0 rounded-lg bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center font-black text-sm">{qIdx + 1}</span>
+                                                                <span className="text-xs font-bold text-slate-500">Câu {qIdx + 1} – Đúng / Sai mỗi ý</span>
+                                                            </div>
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                                {stmts.map((stmt, sIdx) => {
+                                                                    const stmtId = normalizeStatementId(stmt.id);
+                                                                    const userVal = pickStatementValue(userAns, stmtId);
+                                                                    const expVal = Array.isArray(expected) ? expected[sIdx] : pickStatementValue(expected, stmtId);
+                                                                    const hasExpected = hasKnownTrueFalseValue(expVal);
+                                                                    const correct = hasExpected && userVal === expVal;
+                                                                    const wrong = hasExpected && userVal !== undefined && userVal !== expVal;
+                                                                    return (
+                                                                        <div key={stmt.id} className={`flex items-center gap-2 p-2 rounded-lg border-2 ${correct ? 'bg-green-50 border-green-300' : wrong ? 'bg-red-50 border-red-300' : 'bg-slate-50 border-slate-200'}`}>
+                                                                            <span className="font-black text-slate-500 w-5">{['a','b','c','d'][sIdx]})</span>
+                                                                            <div className="flex flex-col text-xs font-bold">
+                                                                                <span className={correct ? 'text-green-600' : wrong ? 'text-red-500' : 'text-slate-500'}>
+                                                                                    Bạn: {userVal !== undefined ? formatTrueFalseValue(userVal) : '—'}
+                                                                                </span>
+                                                                                {hasExpected && <span className="text-blue-600">Đ/A: {formatTrueFalseValue(expVal)}</span>}
+                                                                            </div>
+                                                                            {correct && <span className="material-symbols-outlined text-green-500 ml-auto text-[16px]">check</span>}
+                                                                            {wrong && <span className="material-symbols-outlined text-red-500 ml-auto text-[16px]">close</span>}
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+
+                                        {/* Part 3: short_answer */}
+                                        {part.questions[0]?.type === 'short_answer' && (
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {part.questions.map((q, qIdx) => {
+                                                    const userAns = pickQuestionValue(answers, part.id, q.id);
+                                                    const expected = pickQuestionValue(examData.answer_key, part.id, q.id);
+                                                    const userStr = String(userAns || '').replace(',', '.').trim().toLowerCase();
+                                                    const expStr = String(expected ?? '').replace(',', '.').trim().toLowerCase();
+                                                    const correct = userStr && userStr === expStr;
+                                                    const wrong = userStr && expStr && userStr !== expStr;
+                                                    return (
+                                                        <div key={q.id} className={`bg-white rounded-xl border-2 p-3 flex items-center gap-3 ${correct ? 'border-green-300' : wrong ? 'border-red-300' : 'border-slate-200'}`}>
+                                                            <span className="w-7 h-7 shrink-0 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center font-black text-sm">{qIdx + 1}</span>
+                                                            <div className="flex gap-4 flex-1 flex-col sm:flex-row">
+                                                                <div className="text-sm">
+                                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Bạn trả lời</p>
+                                                                    <p className={`font-mono font-black ${correct ? 'text-green-600' : wrong ? 'text-red-500' : 'text-slate-400'}`}>
+                                                                        {userAns ? String(userAns).replace('.', ',') : <span className="italic font-normal text-slate-300">Bỏ trống</span>}
+                                                                    </p>
+                                                                </div>
+                                                                {expStr && (
+                                                                    <div className="text-sm">
+                                                                        <p className="text-[10px] font-bold text-blue-400 uppercase">Đáp án đúng</p>
+                                                                        <p className="font-mono font-black text-blue-700">{String(expected).replace('.', ',')}</p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            {correct && <span className="material-symbols-outlined text-green-500 shrink-0 text-[20px]">check_circle</span>}
+                                                            {wrong && <span className="material-symbols-outlined text-red-500 shrink-0 text-[20px]">cancel</span>}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        
+                        {/* Tài nguyên VIP */}
+                        <div className="mt-8 w-full flex justify-center">
+                            <VipResourcePanel
+                                documentResourceUrl={documentResourceUrl}
+                                documentResourceLabel={documentResourceLabel}
+                                videoReviewUrl={videoReviewUrl}
+                                isVip={isVip}
+                            />
+                        </div>
+
                     </div>
                 </div>
             </div>
         );
     }
 
+    // ============ SCORE CARD ============
     return (
-        <div className="min-h-screen bg-[#f8f6f6] text-slate-800 font-display py-12 px-4">
-            <div className="max-w-3xl mx-auto space-y-8">
+        <div className="min-h-screen bg-[#f8f6f6] text-slate-800 font-display py-12 px-4 flex justify-center pb-24">
+            <div className="max-w-3xl w-full space-y-8">
                 {/* Score Card */}
-                <div className="bg-white rounded-3xl p-8 text-center shadow-xl border border-slate-200 relative overflow-hidden">
+                <div className="bg-white rounded-3xl p-8 text-center shadow-xl border border-slate-200 relative overflow-hidden flex flex-col pt-16 lg:pt-8 min-h-[400px]">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 blur-3xl rounded-full" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 blur-3xl rounded-full" />
                     
-                    <div className="relative z-10 lg:pr-[20rem]">
-                        <div className="mb-6 lg:absolute lg:top-0 lg:right-0 lg:mb-0">
+                    <div className="relative z-10 w-full h-full flex flex-col justify-center">
+                        <div className="hidden">
+
+
                             <VipResourcePanel
                                 documentResourceUrl={documentResourceUrl}
                                 documentResourceLabel={documentResourceLabel}
@@ -892,14 +972,14 @@ export default function ExamResult() {
                         <p className="text-slate-500 font-medium mb-8">{examData.title}</p>
 
                         {!hasReviewAnswerKey && (
-                            <div className="mb-6 mx-auto max-w-xl rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-left">
+                            <div className="mb-6 mx-auto max-w-xl w-full rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-left">
                                 <p className="text-sm font-bold text-amber-700">Đề này chưa có đáp án chuẩn trong database.</p>
                                 <p className="mt-1 text-xs font-medium text-amber-700/80">Điểm hiển thị là kết quả lưu tạm từ lần nộp bài, chưa có chấm chi tiết từng câu.</p>
                             </div>
                         )}
                         
-                        <div className="inline-block p-1 rounded-[2rem] bg-gradient-to-r from-[#fe5f36] to-pink-500 mb-8">
-                            <div className="bg-white rounded-[1.8rem] px-12 py-8">
+                        <div className="inline-block p-1 rounded-[2rem] bg-gradient-to-r from-[#fe5f36] to-pink-500 mb-8 mx-auto max-w-[280px] w-full">
+                            <div className="bg-white rounded-[1.8rem] px-8 py-8 w-full">
                                 <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Điểm tổng kết</p>
                                 <div className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#fe5f36] to-pink-600">
                                     {displayScore.toFixed(2).replace(/\.00$/, '').replace('.', ',')}<span className="text-3xl text-slate-300 ml-2">/10</span>
@@ -941,15 +1021,26 @@ export default function ExamResult() {
                                 )
                             )}
                         </div>
+
+
+                        {/* Tài nguyên VIP */}
+                        <div className="mt-8 flex justify-center w-full">
+                            <VipResourcePanel
+                                documentResourceUrl={documentResourceUrl}
+                                documentResourceLabel={documentResourceLabel}
+                                videoReviewUrl={videoReviewUrl}
+                                isVip={isVip}
+                            />
+                        </div>
                     </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex flex-wrap gap-4 justify-center">
-                    <button onClick={() => navigate('/exam-room')} className="px-8 py-4 rounded-2xl bg-white border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors shadow-sm">
+                    <button onClick={() => navigate('/exam-room')} className="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-white border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors shadow-sm w-full sm:w-auto">
                         Quay lại danh sách đề
                     </button>
-                    <button onClick={() => setShowReview(true)} className="px-8 py-4 rounded-2xl bg-slate-900 border-2 border-slate-900 text-white font-bold hover:bg-slate-800 transition-colors shadow-xl shadow-slate-900/20">
+                    <button onClick={() => setShowReview(true)} className="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-slate-900 border-2 border-slate-900 text-white font-bold hover:bg-slate-800 transition-colors shadow-xl shadow-slate-900/20 w-full sm:w-auto">
                         Xem chi tiết đáp án
                     </button>
                     <ResultResourceActions

@@ -18,6 +18,17 @@ export const DEFAULT_EXAM_RESOURCES = {
     edit_link: null
 };
 
+const SUBJECT_TIME_DEFAULTS = {
+    toan: 90,
+    math: 90,
+    ly: 50,
+    physics: 50,
+    hoa: 50,
+    chemistry: 50,
+    sinh: 50,
+    biology: 50,
+};
+
 export function resolveExamDir(subjectFolder, examPath) {
     return path.join(EXAMS_ROOT, subjectFolder, examPath);
 }
@@ -28,6 +39,46 @@ export function resolveExamJsonPath(subjectFolder, examPath) {
 
 export function createDefaultExamResources() {
     return { ...DEFAULT_EXAM_RESOURCES };
+}
+
+export function normalizeSubjectFolder(value) {
+    const normalized = String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim()
+        .toLowerCase();
+
+    if (!normalized) return '';
+    if (normalized.includes('toan') || normalized === 'math') return 'toan';
+    if (normalized.includes('vat ly') || normalized === 'ly' || normalized === 'physics') return 'ly';
+    if (normalized.includes('hoa') || normalized === 'chemistry') return 'hoa';
+    if (normalized.includes('sinh') || normalized === 'biology') return 'sinh';
+    return normalized;
+}
+
+export function getCanonicalExamTimeMinutes(subjectFolder) {
+    const normalized = normalizeSubjectFolder(subjectFolder);
+    if (!normalized) return null;
+    return SUBJECT_TIME_DEFAULTS[normalized] ?? null;
+}
+
+export function normalizeExamTimeMinutes(subjectFolder, value, fallback = null) {
+    const canonical = getCanonicalExamTimeMinutes(subjectFolder);
+    if (canonical !== null) {
+        return canonical;
+    }
+
+    const parsed = Number(value);
+    if (Number.isFinite(parsed) && parsed >= 0) {
+        return Math.trunc(parsed);
+    }
+
+    const fallbackParsed = Number(fallback);
+    if (Number.isFinite(fallbackParsed) && fallbackParsed >= 0) {
+        return Math.trunc(fallbackParsed);
+    }
+
+    return null;
 }
 
 export async function loadExamJson(subjectFolder, examPath) {

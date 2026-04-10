@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
+import { normalizeExamTimeMinutes } from './exam-utils.js';
 
 const INDEX_FILENAME = 'index.json';
 
@@ -48,7 +49,11 @@ function normalizeIndexCandidate({ examData, subjectFolder, examPath, updatedAt 
     subject: subjectValue,
     subjectFolder,
     examPath,
-    time: examData.time,
+    time: normalizeExamTimeMinutes(
+      subjectFolder,
+      examData.time,
+      examData.duration_minutes ?? examData.durationMinutes ?? null,
+    ),
     color: ui.color,
     icon: ui.icon,
     questions: getQuestionCount(examData),

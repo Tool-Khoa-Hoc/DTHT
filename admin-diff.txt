@@ -1,0 +1,964 @@
+﻿diff --git a/src/pages/Admin.jsx b/src/pages/Admin.jsx
+index d538913..bc6fa7b 100644
+--- a/src/pages/Admin.jsx
++++ b/src/pages/Admin.jsx
+@@ -3,13 +3,17 @@ import { useAuth } from '../contexts/AuthContext';
+ import { supabase } from '../lib/supabase';
+ import { Navigate } from 'react-router-dom';
+ import { assertSafeExternalUrl } from '../utils/urlSecurity';
++import { uploadExamDocument } from '../lib/uploadExamFile';
+ import Avatar from '../components/Avatar';
+ import { clearExamIndexCache, getExamIndex } from '../utils/examIndexCache';
++import { normalizeExamSubject, normalizeExamTimeMinutes } from '../utils/examTime';
+ import {
++  clearAdminDeletedExamMarker,
+   deleteAdminExamKeys,
+   getAdminExamKey,
+   hasPopulatedAnswerKey,
+   listAdminExamKeys,
++  markAdminExamDeleted,
+   normalizeExamResources,
+   upsertAdminExamKeyBundle,
+   uploadExamAnswerFile,
+@@ -47,6 +51,7 @@ const DEFAULT_EXAM_EDIT_FORM = {
+   video_url: '',
+   answer_file_url: '',
+   answer_file_name: '',
++  document_url: '',
+ };
+ 
+ const EXAM_STATUS_OPTIONS = [
+@@ -63,6 +68,14 @@ const toOptionalPositiveInteger = (value) => {
+   return Number.isFinite(parsed) && parsed >= 0 ? Math.trunc(parsed) : null;
+ };
+ 
++const normalizeExamAdminSubject = (value) => (
++  normalizeExamSubject(value) || toTrimmedString(value).toLowerCase()
++);
++
++const normalizeExamAdminTime = (subjectFolder, value, fallback = null) => (
++  normalizeExamTimeMinutes(normalizeExamAdminSubject(subjectFolder), value, fallback)
++);
++
+ const countQuestionsFromExamJson = (examJson) => {
+   if (!Array.isArray(examJson?.parts)) return 0;
+   return examJson.parts.reduce((total, part) => (
+@@ -70,6 +83,111 @@ const countQuestionsFromExamJson = (examJson) => {
+   ), 0);
+ };
+ 
++const ADMIN_HIDDEN_LOCAL_EXAMS_SESSION_KEY = 'admin_hidden_local_exams_v1';
++
++const getAdminExamIdentityKey = (value) => {
++  if (!value || typeof value !== 'object') return '';
++
++  const resources = value.resources && typeof value.resources === 'object'
++    ? value.resources
++    : {};
++
++  const subjectFolder = normalizeExamAdminSubject(
++    value.subjectFolder ||
++    value.subject ||
++    resources.subject_folder ||
++    resources.subjectFolder ||
++    resources.subject,
++  );
++
++  const examPath = toTrimmedString(
++    value.examPath ||
++    value.exam_path ||
++    resources.exam_path ||
++    resources.examPath ||
++    resources.path ||
++    value.id ||
++    value.exam_id,
++  );
++
++  if (subjectFolder && examPath) {
++    return `${subjectFolder}:${examPath}`.toLowerCase();
++  }
++
++  return toTrimmedString(value.id || value.exam_id).toLowerCase();
++};
++
++const readHiddenLocalExamKeys = () => {
++  if (typeof window === 'undefined' || typeof window.sessionStorage === 'undefined') {
++    return [];
++  }
++
++  try {
++    const raw = window.sessionStorage.getItem(ADMIN_HIDDEN_LOCAL_EXAMS_SESSION_KEY);
++    if (!raw) return [];
++    const parsed = JSON.parse(raw);
++    return Array.isArray(parsed)
++      ? parsed.map((item) => toTrimmedString(item).toLowerCase()).filter(Boolean)
++      : [];
++  } catch {
++    return [];
++  }
++};
++
++const writeHiddenLocalExamKeys = (values) => {
++  if (typeof window === 'undefined' || typeof window.sessionStorage === 'undefined') {
++    return;
++  }
++
++  try {
++    window.sessionStorage.setItem(
++      ADMIN_HIDDEN_LOCAL_EXAMS_SESSION_KEY,
++      JSON.stringify(values),
++    );
++  } catch {
++    // Ignore storage failures in admin-only convenience state.
++  }
++};
++
++const removeExamFromList = (items, examToRemove, deletedIds = []) => {
++  const deletedIdSet = new Set(
++    (Array.isArray(deletedIds) ? deletedIds : [])
++      .map((item) => toTrimmedString(item).toLowerCase())
++      .filter(Boolean),
++  );
++
++  const identityKey = getAdminExamIdentityKey(examToRemove);
++  const examId = toTrimmedString(examToRemove?.id).toLowerCase();
++  const examPath = toTrimmedString(examToRemove?.examPath).toLowerCase();
++  const examSubject = normalizeExamAdminSubject(examToRemove?.subjectFolder || examToRemove?.subject);
++
++  return (Array.isArray(items) ? items : []).filter((item) => {
++    const itemIdentityKey = getAdminExamIdentityKey(item);
++    if (identityKey && itemIdentityKey === identityKey) {
++      return false;
++    }
++
++    const itemId = toTrimmedString(item?.id).toLowerCase();
++    if (itemId && (deletedIdSet.has(itemId) || (examId && itemId === examId))) {
++      return false;
++    }
++
++    const itemPath = toTrimmedString(item?.examPath).toLowerCase();
++    const itemSubject = normalizeExamAdminSubject(item?.subjectFolder || item?.subject);
++    if (examPath && itemPath === examPath && itemSubject === examSubject) {
++      return false;
++    }
++
++    return true;
++  });
++};
++
++const removeHiddenLocalExamKey = (items, exam) => {
++  const identityKey = getAdminExamIdentityKey(exam);
++  if (!identityKey) return Array.isArray(items) ? items : [];
++  return (Array.isArray(items) ? items : []).filter((item) => item !== identityKey);
++};
++
+ export default function Admin() {
+   const { user, profile } = useAuth();
+   const isAdmin = profile?.role === 'admin';
+@@ -122,11 +240,13 @@ export default function Admin() {
+   const [editingExam, setEditingExam] = useState(null);
+   const [examEditForm, setExamEditForm] = useState(DEFAULT_EXAM_EDIT_FORM);
+   const [selectedAnswerFile, setSelectedAnswerFile] = useState(null);
++  const [selectedDocumentFile, setSelectedDocumentFile] = useState(null);
+   const [savingExam, setSavingExam] = useState(false);
+   const [vipMembers, setVipMembers] = useState([]);
+   const [vipMembersLoading, setVipMembersLoading] = useState(false);
+   const [keysError, setKeysError] = useState(null);
+   const [examsDbError, setExamsDbError] = useState(null);
++  const [hiddenLocalExamKeys, setHiddenLocalExamKeys] = useState(() => readHiddenLocalExamKeys());
+ 
+   useEffect(() => {
+     if (!isAdmin) return;
+@@ -549,6 +669,200 @@ export default function Admin() {
+     }
+   };
+ 
++  const toggleFeatured = async (id, currentStatus) => {
++    try {
++      const { error } = await supabase
++        .from('documents')
++                .sort((a, b) => b.completedCount - a.completedCount)
++            );
++          }
++        } else {
++          setCandidates([]);
++        }
++      }
++    } catch (err) {
++      console.error(err);
++    } finally {
++      setLoadingCandidates(false);
++    }
++  };
++
++  const approveBangChu = async (userId, currentStatus) => {
++    try {
++      const { error } = await supabase.from('profiles').update({ is_approved_bang_chu: !currentStatus }).eq('id', userId);
++      if (error) throw error;
++      setCandidates(candidates.map(c => c.id === userId ? { ...c, is_approved_bang_chu: !currentStatus } : c));
++    } catch (err) {
++      alert('Lß╗ùi: ' + err.message);
++    }
++  };
++
++  const fetchCollaborators = async () => {
++    setLoadingCollabs(true);
++    try {
++      const data = await adminUserDirectory({
++        role: 'collaborator',
++        limit: ADMIN_USER_DIRECTORY_SELECT_LIMIT,
++      });
++      setCollaborators(data);
++    } catch (err) {
++      console.error(err);
++    } finally {
++      setLoadingCollabs(false);
++    }
++  };
++
++  const searchUsers = async (e) => {
++    e.preventDefault();
++    if (!collabSearchTerm.trim()) return;
++    setLoadingCollabs(true);
++    try {
++      const data = await adminUserDirectory({ search: collabSearchTerm.trim(), limit: 10 });
++      setSearchResults(data.filter(candidate => candidate.role !== 'admin'));
++    } catch (err) {
++      console.error(err);
++    } finally {
++      setLoadingCollabs(false);
++    }
++  };
++
++  const setCollaboratorRole = async (userId, makeCollaborator) => {
++    try {
++      const newRole = makeCollaborator ? 'collaborator' : 'user';
++      const { error } = await supabase
++        .from('profiles')
++        .update({ role: newRole })
++        .eq('id', userId);
++
++      if (error) throw error;
++
++      // Update local state
++      if (makeCollaborator) {
++        toast('─É├ú th─âng cß║Ñp th├ánh Truyß╗ün ─Éß║ío S╞░');
++      } else {
++        toast('─É├ú gi├íng cß║Ñp th├ánh ng╞░ß╗¥i d├╣ng th╞░ß╗¥ng');
++      }
++
++      // Refresh list
++      fetchCollaborators();
++      if (collabSearchTerm) {
++        // Trigger search again to update results UI
++        setSearchResults(searchResults.map(u => u.id === userId ? { ...u, role: newRole } : u));
++      }
++    } catch (err) {
++      alert('Lß╗ùi: ' + err.message);
++    }
++  };
++
++  const toast = (msg) => {
++    setMessage({ type: 'success', text: msg });
++    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
++  };
++
++  const handleLibrarySubmit = async (e) => {
++    e.preventDefault();
++    setLoading(true);
++    setMessage({ type: '', text: '' });
++
++    try {
++      const safeFileUrl = assertSafeExternalUrl(fileUrl);
++
++      if (docId) {
++        // Update existing document
++        const { error } = await supabase
++          .from('documents')
++          .update({
++            title,
++            description,
++            file_url: safeFileUrl,
++            author_name: authorName || 'Khuyß║┐t danh',
++            category: educationLevel === 'university' ? (category || 'Chuy├¬n ng├ánh') : category,
++            major: educationLevel === 'university' ? major : null,
++            is_featured: isFeatured,
++            education_level: educationLevel,
++            publish_date: publishDate || null
++          })
++          .eq('id', docId);
++
++        if (error) throw error;
++        setMessage({ type: 'success', text: 'T├ái liß╗çu ─æ├ú ─æ╞░ß╗úc cß║¡p nhß║¡t th├ánh c├┤ng!' });
++      } else {
++        // Insert new document
++        const { error } = await supabase
++          .from('documents')
++          .insert([
++            {
++              title,
++              description,
++              file_url: safeFileUrl,
++              author_name: authorName || 'Khuyß║┐t danh',
++              uploaded_by: user.id,
++              is_public: true,
++              category: educationLevel === 'university' ? (category || 'Chuy├¬n ng├ánh') : category,
++              major: educationLevel === 'university' ? major : null,
++              is_featured: isFeatured,
++              education_level: educationLevel,
++              publish_date: publishDate || null
++            }
++          ]);
++
++        if (error) throw error;
++        setMessage({ type: 'success', text: 'T├ái liß╗çu ─æ├ú ─æ╞░ß╗úc ─æ─âng tß║úi th├ánh c├┤ng!' });
++      }
++
++      // Reset form & refresh list
++      resetForm();
++      fetchDocuments();
++    } catch (error) {
++      console.error('Error saving document:', error);
++      setMessage({ type: 'error', text: 'C├│ lß╗ùi xß║úy ra: ' + error.message });
++    } finally {
++      setLoading(false);
++      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
++    }
++  };
++
++  const resetForm = () => {
++    setDocId(null);
++    setTitle('');
++    setDescription('');
++    setFileUrl('');
++    setAuthorName('');
++    setMajor('');
++    setCategory('khac');
++    setIsFeatured(false);
++    setEducationLevel('thpt');
++    setPublishDate('');
++  };
++
++  const handleEdit = (doc) => {
++    setDocId(doc.id);
++    setTitle(doc.title);
++    setDescription(doc.description || '');
++    setFileUrl(doc.file_url);
++    setAuthorName(doc.author_name || '');
++    setMajor(doc.major || '');
++    setCategory(doc.category || 'khac');
++    setIsFeatured(doc.is_featured || false);
++    setEducationLevel(doc.education_level || 'thpt');
++    setPublishDate(doc.publish_date || '');
++
++    // Scroll to form automatically
++    window.scrollTo({ top: 0, behavior: 'smooth' });
++  };
++
++  const handleDelete = async (id) => {
++    if (!window.confirm("Bß║ín c├│ chß║»c chß║»n muß╗æn x├│a t├ái liß╗çu n├áy v─⌐nh viß╗àn?")) return;
++
++    try {
++      const { error } = await supabase.from('documents').delete().eq('id', id);
++      if (error) throw error;
++      setDocuments(documents.filter(d => d.id !== id));
++      if (docId === id) resetForm(); // If deleting what is currently being edited
++    } catch (error) {
++      alert("Lß╗ùi khi x├│a t├ái liß╗çu: " + error.message);
++    }
++  };
+   const toggleFeatured = async (id, currentStatus) => {
+     try {
+       const { error } = await supabase
+@@ -563,21 +877,17 @@ export default function Admin() {
+     }
+   };
+ 
+-  const fetchExams = async () => {
++  const fetchExams = async ({ hiddenKeysOverride } = {}) => {
+     setLoadingExams(true);
+     setKeysError(null);
+     setExamsDbError(null);
+     try {
+       const examMap = new Map();
+-      let mergedIndex = [];
++      const hiddenLocalKeySet = new Set(
++        Array.isArray(hiddenKeysOverride) ? hiddenKeysOverride : hiddenLocalExamKeys,
++      );
+       let keysData = [];
+ 
+-      try {
+-        mergedIndex = await getExamIndex({ forceRefresh: true });
+-      } catch (indexError) {
+-        console.error(indexError);
+-      }
+-
+       try {
+         keysData = await listAdminExamKeys();
+       } catch (keyError) {
+@@ -585,91 +895,64 @@ export default function Admin() {
+         setKeysError(keyError?.message || 'Kh├┤ng thß╗â tß║úi kho ─æ├íp ├ín tß╗½ database.');
+       }
+ 
+-      (Array.isArray(mergedIndex) ? mergedIndex : []).forEach((exam) => {
+-        const safeId = toTrimmedString(exam?.id);
+-        if (!safeId) return;
+-
+-        const subjectFolder = toTrimmedString(exam.subjectFolder || exam.subject).toLowerCase();
+-        const examPath = toTrimmedString(exam.examPath || safeId);
+-
+-        examMap.set(safeId.toLowerCase(), {
+-          ...exam,
+-          id: safeId,
+-          subject: subjectFolder || toTrimmedString(exam.subject).toLowerCase(),
+-          subjectFolder: subjectFolder || toTrimmedString(exam.subject).toLowerCase(),
+-          examPath,
+-          has_key: false,
+-          has_resources: false,
+-          solution_url: '',
+-          video_url: '',
+-          answer_file_url: '',
+-          answer_file_name: '',
+-          answer_key: null,
+-          resources: {},
+-          is_local: true,
+-          is_in_db: false,
+-          last_synced_at: null,
+-        });
+-      });
+-
+       (Array.isArray(keysData) ? keysData : []).forEach((row) => {
+         const dbExamId = toTrimmedString(row?.exam_id);
+         if (!dbExamId) return;
+-
+-        const existing = examMap.get(dbExamId.toLowerCase()) || null;
+         const resources = normalizeExamResources(row?.resources);
+ 
+-        const subjectFolder = toTrimmedString(
+-          existing?.subjectFolder ||
+-          existing?.subject ||
++        const initialIdentityKey = getAdminExamIdentityKey({
++          exam_id: dbExamId,
++          resources,
++        });
++
++        const subjectFolder = normalizeExamAdminSubject(
+           resources?.subject_folder ||
+           resources?.subjectFolder ||
+           resources?.subject,
+-        ).toLowerCase();
++        );
+ 
+         const examPath = toTrimmedString(
+-          existing?.examPath ||
+           resources?.exam_path ||
+           resources?.examPath ||
+           resources?.path ||
+           dbExamId,
+         );
+ 
+-        const timeValue = (
+-          existing?.time ??
+-          toOptionalPositiveInteger(resources?.time ?? resources?.duration_minutes)
+-        );
+-        const questionValue = (
+-          existing?.questions ??
+-          toOptionalPositiveInteger(resources?.questions ?? resources?.question_count)
++        const timeValue = normalizeExamAdminTime(
++          subjectFolder,
++          resources?.time,
++          resources?.duration_minutes,
+         );
++        const questionValue = toOptionalPositiveInteger(resources?.questions ?? resources?.question_count);
+ 
+-        const normalizedStatus = (
+-          toTrimmedString(resources?.status || existing?.status || 'ongoing') || 'ongoing'
+-        );
++        const normalizedStatus = toTrimmedString(resources?.status || 'ongoing') || 'ongoing';
+ 
+-        const solutionUrl = toTrimmedString(
+-          resources?.solution_url ||
+-          resources?.answer_file_url ||
+-          existing?.solution_url,
+-        );
++        const solutionUrl = toTrimmedString(resources?.solution_url || resources?.answer_file_url);
+ 
+-        const videoUrl = toTrimmedString(resources?.video_url || existing?.video_url);
++        const videoUrl = toTrimmedString(resources?.video_url);
+         const answerFileUrl = toTrimmedString(resources?.answer_file_url);
+         const answerFileName = toTrimmedString(resources?.answer_file_name || 'Dap an');
++        
++        const examIdentityKey = getAdminExamIdentityKey({
++          id: dbExamId,
++          exam_id: dbExamId,
++          subjectFolder: subjectFolder || 'khac',
++          examPath: examPath || dbExamId,
++          resources,
++        });
++        if (!examIdentityKey) return;
+ 
+-        examMap.set(dbExamId.toLowerCase(), {
+-          ...existing,
++        examMap.set(examIdentityKey, {
+           id: dbExamId,
+-          title: toTrimmedString(existing?.title || resources?.title || resources?.exam_title || dbExamId),
+-          subject: subjectFolder || existing?.subject || 'khac',
+-          subjectFolder: subjectFolder || existing?.subjectFolder || 'khac',
+-          examPath: examPath || existing?.examPath || dbExamId,
++          title: toTrimmedString(resources?.title || resources?.exam_title || dbExamId),
++          subject: subjectFolder || 'khac',
++          subjectFolder: subjectFolder || 'khac',
++          examPath: examPath || dbExamId,
+           time: timeValue,
+           questions: questionValue,
+           status: normalizedStatus,
+-          icon: toTrimmedString(existing?.icon || resources?.icon) || existing?.icon,
+-          color: toTrimmedString(existing?.color || resources?.color) || existing?.color,
++          icon: toTrimmedString(resources?.icon),
++          color: toTrimmedString(resources?.color),
+           solution_url: solutionUrl,
+           video_url: videoUrl,
+           answer_file_url: answerFileUrl,
+@@ -678,16 +961,17 @@ export default function Admin() {
+           has_resources: Boolean(solutionUrl || videoUrl || answerFileUrl),
+           answer_key: row?.answer_key || {},
+           resources,
+-          is_local: Boolean(existing),
++          is_local: false,
+           is_in_db: true,
+           last_synced_at: row?.last_synced_at || row?.updated_at || row?.created_at || null,
+         });
+       });
+ 
+       const merged = Array.from(examMap.values())
++        .filter((item) => !hiddenLocalKeySet.has(getAdminExamIdentityKey(item)))
+         .sort((a, b) => {
+-          const leftTs = new Date(a.last_synced_at || a.updated_at || 0).getTime() || 0;
+-          const rightTs = new Date(b.last_synced_at || b.updated_at || 0).getTime() || 0;
++          const leftTs = new Date(a.last_synced_at || 0).getTime() || 0;
++          const rightTs = new Date(b.last_synced_at || 0).getTime() || 0;
+           if (rightTs !== leftTs) return rightTs - leftTs;
+           return String(a.id || '').localeCompare(String(b.id || ''));
+         });
+@@ -701,27 +985,69 @@ export default function Admin() {
+     }
+   };
+ 
+-  const deleteExam = async (examId) => {
+-    const safeExamId = toTrimmedString(examId);
++  const hideLocalExamFromAdminList = (exam) => {
++    const identityKey = getAdminExamIdentityKey(exam);
++    if (!identityKey) return hiddenLocalExamKeys;
++    if (hiddenLocalExamKeys.includes(identityKey)) return hiddenLocalExamKeys;
++
++    const next = [...hiddenLocalExamKeys, identityKey];
++    setHiddenLocalExamKeys(next);
++    writeHiddenLocalExamKeys(next);
++    return next;
++  };
++
++  const unhideLocalExamFromAdminList = (exam) => {
++    const next = removeHiddenLocalExamKey(hiddenLocalExamKeys, exam);
++    setHiddenLocalExamKeys(next);
++    writeHiddenLocalExamKeys(next);
++    return next;
++  };
++
++  const persistDeletedExamMarker = async (exam) => {
++    if (!exam) return null;
++
++    return markAdminExamDeleted({
++      examId: exam.id,
++      subjectFolder: exam.subjectFolder || exam.subject,
++      examPath: exam.examPath || exam.id,
++    });
++  };
++
++  const deleteExam = async (exam) => {
++    const safeExamId = toTrimmedString(exam?.id || exam);
++    const safeExamPath = toTrimmedString(exam?.examPath);
+     if (!safeExamId) return;
+     if (!window.confirm(`Bß║ín c├│ chß║»c chß║»n muß╗æn x├│a ─æß╗ü thi ${safeExamId} v─⌐nh viß╗àn? H├ánh ─æß╗Öng n├áy sß║╜ x├│a cß║ú metadata, ─æ├íp ├ín v├á c├íc bß║ún ghi li├¬n quan trong database.`)) return;
+ 
+     setLoadingExams(true);
+     try {
+-      const result = await deleteAdminExamKeys([safeExamId]);
++      const result = await deleteAdminExamKeys([safeExamId, safeExamPath]);
+ 
+       if (Array.isArray(result?.failed) && result.failed.length > 0) {
+         throw new Error(result.failed[0]?.error || 'X├│a ─æß╗ü thi thß║Ñt bß║íi.');
+       }
+ 
+-      if (!Array.isArray(result?.deleted) || result.deleted.length === 0) {
++      const deletedIds = Array.isArray(result?.deleted) ? result.deleted : [];
++
++      if (deletedIds.length === 0) {
++        if (exam && (exam.is_local || !exam.is_in_db)) {
++          await persistDeletedExamMarker(exam);
++          const nextHiddenKeys = hideLocalExamFromAdminList(exam);
++          clearExamIndexCache();
++          setExams((prev) => removeExamFromList(prev, exam));
++          await fetchExams({ hiddenKeysOverride: nextHiddenKeys });
++          toast('─É├ú x├│a ─æß╗ü local-only khß╗Åi danh s├ích');
++          return;
++        }
+         throw new Error('Kh├┤ng t├¼m thß║Ñy ─æß╗ü ─æß╗â x├│a tr├¬n database.');
+       }
+ 
++      await persistDeletedExamMarker(exam);
+       clearExamIndexCache();
+-      setExams((prev) => prev.filter((item) => item.id.toLowerCase() !== safeExamId.toLowerCase()));
++      const nextHiddenKeys = hideLocalExamFromAdminList(exam);
++      setExams((prev) => removeExamFromList(prev, exam, deletedIds));
+       toast('─É├ú x├│a ─æß╗ü thi th├ánh c├┤ng');
+-      await fetchExams();
++      await fetchExams({ hiddenKeysOverride: nextHiddenKeys });
+     } catch (err) {
+       alert('Lß╗ùi khi x├│a ─æß╗ü thi: ' + err.message);
+     } finally {
+@@ -779,6 +1105,7 @@ export default function Admin() {
+     if (!ex?.id) return;
+     setEditingExam(ex.id);
+     setSelectedAnswerFile(null);
++    setSelectedDocumentFile(null);
+ 
+     const fallbackResources = normalizeExamResources(ex.resources || {});
+     let remotePayload = null;
+@@ -801,13 +1128,13 @@ export default function Admin() {
+     setExamEditForm({
+       ...DEFAULT_EXAM_EDIT_FORM,
+       title: toTrimmedString(ex.title || mergedResources.title || ex.id),
+-      subject_folder: toTrimmedString(
++      subject_folder: normalizeExamAdminSubject(
+         ex.subjectFolder ||
+         ex.subject ||
+         mergedResources.subject_folder ||
+         mergedResources.subjectFolder ||
+         mergedResources.subject,
+-      ).toLowerCase(),
++      ),
+       exam_path: toTrimmedString(
+         ex.examPath ||
+         mergedResources.exam_path ||
+@@ -816,10 +1143,20 @@ export default function Admin() {
+         ex.id,
+       ),
+       time: String(
+-        ex.time ??
+-        toOptionalPositiveInteger(mergedResources.time ?? mergedResources.duration_minutes) ??
+-        '',
++        normalizeExamAdminTime(
++          ex.subjectFolder ||
++          ex.subject ||
++          mergedResources.subject_folder ||
++          mergedResources.subjectFolder ||
++          mergedResources.subject,
++          ex.time ?? mergedResources.time,
++          mergedResources.duration_minutes,
++        ) ?? '',
+       ),
++      questions: String(
++        ex.questions ??
++        toOptionalPositiveInteger(mergedResources.questions ?? mergedResources.question_count) ??
++        '',
+       questions: String(
+         ex.questions ??
+         toOptionalPositiveInteger(mergedResources.questions ?? mergedResources.question_count) ??
+@@ -831,53 +1168,34 @@ export default function Admin() {
+       video_url: toTrimmedString(mergedResources.video_url || ex.video_url),
+       answer_file_url: toTrimmedString(mergedResources.answer_file_url || ex.answer_file_url),
+       answer_file_name: toTrimmedString(mergedResources.answer_file_name || ex.answer_file_name),
+-    });
+-  };
+-
+-  const handleSyncFromJson = async () => {
+-    if (!editingExam) return;
+-
+-    const ex = exams.find((item) => item.id === editingExam);
+-    if (!ex) return;
+-
+-    setLoadingExams(true);
+-    try {
+-      const subjectFolder = toTrimmedString(ex.subjectFolder || ex.subject || examEditForm.subject_folder).toLowerCase();
+-      const examPath = toTrimmedString(ex.examPath || examEditForm.exam_path || ex.id);
+-      const resp = await fetch(`/data/exams/${subjectFolder}/${examPath}/exam.json`, { cache: 'no-store' });
+-      if (!resp.ok) throw new Error('Kh├┤ng t├¼m thß║Ñy file exam.json cß╗Ñc bß╗Ö.');
+-
+-      const data = await resp.json();
+-      const resources = normalizeExamResources(data.resources || {});
+-      const questionCount = countQuestionsFromExamJson(data);
+-
+-      setExamEditForm({
+-        ...examEditForm,
+-        title: toTrimmedString(data.title || examEditForm.title || ex.title),
+-        subject_folder: toTrimmedString(data.subject || subjectFolder).toLowerCase(),
+-        exam_path: examPath,
+-        time: String(toOptionalPositiveInteger(data.time) ?? examEditForm.time ?? ''),
+-        questions: String(questionCount || toOptionalPositiveInteger(examEditForm.questions) || ''),
+-        answer_key: JSON.stringify(data.answer_key || {}, null, 2),
+-        solution_url: toTrimmedString(
+-          resources.solution_url ||
+-          resources.answer_file_url ||
+-          data.solution_url ||
+-          data.solutionUrl,
+-        ),
+-        video_url: toTrimmedString(resources.video_url || data.video_url || data.videoUrl),
+-        answer_file_url: toTrimmedString(resources.answer_file_url || examEditForm.answer_file_url),
+-        answer_file_name: toTrimmedString(resources.answer_file_name || examEditForm.answer_file_name || 'Dap an'),
+-      });
+-
+-      toast('─É├ú nß║íp dß╗» liß╗çu tß╗½ file JSON th├ánh c├┤ng!');
+-    } catch (err) {
+       alert('Lß╗ùi khi ─æß╗ông bß╗Ö: ' + err.message);
+     } finally {
+       setLoadingExams(false);
+     }
+   };
+ 
++  const generateTemplate2025 = () => {
++    const defaultTemplate = {
++        "phan_thu_nhat": {
++            "cau_1": "A", "cau_2": "A", "cau_3": "A", "cau_4": "A", "cau_5": "A", "cau_6": "A",
++            "cau_7": "A", "cau_8": "A", "cau_9": "A", "cau_10": "A", "cau_11": "A", "cau_12": "A",
++            "cau_13": "A", "cau_14": "A", "cau_15": "A", "cau_16": "A", "cau_17": "A", "cau_18": "A"
++        },
++        "phan_thu_hai": {
++            "cau_1": ["T", "F", "T", "F"],
++            "cau_2": ["T", "F", "T", "F"],
++            "cau_3": ["T", "F", "T", "F"],
++            "cau_4": ["T", "F", "T", "F"]
++        },
++        "phan_thu_ba": {
++            "cau_1": "1.0", "cau_2": "2.0", "cau_3": "3.0", "cau_4": "4.0", "cau_5": "5.0", "cau_6": "6.0"
++        }
++    };
++    if (window.confirm("Tß║ío form mß║½u 18 C├óu trß║»c nghiß╗çm - 4 C├óu ─É/S - 6 C├óu ─æiß╗ün sß╗æ? Viß╗çc n├áy sß║╜ ghi ─æ├¿ ─É├íp ├ín hiß╗çn tß║íi.")) {
++       setExamEditForm({ ...examEditForm, answer_key: JSON.stringify(defaultTemplate, null, 2) });
++    }
++  };
++
+   const formatJson = () => {
+     try {
+       const parsed = JSON.parse(examEditForm.answer_key);
+@@ -904,14 +1222,14 @@ export default function Admin() {
+         throw new Error('Thiß║┐u m├ú ─æß╗ü thi ─æß╗â l╞░u.');
+       }
+ 
+-      const subjectFolder = toTrimmedString(examEditForm.subject_folder).toLowerCase();
++      const subjectFolder = normalizeExamAdminSubject(examEditForm.subject_folder);
+       if (!subjectFolder) {
+         throw new Error('Vui l├▓ng nhß║¡p m├┤n hß╗ìc (subject_folder) tr╞░ß╗¢c khi l╞░u.');
+       }
+ 
+       const examPath = toTrimmedString(examEditForm.exam_path || safeExamId);
+       const title = toTrimmedString(examEditForm.title || safeExamId);
+-      const durationMinutes = toOptionalPositiveInteger(examEditForm.time);
++      const durationMinutes = normalizeExamAdminTime(subjectFolder, examEditForm.time);
+       const questionCount = toOptionalPositiveInteger(examEditForm.questions);
+       const status = toTrimmedString(examEditForm.status || 'ongoing') || 'ongoing';
+ 
+@@ -935,12 +1253,18 @@ export default function Admin() {
+         video_url: examEditForm.video_url,
+         answer_file_url: examEditForm.answer_file_url || currentResources.answer_file_url || examEditForm.solution_url,
+         answer_file_name: examEditForm.answer_file_name || currentResources.answer_file_name || 'Dap an',
++        document_url: examEditForm.document_url || currentResources.document_url,
+       });
+ 
+       if (selectedAnswerFile) {
+         const uploadResult = await uploadExamAnswerFile(safeExamId, selectedAnswerFile);
+         nextResources.answer_file_url = uploadResult.publicUrl;
+-        nextResources.answer_file_name = uploadResult.fileName || nextResources.answer_file_name || 'Dap an';
++        nextResources.answer_file_name = examEditForm.answer_file_name || uploadResult.fileName || 'Dap an';
++      }
++
++      if (selectedDocumentFile) {
++        const docUploadPath = await uploadExamDocument(selectedDocumentFile, subjectFolder, safeExamId);
++        nextResources.document_url = docUploadPath;
+       }
+ 
+       await upsertAdminExamKeyBundle({
+@@ -948,11 +1272,22 @@ export default function Admin() {
+         answerKey: parsedKey,
+         resources: nextResources,
+       });
++      await clearAdminDeletedExamMarker({
++        examId: safeExamId,
++        subjectFolder,
++        examPath,
++      });
+ 
+       toast('Cß║¡p nhß║¡t dß╗» liß╗çu ─æß╗ü thi th├ánh c├┤ng!');
+       setEditingExam(null);
+       setExamEditForm(DEFAULT_EXAM_EDIT_FORM);
+       setSelectedAnswerFile(null);
++      setSelectedDocumentFile(null);
++      unhideLocalExamFromAdminList({
++        id: safeExamId,
++        subjectFolder,
++        examPath,
++      });
+       clearExamIndexCache();
+       await fetchExams();
+     } catch (err) {
+@@ -1181,57 +1516,8 @@ export default function Admin() {
+                         <p className="text-xs text-slate-500">
+                           {member.vip_expired_at
+                             ? new Date(member.vip_expired_at).toLocaleDateString('vi-VN')
+-                            : 'Kh├┤ng r├╡ hß║ín'}
+-                        </p>
+-                      </div>
+-                    </div>
+                   ))}
+                 </div>
+-              )}
+-            </div>
+-
+-            {/* Payment Logs */}
+-            <div className="bg-white dark:bg-[#201216] border border-white/10 rounded-2xl p-5 shadow-xl">
+-              <div className="flex items-center justify-between mb-4">
+-                <h2 className="text-base font-black text-slate-300 flex items-center gap-2">
+-                  <span className="material-symbols-outlined text-[18px]">receipt_long</span> Webhook Logs
+-                </h2>
+-                <button onClick={fetchPaymentLogs} className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+-                  <span className="material-symbols-outlined text-[14px]">refresh</span> Tß║úi lß║íi
+-                </button>
+-              </div>
+-              {paymentLogsLoading ? (
+-                <div className="flex justify-center py-6"><span className="material-symbols-outlined animate-spin text-slate-400">sync</span></div>
+-              ) : paymentLogs.length === 0 ? (
+-                <p className="text-slate-500 text-sm text-center py-4">Ch╞░a c├│ webhook log n├áo.</p>
+-              ) : (
+-                <div className="space-y-2 max-h-80 overflow-y-auto">
+-                  {paymentLogs.map(log => (
+-                    <div key={log.id} className={`flex items-center gap-3 p-3 rounded-xl border text-xs ${
+-                      log.status === 'ok' ? 'border-green-500/20 bg-green-500/5 text-green-400'
+-                      : log.status === 'duplicate' ? 'border-blue-500/20 bg-blue-500/5 text-blue-400'
+-                      : 'border-red-500/20 bg-red-500/5 text-red-400'
+-                    }`}>
+-                      <span className="font-mono font-bold uppercase">{log.status}</span>
+-                      <span className="text-slate-500 flex-1 truncate">{log.error_message || 'OK'}</span>
+-                      <span className="text-slate-600 shrink-0">{new Date(log.created_at).toLocaleString('vi-VN')}</span>
+-                    </div>
+-                  ))}
+-                </div>
+-              )}
+-            </div>
+-          </div>
+-        )}
+-
+-        {/* ΓöÇΓöÇΓöÇ Exam Management Tab ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
+-        {mainTab === 'exams' && (
+-          <div className="space-y-6">
+-            {/* Error Display for DB Issues */}
+-            {(keysError || examsDbError) && (
+-              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-bold animate-pulse">
+-                <div className="flex items-center gap-2 mb-1">
+-                  <span className="material-symbols-outlined text-[18px]">database_off</span>
+-                  <span>Cß║óNH B├üO DATABASE: Dß╗» liß╗çu tß╗½ Supabase c├│ thß╗â kh├┤ng ─æß║ºy ─æß╗º.</span>
+                 </div>
+                 {keysError && <div className="ml-7">ΓÇó Lß╗ùi Kho kh├│a: {keysError}</div>}
+                 {examsDbError && <div className="ml-7">ΓÇó Lß╗ùi Metadata: {examsDbError}</div>}
+@@ -1265,26 +1551,6 @@ export default function Admin() {
+                     placeholder="T├¼m m├ú ─æß╗ü hoß║╖c t├¬n ─æß╗ü thi..."
+                     value={examSearch}
+                     onChange={(e) => setExamSearch(e.target.value)}
+-                    className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-slate-900 dark:text-white"
+-                  />
+-                </div>
+-                <div className="mt-2 text-[11px] text-slate-500 font-semibold">
+-                  Tß╗òng ─æß╗ü: {exams.length} | Khß╗¢p t├¼m kiß║┐m: {filteredExams.length}
+-                </div>
+-              </div>
+-
+-              {/* Edit Mode Overlay/Form */}
+-              {editingExam && (
+-                <div className="mb-8 p-6 rounded-2xl bg-blue-50 dark:bg-blue-500/5 border-2 border-blue-500/30 space-y-4 animate-in fade-in slide-in-from-top-4">
+-                  <div className="flex items-center justify-between">
+-                    <div>
+-                      <h3 className="font-black text-blue-600 dark:text-blue-400 flex items-center gap-2">
+-                        <span className="material-symbols-outlined">edit_note</span>
+-                        ─Éang chß╗ënh sß╗¡a: {editingExam}
+-                      </h3>
+-                      <p className="text-[10px] text-slate-500 font-bold uppercase mt-1">L╞░u trß╗▒c tiß║┐p v├áo database qua RPC admin</p>
+-                    </div>
+-                    <div className="flex gap-2">
+                       <button 
+                         onClick={handleSyncFromJson}
+                         className="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-[10px] font-black uppercase flex items-center gap-1 hover:bg-amber-600 shadow-sm"
+@@ -1411,6 +1677,18 @@ export default function Admin() {
+                         />
+                       </div>
+                       <div>
++                        <label className="block text-xs font-bold text-amber-500 uppercase mb-1">Upload ─Éß╗Ç THI (PDF Storage)</label>
++                        <input
++                          type="file"
++                          accept=".pdf,.doc,.docx"
++                          onChange={(e) => setSelectedDocumentFile(e.target.files?.[0] || null)}
++                          className="w-full text-xs px-3 py-2 mb-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-500/30 text-amber-900 dark:text-amber-100"
++                        />
++                        {(selectedDocumentFile || examEditForm.document_url) && (
++                          <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1 mb-4 font-medium truncate">
++                            {selectedDocumentFile ? `Chß╗¥ L╞░u: ${selectedDocumentFile.name}` : `─É├ú l╞░u: ${examEditForm.document_url}`}
++                          </p>
++                        )}
+                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Upload file ─æ├íp ├ín</label>
+                         <input
+                           type="file"
+@@ -1426,7 +1704,10 @@ export default function Admin() {
+                     <div>
+                       <div className="flex items-center justify-between mb-1">
+                         <label className="block text-xs font-bold text-slate-500 uppercase">─É├íp ├ín (JSON Answer Key)</label>
+-                        <button onClick={formatJson} className="text-[10px] font-bold text-blue-500 hover:underline">─Éß╗ïnh dß║íng JSON</button>
++                        <div className="flex gap-3">
++                          <button onClick={generateTemplate2025} type="button" className="text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 font-bold hover:bg-emerald-100 flex items-center rounded transition-colors"><span className="material-symbols-outlined text-[14px] mr-1">auto_awesome</span> Tß║ío BGD 2025</button>
++                          <button onClick={formatJson} type="button" className="text-[10px] font-bold text-blue-500 hover:underline flex items-center">─Éß╗ïnh dß║íng JSON</button>
++                        </div>
+                       </div>
+                       <textarea
+                         rows="14"
+@@ -1473,8 +1754,26 @@ export default function Admin() {
+                   <p className="text-slate-500 font-medium">Kh├┤ng c├│ ─æß╗ü n├áo khß╗¢p tß╗½ kh├│a t├¼m kiß║┐m.</p>
+                 </div>
+               ) : (
+-                <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
+-                  {filteredExams.map(ex => (
++                <div className="space-y-10">
++                  {Object.entries(filteredExams.reduce((acc, ex) => {
++                    const subjRaw = ex.subjectFolder || ex.subject || 'khac';
++                    const subj = typeof subjRaw === 'string' ? subjRaw.trim() : 'khac';
++                    if (!acc[subj]) acc[subj] = [];
++                    acc[subj].push(ex);
++                    return acc;
++                  }, {})).map(([subject, subjectExams]) => (
++                    <div key={subject} className="space-y-4">
++                      <div className="flex items-center gap-3 border-b-2 border-slate-200 dark:border-white/10 pb-3">
++                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 text-blue-500 flex items-center justify-center">
++                           <span className="material-symbols-outlined text-[20px]">folder_open</span>
++                        </div>
++                        <h3 className="font-black text-xl text-slate-800 dark:text-white uppercase tracking-widest">
++                          M├öN {subject === 'ly' ? 'Vß║¡t L├╜' : subject === 'toan' ? 'To├ín Hß╗ìc' : subject === 'hoa' ? 'H├│a Hß╗ìc' : subject === 'sinh' ? 'Sinh Hß╗ìc' : subject === 'anh' ? 'Tiß║┐ng Anh' : subject === 'van' ? 'Ngß╗» V─ân' : subject === 'su' ? 'Lß╗ïch Sß╗¡' : subject === 'dia' ? '─Éß╗ïa L├╜' : subject === 'gdcd' ? 'GDCD' : subject}
++                        </h3>
++                        <span className="text-[11px] font-black text-slate-500 bg-slate-200 dark:bg-slate-800 px-3 py-1 rounded-full shadow-inner">{subjectExams.length} ─Éß╗Ç THI</span>
++                      </div>
++                      <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
++                        {subjectExams.map(ex => (
+                     <div key={ex.id} className="p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:border-blue-500/30 transition-all flex flex-col gap-4">
+                       <div className="flex-1 min-w-0">
+                         <div className="flex flex-wrap items-start gap-2 mb-1">
+@@ -1540,12 +1839,15 @@ export default function Admin() {
+                           <span className="material-symbols-outlined text-[16px]">visibility</span> Kiß╗âm tra
+                         </button>
+                         <button 
+-                          onClick={() => deleteExam(ex.id)}
++                          onClick={() => deleteExam(ex)}
+                           className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-red-500/10 hover:text-red-500 text-xs font-bold transition-all flex items-center gap-1"
+                         >
+                           <span className="material-symbols-outlined text-[16px]">delete</span> X├│a
+                         </button>
+                       </div>
++                    </div>
++                        ))}
++                      </div>
+                     </div>
+                   ))}
+                 </div>

@@ -68,12 +68,15 @@ const toSafeFilePart = (value) => String(value || '')
   .replace(/-+/g, '-')
   .replace(/^-|-$/g, '');
 
-const toStoragePath = (examId, originalName = 'answer-file') => {
-  const examFolder = toSafeFilePart(examId) || 'unknown-exam';
-  const safeName = toSafeFilePart(originalName) || 'answer-file';
-  const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
-  return `${examFolder}/${stamp}-${safeName}`;
-};
+export async function adminDeleteStorageFile(bucket, path) {
+  if (!bucket || !path) return false;
+  const { error } = await supabase.storage.from(bucket).remove([path]);
+  if (error) {
+    console.error(`[StorageCleanup] Failed to delete ${path} in ${bucket}:`, error);
+    return false;
+  }
+  return true;
+}
 
 export async function listAdminExamKeys() {
   const { data, error } = await supabase.rpc('admin_list_exam_keys');
@@ -217,12 +220,55 @@ export async function deleteAdminExamKeys(examIds) {
   };
 }
 
-export async function uploadExamAnswerFile(examId, file) {
+export async function uploadExamDocumentFile(examId, subjectFolder, file, oldPath = null) {
+  if (!file) {
+    throw new Error('Chưa chọn file đề thi để tải lên.');
+  }
+
+  const EXAM_DOCUMENT_BUCKET = 'exams';
+  const folder = toSafeFilePart(subjectFolder) || toSafeFilePart(examId) || 'unknown';
+  const ext = file.name.split('.').pop() || 'pdf';
+  const storagePath = `${folder}/${toSafeFilePart(examId)}.${ext}`;
+
+  if (oldPath && oldPath !== storagePath) {
+    await adminDeleteStorageFile(EXAM_DOCUMENT_BUCKET, oldPath).catch(() => {});
+  }
+
+  const { error: uploadError } = await supabase
+    .storage
+    .from(EXAM_DOCUMENT_BUCKET)
+    .upload(storagePath, file, {
+      upsert: true,
+      contentType: file.type || undefined,
+      cacheControl: '3600',
+    });
+
+  if (uploadError) {
+    throw uploadError;
+  }
+
+  const { data } = supabase.storage.from(EXAM_DOCUMENT_BUCKET).getPublicUrl(storagePath);
+  return {
+    bucket: EXAM_DOCUMENT_BUCKET,
+    path: storagePath,
+    publicUrl: data?.publicUrl || '',
+    fileName: file.name || 'exam-document.pdf',
+  };
+}
+
+export async function uploadExamAnswerFile(examId, file, oldPath = null) {
   if (!file) {
     throw new Error('Chưa chọn file đáp án để tải lên.');
   }
 
-  const storagePath = toStoragePath(examId, file.name);
+  const ext = file.name.split('.').pop() || 'pdf';
+  const examFolder = toSafeFilePart(examId) || 'unknown-exam';
+  const storagePath = `${examFolder}/${examFolder}-answer.${ext}`;
+
+  if (oldPath && oldPath !== storagePath) {
+    await adminDeleteStorageFile(ANSWER_FILE_BUCKET, oldPath).catch(() => {});
+  }
+
   const { error: uploadError } = await supabase
     .storage
     .from(ANSWER_FILE_BUCKET)
