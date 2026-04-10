@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import WelcomeModal from './WelcomeModal';
 import Avatar from './Avatar';
 
 /* ───────────────────── Bottom Tab Configuration ───────────────────── */
@@ -13,10 +12,27 @@ const BOTTOM_TABS = [
   { path: '/profile',   icon: 'person',         label: 'Cá nhân' },
 ];
 
+const WelcomeModal = lazy(() => import('./WelcomeModal'));
+
+const scheduleIdleTask = (callback, timeout = 1800) => {
+  if (typeof window === 'undefined') {
+    return () => {};
+  }
+
+  if ('requestIdleCallback' in window) {
+    const idleId = window.requestIdleCallback(callback, { timeout });
+    return () => window.cancelIdleCallback(idleId);
+  }
+
+  const timerId = window.setTimeout(callback, Math.min(timeout, 1000));
+  return () => window.clearTimeout(timerId);
+};
+
 export default function RootLayout() {
   const { user, profile } = useAuth();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [shouldLoadWelcomeModal, setShouldLoadWelcomeModal] = useState(false);
   const mainRef = useRef(null);
 
   // Close mobile menu on route change
@@ -35,6 +51,15 @@ export default function RootLayout() {
 
   const isActive = (path) => location.pathname === path;
   const isExamTakingRoute = /^\/exam\/[^/]+\/[^/]+$/.test(location.pathname);
+
+  useEffect(() => {
+    if (isExamTakingRoute) {
+      return undefined;
+    }
+
+    const cleanup = scheduleIdleTask(() => setShouldLoadWelcomeModal(true));
+    return cleanup;
+  }, [isExamTakingRoute]);
 
   if (isExamTakingRoute) {
     return (
@@ -174,7 +199,11 @@ export default function RootLayout() {
         className="flex-1 md:ml-64 relative min-h-dvh has-bottom-nav md:pb-0 animate-page-in"
       >
         <Outlet />
-        <WelcomeModal />
+        {shouldLoadWelcomeModal ? (
+          <Suspense fallback={null}>
+            <WelcomeModal />
+          </Suspense>
+        ) : null}
       </main>
 
       {/* ═══════════ MOBILE BOTTOM TAB BAR ═══════════ */}

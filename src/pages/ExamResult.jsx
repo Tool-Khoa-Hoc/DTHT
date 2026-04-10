@@ -18,6 +18,7 @@ import {
     questionHasStatementContent
 } from '../utils/examQuestionLayout';
 import { getSecureDocumentUrl } from '../lib/uploadExamFile';
+import DocumentRenderer from '../components/exam/DocumentRenderer';
 
 const getQuestionKey = (partId, questionId) => `${partId}.${questionId}`;
 const CHOICE_LABELS = ['A', 'B', 'C', 'D'];
@@ -419,11 +420,15 @@ export default function ExamResult() {
         correct: location.state?.correct ?? null,
         total: location.state?.total ?? null
     }));
+    // Track whether the server has scored this exam (answer_key existed server-side)
+    const [serverIsScored, setServerIsScored] = useState(() => Boolean(location.state?.isScored));
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
     const [showReview, setShowReview] = useState(false);
     const [vipResources, setVipResources] = useState(null);
     const [secureAnswerUrl, setSecureAnswerUrl] = useState(null);
+    const [secureDocumentUrl, setSecureDocumentUrl] = useState(null);
+    const [bucketAnswerFiles, setBucketAnswerFiles] = useState([]);
     const [reviewLeftWidth, setReviewLeftWidth] = useState(68);
     const [isDragging, setIsDragging] = useState(false);
 
@@ -491,81 +496,159 @@ export default function ExamResult() {
                 return;
             }
 
+            // Reset state on every run (e.g. when user resolves from null → authenticated)
+            setLoading(true);
+            setLoadError('');
+
             try {
                 const searchParams = new URLSearchParams(location.search);
                 const resultId = location.state?.resultId || searchParams.get('resultId');
                 const routeExamMeta = await resolveCanonicalExamMeta(routeSubjectFolder, routeExamPath, location.state?.examId);
                 setExamMeta(routeExamMeta);
-                let resultQuery = supabase
-                    .from('exam_results')
-                    .select('id, exam_id, subject_folder, answers_snapshot, score, correct_count, total_questions')
-                    .eq('user_id', user.id);
+
+                // --- Step 1: Find the exam result ---
+                let result = null;
 
                 if (resultId) {
-                    resultQuery = resultQuery.eq('id', resultId);
-                } else {
-                    const canonicalSubjectFolder = (
-                        routeExamMeta?.subjectFolder ||
-                        location.state?.subjectFolder ||
-                        routeSubjectFolder
-                    );
-                    resultQuery = resultQuery
-                        .eq('exam_id', location.state?.examId || routeExamMeta.id)
-                        .eq('subject_folder', canonicalSubjectFolder)
-                        .order('submitted_at', { ascending: false })
-                        .limit(1);
+                    const { data, error } = await supabase
+                        .from('exam_results')
+                        .select('id, exam_id, subject_folder, answers_snapshot, score, correct_count, total_questions, is_scored')
+                        .eq('user_id', user.id)
+                        .eq('id', resultId)
+                        .maybeSingle();
+                    if (error) throw error;
+                    result = data;
                 }
 
-                const { data: resultData, error: resultError } = await resultQuery;
-                if (resultError) throw resultError;
-
-                const result = Array.isArray(resultData) ? resultData[0] : resultData;
                 if (!result) {
-                    throw new Error('Result not found');
+                    // Try finding by exam_id + subject_folder
+                    const candidateIds = [
+                        location.state?.examId,
+                        routeExamMeta?.id,
+                        routeExamPath,
+                        ...(routeExamMeta?.legacyExamIds || []),
+                    ].filter(Boolean);
+
+                    const uniqueIds = [...new Set(candidateIds.map(id => id.toLowerCase()))];
+
+                    for (const tryId of uniqueIds) {
+                        if (result) break;
+                        const canonicalSubjectFolder = (
+                            routeExamMeta?.subjectFolder ||
+                            location.state?.subjectFolder ||
+                            routeSubjectFolder
+                        );
+                        const { data, error } = await supabase
+                            .from('exam_results')
+                            .select('id, exam_id, subject_folder, answers_snapshot, score, correct_count, total_questions, is_scored')
+                            .eq('user_id', user.id)
+                            .ilike('exam_id', tryId)
+                            .eq('subject_folder', canonicalSubjectFolder)
+                            .order('submitted_at', { ascending: false })
+                            .limit(1)
+                            .maybeSingle();
+                        if (error) {
+                            console.warn(`[ExamResult] Query for exam_id="${tryId}" failed:`, error.message);
+                            continue;
+                        }
+                        result = data;
+                    }
                 }
 
+                if (!result) {
+                    console.warn('[ExamResult] No result found for user', user.id, 'exam', routeExamPath);
+                    setLoadError('Bạn chưa có kết quả cho đề thi này. Hãy hoàn thành bài thi trước.');
+                    setLoading(false);
+                    return;
+                }
+
+                console.log('[ExamResult] Found result:', { id: result.id, exam_id: result.exam_id, is_scored: result.is_scored });
+
+                // --- Step 2: Load exam structure ---
                 const subjectFolder = result.subject_folder || routeSubjectFolder || location.state?.subjectFolder;
                 const examId = result.exam_id || location.state?.examId || routeExamPath;
                 const examMeta = await resolveCanonicalExamMeta(subjectFolder, routeExamPath || location.state?.examPath, examId);
                 const reviewContentPath = getExamBundlePath(examMeta, routeExamPath || location.state?.examPath || examId);
                 const examBasePath = getExamBasePath(subjectFolder, reviewContentPath);
-                const examRes = await fetch(`${examBasePath}/exam.json`);
-                if (!examRes.ok) {
-                    console.warn("Could not fetch exam.json for review");
+                let rawExamData;
+                try {
+                    const examRes = await fetch(`${examBasePath}/exam.json`);
+                    rawExamData = examRes.ok ? await examRes.json() : null;
+                } catch {
+                    rawExamData = null;
                 }
-                const rawExamData = examRes.ok ? await examRes.json() : {
-                    title: examMeta.title || "Đề thi",
-                    subject: subjectFolder,
-                    time: examMeta.time || 50,
-                    parts: [
-                        {
-                            id: "phan_thu_nhat",
-                            type: "multiple_choice",
-                            questions: Array.from({ length: 18 }, (_, i) => ({ id: `cau_${i + 1}`, type: "single_choice" }))
-                        },
-                        {
-                            id: "phan_thu_hai",
-                            type: "true_false",
-                            questions: Array.from({ length: 4 }, (_, i) => ({
-                                id: `cau_${i + 1}`,
+
+                if (!rawExamData) {
+                    console.warn('[ExamResult] No local exam.json, using fallback structure');
+                    const questionCount = result.total_questions || examMeta?.questions || 28;
+                    // Standard THPTQG format: 18 MC + 4 TF + 6 SA = 28
+                    const mcCount = Math.max(0, questionCount - 10);
+                    rawExamData = {
+                        title: examMeta?.title || "Đề thi",
+                        subject: subjectFolder,
+                        time: examMeta?.time || 50,
+                        parts: [
+                            {
+                                id: "part-1",
+                                type: "multiple_choice",
+                                questions: Array.from({ length: mcCount }, (_, i) => ({ id: `${i + 1}`, type: "single_choice" }))
+                            },
+                            {
+                                id: "part-2",
                                 type: "true_false",
-                                statements: [{ id: "A" }, { id: "B" }, { id: "C" }, { id: "D" }]
-                            }))
-                        },
-                        {
-                            id: "phan_thu_ba",
-                            type: "short_answer",
-                            questions: Array.from({ length: 6 }, (_, i) => ({ id: `cau_${i + 1}`, type: "short_answer" }))
-                        }
-                    ]
-                };
+                                questions: Array.from({ length: 4 }, (_, i) => ({
+                                    id: `${i + 1}`,
+                                    type: "true_false",
+                                    statements: [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
+                                }))
+                            },
+                            {
+                                id: "part-3",
+                                type: "short_answer",
+                                questions: Array.from({ length: 6 }, (_, i) => ({ id: `${i + 1}`, type: "short_answer" }))
+                            }
+                        ]
+                    };
+                }
 
-                const { data: reviewPayload, error: reviewError } = await supabase.rpc('get_exam_review_payload', {
-                    p_result_id: result.id
-                });
-                if (reviewError) throw reviewError;
+                // --- Step 3: Load answer key via RPC ---
+                let mergedAnswerKey = {};
+                let reviewIsScored = Boolean(result.is_scored);
 
-                const mergedAnswerKey = reviewPayload?.answer_key || {};
+                try {
+                    const { data: reviewPayload, error: reviewError } = await supabase.rpc('get_exam_review_payload', {
+                        p_result_id: result.id
+                    });
+                    if (reviewError) throw reviewError;
+
+                    mergedAnswerKey = reviewPayload?.answer_key || {};
+                    reviewIsScored = Boolean(reviewPayload?.is_scored || reviewPayload?.has_answer_key || result.is_scored);
+                    console.log('[ExamResult] Review payload:', {
+                        hasAnswerKey: Object.keys(mergedAnswerKey).length > 0,
+                        answerKeyCount: Object.keys(mergedAnswerKey).length,
+                        isScored: reviewIsScored,
+                        score: reviewPayload?.score,
+                    });
+
+                    // Update answers and metrics from review payload
+                    setAnswers(reviewPayload?.answers_snapshot || result.answers_snapshot || {});
+                    setResultMetrics({
+                        score: reviewPayload?.score ?? result.score ?? null,
+                        correct: reviewPayload?.correct_count ?? result.correct_count ?? null,
+                        total: reviewPayload?.total_questions ?? result.total_questions ?? null
+                    });
+                } catch (rpcError) {
+                    console.warn('[ExamResult] RPC get_exam_review_payload failed, using result data:', rpcError?.message);
+                    // Fallback: use data from the exam_results row directly
+                    setAnswers(result.answers_snapshot || {});
+                    setResultMetrics({
+                        score: result.score ?? null,
+                        correct: result.correct_count ?? null,
+                        total: result.total_questions ?? null
+                    });
+                }
+
+                // --- Step 4: Assemble final exam data ---
                 const publicResources = await getPublicExamResources([examId, routeExamPath, examMeta?.examPath]);
                 const canonicalExamData = applyCanonicalExamMetadata({
                     ...rawExamData,
@@ -573,15 +656,14 @@ export default function ExamResult() {
                 }, examMeta, publicResources, subjectFolder);
 
                 setExamData(normalizeExamMediaPaths(canonicalExamData, examBasePath));
-                setAnswers(reviewPayload?.answers_snapshot || result.answers_snapshot || {});
-                setResultMetrics({
-                    score: reviewPayload?.score ?? result.score ?? null,
-                    correct: reviewPayload?.correct_count ?? result.correct_count ?? null,
-                    total: reviewPayload?.total_questions ?? result.total_questions ?? null
-                });
+                setServerIsScored(reviewIsScored);
             } catch (error) {
-                console.error('[ExamResult] Load review failed:', error);
+                console.error('[ExamResult] Load review failed:', error?.message, error);
                 setLoadError('Không thể tải dữ liệu xem lại bài thi.');
+                // Still trust server scoring flag from navigation state
+                if (location.state?.isScored) {
+                    setServerIsScored(true);
+                }
             } finally {
                 setLoading(false);
             }
@@ -601,16 +683,76 @@ export default function ExamResult() {
             });
     }, [location.state?.examId, examMeta?.id, user]);
 
-    // Khi mở showReview: lấy signed URL cho file đáp án từ Supabase Storage
+    // Khi mở showReview: lấy URL cho file đáp án. ĐỌC THEO CẤU TRÚC THƯ MỤC TRỰC TIẾP TỪ STORAGE (nhiều files) HOẶC FALLBACK.
     useEffect(() => {
         if (!showReview) return;
-        const rawAnswerUrl = vipResources?.answer_file_url || examData?.answer_file_url || examData?.resources?.answer_file_url || null;
-        if (!rawAnswerUrl) { setSecureAnswerUrl(null); return; }
-        if (rawAnswerUrl.startsWith('http')) { setSecureAnswerUrl(rawAnswerUrl); return; }
-        // Đây là path trong bucket exam-answer-files (public) → tạo public URL
-        const { data } = supabase.storage.from('exam-answer-files').getPublicUrl(rawAnswerUrl);
-        setSecureAnswerUrl(data?.publicUrl || null);
-    }, [showReview, vipResources, examData]);
+        const examId = location.state?.examId || examMeta?.id;
+        
+        const fetchFiles = async () => {
+            let filesUrls = [];
+            
+            // Bước 1: Ưu tiên tự động tìm toàn bộ file trong thư mục exam_id từ Storage (đọc cấu trúc bucket)
+            if (examId) {
+                const { data: bucketFiles } = await supabase.rpc('list_exam_answer_files', { p_exam_id: examId });
+                if (bucketFiles && bucketFiles.length > 0) {
+                    filesUrls = bucketFiles.map(file => {
+                        const { data } = supabase.storage.from('exam-answer-files').getPublicUrl(file.path);
+                        return data?.publicUrl;
+                    }).filter(Boolean);
+                }
+            }
+
+            // Bước 2: NẾU thư mục rỗng, fallback về url lưu trong db (vipResources) hoặc local (examData)
+            if (filesUrls.length === 0) {
+                let rawAnswerUrl = null;
+                if (vipResources) {
+                    rawAnswerUrl = vipResources.answer_file_url || null;
+                } else {
+                    rawAnswerUrl = examData?.answer_file_url || examData?.resources?.answer_file_url || null;
+                }
+
+                if (rawAnswerUrl) {
+                    // Yêu cầu: CHỈ sử dụng Supabase Storage, kiên quyết loại bỏ link Google Drive ở phần Đáp Án
+                    // Đợi xử lý: Nếu gặp link Google Drive (đặc biệt là link folder), bỏ qua để tự động rớt xuống hiển thị Đề Thi
+                    if (rawAnswerUrl.includes('drive.google.com') || rawAnswerUrl.includes('docs.google.com')) {
+                        rawAnswerUrl = null; 
+                    } else if (rawAnswerUrl.startsWith('http')) { 
+                        filesUrls = [rawAnswerUrl];
+                    } else {
+                        const { data } = supabase.storage.from('exam-answer-files').getPublicUrl(rawAnswerUrl);
+                        if (data?.publicUrl) filesUrls = [data.publicUrl];
+                    }
+                }
+            }
+
+            // Gán giá trị đầu tiên cho logic cũ nếu có component nào còn cần (vẫn gọi setSecureAnswerUrl dùng để tương thích)
+            setSecureAnswerUrl(filesUrls[0] || null);
+            // Ghi nhận mảng để dùng render component mới (nhiều files)
+            setBucketAnswerFiles(filesUrls);
+        };
+        fetchFiles();
+    }, [showReview, vipResources, examData, location.state?.examId, examMeta?.id]);
+
+    // Khi mở showReview: lấy signed URL cho PDF đề thi (document_url) từ bucket exams (private)
+    useEffect(() => {
+        if (!showReview) return;
+        
+        let rawDocUrl = null;
+        if (vipResources) {
+            rawDocUrl = vipResources.document_url || null;
+        } else {
+            rawDocUrl = examData?.document_url || examData?.resources?.document_url || examMeta?.documentUrl || null;
+        }
+
+        if (!rawDocUrl) { setSecureDocumentUrl(null); return; }
+        if (rawDocUrl.startsWith('http')) { setSecureDocumentUrl(rawDocUrl); return; }
+        if (rawDocUrl.startsWith('/')) { setSecureDocumentUrl(rawDocUrl); return; }
+
+        // Path tương đối → tạo Signed URL từ bucket exams (private)
+        getSecureDocumentUrl(rawDocUrl, 10800).then((url) => {
+            setSecureDocumentUrl(url || null);
+        });
+    }, [showReview, vipResources, examData, examMeta]);
 
     const resolvedSubjectFolder = examMeta?.subjectFolder || routeSubjectFolder || location.state?.subjectFolder;
     const resolvedExamPath = examMeta?.examPath || location.state?.examPath || routeExamPath;
@@ -665,10 +807,11 @@ export default function ExamResult() {
 
     if (!examData) {
          return (
-             <div className="min-h-screen bg-[#f8f6f6] flex flex-col items-center justify-center">
-                 <h2 className="text-xl font-bold mb-2">Không tìm thấy kết quả hợp lệ.</h2>
-                 {loadError && <p className="text-sm text-slate-500 mb-4">{loadError}</p>}
-                 <Link to="/exam-room" className="px-6 py-2 bg-blue-500 text-white rounded-lg">Quay lại</Link>
+             <div className="min-h-screen bg-[#f8f6f6] flex flex-col items-center justify-center px-4">
+                 <span className="material-symbols-outlined text-5xl text-slate-300 mb-4">assignment_late</span>
+                 <h2 className="text-xl font-bold text-slate-700 mb-2">Không tìm thấy kết quả</h2>
+                 {loadError && <p className="text-sm text-slate-500 mb-6 text-center max-w-md">{loadError}</p>}
+                 <Link to="/exam-room" className="px-6 py-3 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600 transition-colors">Quay lại phòng thi</Link>
              </div>
          );
     }
@@ -738,7 +881,8 @@ export default function ExamResult() {
         });
     });
 
-    const hasReviewAnswerKey = hasPopulatedAnswerKey(examData.answer_key);
+    // answer_key is populated from the RPC call; also trust the server's is_scored flag
+    const hasReviewAnswerKey = hasPopulatedAnswerKey(examData.answer_key) || serverIsScored;
     const scoreFromServer = Number(resultMetrics.score);
     const displayScore = Number.isFinite(scoreFromServer)
         ? scoreFromServer
@@ -772,20 +916,25 @@ export default function ExamResult() {
                 </header>
 
                 <div className="flex-1 flex flex-row w-full relative overflow-hidden">
-                    {/* Left Pane – PDF đáp án */}
+                    {/* Left Pane – PDF đề thi / đáp án */}
                     <div style={{ width: `calc(${reviewLeftWidth}%)` }} className="h-full border-r border-slate-200 bg-slate-900 flex flex-col items-center justify-center overflow-hidden">
                         {secureAnswerUrl ? (
-                            <iframe
-                                src={secureAnswerUrl}
-                                title="Folder đề"
-                                className="w-full h-full"
-                                style={{ border: 'none' }}
+                            <DocumentRenderer
+                                url={secureAnswerUrl}
+                                userEmail={user?.email}
+                                userName={profile?.full_name || user?.user_metadata?.full_name}
+                            />
+                        ) : secureDocumentUrl ? (
+                            <DocumentRenderer
+                                url={secureDocumentUrl}
+                                userEmail={user?.email}
+                                userName={profile?.full_name || user?.user_metadata?.full_name}
                             />
                         ) : (
                             <div className="flex flex-col items-center gap-4 text-slate-400 p-10 text-center">
-                                <span className="material-symbols-outlined text-6xl">sentiment_dissatisfied</span>
-                                <p className="text-lg font-bold text-slate-300">Chưa có lời giải</p>
-                                <p className="text-sm text-slate-500">Giáo viên chưa upload file đáp án / bài giải cho đề thi này.</p>
+                                <span className="material-symbols-outlined text-6xl">description</span>
+                                <p className="text-lg font-bold text-slate-300">Chưa có file PDF đề thi</p>
+                                <p className="text-sm text-slate-500">File PDF cho đề thi này chưa được tải lên hệ thống.</p>
                             </div>
                         )}
                     </div>
@@ -988,7 +1137,7 @@ export default function ExamResult() {
                         </div>
 
                         <div className="flex flex-wrap justify-center gap-4">
-                            {hasReviewAnswerKey ? (
+                            {hasPopulatedAnswerKey(examData.answer_key) ? (
                                 <>
                                     {details.part1.total > 0 && (
                                         <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-44">

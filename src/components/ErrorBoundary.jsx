@@ -1,16 +1,59 @@
 import React from 'react';
 
+/**
+ * Check if an error originates from pdfjs-dist worker lifecycle.
+ * These errors fire when navigating away from a page with a PDF viewer,
+ * and the PDF worker's messageHandler becomes null during cleanup.
+ */
+function isPdfjsWorkerError(error) {
+    const msg = String(error?.message || '');
+    return (
+        msg.includes('sendWithPromise') ||
+        msg.includes('Cannot read properties of null') && msg.includes('send') ||
+        msg.includes('worker was destroyed') ||
+        msg.includes('Worker was terminated')
+    );
+}
+
 class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
         this.state = { hasError: false, error: null };
+        this._unhandledRejectionHandler = null;
     }
 
     static getDerivedStateFromError(error) {
+        // Suppress pdfjs worker errors — they are harmless navigation artifacts
+        if (isPdfjsWorkerError(error)) {
+            console.warn('[ErrorBoundary] Suppressed pdfjs worker error:', error?.message);
+            return null; // Don't trigger error state
+        }
         return { hasError: true, error };
     }
 
+    componentDidMount() {
+        // Catch unhandled promise rejections from pdfjs-dist worker cleanup
+        this._unhandledRejectionHandler = (event) => {
+            if (isPdfjsWorkerError(event?.reason)) {
+                event.preventDefault();
+                console.warn('[ErrorBoundary] Suppressed unhandled pdfjs rejection:', event?.reason?.message);
+            }
+        };
+        window.addEventListener('unhandledrejection', this._unhandledRejectionHandler);
+    }
+
+    componentWillUnmount() {
+        if (this._unhandledRejectionHandler) {
+            window.removeEventListener('unhandledrejection', this._unhandledRejectionHandler);
+        }
+    }
+
     componentDidCatch(error, errorInfo) {
+        if (isPdfjsWorkerError(error)) {
+            // Reset the error state since we want to suppress this
+            this.setState({ hasError: false, error: null });
+            return;
+        }
         console.error("UI Error Caught by Boundary:", error, errorInfo);
     }
 
@@ -48,3 +91,4 @@ class ErrorBoundary extends React.Component {
 }
 
 export default ErrorBoundary;
+

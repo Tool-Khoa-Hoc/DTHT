@@ -303,3 +303,29 @@ export async function uploadExamAnswerFile(examId, file, oldPath = null) {
     fileName: file.name || FALLBACK_ANSWER_FILE_NAME,
   };
 }
+
+export async function listAdminSubjects() {
+  const { data, error } = await supabase.rpc('admin_list_exam_subjects');
+  if (error) throw error;
+  return Array.isArray(data) ? data : [];
+}
+
+export async function upsertAdminSubject({ id, name, icon, color, display_order }) {
+  const { data, error } = await supabase.rpc('admin_upsert_exam_subject', {
+    p_id: id,
+    p_name: name,
+    p_icon: icon || null,
+    p_color: color || null,
+    p_order: display_order || 0
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteAdminSubject(id) {
+  const { data, error } = await supabase.rpc('admin_delete_exam_subject', {
+    p_id: id
+  });
+  if (error) throw error;
+  return Boolean(data);
+}

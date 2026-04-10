@@ -5,7 +5,7 @@ import { useExamAccess } from '../hooks/useExamAccess';
 import { useExamEngine } from '../hooks/useExamEngine';
 import ExamTakingHeader from '../components/exam/ExamTakingHeader';
 import ExamRightPanel from '../components/exam/ExamRightPanel';
-import SecurePdfViewer from '../components/exam/SecurePdfViewer';
+import DocumentRenderer from '../components/exam/DocumentRenderer';
 
 const FREE_DAILY_LIMIT = 3;
 
@@ -125,14 +125,14 @@ export default function ExamTaking() {
             <ExamTakingHeader examData={examData} timeLeft={timeLeft} />
 
             <div className="flex-1 flex flex-col md:flex-row w-full relative overflow-hidden">
-                {/* Premium Mode Left Pane */}
-                <div style={{ width: `calc(${leftWidth}%)` }} className="h-full hidden md:block">
-                    <SecurePdfViewer 
-                        url={documentUrl} 
-                        userEmail={user?.email} 
-                        userName={profile?.full_name || user?.user_metadata?.full_name} 
-                    />
-                </div>
+                    {/* PC PDF section */}
+                    <div style={{ width: `calc(${leftWidth}%)` }} className="hidden md:flex flex-col h-full overflow-hidden border-r-2 border-slate-200 shadow-2xl relative z-10 bg-slate-900 border-r-2 border-red-200 z-10 box-border pointer-events-auto">
+                        <DocumentRenderer 
+                            url={documentUrl} 
+                            userEmail={user?.email} 
+                            userName={profile?.full_name || user?.user_metadata?.full_name} 
+                        />
+                    </div>
                 
                 {/* Glassmorphism Resizer */}
                 <div 

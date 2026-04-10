@@ -1,8 +1,26 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
-// https://vitejs.dev/config/
+const CHUNK_RULES = [
+  {
+    name: 'vendor-react',
+    test: /node_modules[\\/](react|react-dom|scheduler|react-router|react-router-dom)[\\/]/,
+  },
+  {
+    name: 'vendor-supabase',
+    test: /node_modules[\\/]@supabase[\\/]/,
+  },
+  {
+    name: 'vendor-katex',
+    test: /node_modules[\\/](katex|react-katex)[\\/]/,
+  },
+  {
+    name: 'vendor-icons',
+    test: /node_modules[\\/]lucide-react[\\/]/,
+  },
+];
+
 export default defineConfig({
   plugins: [
     react(),
@@ -12,20 +30,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
-              return 'vendor-react';
-            }
-            if (id.includes('@supabase')) {
-              return 'vendor-supabase';
-            }
-            if (id.includes('@vercel')) {
-              return 'vendor-vercel';
-            }
-            return 'vendor'; // Gom các gói còn lại
+          if (!id.includes('node_modules')) {
+            return undefined;
           }
-        }
-      }
-    }
-  }
-})
+
+          const matchedRule = CHUNK_RULES.find((rule) => rule.test.test(id));
+          return matchedRule?.name;
+        },
+      },
+    },
+  },
+});

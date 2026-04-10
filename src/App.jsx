@@ -1,36 +1,30 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import RootLayout from './components/RootLayout';
-import { SpeedInsights } from "@vercel/speed-insights/react"
 import SecurityWrapper from './components/SecurityWrapper';
 import ErrorBoundary from './components/ErrorBoundary';
 
-// Include global styles
 import './index.css';
 
-// Gói bọc (Wrapper) xử lý riêng cho lỗi mất Chunk của Vite khi có bản Build mới hoặc đứt Server
-const lazyRetry = (componentImport) => {
-  return lazy(async () => {
-    try {
-      const module = await componentImport();
-      window.sessionStorage.removeItem('vite-chunk-reload'); // Tải thành công thì xoá cờ
-      return module;
-    } catch (error) {
-      // Nếu lỗi là do không tìm thấy file Chunk động (Vite)
-      if (error?.message?.includes('Failed to fetch dynamically imported module')) {
-        const hasReloaded = window.sessionStorage.getItem('vite-chunk-reload');
-        if (!hasReloaded) {
-          window.sessionStorage.setItem('vite-chunk-reload', 'true');
-          window.location.reload(); // Ép F5 làm mới dữ liệu cục bộ
-        }
+const lazyRetry = (componentImport) => lazy(async () => {
+  try {
+    const module = await componentImport();
+    window.sessionStorage.removeItem('vite-chunk-reload');
+    return module;
+  } catch (error) {
+    if (error?.message?.includes('Failed to fetch dynamically imported module')) {
+      const hasReloaded = window.sessionStorage.getItem('vite-chunk-reload');
+      if (!hasReloaded) {
+        window.sessionStorage.setItem('vite-chunk-reload', 'true');
+        window.location.reload();
       }
-      throw error; // Nếu lỗi khác hoặc đã F5 rồi vẫn lỗi thì ném cho ErrorBoundary
     }
-  });
-};
 
-// Lazy load route components thông minh
+    throw error;
+  }
+});
+
+const RootLayout = lazyRetry(() => import('./components/RootLayout'));
 const AuthScreen = lazyRetry(() => import('./pages/AuthScreen'));
 const Home = lazyRetry(() => import('./pages/Home'));
 const GPACalculator = lazyRetry(() => import('./pages/GPACalculator'));
@@ -51,32 +45,74 @@ const PaymentWaiting = lazyRetry(() => import('./pages/PaymentWaiting'));
 const PaymentSuccess = lazyRetry(() => import('./pages/PaymentSuccess'));
 const Notes = lazyRetry(() => import('./pages/Notes'));
 
-// App Loading Fallback
-const PageLoader = () => {
-  const [show, setShow] = React.useState(false);
+const scheduleIdleTask = (callback, timeout = 1500) => {
+  if (typeof window === 'undefined') {
+    return () => {};
+  }
+
+  if ('requestIdleCallback' in window) {
+    const idleId = window.requestIdleCallback(callback, { timeout });
+    return () => window.cancelIdleCallback(idleId);
+  }
+
+  const timerId = window.setTimeout(callback, Math.min(timeout, 800));
+  return () => window.clearTimeout(timerId);
+};
+
+function DeferredSpeedInsights() {
+  const [SpeedInsightsComponent, setSpeedInsightsComponent] = React.useState(null);
+
   React.useEffect(() => {
-    const timer = setTimeout(() => setShow(true), 400); // 400ms delay để không nháy khung loading
-    return () => clearTimeout(timer);
+    let cancelled = false;
+
+    const cleanup = scheduleIdleTask(async () => {
+      try {
+        const mod = await import('@vercel/speed-insights/react');
+        if (!cancelled) {
+          setSpeedInsightsComponent(() => mod.SpeedInsights);
+        }
+      } catch (error) {
+        console.warn('[App] Could not load SpeedInsights.', error);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      cleanup();
+    };
   }, []);
-  
-  if (!show) return <div className="min-h-screen bg-[#0a0c14]"></div>;
+
+  return SpeedInsightsComponent ? <SpeedInsightsComponent /> : null;
+}
+
+function PageLoader() {
+  const [show, setShow] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => setShow(true), 250);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (!show) {
+    return <div className="min-h-screen bg-[#0a0c14]" />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0a0c14] text-white">
       <div className="flex flex-col items-center gap-3">
         <span className="material-symbols-outlined animate-spin text-4xl text-[#3b82f6]">sync</span>
-        <p className="text-sm text-slate-400 animate-pulse">Đang nạp phân đoạn giao diện...</p>
+        <p className="text-sm text-slate-400 animate-pulse">Đang nạp giao diện...</p>
       </div>
     </div>
   );
-};
+}
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <SecurityWrapper>
-          <SpeedInsights />
+          <DeferredSpeedInsights />
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Routes>
