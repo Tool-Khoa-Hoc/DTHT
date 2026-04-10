@@ -319,8 +319,8 @@ export default function Roadmap() {
                             {/* Progress Ring */}
                             <div className="relative w-24 h-24 shrink-0 hidden sm:block">
                                 <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                                    <circle className="stroke-slate-200 dark:stroke-[#7f13ec]/20" cx="18" cy="18" fill="none" r="16" strokeWidth="3"></circle>
-                                    <circle className="stroke-[#7f13ec]" cx="18" cy="18" fill="none" r="16" strokeDasharray="100" strokeDashoffset={100 - overallProgress} strokeLinecap="round" strokeWidth="3" style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}></circle>
+                                    <circle className="stroke-slate-200 dark:stroke-[#7f13ec]/20" cx="18" cy="18" fill="none" r="15.5" strokeWidth="3"></circle>
+                                    <circle className="stroke-[#7f13ec]" cx="18" cy="18" fill="none" r="15.5" strokeDasharray="97.39" strokeDashoffset={97.39 - (97.39 * overallProgress) / 100} strokeLinecap="round" strokeWidth="3" style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}></circle>
                                 </svg>
                                 <div className="absolute inset-0 flex items-center justify-center">
                                     <span className="font-bold text-[#7f13ec] text-xl">{overallProgress}%</span>

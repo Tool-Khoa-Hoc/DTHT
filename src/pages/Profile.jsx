@@ -365,9 +365,9 @@ export default function Profile() {
                                         )}
                                     </div>
                                     <div className="relative flex items-center justify-center">
-                                        <svg className="h-16 w-16 transform -rotate-90">
-                                            <circle className="text-white/10" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" strokeWidth="4"></circle>
-                                            <circle className="text-[#7f13ec]" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" strokeDasharray="175.9" strokeDashoffset={`${175.9 - (175.9 * Math.min(Number(profile?.target_thpt || 24) / 30, 1))}`} strokeLinecap="round" strokeWidth="4"></circle>
+                                        <svg className="h-16 w-16 transform -rotate-90" viewBox="0 0 64 64">
+                                            <circle className="text-white/10" cx="32" cy="32" fill="transparent" r="27" stroke="currentColor" strokeWidth="4"></circle>
+                                            <circle className="text-[#7f13ec]" cx="32" cy="32" fill="transparent" r="27" stroke="currentColor" strokeDasharray="169.65" strokeDashoffset={`${169.65 - (169.65 * Math.min(Number(profile?.target_thpt || 24) / 30, 1))}`} strokeLinecap="round" strokeWidth="4"></circle>
                                         </svg>
                                     </div>
                                 </div>
@@ -395,9 +395,9 @@ export default function Profile() {
                                         </div>
                                         {profile?.target_dgnl && !isEditing && (
                                             <div className="relative flex items-center justify-center">
-                                                <svg className="h-12 w-12 transform -rotate-90">
-                                                    <circle className="text-white/10" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" strokeWidth="3"></circle>
-                                                    <circle className="text-blue-500" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" strokeDasharray="125.6" strokeDashoffset={`${125.6 - (125.6 * Math.min(Number(profile?.target_dgnl || 850) / 1200, 1))}`} strokeLinecap="round" strokeWidth="3"></circle>
+                                                <svg className="h-12 w-12 transform -rotate-90" viewBox="0 0 48 48">
+                                                    <circle className="text-white/10" cx="24" cy="24" fill="transparent" r="19" stroke="currentColor" strokeWidth="3"></circle>
+                                                    <circle className="text-blue-500" cx="24" cy="24" fill="transparent" r="19" stroke="currentColor" strokeDasharray="119.38" strokeDashoffset={`${119.38 - (119.38 * Math.min(Number(profile?.target_dgnl || 850) / 1200, 1))}`} strokeLinecap="round" strokeWidth="3"></circle>
                                                 </svg>
                                             </div>
                                         )}
@@ -429,9 +429,9 @@ export default function Profile() {
                                 </div>
                             </div>
                             <div className="relative flex items-center justify-center">
-                                <svg className="h-20 w-20 transform -rotate-90">
-                                    <circle className="text-white/10" cx="40" cy="40" fill="transparent" r="34" stroke="currentColor" strokeWidth="6"></circle>
-                                    <circle className="text-[#7f13ec]" cx="40" cy="40" fill="transparent" r="34" stroke="currentColor" strokeDasharray="213.6" strokeDashoffset={`${213.6 - (213.6 * Math.min(Number(profile?.current_gpa || 0) / Number(profile?.target_gpa || 4), 1))}`} strokeLinecap="round" strokeWidth="6"></circle>
+                                <svg className="h-20 w-20 transform -rotate-90" viewBox="0 0 80 80">
+                                    <circle className="text-white/10" cx="40" cy="40" fill="transparent" r="33" stroke="currentColor" strokeWidth="6"></circle>
+                                    <circle className="text-[#7f13ec]" cx="40" cy="40" fill="transparent" r="33" stroke="currentColor" strokeDasharray="207.35" strokeDashoffset={`${207.35 - (207.35 * Math.min(Number(profile?.current_gpa || 0) / Number(profile?.target_gpa || 4), 1))}`} strokeLinecap="round" strokeWidth="6"></circle>
                                 </svg>
                                 <span className="absolute text-sm font-bold">{Math.round(Math.min(Number(profile?.current_gpa || 0) / Number(profile?.target_gpa || 4), 1) * 100)}%</span>
                             </div>

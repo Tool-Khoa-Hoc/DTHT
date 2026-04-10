@@ -69,10 +69,10 @@ function RingResult({ score, max, color, label }) {
         </p>
       </div>
       <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
-        <svg className="w-full h-full -rotate-90">
-          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
-          <circle cx="40" cy="40" r="34" fill="none" stroke={color}
-            strokeWidth="6" strokeDasharray="213.6" strokeDashoffset={213.6 - (213.6 * pct) / 100}
+        <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
+          <circle cx="40" cy="40" r="33" fill="none" stroke={color}
+            strokeWidth="6" strokeDasharray="207.35" strokeDashoffset={207.35 - (207.35 * pct) / 100}
             strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.7s ease' }} />
         </svg>
         <span className="absolute text-sm font-bold text-white">{Math.round(pct)}%</span>
@@ -106,7 +106,7 @@ function THPTCalc() {
 }
 
 function THPTExamCalc() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const admissionScoresRef = React.useRef(null);
   const [subjects, setSubjects] = useState([
     { id: 1, name: 'Toán', grade: 0 },
@@ -114,7 +114,7 @@ function THPTExamCalc() {
     { id: 3, name: 'Tiếng Anh', grade: 0 }
   ]);
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     if (profile?.admission_scores?.thpt_exam) {
@@ -132,9 +132,9 @@ function THPTExamCalc() {
   const maxScore = subjects.length * 10;
 
   const handleSave = async () => {
-    if (!user) { setMessage('Đăng nhập để lưu.'); return; }
+    if (!user) { setMessage({ type: 'error', text: 'Đăng nhập để lưu.' }); return; }
     setIsSaving(true);
-    setMessage('');
+    setMessage({ type: '', text: '' });
     try {
       const currentScores = admissionScoresRef.current || {};
 
@@ -147,13 +147,16 @@ function THPTExamCalc() {
       }).eq('id', user.id);
 
       if (error) throw error;
-      // Update local cache after successful save
+      
+      // Update local cache and refresh profile
       admissionScoresRef.current = { ...currentScores, thpt_exam: subjects, thpt_exam_total: total.toFixed(2) };
-      setMessage('Đã lưu điểm thành công!');
-      setTimeout(() => setMessage(''), 3000);
+      await refreshProfile?.();
+      
+      setMessage({ type: 'success', text: 'Đã lưu điểm thành công!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     } catch (err) {
       console.error(err);
-      setMessage('Lỗi khi lưu điểm.');
+      setMessage({ type: 'error', text: 'Lỗi: ' + (err.message || 'Không thể lưu điểm.') });
     } finally {
       setIsSaving(false);
     }
@@ -198,13 +201,17 @@ function THPTExamCalc() {
           {isSaving ? 'Đang lưu...' : 'Lưu điểm thi'}
         </button>
       </div>
-      {message && <p className="text-center text-xs font-medium text-green-400">{message}</p>}
+      {message.text && (
+        <p className={`text-center text-xs font-medium ${message.type === 'error' ? 'text-rose-400' : 'text-green-400'}`}>
+          {message.text}
+        </p>
+      )}
     </div>
   );
 }
 
 function THPTTranscriptCalc() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const admissionScoresRef = React.useRef(null);
   const [subjects, setSubjects] = useState([
     { id: 1, name: 'Toán', grade10: 0, grade11: 0, grade12: 0 },
@@ -212,7 +219,7 @@ function THPTTranscriptCalc() {
     { id: 3, name: 'Tiếng Anh', grade10: 0, grade11: 0, grade12: 0 }
   ]);
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     if (profile?.admission_scores?.thpt_transcript) {
@@ -233,9 +240,9 @@ function THPTTranscriptCalc() {
   const maxCombinationScore = subjects.length * 10;
 
   const handleSave = async () => {
-    if (!user) { setMessage('Đăng nhập để lưu.'); return; }
+    if (!user) { setMessage({ type: 'error', text: 'Đăng nhập để lưu.' }); return; }
     setIsSaving(true);
-    setMessage('');
+    setMessage({ type: '', text: '' });
     try {
       const currentScores = admissionScoresRef.current || {};
 
@@ -248,12 +255,15 @@ function THPTTranscriptCalc() {
       }).eq('id', user.id);
 
       if (error) throw error;
+      
       admissionScoresRef.current = { ...currentScores, thpt_transcript: subjects, thpt_transcript_total: sumAvg.toFixed(2) };
-      setMessage('Đã lưu điểm thành công!');
-      setTimeout(() => setMessage(''), 3000);
+      await refreshProfile?.();
+      
+      setMessage({ type: 'success', text: 'Đã lưu điểm thành công!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     } catch (err) {
       console.error(err);
-      setMessage('Lỗi khi lưu điểm.');
+      setMessage({ type: 'error', text: 'Lỗi: ' + (err.message || 'Không thể lưu điểm.') });
     } finally {
       setIsSaving(false);
     }
@@ -322,7 +332,11 @@ function THPTTranscriptCalc() {
           {isSaving ? 'Đang lưu...' : 'Lưu điểm xét học bạ'}
         </button>
       </div>
-      {message && <p className="text-center text-xs font-medium text-amber-400">{message}</p>}
+      {message.text && (
+        <p className={`text-center text-xs font-medium ${message.type === 'error' ? 'text-rose-400' : 'text-green-400'}`}>
+          {message.text}
+        </p>
+      )}
     </div>
   );
 }
@@ -359,10 +373,11 @@ function BLabel({ label, hint }) {
 // HọcTHPT_quy đổi = (tb1 [×2 if Toán] + tb2 + tb3) / 4 × 10
 function BKHCMCalc() {
   const SAVE_KEY = 'bkhcm_admission';
-
-  const [hasDGNL, setHasDGNL] = useState(true);   // ĐT 2.1 vs 2.2
-  const [toanX2, setToanX2] = useState(true);    // Toán × 2 trong tổ hợp
-  const [saved, setSaved] = useState(false);
+  const { user, refreshProfile, profile } = useAuth();
+  const [hasDGNL, setHasDGNL] = useState(true);
+  const [toanX2, setToanX2] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
 
   // ĐGNL score parts (only used when hasDGNL)
   const [dgnlTV, setDgnlTV] = useState('');
@@ -384,29 +399,47 @@ function BKHCMCalc() {
   const [diemCong, setDiemCong] = useState('');
   const [uuTien, setUuTien] = useState('');
 
-  // Load saved on mount
   useEffect(() => {
-    const s = localStorage.getItem(SAVE_KEY);
-    if (s) {
-      try {
-        const d = JSON.parse(s);
-        if (d.hasDGNL !== undefined) setHasDGNL(d.hasDGNL);
-        if (d.toanX2 !== undefined) setToanX2(d.toanX2);
-        if (d.dgnlTV) setDgnlTV(d.dgnlTV);
-        if (d.dgnlAnh) setDgnlAnh(d.dgnlAnh);
-        if (d.dgnlToan) setDgnlToan(d.dgnlToan);
-        if (d.dgnlKH) setDgnlKH(d.dgnlKH);
-        if (d.thpt1) setThpt1(d.thpt1);
-        if (d.thpt2) setThpt2(d.thpt2);
-        if (d.thpt3) setThpt3(d.thpt3);
-        if (d.hb1) setHb1(d.hb1);
-        if (d.hb2) setHb2(d.hb2);
-        if (d.hb3) setHb3(d.hb3);
-        if (d.diemCong) setDiemCong(d.diemCong);
-        if (d.uuTien) setUuTien(d.uuTien);
-      } catch { }
+    if (profile?.admission_scores?.bkhcm) {
+      const d = profile.admission_scores.bkhcm;
+      if (d.hasDGNL !== undefined) setHasDGNL(d.hasDGNL);
+      if (d.toanX2 !== undefined) setToanX2(d.toanX2);
+      if (d.dgnlTV) setDgnlTV(d.dgnlTV);
+      if (d.dgnlAnh) setDgnlAnh(d.dgnlAnh);
+      if (d.dgnlToan) setDgnlToan(d.dgnlToan);
+      if (d.dgnlKH) setDgnlKH(d.dgnlKH);
+      if (d.thpt1) setThpt1(d.thpt1);
+      if (d.thpt2) setThpt2(d.thpt2);
+      if (d.thpt3) setThpt3(d.thpt3);
+      if (d.hb1) setHb1(d.hb1);
+      if (d.hb2) setHb2(d.hb2);
+      if (d.hb3) setHb3(d.hb3);
+      if (d.diemCong) setDiemCong(d.diemCong);
+      if (d.uuTien) setUuTien(d.uuTien);
+    } else {
+      // Fallback to local storage for users not logged in yet or legacy
+      const s = localStorage.getItem(SAVE_KEY);
+      if (s) {
+        try {
+          const d = JSON.parse(s);
+          if (d.hasDGNL !== undefined) setHasDGNL(d.hasDGNL);
+          if (d.toanX2 !== undefined) setToanX2(d.toanX2);
+          if (d.dgnlTV) setDgnlTV(d.dgnlTV);
+          if (d.dgnlAnh) setDgnlAnh(d.dgnlAnh);
+          if (d.dgnlToan) setDgnlToan(d.dgnlToan);
+          if (d.dgnlKH) setDgnlKH(d.dgnlKH);
+          if (d.thpt1) setThpt1(d.thpt1);
+          if (d.thpt2) setThpt2(d.thpt2);
+          if (d.thpt3) setThpt3(d.thpt3);
+          if (d.hb1) setHb1(d.hb1);
+          if (d.hb2) setHb2(d.hb2);
+          if (d.hb3) setHb3(d.hb3);
+          if (d.diemCong) setDiemCong(d.diemCong);
+          if (d.uuTien) setUuTien(d.uuTien);
+        } catch { }
+      }
     }
-  }, []);
+  }, [profile]);
 
   // ─── Calculations (memoised so they only re-run when relevant deps change) ───
   const p = useCallback((v) => parseFloat(v) || 0, []);
@@ -427,15 +460,44 @@ function BKHCMCalc() {
     return { dgnlAdj, maxDGNL, divTHPT, tnthptQD, hbQD, diemNL, diemHL, diemXT };
   }, [hasDGNL, toanX2, dgnlTV, dgnlAnh, dgnlToan, dgnlKH, thpt1, thpt2, thpt3, hb1, hb2, hb3, diemCong, uuTien]);
 
-  const handleSave = useCallback(() => {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({
+  const handleSave = async () => {
+    const data = {
       hasDGNL, toanX2, dgnlTV, dgnlAnh, dgnlToan, dgnlKH,
       thpt1, thpt2, thpt3, hb1, hb2, hb3, diemCong, uuTien,
       savedScore: diemXT.toFixed(2), savedAt: new Date().toISOString()
-    }));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-  }, [hasDGNL, toanX2, dgnlTV, dgnlAnh, dgnlToan, dgnlKH, thpt1, thpt2, thpt3, hb1, hb2, hb3, diemCong, uuTien, diemXT]);
+    };
+
+    // Always save to localStorage
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+
+    if (!user) {
+      setMessage({ type: 'success', text: 'Đã lưu vào bộ nhớ trình duyệt!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      return;
+    }
+
+    setIsSaving(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const currentScores = profile?.admission_scores || {};
+      const { error } = await supabase.from('profiles').update({
+        admission_scores: {
+          ...currentScores,
+          bkhcm: data
+        }
+      }).eq('id', user.id);
+
+      if (error) throw error;
+      await refreshProfile?.();
+      setMessage({ type: 'success', text: 'Đã lưu điểm thành công!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: 'error', text: 'Lỗi: ' + (err.message || 'Không thể lưu.') });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="bg-[#0f172a]/60 border border-white/10 rounded-2xl overflow-hidden">
@@ -563,11 +625,16 @@ function BKHCMCalc() {
             </div>
           </div>
 
-          <button onClick={handleSave}
-            className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${saved ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-[#e36488]/20 hover:bg-[#e36488]/40 text-white border border-[#e36488]/30'}`}>
-            <span className="material-symbols-outlined text-base">{saved ? 'check_circle' : 'save'}</span>
-            {saved ? 'Đã lưu điểm!' : 'Lưu điểm xét tuyển'}
+          <button onClick={handleSave} disabled={isSaving}
+            className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${message.type === 'success' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-[#e36488]/20 hover:bg-[#e36488]/40 text-white border border-[#e36488]/30'} disabled:opacity-50`}>
+            <span className="material-symbols-outlined text-base">{isSaving ? 'sync' : (message.type === 'success' ? 'check_circle' : 'save')}</span>
+            {isSaving ? 'Đang lưu...' : (message.type === 'success' ? 'Đã lưu điểm!' : 'Lưu điểm xét tuyển')}
           </button>
+          {message.text && (
+            <p className={`text-center text-[10px] font-medium mt-1 ${message.type === 'error' ? 'text-rose-400' : 'text-green-400'}`}>
+              {message.text}
+            </p>
+          )}
         </div>
 
       </div>

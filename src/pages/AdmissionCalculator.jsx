@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 
 // ==================== TABS CONFIG ====================
 const TABS = [
@@ -13,13 +15,47 @@ const TABS = [
 // Đánh giá năng lực ĐHQG HCM (HSA) - Thang 1200 điểm
 // Phần 1: Ngôn ngữ (TV 300 + EN 300 = 600), P2: Toán 300, P3: Tư duy KH 300
 function HSACalculator() {
+  const { user, profile, refreshProfile } = useAuth();
   const [tv, setTv] = useState('');
   const [en, setEn] = useState('');
   const [toan, setToan] = useState('');
   const [kh, setKh] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
 
-  const total = (parseFloat(tv)||0) + (parseFloat(en)||0) + (parseFloat(toan)||0) + (parseFloat(kh)||0);
+  useEffect(() => {
+    if (profile?.admission_scores?.hsa) {
+      const d = profile.admission_scores.hsa;
+      if (d.tv) setTv(d.tv);
+      if (d.en) setEn(d.en);
+      if (d.toan) setToan(d.toan);
+      if (d.kh) setKh(d.kh);
+    }
+  }, [profile]);
+
+  const total = (parseFloat(tv) || 0) + (parseFloat(en) || 0) + (parseFloat(toan) || 0) + (parseFloat(kh) || 0);
   const quyDoi30 = ((total / 1200) * 30).toFixed(2);
+
+  const handleSave = async () => {
+    if (!user) { setMessage({ type: 'error', text: 'Đăng nhập để lưu.' }); return; }
+    setIsSaving(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const currentScores = profile?.admission_scores || {};
+      const data = { tv, en, toan, kh, total, quyDoi: quyDoi30, savedAt: new Date().toISOString() };
+      const { error } = await supabase.from('profiles').update({
+        admission_scores: { ...currentScores, hsa: data }
+      }).eq('id', user.id);
+      if (error) throw error;
+      await refreshProfile?.();
+      setMessage({ type: 'success', text: 'Đã lưu điểm HSA!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Lỗi: ' + err.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -37,7 +73,8 @@ function HSACalculator() {
         <Field label="Tư duy KH (0–300)" value={kh} onChange={setKh} max={300} color="#e36488" />
       </div>
 
-      <ScoreResult total={total} maxTotal={1200} quyDoi={quyDoi30} label="Tổng điểm HSA" color="#e36488" />
+      <ScoreResult total={total} maxTotal={1200} quyDoi={quyDoi30} label="Tổng điểm HSA" color="#e36488" 
+        onSave={handleSave} isSaving={isSaving} message={message} />
     </div>
   );
 }
@@ -46,13 +83,47 @@ function HSACalculator() {
 // Đánh giá năng lực ĐHQG HN (VACT) - Thang 1200 điểm
 // TV 300 + EN 300 + Toán 300 + Tư duy KH 300
 function VACTCalculator() {
+  const { user, profile, refreshProfile } = useAuth();
   const [tv, setTv] = useState('');
   const [en, setEn] = useState('');
   const [toan, setToan] = useState('');
   const [kh, setKh] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
 
-  const total = (parseFloat(tv)||0) + (parseFloat(en)||0) + (parseFloat(toan)||0) + (parseFloat(kh)||0);
+  useEffect(() => {
+    if (profile?.admission_scores?.vact) {
+      const d = profile.admission_scores.vact;
+      if (d.tv) setTv(d.tv);
+      if (d.en) setEn(d.en);
+      if (d.toan) setToan(d.toan);
+      if (d.kh) setKh(d.kh);
+    }
+  }, [profile]);
+
+  const total = (parseFloat(tv) || 0) + (parseFloat(en) || 0) + (parseFloat(toan) || 0) + (parseFloat(kh) || 0);
   const quyDoi30 = ((total / 1200) * 30).toFixed(2);
+
+  const handleSave = async () => {
+    if (!user) { setMessage({ type: 'error', text: 'Đăng nhập để lưu.' }); return; }
+    setIsSaving(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const currentScores = profile?.admission_scores || {};
+      const data = { tv, en, toan, kh, total, quyDoi: quyDoi30, savedAt: new Date().toISOString() };
+      const { error } = await supabase.from('profiles').update({
+        admission_scores: { ...currentScores, vact: data }
+      }).eq('id', user.id);
+      if (error) throw error;
+      await refreshProfile?.();
+      setMessage({ type: 'success', text: 'Đã lưu điểm VACT!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Lỗi: ' + err.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -70,7 +141,8 @@ function VACTCalculator() {
         <Field label="Tư duy KH (0–300)" value={kh} onChange={setKh} max={300} color="#8b5cf6" />
       </div>
 
-      <ScoreResult total={total} maxTotal={1200} quyDoi={quyDoi30} label="Tổng điểm VACT" color="#8b5cf6" />
+      <ScoreResult total={total} maxTotal={1200} quyDoi={quyDoi30} label="Tổng điểm VACT" color="#8b5cf6" 
+        onSave={handleSave} isSaving={isSaving} message={message} />
     </div>
   );
 }
@@ -79,13 +151,47 @@ function VACTCalculator() {
 // Đánh giá tư duy Bách Khoa HN (TSA) - Thang 100 điểm
 // Toán: 40đ, Đọc hiểu: 20đ, KHTN/GQVĐ: 40đ
 function TSACalculator() {
+  const { user, profile, refreshProfile } = useAuth();
   const [toan, setToan] = useState('');
   const [doc, setDoc] = useState('');
   const [kh, setKh] = useState('');
   const [uuTien, setUuTien] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
 
-  const total = (parseFloat(toan)||0) + (parseFloat(doc)||0) + (parseFloat(kh)||0);
-  const totalWithPriority = Math.min(total + (parseFloat(uuTien)||0), 100);
+  useEffect(() => {
+    if (profile?.admission_scores?.tsa) {
+      const d = profile.admission_scores.tsa;
+      if (d.toan) setToan(d.toan);
+      if (d.doc) setDoc(d.doc);
+      if (d.kh) setKh(d.kh);
+      if (d.uuTien) setUuTien(d.uuTien);
+    }
+  }, [profile]);
+
+  const total = (parseFloat(toan) || 0) + (parseFloat(doc) || 0) + (parseFloat(kh) || 0);
+  const totalWithPriority = Math.min(total + (parseFloat(uuTien) || 0), 100);
+
+  const handleSave = async () => {
+    if (!user) { setMessage({ type: 'error', text: 'Đăng nhập để lưu.' }); return; }
+    setIsSaving(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const currentScores = profile?.admission_scores || {};
+      const data = { toan, doc, kh, uuTien, total, totalWithPriority, savedAt: new Date().toISOString() };
+      const { error } = await supabase.from('profiles').update({
+        admission_scores: { ...currentScores, tsa: data }
+      }).eq('id', user.id);
+      if (error) throw error;
+      await refreshProfile?.();
+      setMessage({ type: 'success', text: 'Đã lưu điểm TSA!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Lỗi: ' + err.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -104,7 +210,8 @@ function TSACalculator() {
         <Field label="Điểm ưu tiên (+)" value={uuTien} onChange={setUuTien} max={10} color="#64748b" />
       </div>
 
-      <ScoreResult total={total} maxTotal={100} quyDoi={null} totalWithPriority={totalWithPriority} label="Tổng điểm TSA" color="#306ee8" />
+      <ScoreResult total={total} maxTotal={100} quyDoi={null} totalWithPriority={totalWithPriority} label="Tổng điểm TSA" color="#306ee8" 
+        onSave={handleSave} isSaving={isSaving} message={message} />
     </div>
   );
 }
@@ -114,6 +221,7 @@ function TSACalculator() {
 // Tự luận 25 + Toán 35 + Sử 10 + NN 15 + Tự chọn 15 = 100
 // Công thức xét tuyển: ĐXT = (M1+M2+M3)*2/5 + BCA*3/5 + ĐC
 function BCACalculator() {
+  const { user, profile, refreshProfile } = useAuth();
   const [tuLuan, setTuLuan] = useState('');
   const [toan, setToan] = useState('');
   const [lich, setLich] = useState('');
@@ -126,10 +234,49 @@ function BCACalculator() {
   const [m3, setM3] = useState('');
   const [dc, setDc] = useState('');
 
-  const bcaScore = (parseFloat(tuLuan)||0) + (parseFloat(toan)||0) + (parseFloat(lich)||0) + (parseFloat(nn)||0) + (parseFloat(tuChon)||0);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  useEffect(() => {
+    if (profile?.admission_scores?.bca) {
+      const d = profile.admission_scores.bca;
+      if (d.tuLuan) setTuLuan(d.tuLuan);
+      if (d.toan) setToan(d.toan);
+      if (d.lich) setLich(d.lich);
+      if (d.nn) setNn(d.nn);
+      if (d.tuChon) setTuChon(d.tuChon);
+      if (d.m1) setM1(d.m1);
+      if (d.m2) setM2(d.m2);
+      if (d.m3) setM3(d.m3);
+      if (d.dc) setDc(d.dc);
+    }
+  }, [profile]);
+
+  const bcaScore = (parseFloat(tuLuan) || 0) + (parseFloat(toan) || 0) + (parseFloat(lich) || 0) + (parseFloat(nn) || 0) + (parseFloat(tuChon) || 0);
   
-  const sumThpt = (parseFloat(m1)||0) + (parseFloat(m2)||0) + (parseFloat(m3)||0);
-  const admissionScore = (sumThpt * (2/5) + bcaScore * (3/5) + (parseFloat(dc)||0)).toFixed(2);
+  const sumThpt = (parseFloat(m1) || 0) + (parseFloat(m2) || 0) + (parseFloat(m3) || 0);
+  const admissionScore = (sumThpt * (2 / 5) + bcaScore * (3 / 5) + (parseFloat(dc) || 0)).toFixed(2);
+
+  const handleSave = async () => {
+    if (!user) { setMessage({ type: 'error', text: 'Đăng nhập để lưu.' }); return; }
+    setIsSaving(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const currentScores = profile?.admission_scores || {};
+      const data = { tuLuan, toan, lich, nn, tuChon, m1, m2, m3, dc, bcaScore, admissionScore, savedAt: new Date().toISOString() };
+      const { error } = await supabase.from('profiles').update({
+        admission_scores: { ...currentScores, bca: data }
+      }).eq('id', user.id);
+      if (error) throw error;
+      await refreshProfile?.();
+      setMessage({ type: 'success', text: 'Đã lưu điểm BCA!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Lỗi: ' + err.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -169,6 +316,17 @@ function BCACalculator() {
           </div>
           <span className="text-3xl font-extrabold text-[#10b981]">{admissionScore}</span>
         </div>
+        
+        <button onClick={handleSave} disabled={isSaving}
+          className={`w-full py-3.5 mt-2 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${message.type === 'success' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-[#10b981]/20 hover:bg-[#10b981]/40 text-white border border-[#10b981]/30'} disabled:opacity-50`}>
+          <span className="material-symbols-outlined text-base">{isSaving ? 'sync' : (message.type === 'success' ? 'check_circle' : 'save')}</span>
+          {isSaving ? 'Đang lưu...' : (message.type === 'success' ? 'Đã lưu điểm!' : 'Lưu kết quả BCA')}
+        </button>
+        {message.text && (
+          <p className={`text-center text-[11px] font-medium mt-1 ${message.type === 'error' ? 'text-rose-400' : 'text-green-400'}`}>
+            {message.text}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -195,11 +353,11 @@ function Field({ label, value, onChange, max, color, hintText }) {
   );
 }
 
-function ScoreResult({ total, maxTotal, quyDoi, totalWithPriority, label, color }) {
+function ScoreResult({ total, maxTotal, quyDoi, totalWithPriority, label, color, onSave, isSaving, message }) {
   const pct = Math.min((total / maxTotal) * 100, 100);
   return (
     <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: `linear-gradient(135deg, ${color}15, transparent)` }}>
-      <div className="p-5">
+      <div className="p-5 pb-4">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">{label}</p>
@@ -210,14 +368,14 @@ function ScoreResult({ total, maxTotal, quyDoi, totalWithPriority, label, color 
           </div>
 
           {/* Ring */}
-          <div className="relative w-20 h-20 flex items-center justify-center">
-            <svg className="w-full h-full -rotate-90">
-              <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
+          <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
               <circle
-                cx="40" cy="40" r="34" fill="none"
+                cx="40" cy="40" r="33" fill="none"
                 stroke={color} strokeWidth="6"
-                strokeDasharray="213.6"
-                strokeDashoffset={213.6 - (213.6 * pct) / 100}
+                strokeDasharray="207.35"
+                strokeDashoffset={207.35 - (207.35 * pct) / 100}
                 strokeLinecap="round"
                 style={{ transition: 'stroke-dashoffset 0.8s ease' }}
               />
@@ -237,6 +395,21 @@ function ScoreResult({ total, maxTotal, quyDoi, totalWithPriority, label, color 
           <div className="bg-white/5 rounded-xl px-4 py-3 flex items-center justify-between">
             <p className="text-slate-400 text-sm">Điểm sau ưu tiên</p>
             <p className="font-extrabold text-white text-xl">{totalWithPriority.toFixed(1)} <span className="text-slate-500 text-sm font-medium">/ 100</span></p>
+          </div>
+        )}
+
+        {onSave && (
+          <div className="mt-4 space-y-2">
+            <button onClick={onSave} disabled={isSaving}
+              className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${message?.type === 'success' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'} disabled:opacity-50`}>
+              <span className="material-symbols-outlined text-sm">{isSaving ? 'sync' : (message?.type === 'success' ? 'check_circle' : 'save')}</span>
+              {isSaving ? 'Đang lưu...' : (message?.type === 'success' ? 'Đã lưu điểm!' : 'Lưu kết quả vào hồ sơ')}
+            </button>
+            {message?.text && (
+              <p className={`text-center text-[10px] font-medium ${message.type === 'error' ? 'text-rose-400' : 'text-green-400'}`}>
+                {message.text}
+              </p>
+            )}
           </div>
         )}
       </div>
