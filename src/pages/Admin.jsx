@@ -996,7 +996,7 @@ export default function Admin() {
           }
         }
         const uploadResult = await uploadExamAnswerFile(nextExamId, selectedAnswerFile, identityResources.answer_file_url);
-        nextResources.answer_file_url = uploadResult.publicUrl;
+        nextResources.answer_file_url = uploadResult.path;
       }
 
       await upsertAdminExamKeyBundle({
