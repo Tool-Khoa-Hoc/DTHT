@@ -319,8 +319,7 @@ export default function AnswerSheet2025({ examData, answers, handleAnswerChange,
             <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 pb-24">
                 {part1Questions.length > 0 && (
                     <SectionPanel
-                        label={part1?.name || 'Phần I'}
-                        note="Trắc nghiệm nhiều lựa chọn. Mỗi câu chỉ chọn một đáp án đúng."
+                        label="PHẦN I"
                     >
                         <div className="as25-panel-grid">
                             {part1Groups.map((group, groupIndex) => (
@@ -370,8 +369,7 @@ export default function AnswerSheet2025({ examData, answers, handleAnswerChange,
 
                 {part2Questions.length > 0 && (
                     <SectionPanel
-                        label={part2?.name || 'Phần II'}
-                        note="Mỗi câu gồm 4 ý a, b, c, d. Chọn Đúng hoặc Sai cho từng ý."
+                        label="PHẦN II"
                     >
                         <div className="as25-panel-grid">
                             {part2Questions.map((question, questionIndex) => {
@@ -433,8 +431,7 @@ export default function AnswerSheet2025({ examData, answers, handleAnswerChange,
 
                 {part3Questions.length > 0 && (
                     <SectionPanel
-                        label={part3?.name || 'Phần III'}
-                        note="Trả lời ngắn bằng số hoặc ký hiệu phù hợp. Có thể nhập trực tiếp hoặc tô theo từng cột."
+                        label="PHẦN III"
                     >
                         <div className="as25-panel-grid as25-panel-grid--short">
                             {part3Questions.map((question, questionIndex) => {
