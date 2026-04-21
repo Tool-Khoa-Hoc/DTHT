@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+
 /**
  * TASK 4 — PDF Worker Async Init
  *
@@ -156,8 +159,16 @@ export default function SecurePdfViewer({ url, userEmail, userName }) {
     const [width, setWidth] = useState(800);
     // TASK 4: Track whether PDF worker is initialized before rendering Document
     const [workerReady, setWorkerReady] = useState(false);
+    const [useNativeViewer, setUseNativeViewer] = useState(false);
+    const [loadErrorMessage, setLoadErrorMessage] = useState('');
     const containerRef = useRef(null);
     const mountedRef = useRef(true);
+
+    useEffect(() => {
+        setNumPages(null);
+        setUseNativeViewer(false);
+        setLoadErrorMessage('');
+    }, [url]);
 
     useEffect(() => {
         mountedRef.current = true;
@@ -250,6 +261,8 @@ export default function SecurePdfViewer({ url, userEmail, userName }) {
 
     const onDocumentLoadSuccess = ({ numPages: nextNumPages }) => {
         if (mountedRef.current) {
+            setUseNativeViewer(false);
+            setLoadErrorMessage('');
             setNumPages(nextNumPages);
         }
     };
@@ -259,7 +272,10 @@ export default function SecurePdfViewer({ url, userEmail, userName }) {
             return;
         }
 
-        console.error('[SecurePdfViewer] PDF load error:', error?.message, error);
+        const nextMessage = String(error?.message || error || 'Unknown PDF load error');
+        console.error('[SecurePdfViewer] PDF load error:', nextMessage, error);
+        setLoadErrorMessage(nextMessage);
+        setUseNativeViewer(true);
     };
 
     return (
@@ -287,6 +303,33 @@ export default function SecurePdfViewer({ url, userEmail, userName }) {
                     <div className="flex flex-col items-center justify-center p-20 text-slate-400">
                         <span className="material-symbols-outlined mb-4 text-4xl animate-spin text-[#fe5f36]">sync</span>
                         <p className="font-medium animate-pulse">Đang khởi động trình đọc PDF...</p>
+                    </div>
+                ) : useNativeViewer ? (
+                    <div className="flex w-full flex-col gap-4 px-4">
+                        <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-amber-100 shadow-lg shadow-black/20">
+                            <div className="min-w-0">
+                                <p className="font-semibold">Trình xem PDF nâng cao tạm thời lỗi, đã chuyển sang chế độ dự phòng.</p>
+                                {loadErrorMessage ? (
+                                    <p className="mt-1 truncate text-xs text-amber-200/80">{loadErrorMessage}</p>
+                                ) : null}
+                            </div>
+                            <a
+                                href={url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="shrink-0 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs font-semibold text-amber-100 transition hover:bg-amber-400/20"
+                            >
+                                Mở tab mới
+                            </a>
+                        </div>
+
+                        <div className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl shadow-black/50 ring-1 ring-white/10">
+                            <iframe
+                                src={`${url}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
+                                title="PDF fallback viewer"
+                                className="h-[calc(100vh-12rem)] min-h-[720px] w-full bg-white"
+                            />
+                        </div>
                     </div>
                 ) : (
                     <PdfErrorBoundary>
