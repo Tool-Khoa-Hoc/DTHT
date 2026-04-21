@@ -2,21 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { preloadRouteModules, shouldPrefetchModules } from '../lib/routeModules';
-
-const scheduleIdleTask = (callback, timeout = 1200) => {
-  if (typeof window === 'undefined') {
-    return () => {};
-  }
-
-  if ('requestIdleCallback' in window) {
-    const idleId = window.requestIdleCallback(callback, { timeout });
-    return () => window.cancelIdleCallback(idleId);
-  }
-
-  const timerId = window.setTimeout(callback, Math.min(timeout, 800));
-  return () => window.clearTimeout(timerId);
-};
 
 export default function AuthScreen() {
   const { user, loading: authLoading } = useAuth();
@@ -33,18 +18,6 @@ export default function AuthScreen() {
       navigate('/home', { replace: true });
     }
   }, [authLoading, navigate, user]);
-
-  useEffect(() => {
-    if (!shouldPrefetchModules()) {
-      return undefined;
-    }
-
-    const cleanup = scheduleIdleTask(() => {
-      void preloadRouteModules(['RootLayout', 'Home', 'Library', 'CourseComboHs12']);
-    });
-
-    return cleanup;
-  }, []);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -99,22 +72,19 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="relative min-h-dvh w-full overflow-hidden bg-gradient-to-br from-[#201216] via-[#2d1b2e] to-[#1a1025] flex flex-col justify-center px-6 py-8 text-white font-display safe-top safe-bottom">
-      {/* Background Orbs — GPU accelerated */}
-      <div className="absolute top-[-10%] right-[-20%] w-[300px] h-[300px] bg-[#e36488]/15 rounded-full blur-[80px] gpu" />
-      <div className="absolute bottom-[5%] left-[-15%] w-[250px] h-[250px] bg-indigo-500/10 rounded-full blur-[70px] gpu" />
-
-      <div className="relative z-10 flex flex-col max-w-md mx-auto w-full animate-page-in">
+    <div className="relative flex min-h-dvh w-full flex-col justify-center overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(227,100,136,0.16),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.12),transparent_24%),linear-gradient(135deg,#201216_0%,#2d1b2e_48%,#1a1025_100%)] px-6 py-8 text-white font-display safe-top safe-bottom">
+      <div className="relative z-10 mx-auto flex w-full max-w-md flex-col">
         {/* Header Section */}
         <div className="flex flex-col items-center mb-10">
           <img
             src="/logo.webp"
             width="114"
             height="114"
-            decoding="async"
+            loading="eager"
+            decoding="sync"
             fetchPriority="high"
             alt="Đấu Trường Học Tập"
-            className="w-20 h-20 rounded-2xl object-contain mb-4 drop-shadow-[0_0_15px_rgba(227,100,136,0.4)]"
+            className="mb-4 h-20 w-20 rounded-2xl object-contain"
           />
           <h1 className="text-3xl font-bold text-center mb-2">
             {isLogin ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
@@ -132,7 +102,7 @@ export default function AuthScreen() {
             error ? 'max-h-24 opacity-100 mb-5' : 'max-h-0 opacity-0 mb-0'
           }`}
         >
-          <div className="bg-red-500/15 border border-red-500/30 text-red-200 px-4 py-3 rounded-xl text-sm text-center backdrop-blur-sm">
+          <div className="rounded-xl border border-red-500/30 bg-red-500/15 px-4 py-3 text-center text-sm text-red-200">
             {error}
           </div>
         </div>
@@ -140,7 +110,7 @@ export default function AuthScreen() {
         {/* Social Login */}
         <button
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 bg-white/8 backdrop-blur-md border border-white/15 h-14 rounded-2xl text-white font-semibold transition-all active:scale-[0.97] mb-6 shadow-xl"
+          className="mb-6 flex h-14 w-full items-center justify-center gap-3 rounded-2xl border border-white/[0.12] bg-white/[0.07] text-white shadow-lg transition-transform active:scale-[0.97]"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -167,7 +137,7 @@ export default function AuthScreen() {
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 text-white focus:ring-2 focus:ring-[#e36488]/40 focus:border-[#e36488]/60 transition-all backdrop-blur-sm outline-none placeholder:text-slate-500"
+              className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 pl-12 pr-4 text-white outline-none transition-all placeholder:text-slate-500 focus:border-[#e36488]/60 focus:ring-2 focus:ring-[#e36488]/40"
               placeholder="Email"
               type="email"
               autoComplete="email"
@@ -181,7 +151,7 @@ export default function AuthScreen() {
             <input
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl pl-12 pr-14 text-white focus:ring-2 focus:ring-[#e36488]/40 focus:border-[#e36488]/60 transition-all backdrop-blur-sm outline-none placeholder:text-slate-500"
+              className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 pl-12 pr-14 text-white outline-none transition-all placeholder:text-slate-500 focus:border-[#e36488]/60 focus:ring-2 focus:ring-[#e36488]/40"
               placeholder="Mật khẩu"
               type={showPassword ? 'text' : 'password'}
               autoComplete={isLogin ? 'current-password' : 'new-password'}

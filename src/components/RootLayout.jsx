@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Avatar from './Avatar';
 import OptimizedImage from './ui/OptimizedImage';
 import { PageSkeleton } from './ui/Skeleton';
-import { preloadRouteModule, preloadRouteModules, shouldPrefetchModules } from '../lib/routeModules';
+import { preloadRouteModule } from '../lib/routeModules';
 
 const BOTTOM_TABS = [
   { path: '/home', icon: 'home', label: 'Trang chủ' },
@@ -61,18 +61,6 @@ export default function RootLayout() {
     }
 
     const cleanup = scheduleIdleTask(() => setShouldLoadWelcomeModal(true));
-    return cleanup;
-  }, [isExamTakingRoute]);
-
-  useEffect(() => {
-    if (isExamTakingRoute || !shouldPrefetchModules()) {
-      return undefined;
-    }
-
-    const cleanup = scheduleIdleTask(() => {
-      void preloadRouteModules(['Home', 'Library', 'Roadmap', 'CourseComboHs12']);
-    }, 2400);
-
     return cleanup;
   }, [isExamTakingRoute]);
 
@@ -237,7 +225,7 @@ export default function RootLayout() {
 
       <main
         ref={mainRef}
-        className="has-bottom-nav animate-page-in relative min-h-dvh flex-1 md:ml-64 md:pb-0"
+        className="has-bottom-nav relative min-h-dvh flex-1 md:ml-64 md:pb-0"
       >
         <Outlet />
         {shouldLoadWelcomeModal ? (

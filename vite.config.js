@@ -16,10 +16,6 @@ const CHUNK_RULES = [
     name: 'vendor-katex',
     test: /node_modules[\\/]katex[\\/]/,
   },
-  {
-    name: 'vendor-pdf',
-    test: /node_modules[\\/](react-pdf|pdfjs-dist)[\\/]/,
-  },
 ];
 
 export default defineConfig({

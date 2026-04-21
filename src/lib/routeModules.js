@@ -29,7 +29,16 @@ export function shouldPrefetchModules() {
   }
 
   const connection = navigator.connection;
-  return !(connection?.saveData || ['slow-2g', '2g'].includes(connection?.effectiveType));
+  const effectiveType = connection?.effectiveType ?? '';
+  const lowMemory = typeof navigator.deviceMemory === 'number' && navigator.deviceMemory < 4;
+  const limitedCpu = typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency < 6;
+
+  return !(
+    connection?.saveData ||
+    ['slow-2g', '2g', '3g'].includes(effectiveType) ||
+    lowMemory ||
+    limitedCpu
+  );
 }
 
 export function preloadRouteModule(key) {
@@ -52,8 +61,4 @@ export function preloadRouteModule(key) {
   }
 
   return preloadCache.get(key);
-}
-
-export function preloadRouteModules(keys) {
-  return Promise.allSettled((keys || []).map((key) => preloadRouteModule(key)));
 }

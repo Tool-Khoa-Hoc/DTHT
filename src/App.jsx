@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import SecurityWrapper from './components/SecurityWrapper';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -77,7 +77,7 @@ function DeferredSpeedInsights() {
       } catch (error) {
         console.warn('[App] Could not load SpeedInsights.', error);
       }
-    });
+    }, 5000);
 
     return () => {
       cancelled = true;
@@ -97,11 +97,11 @@ function App() {
     }
 
     bootShell.dataset.ready = 'true';
-    const timerId = window.setTimeout(() => {
+    const frameId = window.requestAnimationFrame(() => {
       bootShell.remove();
-    }, 220);
+    });
 
-    return () => window.clearTimeout(timerId);
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   return (
@@ -112,10 +112,10 @@ function App() {
           <ErrorBoundary>
             <Suspense fallback={<PageSkeleton />}>
               <Routes>
+                <Route path="/" element={<AuthScreen />} />
                 <Route path="/auth" element={<AuthScreen />} />
 
-                <Route path="/" element={<RootLayout />}>
-                  <Route index element={<Navigate to="/home" replace />} />
+                <Route element={<RootLayout />}>
                   <Route path="home" element={<Home />} />
                   <Route path="gpa" element={<GPACalculator />} />
                   <Route path="library" element={<Library />} />
