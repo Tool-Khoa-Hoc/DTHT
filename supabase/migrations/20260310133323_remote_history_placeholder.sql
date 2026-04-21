@@ -1,0 +1,1 @@
+-- Placeholder migration to align local Supabase history with existing remote project.

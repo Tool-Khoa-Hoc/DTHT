@@ -1,0 +1,129 @@
+{
+  "backup_info": {
+    "created_at": "2026-03-29T06:39:47+07:00",
+    "project_id": "szvzwnbdjixcvgbgpavf",
+    "table": "exam_keys",
+    "note": "Backup truoc khi chuan hoa format answer_key (Option A migration)"
+  },
+  "data": [
+    {
+      "exam_id": "01-lien-truong-thpt-so-bac-ninh-kscl-l1-2026",
+      "answer_key": {"part-1.1":2,"part-1.2":2,"part-1.3":0,"part-1.4":2,"part-1.5":2,"part-1.6":2,"part-1.7":2,"part-1.8":0,"part-1.9":2,"part-2.1":{"a":false,"b":false,"c":true,"d":true},"part-2.2":{"a":true,"b":false,"c":true,"d":true},"part-2.3":{"a":true,"b":false,"c":true,"d":true},"part-2.4":{"a":true,"b":true,"c":false,"d":false},"part-3.1":0.19,"part-3.2":2,"part-3.3":3,"part-3.4":0.45,"part-3.5":1,"part-3.6":3,"part-1.10":2,"part-1.11":0,"part-1.12":1,"part-1.13":3,"part-1.14":0,"part-1.15":2,"part-1.16":3,"part-1.17":2,"part-1.18":3},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/drive/folders/1VdVFRH3O6JyOyvQ0vSI2QaOm7a5B2vK3?usp=drive_link","answer_file_name":"Đáp Án"},
+      "created_at": "2026-03-21 13:02:58.677317+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "02-cum-thpt-so-bac-ninh-kscl-2026",
+      "answer_key": {"part-1.1":2,"part-1.2":2,"part-1.3":1,"part-1.4":3,"part-1.5":0,"part-1.6":0,"part-1.7":1,"part-1.8":0,"part-1.9":2,"part-2.1":[false,true,false,false],"part-2.2":[false,true,false,true],"part-2.3":[false,true,true,false],"part-2.4":[true,false,true,true],"part-3.1":"0,45","part-3.2":"22","part-3.3":"2431","part-3.4":"0,25","part-3.5":"3421","part-3.6":"4","part-1.10":1,"part-1.11":1,"part-1.12":2,"part-1.13":0,"part-1.14":2,"part-1.15":3,"part-1.16":1,"part-1.17":0,"part-1.18":0},
+      "resources": {},
+      "created_at": "2026-03-21 13:02:59.519717+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "03-thpt-luong-tai-bac-ninh-ks-thptqg-2026",
+      "answer_key": {"part-1.1":3,"part-1.2":0,"part-1.3":3,"part-1.4":1,"part-1.5":1,"part-1.6":3,"part-1.7":3,"part-1.8":0,"part-1.9":1,"part-2.1":{"a":false,"b":false,"c":true,"d":true},"part-2.2":{"a":true,"b":true,"c":true,"d":false},"part-2.3":{"a":true,"b":false,"c":false,"d":false},"part-2.4":{"a":true,"b":false,"c":true,"d":false},"part-3.1":17,"part-3.2":0.43,"part-3.3":4,"part-3.4":25,"part-3.5":3,"part-3.6":56,"part-1.10":2,"part-1.11":2,"part-1.12":2,"part-1.13":2,"part-1.14":2,"part-1.15":3,"part-1.16":2,"part-1.17":2,"part-1.18":2},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/drive/folders/1JhaKzdmIuJ-H5-s8uyDpW6bT_IXmQ6HG","answer_file_name":"Đáp án"},
+      "created_at": "2026-03-21 13:02:58.828207+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "04-thpt-yen-my-hung-yen-ks-l1",
+      "answer_key": {"part-1.1":2,"part-1.2":2,"part-1.3":2,"part-1.4":3,"part-1.5":0,"part-1.6":2,"part-1.7":0,"part-1.8":3,"part-1.9":3,"part-2.1":{"a":true,"b":false,"c":true,"d":true},"part-2.2":{"a":true,"b":true,"c":true,"d":false},"part-2.3":{"a":false,"b":true,"c":false,"d":false},"part-2.4":{"a":true,"b":false,"c":true,"d":false},"part-3.1":4,"part-3.2":0.67,"part-3.3":4,"part-3.4":6,"part-3.5":600,"part-3.6":3,"part-1.10":2,"part-1.11":3,"part-1.12":2,"part-1.13":0,"part-1.14":3,"part-1.15":0,"part-1.16":3,"part-1.17":1,"part-1.18":2},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/drive/folders/1ofir5uivJBGshc31H7xWz7ECGs3zLKst","answer_file_name":"Đáp án"},
+      "created_at": "2026-03-21 13:02:59.008401+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "0401",
+      "answer_key": {"part-1.1":2,"part-1.2":3,"part-1.3":3,"part-1.4":3,"part-1.5":0,"part-1.6":2,"part-1.7":3,"part-1.8":2,"part-1.9":0,"part-2.1":{"a":false,"b":false,"c":true,"d":true},"part-2.2":{"a":false,"b":false,"c":false,"d":true},"part-2.3":{"a":false,"b":true,"c":true,"d":true},"part-2.4":{"a":false,"b":false,"c":false,"d":true},"part-3.1":42,"part-3.2":5,"part-3.3":6,"part-3.4":5,"part-3.5":2134,"part-3.6":4132,"part-1.10":3,"part-1.11":1,"part-1.12":3,"part-1.13":1,"part-1.14":0,"part-1.15":1,"part-1.16":3,"part-1.17":2,"part-1.18":3},
+      "resources": {"title":"Cụm THPT chuyên Phan Bội Châu","subject":"sinh","video_url":"","solution_url":"","answer_file_url":"","answer_file_name":"Dap an","answer_file_path":null,"answer_file_bucket":null},
+      "created_at": "2026-03-26 22:47:42.999913+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "05-thpt-chuyen-thoai-ngoc-hau-an-giang",
+      "answer_key": {"part-3.1":"………","part-3.2":"………","part-3.3":"………","part-3.4":"………"},
+      "resources": {},
+      "created_at": "2026-03-21 13:02:59.863249+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "07-so-ninh-binh-kscl-l1-2026",
+      "answer_key": {"part-1.1":2,"part-1.2":1,"part-1.3":0,"part-1.4":3,"part-1.5":0,"part-1.6":0,"part-1.7":0,"part-1.8":1,"part-1.9":2,"part-2.1":{"a":true,"b":true,"c":false,"d":false},"part-2.2":{"a":true,"b":false,"c":false,"d":false},"part-2.3":{"a":true,"b":false,"c":true,"d":false},"part-2.4":{"a":false,"b":true,"c":false,"d":true},"part-3.1":1200,"part-3.2":1235,"part-3.3":1342,"part-3.4":1235,"part-3.5":2153,"part-1.10":0,"part-1.11":1,"part-1.12":0,"part-1.13":0,"part-1.14":1,"part-1.15":1,"part-1.16":0,"part-1.17":1,"part-1.18":2},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/drive/folders/1xjO7XQhf5pQWL1BzpNo8IvAlHCo7YUvT","answer_file_name":"Đáp án"},
+      "created_at": "2026-03-21 13:02:59.137782+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "09-chuyen-ha-long-thi-thu-l1-2026",
+      "answer_key": {"part-1.1":1,"part-1.2":0,"part-1.3":2,"part-1.4":1,"part-1.5":0,"part-1.6":1,"part-1.7":1,"part-1.8":2,"part-1.9":0,"part-2.1":{"a":true,"b":true,"c":true,"d":false},"part-2.2":{"a":false,"b":true,"c":false,"d":false},"part-2.3":{"a":true,"b":false,"c":false,"d":false},"part-2.4":{"a":false,"b":false,"c":true,"d":true},"part-3.1":0.56,"part-3.2":2134,"part-3.3":0.78,"part-3.4":8,"part-3.5":3,"part-3.6":1423,"part-1.10":1,"part-1.11":1,"part-1.12":1,"part-1.13":1,"part-1.14":3,"part-1.15":3,"part-1.16":3,"part-1.17":2},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/drive/folders/1bu6KTJuSIa9z07Om-hTqBDCm1zyCCwcl?usp=drive_link","answer_file_name":"Đáp án"},
+      "created_at": "2026-03-21 13:02:59.235775+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "10-cum-thpt-chuyen-phan-boi-chau-chuyen-ha-tinh-l1-2026",
+      "answer_key": {"part-1.1":1,"part-1.2":3,"part-1.3":2,"part-1.4":2,"part-1.5":3,"part-1.6":2,"part-1.7":0,"part-1.8":2,"part-1.9":0,"part-2.1":{"a":true,"b":false,"c":true,"d":false},"part-2.2":{"a":true,"b":false,"c":true,"d":false},"part-2.3":{"a":true,"b":false,"c":false,"d":false},"part-2.4":{"a":true,"b":false,"c":true,"d":false},"part-3.1":35,"part-3.2":3,"part-3.3":0.11,"part-3.4":28,"part-3.5":3,"part-3.6":4213,"part-1.10":2,"part-1.11":3,"part-1.12":3,"part-1.13":3,"part-1.14":3,"part-1.15":0,"part-1.16":2,"part-1.17":2,"part-1.18":1},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/drive/folders/1ndKBRVrjRyFBB33YKiIME7l-MQ9ccnt8?usp=drive_link","answer_file_name":"Đáp án"},
+      "created_at": "2026-03-21 13:02:59.319753+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "54-thpt-chuyen-tuyen-quang-l1-2026",
+      "answer_key": {"part-1.1":2,"part-1.2":3,"part-1.3":1,"part-1.4":0,"part-1.5":1,"part-1.6":2,"part-1.7":0,"part-1.8":1,"part-1.9":2,"part-2.1":{"a":true,"b":true,"c":true,"d":false},"part-2.2":{"a":true,"b":false,"c":false,"d":false},"part-2.3":{"a":false,"b":true,"c":true,"d":false},"part-2.4":{"a":false,"b":true,"c":false,"d":false},"part-3.1":26,"part-3.2":0.17,"part-3.3":2,"part-3.4":10,"part-3.5":0.44,"part-3.6":0.98,"part-1.10":1,"part-1.11":3,"part-1.12":0,"part-1.13":1,"part-1.14":2,"part-1.15":0,"part-1.16":1,"part-1.17":3,"part-1.18":0},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":null,"answer_file_name":null},
+      "created_at": "2026-03-23 13:17:25.377364+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "55-lien-truong-thpt-so-ha-noi-l1-2026",
+      "answer_key": {"part-1.1":3,"part-1.2":0,"part-1.3":2,"part-1.4":1,"part-1.5":3,"part-1.6":0,"part-1.7":0,"part-1.8":1,"part-1.9":3,"part-2.1":{"a":false,"b":false,"c":false,"d":true},"part-2.2":{"a":false,"b":false,"c":true,"d":false},"part-2.3":{"a":false,"b":false,"c":false,"d":true},"part-2.4":{"a":false,"b":false,"c":true,"d":true},"part-3.1":27,"part-3.2":40,"part-3.3":2,"part-3.4":0,"part-3.5":44.4,"part-3.6":6,"part-1.10":3,"part-1.11":0,"part-1.12":1,"part-1.13":2,"part-1.14":0,"part-1.15":2,"part-1.16":0,"part-1.17":1,"part-1.18":2},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":null,"answer_file_name":null},
+      "created_at": "2026-03-23 13:17:25.676051+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "bac-ninh-2026-lan-1",
+      "answer_key": {"part-1.1":0,"part-1.2":2,"part-1.3":3,"part-1.4":0,"part-1.5":3,"part-1.6":2,"part-1.7":1,"part-1.8":0,"part-1.9":2,"part-1.10":3,"part-1.11":1,"part-1.12":2,"part-2.13":{"a":true,"b":true,"c":true,"d":false},"part-2.14":{"a":true,"b":false,"c":true,"d":false},"part-2.15":{"a":true,"b":false,"c":false,"d":true},"part-2.16":{"a":true,"b":false,"c":true,"d":false},"part-3.17":3,"part-3.18":1,"part-3.19":0.25,"part-3.20":0.31,"part-3.21":607,"part-3.22":87},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/file/d/1TF7uDQ1ot-YV_Q_6Kf5Y5Uvw2DX_5T_f/view?usp=drive_link","answer_file_name":"Đáp Án"},
+      "created_at": "2026-03-16 09:24:53.93+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "han-thuyen",
+      "answer_key": {"part-1.1":2,"part-1.2":2,"part-1.3":0,"part-1.4":2,"part-1.5":2,"part-1.6":2,"part-1.7":2,"part-1.8":0,"part-1.9":2,"part-2.1":{"a":false,"b":false,"c":true,"d":true},"part-2.2":{"a":true,"b":false,"c":true,"d":true},"part-2.3":{"a":true,"b":false,"c":true,"d":true},"part-2.4":{"a":true,"b":true,"c":false,"d":false},"part-3.1":0.19,"part-3.2":2,"part-3.3":3,"part-3.4":0.45,"part-3.5":1,"part-3.6":3,"part-1.10":2,"part-1.11":0,"part-1.12":1,"part-1.13":3,"part-1.14":0,"part-1.15":2,"part-1.16":3,"part-1.17":2,"part-1.18":3},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/drive/folders/1BN654c95hjSma3cHRJ8Qzs_vB9kOjA0z","answer_file_name":"Đáp Án"},
+      "created_at": "2026-03-17 16:06:37.222+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "le-thanh-tong-tp-hcm-2026",
+      "answer_key": {"part-1.1":3,"part-1.2":2,"part-1.3":3,"part-1.4":3,"part-1.5":1,"part-1.6":1,"part-1.7":0,"part-1.8":2,"part-1.9":1,"part-1.10":2,"part-1.11":3,"part-1.12":1,"part-2.13":{"a":false,"b":false,"c":true,"d":false},"part-2.14":{"a":true,"b":false,"c":false,"d":false},"part-2.15":{"a":false,"b":false,"c":false,"d":true},"part-2.16":{"a":true,"b":false,"c":false,"d":true},"part-3.17":10.4,"part-3.18":7,"part-3.19":44,"part-3.20":41.6,"part-3.21":1167,"part-3.22":9900},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/file/d/1UICVKNK4c24GCQulKmXA6KzX-p9McolD/view?usp=drive_link","answer_file_name":null},
+      "created_at": "2026-03-18 04:34:59.747+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "lien-truong-thpt-cum9-lan2",
+      "answer_key": {"part-1.1":1,"part-1.2":1,"part-1.3":2,"part-1.4":3,"part-1.5":3,"part-1.6":3,"part-1.7":0,"part-1.8":0,"part-1.9":1,"part-1.10":1,"part-1.11":3,"part-1.12":0,"part-2.13":{"a":true,"b":true,"c":true,"d":false},"part-2.14":{"a":true,"b":false,"c":true,"d":false},"part-2.15":{"a":true,"b":true,"c":false,"d":false},"part-2.16":{"a":false,"b":true,"c":false,"d":false},"part-3.17":20,"part-3.18":1225,"part-3.19":16,"part-3.20":1.22,"part-3.21":294,"part-3.22":-240},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/file/d/1W407kS39JX7i631l6oaslixge84rX4MP/view?usp=drive_link","answer_file_name":null},
+      "created_at": "2026-03-18 04:35:00.634+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "son-la-2026-lan-1",
+      "answer_key": {"part-1.1":3,"part-1.2":3,"part-1.3":1,"part-1.4":1,"part-1.5":3,"part-1.6":3,"part-1.7":1,"part-1.8":0,"part-1.9":1,"part-1.10":0,"part-1.11":1,"part-1.12":2,"part-2.13":{"a":true,"b":false,"c":true,"d":true},"part-2.14":{"a":true,"b":true,"c":false,"d":false},"part-2.15":{"a":false,"b":true,"c":false,"d":false},"part-2.16":{"a":false,"b":true,"c":true,"d":false},"part-3.17":0.42,"part-3.18":0.83,"part-3.19":116,"part-3.20":760,"part-3.21":2.72,"part-3.22":3360},
+      "resources": {"edit_link":null,"video_url":null,"exam_file_url":null,"answer_file_url":"https://drive.google.com/file/d/1t8cgCxDBGGmX6yrC51DCYhMKAHA3mjcK/view?usp=drive_link","answer_file_name":null},
+      "created_at": "2026-03-18 04:36:22.359+00",
+      "last_synced_at": "2026-03-27 01:27:29.700115+00"
+    },
+    {
+      "exam_id": "thpt-ly-thai-to-lan-1-2026",
+      "answer_key": {"part-1.1":0,"part-1.2":2,"part-1.3":1,"part-1.4":0,"part-1.5":1,"part-1.6":0,"part-1.7":3,"part-1.8":2,"part-1.9":2,"part-2.1":{"a":false,"b":true,"c":false,"d":false},"part-2.2":{"a":false,"b":true,"c":false,"d":true},"part-2.3":{"a":true,"b":true,"c":false,"d":true},"part-2.4":{"a":true,"b":false,"c":true,"d":true},"part-3.1":"3","part-3.2":"4","part-3.3":"4","part-3.4":"1345","part-3.5":"35","part-3.6":"125","part-1.10":3,"part-1.11":3,"part-1.12":0,"part-1.13":1,"part-1.14":3,"part-1.15":0,"part-1.16":2,"part-1.17":0,"part-1.18":3},
+      "resources": {"time":50,"title":"THPT Ly Thai To - Lan I - 2026","status":"ongoing","subject":"sinh","examPath":"64-thpt-ly-thai-to-lan-1-2026","exam_path":"64-thpt-ly-thai-to-lan-1-2026","questions":28,"video_url":"","solution_url":"","subjectFolder":"sinh","question_count":28,"subject_folder":"sinh","answer_file_url":"","answer_file_name":"Dap an","duration_minutes":50},
+      "created_at": "2026-03-28 06:21:35.796496+00",
+      "last_synced_at": "2026-03-28 06:21:35.796496+00"
+    }
+  ]
+}

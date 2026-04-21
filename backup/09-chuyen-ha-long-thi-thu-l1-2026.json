@@ -1,0 +1,60 @@
+{
+  "exam_id": "09-chuyen-ha-long-thi-thu-l1-2026",
+  "answer_key": {
+    "part1.q1": 1,
+    "part1.q2": 0,
+    "part1.q3": 2,
+    "part1.q4": 1,
+    "part1.q5": 0,
+    "part1.q6": 1,
+    "part1.q7": 1,
+    "part1.q8": 2,
+    "part1.q9": 0,
+    "part2.q1": {
+      "q1a": true,
+      "q1b": true,
+      "q1c": true,
+      "q1d": false
+    },
+    "part2.q2": {
+      "q2a": false,
+      "q2b": true,
+      "q2c": false,
+      "q2d": false
+    },
+    "part2.q3": {
+      "q3a": true,
+      "q3b": false,
+      "q3c": false,
+      "q3d": false
+    },
+    "part2.q4": {
+      "q4a": false,
+      "q4b": false,
+      "q4c": true,
+      "q4d": true
+    },
+    "part3.q1": 0.56,
+    "part3.q2": 2134,
+    "part3.q3": 0.78,
+    "part3.q4": 8,
+    "part3.q5": 3,
+    "part3.q6": 1423,
+    "part1.q10": 1,
+    "part1.q11": 1,
+    "part1.q12": 1,
+    "part1.q13": 1,
+    "part1.q14": 3,
+    "part1.q15": 3,
+    "part1.q16": 3,
+    "part1.q17": 2
+  },
+  "created_at": "2026-03-21T13:02:59.235775+00:00",
+  "resources": {
+    "edit_link": null,
+    "video_url": null,
+    "exam_file_url": null,
+    "answer_file_url": "https://drive.google.com/drive/folders/1bu6KTJuSIa9z07Om-hTqBDCm1zyCCwcl?usp=drive_link",
+    "answer_file_name": "Đáp án"
+  }
+}

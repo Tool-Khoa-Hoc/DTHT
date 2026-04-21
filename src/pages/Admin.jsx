@@ -1,0 +1,2318 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
+import { Navigate } from 'react-router-dom';
+import { assertSafeExternalUrl } from '../utils/urlSecurity';
+import Avatar from '../components/Avatar';
+import { clearExamIndexCache, getExamIndex } from '../utils/examIndexCache';
+import {
+  deleteAdminExamKeys,
+  getAdminExamKey,
+  hasPopulatedAnswerKey,
+  listAdminExamKeys,
+  normalizeExamResources,
+  upsertAdminExamKeyBundle,
+  uploadExamAnswerFile,
+  uploadExamDocumentFile,
+  listAdminSubjects,
+  upsertAdminSubject,
+  deleteAdminSubject,
+} from '../services/adminExamApi';
+import { ADMIN_DOCUMENT_FIELDS, formatViDateTime, getDocumentUploadDate } from '../lib/documents';
+
+const CATEGORIES = [
+  { label: 'Toán', value: 'toan', icon: 'calculate', color: 'from-blue-500 to-indigo-600' },
+  { label: 'Vật Lý', value: 'ly', icon: 'experiment', color: 'from-amber-500 to-orange-600' },
+  { label: 'Hóa Học', value: 'hoa', icon: 'science', color: 'from-green-500 to-emerald-600' },
+  { label: 'Sinh Học', value: 'sinh', icon: 'biotech', color: 'from-teal-500 to-cyan-600' },
+  { label: 'Ngữ Văn', value: 'van', icon: 'menu_book', color: 'from-rose-500 to-pink-600' },
+  { label: 'Tiếng Anh', value: 'anh', icon: 'language', color: 'from-sky-500 to-blue-600' },
+  { label: 'Lịch Sử', value: 'su', icon: 'history_edu', color: 'from-yellow-600 to-amber-700' },
+  { label: 'Địa Lý', value: 'dia', icon: 'public', color: 'from-lime-500 to-green-600' },
+  { label: 'GDCD', value: 'gdcd', icon: 'gavel', color: 'from-purple-500 to-violet-600' },
+  { label: 'Tin Học', value: 'tin', icon: 'computer', color: 'from-cyan-500 to-sky-600' },
+  { label: 'Giải Tích', value: 'giai_tich', icon: 'functions', color: 'from-indigo-500 to-purple-600' },
+  { label: 'Lập Trình', value: 'lap_trinh', icon: 'code', color: 'from-slate-500 to-gray-600' },
+  { label: 'Kiến Trúc', value: 'kien_truc', icon: 'architecture', color: 'from-orange-500 to-red-500' },
+  { label: 'Kinh Tế', value: 'kinh_te', icon: 'trending_up', color: 'from-emerald-500 to-teal-600' },
+  { label: 'Khác', value: 'khac', icon: 'folder', color: 'from-gray-400 to-slate-500' },
+];
+
+const VIP_PRESET_DAYS = [7, 30, 90, 365];
+const ADMIN_USER_DIRECTORY_SELECT_LIMIT = 200;
+const ADMIN_USER_DIRECTORY_FALLBACK_SELECT = 'id, display_name, avatar_url, role, is_vip, vip_expired_at, is_approved_bang_chu';
+const ADMIN_USER_DIRECTORY_FALLBACK_WARNING = 'Dang dung duong doc du phong tu bang profiles. Danh sach van tai duoc, nhung tim theo email chi hoat dong khi RPC admin_user_directory hoat dong lai.';
+const DEFAULT_EXAM_EDIT_FORM = {
+  title: '',
+  subject_folder: '',
+  exam_path: '',
+  time: '',
+  questions: '',
+  status: 'ongoing',
+  answer_key: '{}',
+  folder_url: '',
+  lecture_url: '',
+  document_url: '',
+  answer_file_url: '',
+};
+
+const EXAM_STATUS_OPTIONS = [
+  { value: 'ongoing', label: 'Đang mở' },
+  { value: 'upcoming', label: 'Sắp mở' },
+  { value: 'ended', label: 'Đã đóng' },
+];
+
+const toTrimmedString = (value) => (typeof value === 'string' ? value.trim() : '');
+
+const toOptionalPositiveInteger = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.trunc(parsed) : null;
+};
+
+const countQuestionsFromExamJson = (examJson) => {
+  if (!Array.isArray(examJson?.parts)) return 0;
+  return examJson.parts.reduce((total, part) => (
+    total + (Array.isArray(part?.questions) ? part.questions.length : 0)
+  ), 0);
+};
+
+const normalizeAdminDirectoryRow = (row) => ({
+  id: row?.id ?? null,
+  email: row?.email ?? null,
+  display_name: row?.display_name ?? null,
+  full_name: row?.full_name ?? null,
+  avatar_url: row?.avatar_url ?? null,
+  role: row?.role ?? 'user',
+  is_vip: Boolean(row?.is_vip),
+  vip_expired_at: row?.vip_expired_at ?? null,
+  is_approved_bang_chu: Boolean(row?.is_approved_bang_chu),
+});
+
+export default function Admin() {
+  const { user, profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
+
+  const [mainTab, setMainTab] = useState('library'); // 'library' | 'vip' | 'thongsoai' | 'collaborators' | 'exams'
+
+  // VIP Management State
+  const [vipSearch, setVipSearch] = useState('');
+  const [vipGrantEmail, setVipGrantEmail] = useState('');
+  const [vipGrantDays, setVipGrantDays] = useState(30);
+  const [vipUsers, setVipUsers] = useState([]);
+  const [vipLoading, setVipLoading] = useState(false);
+  const [vipGrantLoading, setVipGrantLoading] = useState(false);
+  const [paymentLogs, setPaymentLogs] = useState([]);
+  const [paymentLogsLoading, setPaymentLogsLoading] = useState(false);
+  const [vipMsg, setVipMsg] = useState({ type: '', text: '' });
+
+  // Library Form State
+  const [docId, setDocId] = useState(null); // null means adding new
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [publishDate, setPublishDate] = useState('');
+  const [fileUrl, setFileUrl] = useState('');
+  const [authorName, setAuthorName] = useState('');
+  const [major, setMajor] = useState('');
+  const [category, setCategory] = useState('khac');
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [educationLevel, setEducationLevel] = useState('thpt'); // 'thpt' | 'university'
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  // List State
+  const [documents, setDocuments] = useState([]);
+  const [loadingDocs, setLoadingDocs] = useState(true);
+
+  // Thống Soái State
+  const [candidates, setCandidates] = useState([]);
+  const [loadingCandidates, setLoadingCandidates] = useState(false);
+
+  // Collaborator State
+  const [collabSearchTerm, setCollabSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [collaborators, setCollaborators] = useState([]);
+  const [loadingCollabs, setLoadingCollabs] = useState(false);
+  const [directoryWarning, setDirectoryWarning] = useState('');
+  
+  // Exam Subjects State
+  const [examSubjects, setExamSubjects] = useState([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
+  const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
+  const [editingSubject, setEditingSubject] = useState(null);
+  const [subjectForm, setSubjectForm] = useState({ id: '', name: '', icon: 'folder', color: 'from-blue-500 to-indigo-600', order: 0 });
+  
+  // Exam Management State
+  const [exams, setExams] = useState([]);
+  const [loadingExams, setLoadingExams] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState('ALL');
+  const [examSearch, setExamSearch] = useState('');
+  const [editingExam, setEditingExam] = useState(null);
+  const [examEditForm, setExamEditForm] = useState(DEFAULT_EXAM_EDIT_FORM);
+  const [selectedAnswerFile, setSelectedAnswerFile] = useState(null);
+  const [selectedExamFile, setSelectedExamFile] = useState(null);
+  const [savingExam, setSavingExam] = useState(false);
+  const [vipMembers, setVipMembers] = useState([]);
+  const [vipMembersLoading, setVipMembersLoading] = useState(false);
+  const [keysError, setKeysError] = useState(null);
+  const [examsDbError, setExamsDbError] = useState(null);
+
+  // VIP Management Functions
+  const showVipMessage = (type, text) => {
+    setVipMsg({ type, text });
+    window.setTimeout(() => setVipMsg({ type: '', text: '' }), 3000);
+  };
+
+  const adminUserDirectoryFallback = async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
+    const normalizedSearch = toTrimmedString(search);
+    let query = supabase
+      .from('profiles')
+      .select(ADMIN_USER_DIRECTORY_FALLBACK_SELECT);
+
+    if (role !== null) {
+      query = query.eq('role', role);
+    }
+
+    if (Array.isArray(ids)) {
+      if (ids.length === 0) {
+        return [];
+      }
+      query = query.in('id', ids);
+    }
+
+    if (normalizedSearch) {
+      query = query.ilike('display_name', `%${normalizedSearch}%`);
+    }
+
+    const { data, error } = await query
+      .order('is_vip', { ascending: false })
+      .order('display_name', { ascending: true })
+      .limit(limit);
+
+    if (error) throw error;
+    return Array.isArray(data) ? data.map(normalizeAdminDirectoryRow) : [];
+  };
+
+  const adminUserDirectory = async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
+    const params = { p_limit: limit };
+    if (search !== null) params.p_search = search;
+    if (role !== null) params.p_role = role;
+    if (ids !== null) params.p_ids = ids;
+
+    try {
+      const { data, error } = await supabase.rpc('admin_user_directory', params);
+
+      if (error) throw error;
+
+      setDirectoryWarning('');
+      return {
+        rows: Array.isArray(data) ? data.map(normalizeAdminDirectoryRow) : [],
+        source: 'rpc',
+      };
+    } catch (rpcError) {
+      console.error('admin_user_directory rpc failed, using profiles fallback:', rpcError);
+      const rows = await adminUserDirectoryFallback({ search, role, ids, limit });
+      setDirectoryWarning(ADMIN_USER_DIRECTORY_FALLBACK_WARNING);
+      return { rows, source: 'fallback' };
+    }
+  };
+
+  const searchVipUsers = async (searchValue = vipSearch) => {
+    const keyword = searchValue.trim();
+    if (!keyword) {
+      setVipUsers([]);
+      return;
+    }
+
+    setVipLoading(true);
+    try {
+      const { rows: data } = await adminUserDirectory({ search: keyword, limit: 10 });
+      setVipUsers(data);
+
+      if (data.length === 0) {
+        showVipMessage('error', 'Không tìm thấy người dùng phù hợp với từ khóa này.');
+      }
+    } catch (err) {
+      console.error(err);
+      showVipMessage('error', 'Không tìm thấy người dùng phù hợp hoặc truy vấn bị lỗi.');
+    } finally {
+      setVipLoading(false);
+    }
+  };
+
+  const extendVipMembership = async (userId, days) => {
+    if (!days || days <= 0) {
+      throw new Error('Số ngày VIP phải lớn hơn 0.');
+    }
+
+    const { data: p, error: profileError } = await supabase
+      .from('profiles')
+      .select('vip_expired_at')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) throw profileError;
+
+    const base = (p?.vip_expired_at && new Date(p.vip_expired_at) > new Date())
+      ? new Date(p.vip_expired_at)
+      : new Date();
+    const newExpiry = new Date(base.getTime() + days * 86400000);
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ is_vip: true, vip_expired_at: newExpiry.toISOString() })
+      .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    return newExpiry;
+  };
+
+  const addVipDays = async (userId, days) => {
+    try {
+      await extendVipMembership(userId, days);
+      showVipMessage('success', `Đã cộng ${days} ngày VIP!`);
+      await searchVipUsers();
+      await fetchVipMembers();
+    } catch (err) {
+      showVipMessage('error', 'Lỗi: ' + err.message);
+    }
+  };
+
+  const toggleVip = async (userId, currentState) => {
+    try {
+      const { error } = await supabase.from('profiles').update({
+        is_vip: !currentState,
+        vip_expired_at: !currentState ? new Date(Date.now() + 30 * 86400000).toISOString() : null,
+      }).eq('id', userId);
+
+      if (error) throw error;
+
+      showVipMessage('success', currentState ? 'Đã tắt VIP.' : 'Đã bật VIP 30 ngày.');
+      await searchVipUsers();
+      await fetchVipMembers();
+    } catch (err) {
+      showVipMessage('error', 'Lỗi: ' + err.message);
+    }
+  };
+
+  const grantVipByEmail = async (e) => {
+    e.preventDefault();
+
+    const normalizedEmail = vipGrantEmail.trim().toLowerCase();
+    if (!normalizedEmail) {
+      showVipMessage('error', 'Vui lòng nhập gmail hoặc email tài khoản cần cấp VIP.');
+      return;
+    }
+
+    if (!vipGrantDays || vipGrantDays <= 0) {
+      showVipMessage('error', 'Số ngày VIP phải lớn hơn 0.');
+      return;
+    }
+
+    setVipGrantLoading(true);
+    try {
+      const { rows: matches, source } = await adminUserDirectory({ search: normalizedEmail, limit: 20 });
+      if (source !== 'rpc') {
+        throw new Error('Khong the tim theo email luc nay vi RPC admin_user_directory dang loi. Ban van co the tim theo ten o muc quan ly ben duoi.');
+      }
+      const targetUser = matches.find(candidate => candidate.email?.toLowerCase() === normalizedEmail);
+
+      if (!targetUser) {
+        throw new Error('Không tìm thấy tài khoản với email này.');
+      }
+
+      await extendVipMembership(targetUser.id, vipGrantDays);
+
+      setVipGrantEmail(targetUser.email || normalizedEmail);
+      setVipSearch(targetUser.email || normalizedEmail);
+      await searchVipUsers(targetUser.email || normalizedEmail);
+
+      showVipMessage(
+        'success',
+        `Đã cấp ${vipGrantDays} ngày VIP cho ${targetUser.display_name || targetUser.full_name || targetUser.email || 'người dùng'}.`
+      );
+      await fetchVipMembers();
+    } catch (err) {
+      showVipMessage('error', 'Lỗi: ' + err.message);
+    } finally {
+      setVipGrantLoading(false);
+    }
+  };
+
+  const fetchPaymentLogs = async () => {
+    setPaymentLogsLoading(true);
+    try {
+      const { data } = await supabase.from('payment_logs').select('*').order('created_at', { ascending: false }).limit(30);
+      setPaymentLogs(data || []);
+    } catch (err) { console.error(err); }
+    finally { setPaymentLogsLoading(false); }
+  };
+
+  const fetchVipMembers = async () => {
+    setVipMembersLoading(true);
+    try {
+      const { rows } = await adminUserDirectory({ limit: ADMIN_USER_DIRECTORY_SELECT_LIMIT });
+      const nowTs = Date.now();
+      const members = rows
+        .filter((row) => {
+          if (row?.is_vip) return true;
+          if (!row?.vip_expired_at) return false;
+          return new Date(row.vip_expired_at).getTime() > nowTs;
+        })
+        .sort((a, b) => {
+          const aTs = a?.vip_expired_at ? new Date(a.vip_expired_at).getTime() : 0;
+          const bTs = b?.vip_expired_at ? new Date(b.vip_expired_at).getTime() : 0;
+          return bTs - aTs;
+        });
+      setVipMembers(members);
+    } catch (error) {
+      console.error(error);
+      setVipMembers([]);
+    } finally {
+      setVipMembersLoading(false);
+    }
+  };
+
+  const fetchDocuments = async () => {
+    setLoadingDocs(true);
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .select(ADMIN_DOCUMENT_FIELDS)
+        .order('uploaded_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setDocuments(data || []);
+    } catch (error) {
+      console.error('Error fetching documents', error);
+    } finally {
+      setLoadingDocs(false);
+    }
+  };
+
+  const fetchCandidates = async () => {
+    setLoadingCandidates(true);
+    try {
+      const { data, error } = await supabase.rpc('admin_get_thongsoai_candidates', { p_min_completed: 50 });
+      if (error) throw error;
+      setCandidates(
+        (data || []).map(row => ({
+          ...row,
+          completedCount: Number(row.completed_count) || 0,
+        }))
+      );
+    } catch (err) {
+      console.error('fetchCandidates error:', err);
+      setCandidates([]);
+    } finally {
+      setLoadingCandidates(false);
+    }
+  };
+
+  const approveBangChu = async (userId, currentStatus) => {
+    try {
+      const { error } = await supabase.from('profiles').update({ is_approved_bang_chu: !currentStatus }).eq('id', userId);
+      if (error) throw error;
+      setCandidates(candidates.map(c => c.id === userId ? { ...c, is_approved_bang_chu: !currentStatus } : c));
+    } catch (err) {
+      alert('Lỗi: ' + err.message);
+    }
+  };
+
+  const fetchCollaborators = async () => {
+    setLoadingCollabs(true);
+    try {
+      const { rows: data } = await adminUserDirectory({
+        role: 'collaborator',
+        limit: ADMIN_USER_DIRECTORY_SELECT_LIMIT,
+      });
+      setCollaborators(data);
+    } catch (err) {
+      console.error(err);
+      setCollaborators([]);
+      setMessage({ type: 'error', text: 'Khong the tai danh sach Truyen Dao Su tu Supabase.' });
+    } finally {
+      setLoadingCollabs(false);
+    }
+  };
+
+  const searchUsers = async (e) => {
+    e.preventDefault();
+    if (!collabSearchTerm.trim()) return;
+    setLoadingCollabs(true);
+    try {
+      const { rows: data } = await adminUserDirectory({ search: collabSearchTerm.trim(), limit: 10 });
+      setSearchResults(data.filter(candidate => candidate.role !== 'admin'));
+    } catch (err) {
+      console.error(err);
+      setSearchResults([]);
+      setMessage({ type: 'error', text: 'Khong the tim user tu Supabase.' });
+    } finally {
+      setLoadingCollabs(false);
+    }
+  };
+
+  const setCollaboratorRole = async (userId, makeCollaborator) => {
+    try {
+      const newRole = makeCollaborator ? 'collaborator' : 'user';
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      // Update local state
+      if (makeCollaborator) {
+        toast('Đã thăng cấp thành Truyền Đạo Sư');
+      } else {
+        toast('Đã giáng cấp thành người dùng thường');
+      }
+
+      // Refresh list
+      fetchCollaborators();
+      if (collabSearchTerm) {
+        // Trigger search again to update results UI
+        setSearchResults(searchResults.map(u => u.id === userId ? { ...u, role: newRole } : u));
+      }
+    } catch (err) {
+      alert('Lỗi: ' + err.message);
+    }
+  };
+
+  const toast = (msg) => {
+    setMessage({ type: 'success', text: msg });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+  };
+
+  const handleLibrarySubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const safeFileUrl = assertSafeExternalUrl(fileUrl);
+
+      if (docId) {
+        // Update existing document
+        const { error } = await supabase
+          .from('documents')
+          .update({
+            title,
+            description,
+            file_url: safeFileUrl,
+            author_name: authorName || 'Khuyết danh',
+            category: educationLevel === 'university' ? (category || 'Chuyên ngành') : category,
+            major: educationLevel === 'university' ? major : null,
+            is_featured: isFeatured,
+            education_level: educationLevel,
+            publish_date: publishDate || null
+          })
+          .eq('id', docId);
+
+        if (error) throw error;
+        setMessage({ type: 'success', text: 'Tài liệu đã được cập nhật thành công!' });
+      } else {
+        // Insert new document
+        const { error } = await supabase
+          .from('documents')
+          .insert([
+            {
+              title,
+              description,
+              file_url: safeFileUrl,
+              author_name: authorName || 'Khuyết danh',
+              uploaded_by: user.id,
+              is_public: true,
+              category: educationLevel === 'university' ? (category || 'Chuyên ngành') : category,
+              major: educationLevel === 'university' ? major : null,
+              is_featured: isFeatured,
+              education_level: educationLevel,
+              publish_date: publishDate || null
+            }
+          ]);
+
+        if (error) throw error;
+        setMessage({ type: 'success', text: 'Tài liệu đã được đăng tải thành công!' });
+      }
+
+      // Reset form & refresh list
+      resetForm();
+      fetchDocuments();
+    } catch (error) {
+      console.error('Error saving document:', error);
+      setMessage({ type: 'error', text: 'Có lỗi xảy ra: ' + error.message });
+    } finally {
+      setLoading(false);
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    }
+  };
+
+  const resetForm = () => {
+    setDocId(null);
+    setTitle('');
+    setDescription('');
+    setFileUrl('');
+    setAuthorName('');
+    setMajor('');
+    setCategory('khac');
+    setIsFeatured(false);
+    setEducationLevel('thpt');
+    setPublishDate('');
+  };
+
+  const handleEdit = (doc) => {
+    setDocId(doc.id);
+    setTitle(doc.title);
+    setDescription(doc.description || '');
+    setFileUrl(doc.file_url);
+    setAuthorName(doc.author_name || '');
+    setMajor(doc.major || '');
+    setCategory(doc.category || 'khac');
+    setIsFeatured(doc.is_featured || false);
+    setEducationLevel(doc.education_level || 'thpt');
+    setPublishDate(doc.publish_date || '');
+
+    // Scroll to form automatically
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa tài liệu này vĩnh viễn?")) return;
+
+    try {
+      const { error } = await supabase.from('documents').delete().eq('id', id);
+      if (error) throw error;
+      setDocuments(documents.filter(d => d.id !== id));
+      if (docId === id) resetForm(); // If deleting what is currently being edited
+    } catch (error) {
+      alert("Lỗi khi xóa tài liệu: " + error.message);
+    }
+  };
+
+  const toggleFeatured = async (id, currentStatus) => {
+    try {
+      const { error } = await supabase
+        .from('documents')
+        .update({ is_featured: !currentStatus })
+        .eq('id', id);
+      if (error) throw error;
+      setDocuments(documents.map(d => d.id === id ? { ...d, is_featured: !currentStatus } : d));
+      if (docId === id) setIsFeatured(!currentStatus);
+    } catch (error) {
+      alert("Lỗi khi cập nhật trạng thái: " + error.message);
+    }
+  };
+
+  // Subject Management Functions
+  const fetchSubjects = async () => {
+    setLoadingSubjects(true);
+    try {
+      const data = await listAdminSubjects();
+      setExamSubjects(data);
+    } catch (err) {
+      console.error('Lỗi khi tải môn học:', err);
+    } finally {
+      setLoadingSubjects(false);
+    }
+  };
+
+  const handleOpenSubjectModal = (sub = null) => {
+    if (sub) {
+      setEditingSubject(sub.id);
+      setSubjectForm({
+        id: sub.id,
+        name: sub.name,
+        icon: sub.icon || 'folder',
+        color: sub.color || 'from-blue-500 to-indigo-600',
+        order: sub.display_order || 0
+      });
+    } else {
+      setEditingSubject(null);
+      setSubjectForm({ id: '', name: '', icon: 'folder', color: 'from-blue-500 to-indigo-600', order: 0 });
+    }
+    setIsSubjectModalOpen(true);
+  };
+
+  const handleSaveSubject = async (e) => {
+    e.preventDefault();
+    if (!subjectForm.id || !subjectForm.name) {
+      alert('Vui lòng nhập mã và tên môn học.');
+      return;
+    }
+
+    setSavingExam(true); // Re-use saving exam loader or add new one
+    try {
+      await upsertAdminSubject({
+        id: subjectForm.id.toLowerCase().trim(),
+        name: subjectForm.name.trim(),
+        icon: subjectForm.icon,
+        color: subjectForm.color,
+        display_order: parseInt(subjectForm.order) || 0
+      });
+      toast('Đã lưu môn học thành công');
+      setIsSubjectModalOpen(false);
+      fetchSubjects();
+    } catch (err) {
+      alert('Lỗi khi lưu môn học: ' + err.message);
+    } finally {
+      setSavingExam(false);
+    }
+  };
+
+  const handleDeleteSubject = async (id) => {
+    if (!window.confirm(`Xóa môn học "${id}"? Lưu ý: Các đề thi thuộc môn này sẽ không bị xóa nhưng sẽ không hiển thị đúng nhóm.`)) return;
+    try {
+      await deleteAdminSubject(id);
+      toast('Đã xóa môn học');
+      fetchSubjects();
+    } catch (err) {
+      alert('Lỗi khi xóa môn học: ' + err.message);
+    }
+  };
+
+  const fetchExams = async () => {
+    setLoadingExams(true);
+    setKeysError(null);
+    setExamsDbError(null);
+    try {
+      const examMap = new Map();
+      let mergedIndex = [];
+      let keysData = [];
+
+      try {
+        mergedIndex = await getExamIndex({ forceRefresh: true });
+      } catch (indexError) {
+        console.error(indexError);
+      }
+
+      try {
+        keysData = await listAdminExamKeys();
+      } catch (keyError) {
+        console.error(keyError);
+        setKeysError(keyError?.message || 'Không thể tải kho đáp án từ database.');
+      }
+
+      (Array.isArray(mergedIndex) ? mergedIndex : []).forEach((exam) => {
+        const safeId = toTrimmedString(exam?.id);
+        if (!safeId) return;
+
+        const subjectFolder = toTrimmedString(exam.subjectFolder || exam.subject).toLowerCase();
+        const examPath = toTrimmedString(exam.examPath || safeId);
+
+        examMap.set(safeId.toLowerCase(), {
+          ...exam,
+          id: safeId,
+          subject: subjectFolder || toTrimmedString(exam.subject).toLowerCase(),
+          subjectFolder: subjectFolder || toTrimmedString(exam.subject).toLowerCase(),
+          examPath,
+          has_key: false,
+          has_resources: false,
+          solution_url: '',
+          video_url: '',
+          answer_file_url: '',
+          answer_file_name: '',
+          answer_key: null,
+          resources: {},
+          is_local: true,
+          is_in_db: false,
+          last_synced_at: null,
+        });
+      });
+
+      (Array.isArray(keysData) ? keysData : []).forEach((row) => {
+        const dbExamId = toTrimmedString(row?.exam_id);
+        if (!dbExamId) return;
+
+        const existing = examMap.get(dbExamId.toLowerCase()) || null;
+        const resources = normalizeExamResources(row?.resources);
+
+        const subjectFolder = toTrimmedString(
+          existing?.subjectFolder ||
+          existing?.subject ||
+          resources?.subject_folder ||
+          resources?.subjectFolder ||
+          resources?.subject,
+        ).toLowerCase();
+
+        const examPath = toTrimmedString(
+          existing?.examPath ||
+          resources?.exam_path ||
+          resources?.examPath ||
+          resources?.path ||
+          dbExamId,
+        );
+
+        const timeValue = (
+          existing?.time ??
+          toOptionalPositiveInteger(resources?.time ?? resources?.duration_minutes)
+        );
+        const questionValue = (
+          existing?.questions ??
+          toOptionalPositiveInteger(resources?.questions ?? resources?.question_count)
+        );
+
+        const normalizedStatus = (
+          toTrimmedString(resources?.status || existing?.status || 'ongoing') || 'ongoing'
+        );
+
+        const solutionUrl = toTrimmedString(
+          resources?.solution_url ||
+          resources?.answer_file_url ||
+          existing?.solution_url,
+        );
+
+        const videoUrl = toTrimmedString(resources?.video_url || existing?.video_url);
+        const answerFileUrl = toTrimmedString(resources?.answer_file_url);
+        const answerFileName = toTrimmedString(resources?.answer_file_name || 'Dap an');
+
+        examMap.set(dbExamId.toLowerCase(), {
+          ...existing,
+          id: dbExamId,
+          title: toTrimmedString(existing?.title || resources?.title || resources?.exam_title || dbExamId),
+          subject: subjectFolder || existing?.subject || 'khac',
+          subjectFolder: subjectFolder || existing?.subjectFolder || 'khac',
+          examPath: examPath || existing?.examPath || dbExamId,
+          time: timeValue,
+          questions: questionValue,
+          status: normalizedStatus,
+          icon: toTrimmedString(existing?.icon || resources?.icon) || existing?.icon,
+          color: toTrimmedString(existing?.color || resources?.color) || existing?.color,
+          solution_url: solutionUrl,
+          video_url: videoUrl,
+          answer_file_url: answerFileUrl,
+          answer_file_name: answerFileName,
+          has_key: hasPopulatedAnswerKey(row?.answer_key),
+          has_resources: Boolean(solutionUrl || videoUrl || answerFileUrl),
+          answer_key: row?.answer_key || {},
+          resources,
+          is_local: Boolean(existing),
+          is_in_db: true,
+          last_synced_at: row?.last_synced_at || row?.updated_at || row?.created_at || null,
+        });
+      });
+
+      const merged = Array.from(examMap.values())
+        .sort((a, b) => {
+          const leftTs = new Date(a.last_synced_at || a.updated_at || 0).getTime() || 0;
+          const rightTs = new Date(b.last_synced_at || b.updated_at || 0).getTime() || 0;
+          if (rightTs !== leftTs) return rightTs - leftTs;
+          return String(a.id || '').localeCompare(String(b.id || ''));
+        });
+
+      setExams(merged);
+    } catch (err) {
+      console.error(err);
+      setKeysError(err?.message || 'Không thể tải dữ liệu đề thi từ DB.');
+    } finally {
+      setLoadingExams(false);
+    }
+  };
+
+  const deleteExam = async (examId) => {
+    const safeExamId = toTrimmedString(examId);
+    if (!safeExamId) return;
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa đề thi ${safeExamId} vĩnh viễn? Hành động này sẽ xóa cả metadata, đáp án và các bản ghi liên quan trong database.`)) return;
+
+    setLoadingExams(true);
+    try {
+      const result = await deleteAdminExamKeys([safeExamId]);
+
+      if (Array.isArray(result?.failed) && result.failed.length > 0) {
+        throw new Error(result.failed[0]?.error || 'Xóa đề thi thất bại.');
+      }
+
+      if (!Array.isArray(result?.deleted) || result.deleted.length === 0) {
+        throw new Error('Không tìm thấy đề để xóa trên database.');
+      }
+
+      clearExamIndexCache();
+      setExams((prev) => prev.filter((item) => item.id.toLowerCase() !== safeExamId.toLowerCase()));
+      toast('Đã xóa đề thi thành công');
+      await fetchExams();
+    } catch (err) {
+      alert('Lỗi khi xóa đề thi: ' + err.message);
+    } finally {
+      setLoadingExams(false);
+    }
+  };
+
+  const toggleExamKeyVisibility = async (examId, currentHasKey) => {
+    try {
+      const payload = await getAdminExamKey(examId);
+      if (!payload) {
+        alert(`Đề thi ${examId} chưa có bản ghi đáp án trên database.`);
+        return;
+      }
+
+      const resources = normalizeExamResources(payload.resources);
+      const answerCount = hasPopulatedAnswerKey(payload.answer_key)
+        ? Object.keys(payload.answer_key).length
+        : 0;
+
+      alert(
+        `Mã đề: ${payload.exam_id}\n` +
+        `- Có đáp án: ${currentHasKey ? 'Có' : 'Chưa'}\n` +
+        `- Số key: ${answerCount}\n` +
+        `- File đáp án: ${resources.answer_file_url || 'Chưa có'}\n` +
+        `- Video: ${resources.video_url || 'Chưa có'}`,
+      );
+    } catch (error) {
+      alert('Không thể tải thông tin đáp án: ' + error.message);
+    }
+  };
+
+  const handleCreateExam = () => {
+    const rawExamId = window.prompt('Nhập mã đề thi mới (exam_id):');
+    const newExamId = toTrimmedString(rawExamId);
+    if (!newExamId) return;
+
+    const existed = exams.find((item) => item.id.toLowerCase() === newExamId.toLowerCase());
+    if (existed) {
+      handleStartEdit(existed);
+      return;
+    }
+
+    setEditingExam(newExamId);
+    setSelectedAnswerFile(null);
+    setExamEditForm({
+      ...DEFAULT_EXAM_EDIT_FORM,
+      title: newExamId,
+      exam_path: newExamId,
+      answer_key: '{}',
+    });
+  };
+
+  const handleStartEdit = async (ex) => {
+    if (!ex?.id) return;
+    setEditingExam(ex.id);
+    setSelectedAnswerFile(null);
+
+    const fallbackResources = normalizeExamResources(ex.resources || {});
+    let remotePayload = null;
+    try {
+      remotePayload = await getAdminExamKey(ex.id);
+    } catch (error) {
+      console.error(error);
+    }
+
+    const remoteResources = normalizeExamResources(remotePayload?.resources || {});
+    const mergedResources = normalizeExamResources({
+      ...fallbackResources,
+      ...remoteResources,
+    });
+
+    const answerKeySource = hasPopulatedAnswerKey(remotePayload?.answer_key)
+      ? remotePayload.answer_key
+      : (hasPopulatedAnswerKey(ex.answer_key) ? ex.answer_key : {});
+
+    setExamEditForm({
+      ...DEFAULT_EXAM_EDIT_FORM,
+      title: toTrimmedString(ex.title || mergedResources.title || ex.id),
+      subject_folder: toTrimmedString(
+        ex.subjectFolder ||
+        ex.subject ||
+        mergedResources.subject_folder ||
+        mergedResources.subjectFolder ||
+        mergedResources.subject,
+      ).toLowerCase(),
+      exam_path: toTrimmedString(
+        ex.examPath ||
+        mergedResources.exam_path ||
+        mergedResources.examPath ||
+        mergedResources.path ||
+        ex.id,
+      ),
+      time: String(
+        ex.time ??
+        toOptionalPositiveInteger(mergedResources.time ?? mergedResources.duration_minutes) ??
+        '',
+      ),
+      questions: String(
+        ex.questions ??
+        toOptionalPositiveInteger(mergedResources.questions ?? mergedResources.question_count) ??
+        '',
+      ),
+      status: toTrimmedString(mergedResources.status || ex.status || 'ongoing') || 'ongoing',
+      answer_key: JSON.stringify(answerKeySource, null, 2),
+      folder_url: toTrimmedString(mergedResources.folder_url || ex.folder_url),
+      lecture_url: toTrimmedString(mergedResources.lecture_url || ex.lecture_url),
+      document_url: toTrimmedString(mergedResources.document_url || ex.document_url),
+      answer_file_url: toTrimmedString(mergedResources.answer_file_url || ex.answer_file_url),
+    });
+  };
+
+  const handleSyncFromJson = async () => {
+    if (!editingExam) return;
+
+    const ex = exams.find((item) => item.id === editingExam);
+    if (!ex) return;
+
+    setLoadingExams(true);
+    try {
+      const subjectFolder = toTrimmedString(ex.subjectFolder || ex.subject || examEditForm.subject_folder).toLowerCase();
+      const examPath = toTrimmedString(ex.examPath || examEditForm.exam_path || ex.id);
+      const resp = await fetch(`/data/exams/${subjectFolder}/${examPath}/exam.json`, { cache: 'no-store' });
+      if (!resp.ok) throw new Error('Không tìm thấy file exam.json cục bộ.');
+
+      const data = await resp.json();
+      const resources = normalizeExamResources(data.resources || {});
+      const questionCount = countQuestionsFromExamJson(data);
+
+      setExamEditForm({
+        ...examEditForm,
+        title: toTrimmedString(data.title || examEditForm.title || ex.title),
+        subject_folder: toTrimmedString(data.subject || subjectFolder).toLowerCase(),
+        exam_path: examPath,
+        time: String(toOptionalPositiveInteger(data.time) ?? examEditForm.time ?? ''),
+        questions: String(questionCount || toOptionalPositiveInteger(examEditForm.questions) || ''),
+        answer_key: JSON.stringify(data.answer_key || {}, null, 2),
+        folder_url: toTrimmedString(resources.folder_url || examEditForm.folder_url),
+        lecture_url: toTrimmedString(resources.lecture_url || data.lecture_url || data.lectureUrl),
+        document_url: toTrimmedString(resources.document_url || examEditForm.document_url),
+        answer_file_url: toTrimmedString(resources.answer_file_url || examEditForm.answer_file_url),
+      });
+
+      toast('Đã nạp dữ liệu từ file JSON thành công!');
+    } catch (err) {
+      alert('Lỗi khi đồng bộ: ' + err.message);
+    } finally {
+      setLoadingExams(false);
+    }
+  };
+
+  const formatJson = () => {
+    try {
+      const parsed = JSON.parse(examEditForm.answer_key);
+      setExamEditForm({ ...examEditForm, answer_key: JSON.stringify(parsed, null, 2) });
+    } catch {
+      alert('JSON không hợp lệ để định dạng.');
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingExam) return;
+
+    setSavingExam(true);
+    try {
+      let parsedKey;
+      try {
+        parsedKey = JSON.parse(examEditForm.answer_key);
+      } catch {
+        throw new Error('Đáp án JSON không hợp lệ. Vui lòng kiểm tra lại cú pháp.');
+      }
+
+      const currentExamId = toTrimmedString(editingExam);
+      if (!currentExamId) {
+        throw new Error('Thiếu mã đề thi để lưu.');
+      }
+      const nextExamId = toTrimmedString(examEditForm.next_exam_id || examEditForm.id || currentExamId);
+
+      const subjectFolder = toTrimmedString(examEditForm.subject_folder).toLowerCase();
+      if (!subjectFolder) {
+        throw new Error('Vui lòng nhập môn học (subject_folder) trước khi lưu.');
+      }
+
+      const examPath = toTrimmedString(examEditForm.exam_path || currentExamId);
+      const title = toTrimmedString(examEditForm.title || currentExamId);
+      const durationMinutes = toOptionalPositiveInteger(examEditForm.time);
+      const questionCount = toOptionalPositiveInteger(examEditForm.questions);
+      const status = toTrimmedString(examEditForm.status || 'ongoing') || 'ongoing';
+
+      const ex = exams.find((item) => item.id.toLowerCase() === currentExamId.toLowerCase());
+      const currentResources = normalizeExamResources(ex?.resources || {});
+      const currentExamPath = toTrimmedString(
+        currentResources.exam_path ||
+        currentResources.examPath ||
+        currentResources.path ||
+        ex?.examPath ||
+        currentExamId,
+      );
+      const currentBundlePath = toTrimmedString(
+        currentResources.bundle_path ||
+        currentResources.bundlePath ||
+        currentExamPath ||
+        currentExamId,
+      );
+      const needsIdentityUpdate = (
+        currentExamId.toLowerCase() !== nextExamId.toLowerCase() ||
+        currentExamPath.toLowerCase() !== examPath.toLowerCase()
+      );
+
+      let identityPayload = null;
+      if (needsIdentityUpdate) {
+        identityPayload = await updateAdminExamIdentity({
+          currentExamId,
+          nextExamId,
+          subjectFolder,
+          examPath,
+          bundlePath: currentBundlePath,
+        });
+      }
+
+      const identityResources = normalizeExamResources(identityPayload?.resources || currentResources);
+      const canonicalBundlePath = toTrimmedString(
+        identityPayload?.bundle_path ||
+        identityResources.bundle_path ||
+        identityResources.bundlePath ||
+        currentBundlePath,
+      );
+
+      const nextResources = normalizeExamResources({
+        ...identityResources,
+        title,
+        subject_folder: subjectFolder,
+        subjectFolder,
+        subject: subjectFolder,
+        exam_path: examPath,
+        examPath,
+        path: examPath,
+        bundle_path: canonicalBundlePath,
+        bundlePath: canonicalBundlePath,
+        status,
+        time: durationMinutes,
+        duration_minutes: durationMinutes,
+        questions: questionCount,
+        question_count: questionCount,
+        folder_url: toTrimmedString(examEditForm.folder_url) || identityResources.folder_url,
+        lecture_url: toTrimmedString(examEditForm.lecture_url) || identityResources.lecture_url,
+        document_url: identityResources.document_url,
+        answer_file_url: identityResources.answer_file_url,
+      });
+
+      if (selectedExamFile) {
+        if (identityResources.document_url) {
+          if (!window.confirm('Đề thi này đã có bản PDF đề bài lưu trong máy chủ.\nBạn có CHẮC CHẮN muốn ghi đè bằng file mới không?\n(File cũ sẽ bị xoá vĩnh viễn)')) {
+            setSavingExam(false);
+            return;
+          }
+        }
+        const uploadDocResult = await uploadExamDocumentFile(nextExamId, subjectFolder, selectedExamFile, identityResources.document_url);
+        nextResources.document_url = uploadDocResult.path;
+      }
+
+      if (selectedAnswerFile) {
+        if (identityResources.answer_file_url) {
+          if (!window.confirm('Đề thi này đã có bản PDF đáp án lưu trong máy chủ.\nBạn có CHẮC CHẮN muốn ghi đè bằng file mới không?\n(File cũ sẽ bị xoá vĩnh viễn)')) {
+            setSavingExam(false);
+            return;
+          }
+        }
+        const uploadResult = await uploadExamAnswerFile(nextExamId, selectedAnswerFile, identityResources.answer_file_url);
+        nextResources.answer_file_url = uploadResult.path;
+      }
+
+      await upsertAdminExamKeyBundle({
+        examId: nextExamId,
+        answerKey: parsedKey,
+        resources: nextResources,
+      });
+
+      toast('Cập nhật dữ liệu đề thi thành công!');
+      setEditingExam(null);
+      setExamEditForm(DEFAULT_EXAM_EDIT_FORM);
+      setSelectedAnswerFile(null);
+      setSelectedExamFile(null);
+      clearExamIndexCache();
+      await fetchExams();
+    } catch (err) {
+      alert('Lỗi khi lưu: ' + err.message);
+    } finally {
+      setSavingExam(false);
+    }
+  };
+
+  const normalizedExamSearch = examSearch.trim().toLowerCase();
+  
+  // Extract unique subject folders from all exams or use subjects from DB
+  const uniqueSubjects = examSubjects.length > 0 
+    ? examSubjects.map(s => s.id).sort()
+    : [...new Set(exams.map(ex => toTrimmedString(ex.subjectFolder || ex.subject || 'khac')))].filter(Boolean).sort();
+
+  const filteredExams = exams.filter((item) => {
+    const sFolder = toTrimmedString(item.subjectFolder || item.subject || 'khac');
+    if (selectedSubject !== 'ALL' && sFolder !== selectedSubject) return false;
+
+    if (!normalizedExamSearch) return true;
+    return (
+      item.id.toLowerCase().includes(normalizedExamSearch) ||
+      (item.title && item.title.toLowerCase().includes(normalizedExamSearch))
+    );
+  });
+  const isExamTab = mainTab === 'exams';
+
+  // Data fetch: placed AFTER all const function definitions so closures work correctly
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (!isAdmin) return;
+    if (mainTab === 'library') {
+      fetchDocuments();
+    } else if (mainTab === 'thongsoai') {
+      fetchCandidates();
+    } else if (mainTab === 'collaborators') {
+      fetchCollaborators();
+    } else if (mainTab === 'vip') {
+      fetchPaymentLogs();
+      fetchVipMembers();
+    } else if (mainTab === 'exams') {
+      fetchExams();
+      fetchSubjects();
+    } else if (mainTab === 'subjects') {
+      fetchSubjects();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin, mainTab]);
+
+  // Security Check: Kick out non-admins
+  if (!isAdmin) {
+    return <Navigate to="/home" />;
+  }
+
+  return (
+    <div className="bg-[#f8f6f6] dark:bg-[#1a0f12] font-display text-slate-900 dark:text-white min-h-screen pb-24">
+      {/* Header */}
+      <header className="relative z-30 px-6 py-4 bg-white/50 dark:bg-[#201216]/80 backdrop-blur-md border-b border-[#7f13ec]/10 flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#7f13ec]/20 flex items-center justify-center text-[#7f13ec] shadow-[0_0_15px_rgba(127,19,236,0.3)]">
+            <span className="material-symbols-outlined">admin_panel_settings</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Quản trị viên hệ thống</h1>
+            <p className="text-xs text-slate-500 font-medium">Bảng điều khiển admin quyền lực</p>
+          </div>
+        </div>
+
+        {/* Main Tabs Segmented Control */}
+        <div className="flex bg-slate-200 dark:bg-[#1a0f12] p-1 rounded-xl w-full overflow-x-auto scrollbar-hide">
+          <button onClick={() => setMainTab('library')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'library' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-[#7f13ec]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
+            <span className="material-symbols-outlined text-[18px]">library_books</span> Quản lý Tài Liệu Học Free
+          </button>
+          <button onClick={() => setMainTab('collaborators')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'collaborators' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-[#10b981]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
+            <span className="material-symbols-outlined text-[18px]">group_add</span> Truyền Đạo Sư
+          </button>
+          <button onClick={() => setMainTab('thongsoai')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'thongsoai' ? 'bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/40 dark:to-orange-900/20 border-red-200 dark:border-red-900/50 shadow-sm text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
+            <span className="material-symbols-outlined text-[18px]">local_fire_department</span> Sắc phong Bang Chủ
+          </button>
+          <button onClick={() => setMainTab('vip')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'vip' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-amber-500' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
+            <span className="material-symbols-outlined text-[18px]">workspace_premium</span> Quản lý VIP
+          </button>
+          <button onClick={() => setMainTab('exams')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'exams' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-blue-500' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
+            <span className="material-symbols-outlined text-[18px]">quiz</span> Quản lý đề thi
+          </button>
+          <button onClick={() => setMainTab('subjects')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'subjects' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-indigo-500' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
+            <span className="material-symbols-outlined text-[18px]">category</span> Môn học
+          </button>
+        </div>
+      </header>
+
+      <main className={`w-full mx-auto px-4 pt-8 ${isExamTab ? 'max-w-[1480px]' : 'max-w-3xl'}`}>
+        {/* ─── VIP Management Tab ─────────────────────────────────── */}
+        {mainTab === 'vip' && (
+          <div className="space-y-6">
+            {/* Search & Statistics */}
+            {/* Toast message */}
+            {vipMsg.text && (
+              <div className={`px-4 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 ${
+                vipMsg.type === 'success' ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-red-500/10 border border-red-500/30 text-red-400'
+              }`}>
+                <span className="material-symbols-outlined text-[16px]">{vipMsg.type === 'success' ? 'check_circle' : 'error'}</span>
+                {vipMsg.text}
+              </div>
+            )}
+
+            {directoryWarning && (
+              <div className="px-4 py-3 rounded-2xl text-sm font-medium bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300">
+                {directoryWarning}
+              </div>
+            )}
+
+            {/* User search */}
+            <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-xl space-y-6">
+              <div>
+                <h2 className="text-base font-black text-amber-500 flex items-center gap-2 mb-2">
+                  <span className="material-symbols-outlined text-[18px]">alternate_email</span> Cấp VIP trực tiếp qua Gmail
+                </h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                  Nhập đúng gmail/email tài khoản và số ngày cần cấp để nâng user lên VIP ngay.
+                </p>
+
+                <form onSubmit={grantVipByEmail} className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px_auto] gap-3">
+                  <input
+                    type="email"
+                    placeholder="gmail@example.com"
+                    value={vipGrantEmail}
+                    onChange={e => setVipGrantEmail(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm placeholder:text-slate-400 focus:outline-none focus:border-amber-500/50"
+                  />
+                  <input
+                    type="number"
+                    min="1"
+                    value={vipGrantDays}
+                    onChange={e => setVipGrantDays(Number(e.target.value) || 0)}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-amber-500/50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={vipGrantLoading}
+                    className="px-5 py-3 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                  >
+                    {vipGrantLoading ? <span className="material-symbols-outlined animate-spin text-[16px]">sync</span> : <span className="material-symbols-outlined text-[16px]">workspace_premium</span>}
+                    Cấp VIP
+                  </button>
+                </form>
+
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {VIP_PRESET_DAYS.map(days => (
+                    <button
+                      key={`vip-preset-${days}`}
+                      type="button"
+                      onClick={() => setVipGrantDays(days)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
+                        vipGrantDays === days
+                          ? 'bg-amber-500 text-white border-amber-500'
+                          : 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/20'
+                      }`}
+                    >
+                      {days} ngày
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t border-slate-200 dark:border-white/10 pt-6">
+                <h2 className="text-base font-black text-amber-500 flex items-center gap-2 mb-4">
+                  <span className="material-symbols-outlined text-[18px]">manage_accounts</span> Tìm kiếm & quản lý VIP
+                </h2>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Nhập tên hoặc email..."
+                    value={vipSearch}
+                    onChange={e => setVipSearch(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && searchVipUsers()}
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm placeholder:text-slate-400 focus:outline-none focus:border-amber-500/50"
+                  />
+                  <button
+                    onClick={() => searchVipUsers()}
+                    disabled={vipLoading}
+                    className="px-4 py-2.5 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors flex items-center gap-2 disabled:opacity-70"
+                  >
+                    {vipLoading ? <span className="material-symbols-outlined animate-spin text-[16px]">sync</span> : <span className="material-symbols-outlined text-[16px]">search</span>}
+                    Tìm
+                  </button>
+                </div>
+
+                {vipUsers.length > 0 && (
+                  <div className="mt-4 space-y-3">
+                    {vipUsers.map(u => (
+                      <div key={u.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-slate-900 dark:text-white text-sm">{u.display_name || u.full_name || u.email || u.id}</p>
+                          {u.email && (
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{u.email}</p>
+                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                              u.is_vip ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-500/20 text-slate-400'
+                            }`}>
+                              {u.is_vip ? 'VIP' : 'Free'}
+                            </span>
+                            {u.vip_expired_at && (
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                                Hết: {new Date(u.vip_expired_at).toLocaleDateString('vi-VN')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {VIP_PRESET_DAYS.map(d => (
+                            <button
+                              key={d}
+                              onClick={() => addVipDays(u.id, d)}
+                              className="px-3 py-1.5 text-xs font-black rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-500 hover:bg-amber-500/20 transition-colors"
+                            >
+                              +{d}d
+                            </button>
+                          ))}
+                          <button
+                            onClick={() => toggleVip(u.id, u.is_vip)}
+                            className={`px-3 py-1.5 text-xs font-black rounded-lg border transition-colors ${
+                              u.is_vip
+                                ? 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20'
+                                : 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400 hover:bg-green-500/20'
+                            }`}
+                          >
+                            {u.is_vip ? 'Tắt VIP' : 'Bật VIP'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-black text-amber-500 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">workspace_premium</span> Danh sách thành viên VIP
+                </h2>
+                <button
+                  onClick={fetchVipMembers}
+                  className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors flex items-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[14px]">refresh</span> Tải lại
+                </button>
+              </div>
+
+              {vipMembersLoading ? (
+                <div className="flex justify-center py-6">
+                  <span className="material-symbols-outlined animate-spin text-amber-500">sync</span>
+                </div>
+              ) : vipMembers.length === 0 ? (
+                <p className="text-sm text-slate-500 text-center py-4">Chưa có thành viên VIP nào.</p>
+              ) : (
+                <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+                  {vipMembers.map((member) => (
+                    <div key={member.id} className="flex items-center justify-between gap-3 p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                          {member.display_name || member.full_name || member.email || member.id}
+                        </p>
+                        <p className="text-xs text-slate-500 truncate">{member.email || 'Không có email'}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[11px] font-bold text-amber-500 uppercase">VIP</p>
+                        <p className="text-xs text-slate-500">
+                          {member.vip_expired_at
+                            ? new Date(member.vip_expired_at).toLocaleDateString('vi-VN')
+                            : 'Không rõ hạn'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Payment Logs */}
+            <div className="bg-white dark:bg-[#201216] border border-white/10 rounded-2xl p-5 shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-black text-slate-300 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">receipt_long</span> Webhook Logs
+                </h2>
+                <button onClick={fetchPaymentLogs} className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">refresh</span> Tải lại
+                </button>
+              </div>
+              {paymentLogsLoading ? (
+                <div className="flex justify-center py-6"><span className="material-symbols-outlined animate-spin text-slate-400">sync</span></div>
+              ) : paymentLogs.length === 0 ? (
+                <p className="text-slate-500 text-sm text-center py-4">Chưa có webhook log nào.</p>
+              ) : (
+                <div className="space-y-2 max-h-80 overflow-y-auto">
+                  {paymentLogs.map(log => (
+                    <div key={log.id} className={`flex items-center gap-3 p-3 rounded-xl border text-xs ${
+                      log.status === 'ok' ? 'border-green-500/20 bg-green-500/5 text-green-400'
+                      : log.status === 'duplicate' ? 'border-blue-500/20 bg-blue-500/5 text-blue-400'
+                      : 'border-red-500/20 bg-red-500/5 text-red-400'
+                    }`}>
+                      <span className="font-mono font-bold uppercase">{log.status}</span>
+                      <span className="text-slate-500 flex-1 truncate">{log.error_message || 'OK'}</span>
+                      <span className="text-slate-600 shrink-0">{new Date(log.created_at).toLocaleString('vi-VN')}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ─── Subject Management Tab ─────────────────────────────────── */}
+        {mainTab === 'subjects' && (
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/10 rounded-2xl p-6 xl:p-8 shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold flex items-center gap-2 text-indigo-500">
+                  <span className="material-symbols-outlined">category</span>
+                  Quản lý Môn học (Subjects)
+                </h2>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => handleOpenSubjectModal()} className="text-xs bg-indigo-500 text-white hover:bg-indigo-600 font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">add</span> Thêm môn mới
+                  </button>
+                  <button onClick={() => setMainTab('exams')} className="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">arrow_back</span> Quay lại Exams
+                  </button>
+                </div>
+              </div>
+
+              {loadingSubjects ? (
+                <div className="flex justify-center py-12"><span className="material-symbols-outlined animate-spin text-indigo-500 text-3xl">sync</span></div>
+              ) : examSubjects.length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl">
+                  <span className="material-symbols-outlined text-5xl text-slate-300 mb-2">category</span>
+                  <p className="text-slate-500 font-medium">Chưa có môn học nào. Hãy thêm môn học đầu tiên.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {examSubjects.map(sub => (
+                    <div key={sub.id} className="p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 flex items-center justify-between group">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${sub.color || 'from-slate-400 to-slate-500'} flex items-center justify-center text-white shadow-lg`}>
+                          <span className="material-symbols-outlined">{sub.icon || 'folder'}</span>
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-sm text-slate-900 dark:text-white uppercase">{sub.name}</h4>
+                          <p className="text-[10px] font-black text-slate-400 uppercase">Mã: {sub.id} | Thứ tự: {sub.display_order}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => handleOpenSubjectModal(sub)}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-500 hover:bg-blue-500/10 transition-all"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteSubject(sub.id)}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {/* ─── Exam Management Tab ─────────────────────────────────── */}
+        {mainTab === 'exams' && (
+          <div className="space-y-6">
+            {/* Error Display for DB Issues */}
+            {(keysError || examsDbError) && (
+              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-bold animate-pulse">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="material-symbols-outlined text-[18px]">database_off</span>
+                  <span>CẢNH BÁO DATABASE: Dữ liệu từ Supabase có thể không đầy đủ.</span>
+                </div>
+                {keysError && <div className="ml-7">• Lỗi Kho khóa: {keysError}</div>}
+                {examsDbError && <div className="ml-7">• Lỗi Metadata: {examsDbError}</div>}
+                <div className="ml-7 mt-2 text-slate-400 font-normal">Gợi ý: Kiểm tra phân quyền RLS hoặc chính tả hàm is_admin(). Bạn vẫn có thể dùng "Sync từ File" để sửa.</div>
+              </div>
+            )}
+
+            <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/10 rounded-2xl p-6 xl:p-8 shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold flex items-center gap-2 text-blue-500">
+                  <span className="material-symbols-outlined">quiz</span>
+                  Quản lý kho đề thi
+                </h2>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setMainTab('subjects')} className="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">category</span> Môn học
+                  </button>
+                  <button onClick={handleCreateExam} className="text-xs bg-blue-500 text-white hover:bg-blue-600 font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">add</span> Tạo đề mới
+                  </button>
+                  <button onClick={fetchExams} className="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">refresh</span> Làm mới
+                  </button>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                {/* Subject Tabs */}
+                <div className="flex bg-slate-100 dark:bg-[#1a0f12] p-1.5 rounded-2xl w-full overflow-x-auto scrollbar-hide mb-4 gap-2 border border-slate-200 dark:border-white/5 shadow-inner snap-x">
+                  <button 
+                    onClick={() => setSelectedSubject('ALL')}
+                    className={`snap-start whitespace-nowrap px-4 py-2 text-xs font-black rounded-xl transition-all ${selectedSubject === 'ALL' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/5'}`}
+                  >
+                    TẤT CẢ ({exams.length})
+                  </button>
+                  {uniqueSubjects.map(sub => {
+                    const count = exams.filter(e => toTrimmedString(e.subjectFolder || e.subject || 'khac') === sub).length;
+                    const subjectData = examSubjects.find(s => s.id === sub);
+                    return (
+                      <button 
+                        key={sub}
+                        onClick={() => setSelectedSubject(sub)}
+                        className={`snap-start whitespace-nowrap px-4 py-2 text-xs font-black uppercase rounded-xl transition-all flex items-center gap-1.5 ${selectedSubject === sub ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/5'}`}
+                      >
+                        {subjectData?.name || sub} <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${selectedSubject === sub ? 'bg-white/20 dark:bg-black/10' : 'bg-slate-200 dark:bg-white/10'}`}>{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400">
+                    <span className="material-symbols-outlined text-[20px]">search</span>
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Tìm mã đề hoặc tên đề thi..."
+                    value={examSearch}
+                    onChange={(e) => setExamSearch(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div className="mt-2 text-[11px] text-slate-500 font-semibold">
+                  Tổng đề: {exams.length} | Khớp tìm kiếm: {filteredExams.length}
+                </div>
+              </div>
+
+              {/* Edit Mode Overlay/Form */}
+              {editingExam && (
+                <div className="mb-8 p-6 rounded-2xl bg-blue-50 dark:bg-blue-500/5 border-2 border-blue-500/30 space-y-4 animate-in fade-in slide-in-from-top-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-black text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                        <span className="material-symbols-outlined">edit_note</span>
+                        Đang chỉnh sửa: {editingExam}
+                      </h3>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase mt-1">Lưu trực tiếp vào database qua RPC admin</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={handleSyncFromJson}
+                        className="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-[10px] font-black uppercase flex items-center gap-1 hover:bg-amber-600 shadow-sm"
+                        title="Tự động lấy đáp án và link từ file JSON cục bộ"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">sync</span> Đồng bộ từ File
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditingExam(null);
+                          setSelectedAnswerFile(null);
+                          setExamEditForm(DEFAULT_EXAM_EDIT_FORM);
+                        }}
+                        className="text-slate-400 hover:text-slate-600"
+                      >
+                        <span className="material-symbols-outlined">close</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Tên đề thi</label>
+                      <input
+                        type="text"
+                        value={examEditForm.title}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, title: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Môn học (subject_folder)</label>
+                      <input
+                        type="text"
+                        placeholder="VD: sinh, toan, ly..."
+                        value={examEditForm.subject_folder}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, subject_folder: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Đường dẫn đề (exam_path)</label>
+                      <input
+                        type="text"
+                        value={examEditForm.exam_path}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, exam_path: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Trạng thái hiển thị</label>
+                      <select
+                        value={examEditForm.status}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, status: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
+                      >
+                        {EXAM_STATUS_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>{option.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Thời gian (phút)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={examEditForm.time}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, time: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Số câu hỏi</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={examEditForm.questions}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, questions: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Links Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">folder_open</span> Link Folder đề
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://drive.google.com/drive/folders/..."
+                        value={examEditForm.folder_url}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, folder_url: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">play_circle</span> Link bài giảng
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://youtube.com/... hoặc https://..."
+                        value={examEditForm.lecture_url}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, lecture_url: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-sm focus:border-blue-500 outline-none shadow-inner"
+                      />
+                    </div>
+                  </div>
+
+                  {/* PDF Uploads + JSON Answer Key Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Left: 2 PDF Uploads */}
+                    <div className="space-y-4">
+                      {/* Upload file đề thi */}
+                      <div className="p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-black text-slate-600 dark:text-slate-300 uppercase flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-[16px] text-blue-500">description</span>
+                            PDF Đề thi
+                          </label>
+                          {examEditForm.document_url && (
+                            <span className="text-[10px] font-bold text-green-500 flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[12px]">check_circle</span>
+                              Đã có file
+                            </span>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          id="exam-doc-file"
+                          onChange={(e) => setSelectedExamFile(e.target.files?.[0] || null)}
+                          className="hidden"
+                        />
+                        <label
+                          htmlFor="exam-doc-file"
+                          className="block w-full text-center px-4 py-3 rounded-xl border border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10 text-blue-500 text-xs font-bold cursor-pointer transition-all"
+                        >
+                          {selectedExamFile ? `✓ ${selectedExamFile.name}` : (examEditForm.document_url ? '🔄 Đổi file đề' : '📂 Chọn file PDF đề thi')}
+                        </label>
+                        {examEditForm.document_url && (
+                          <p className="text-[10px] text-slate-400 truncate" title={examEditForm.document_url}>📁 {examEditForm.document_url}</p>
+                        )}
+                      </div>
+
+                      {/* Upload file đáp án */}
+                      <div className="p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-black text-slate-600 dark:text-slate-300 uppercase flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-[16px] text-amber-500">key</span>
+                            PDF Đáp án
+                          </label>
+                          {examEditForm.answer_file_url && (
+                            <span className="text-[10px] font-bold text-green-500 flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[12px]">check_circle</span>
+                              Đã có file
+                            </span>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          id="exam-answer-file"
+                          onChange={(e) => setSelectedAnswerFile(e.target.files?.[0] || null)}
+                          className="hidden"
+                        />
+                        <label
+                          htmlFor="exam-answer-file"
+                          className="block w-full text-center px-4 py-3 rounded-xl border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 text-amber-500 text-xs font-bold cursor-pointer transition-all"
+                        >
+                          {selectedAnswerFile ? `✓ ${selectedAnswerFile.name}` : (examEditForm.answer_file_url ? '🔄 Đổi file đáp án' : '📂 Chọn file PDF đáp án')}
+                        </label>
+                        {examEditForm.answer_file_url && (
+                          <p className="text-[10px] text-slate-400 truncate" title={examEditForm.answer_file_url}>📁 {examEditForm.answer_file_url}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right: JSON Answer Key */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-bold text-slate-500 uppercase">Đáp án (JSON Answer Key)</label>
+                        <button onClick={formatJson} className="text-[10px] font-bold text-blue-500 hover:underline">Định dạng JSON</button>
+                      </div>
+                      <textarea
+                        rows="14"
+                        value={examEditForm.answer_key}
+                        onChange={(e) => setExamEditForm({ ...examEditForm, answer_key: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-white dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-xs font-mono focus:border-blue-500 outline-none resize-none shadow-inner"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button
+                      onClick={() => {
+                        setEditingExam(null);
+                        setSelectedAnswerFile(null);
+                        setSelectedExamFile(null);
+                        setExamEditForm(DEFAULT_EXAM_EDIT_FORM);
+                      }}
+                      className="px-4 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-white/5 transition-all"
+                    >
+                      Hủy bỏ
+                    </button>
+                    <button
+                      onClick={handleSaveEdit}
+                      disabled={savingExam}
+                      className="px-6 py-2 rounded-xl bg-blue-500 text-white text-sm font-bold shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 disabled:opacity-70 disabled:hover:scale-100"
+                    >
+                      <span className={`material-symbols-outlined text-[18px] ${savingExam ? 'animate-spin' : ''}`}>{savingExam ? 'sync' : 'save'}</span>
+                      {savingExam ? 'Đang lưu...' : 'Lưu kho khóa'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {loadingExams ? (
+                <div className="flex justify-center py-12"><span className="material-symbols-outlined animate-spin text-blue-500 text-3xl">sync</span></div>
+              ) : exams.length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl">
+                  <span className="material-symbols-outlined text-5xl text-slate-300 mb-2">inventory_2</span>
+                  <p className="text-slate-500 font-medium">Chưa có đề thi nào trong hệ thống.</p>
+                </div>
+              ) : filteredExams.length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl">
+                  <span className="material-symbols-outlined text-5xl text-slate-300 mb-2">search_off</span>
+                  <p className="text-slate-500 font-medium">Không có đề nào khớp từ khóa tìm kiếm.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
+                  {filteredExams.map(ex => (
+                    <div key={ex.id} className="p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:border-blue-500/30 transition-all flex flex-col gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-start gap-2 mb-1">
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest ${ex.is_in_db ? 'bg-blue-500/10 text-blue-500' : 'bg-slate-500/10 text-slate-500'}`}>
+                            {ex.is_in_db ? 'Synced' : 'Local Only'}
+                          </span>
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-500 uppercase tracking-widest">{ex.id}</span>
+                          <h4 className="font-bold text-sm leading-snug line-clamp-2">{ex.title || 'Đề thi chưa đặt tên'}</h4>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3">
+                           <div className="flex items-center gap-1">
+                              <span className={`material-symbols-outlined text-[16px] ${ex.has_key ? 'text-green-500' : 'text-slate-400'}`}>
+                                {ex.has_key ? 'check_circle' : 'cancel'}
+                              </span>
+                              <span className="text-[11px] font-bold text-slate-500 uppercase">Đáp án</span>
+                           </div>
+                           <div className="flex items-center gap-1">
+                              <span className={`material-symbols-outlined text-[16px] ${ex.has_resources ? 'text-purple-500' : 'text-slate-400'}`}>
+                                {ex.has_resources ? 'check_circle' : 'cancel'}
+                              </span>
+                              <span className="text-[11px] font-bold text-slate-500 uppercase">Video/Lời giải</span>
+                           </div>
+                           <div className="flex items-center gap-1">
+                              <span className={`material-symbols-outlined text-[16px] ${ex.answer_file_url ? 'text-cyan-500' : 'text-slate-400'}`}>
+                                {ex.answer_file_url ? 'check_circle' : 'cancel'}
+                              </span>
+                              <span className="text-[11px] font-bold text-slate-500 uppercase">File đáp án</span>
+                           </div>
+                           <span className="text-[11px] font-semibold text-slate-500 bg-slate-200/80 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                             {toTrimmedString(ex.subjectFolder || ex.subject || 'khac')}
+                           </span>
+                           <span className="text-[11px] font-semibold text-slate-500 bg-slate-200/80 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                             path: {toTrimmedString(ex.examPath || ex.id)}
+                           </span>
+                           {Number.isFinite(Number(ex.time)) && (
+                             <span className="text-[11px] font-semibold text-slate-500 bg-slate-200/80 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                               {Number(ex.time)} phút
+                             </span>
+                           )}
+                           {Number.isFinite(Number(ex.questions)) && (
+                             <span className="text-[11px] font-semibold text-slate-500 bg-slate-200/80 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                               {Number(ex.questions)} câu
+                             </span>
+                           )}
+                           {ex.last_synced_at && (
+                             <span className="text-[11px] text-slate-400 italic">
+                               Sync: {new Date(ex.last_synced_at).toLocaleString('vi-VN')}
+                             </span>
+                           )}
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 self-end border-t border-slate-200 dark:border-white/10 pt-3 justify-end">
+                        <button 
+                          onClick={() => handleStartEdit(ex)}
+                          className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-blue-500/10 hover:text-blue-500 text-xs font-bold transition-all flex items-center gap-1"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">edit</span> Sửa kho khóa
+                        </button>
+                        <button 
+                          onClick={() => toggleExamKeyVisibility(ex.id, ex.has_key)}
+                          className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-amber-500/10 hover:text-amber-500 text-xs font-bold transition-all flex items-center gap-1"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">visibility</span> Kiểm tra
+                        </button>
+                        <button 
+                          onClick={() => deleteExam(ex.id)}
+                          className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-red-500/10 hover:text-red-500 text-xs font-bold transition-all flex items-center gap-1"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">delete</span> Xóa
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {mainTab === 'library' && (
+          <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-bold flex items-center gap-2 text-[#7f13ec]">
+                <span className="material-symbols-outlined">{docId ? 'edit_document' : 'upload_file'}</span>
+                {docId ? 'Cập nhật tài liệu' : 'Thêm tài liệu mới'}
+              </h2>
+              {docId && (
+                <button onClick={resetForm} className="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">close</span> Hủy sửa
+                </button>
+              )}
+            </div>
+
+            {message.text && (
+              <div className={`p-4 rounded-xl mb-6 text-sm font-medium ${message.type === 'success' ? 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'}`}>
+                {message.text}
+              </div>
+            )}
+
+            <form onSubmit={handleLibrarySubmit} className="space-y-5">
+              {/* Form fields... (reusing existing UI) */}
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Tiêu đề tài liệu <span className="text-red-500">*</span></label>
+                <input required value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="VD: Đề thi Giải tích 1 HK231" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Mô tả ngắn</label>
+                <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows="3" className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white resize-none" placeholder="Nhập nội dung mô tả..."></textarea>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Tác giả / Nguồn tài liệu</label>
+                <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="VD: Nguyễn Văn A hoặc PĐT Bách Khoa" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Ngày - tháng - năm <span className="text-slate-400 font-normal">(Tùy chọn)</span></label>
+                <input type="date" value={publishDate} onChange={(e) => setPublishDate(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white dark:[color-scheme:dark]" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">Phân loại cấp học <span className="text-red-500">*</span></label>
+                <div className="flex gap-4">
+                  <label className="flex-1 cursor-pointer">
+                    <input type="radio" name="educationLevel" value="thpt" checked={educationLevel === 'thpt'} onChange={(e) => setEducationLevel(e.target.value)} className="hidden peer" />
+                    <div className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all font-semibold peer-checked:border-[#306ee8] peer-checked:bg-[#306ee8]/10 peer-checked:text-[#306ee8] border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:border-[#306ee8]/50">
+                      <span className="material-symbols-outlined text-[20px]">menu_book</span> THPT Quốc Gia
+                    </div>
+                  </label>
+                  <label className="flex-1 cursor-pointer">
+                    <input type="radio" name="educationLevel" value="university" checked={educationLevel === 'university'} onChange={(e) => setEducationLevel(e.target.value)} className="hidden peer" />
+                    <div className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all font-semibold peer-checked:border-[#7f13ec] peer-checked:bg-[#7f13ec]/10 peer-checked:text-[#7f13ec] border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:border-[#7f13ec]/50">
+                      <span className="material-symbols-outlined text-[20px]">school</span> Đại Học
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {educationLevel === 'university' && (
+                <div>
+                  <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Trường / Ngành học <span className="text-red-500">*</span></label>
+                  <input required value={major} onChange={(e) => setMajor(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="VD: ĐH Bách Khoa, CNTT, Y Dược..." />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">{educationLevel === 'university' ? 'Tên Môn học / Học phần ' : 'Danh mục / Môn học '}<span className="text-red-500">*</span></label>
+                {educationLevel === 'university' ? (
+                  <input required value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="VD: Giải tích 1, Toán cao cấp..." />
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                    {CATEGORIES.map(cat => (
+                      <button key={cat.value} type="button" onClick={() => setCategory(cat.value)} className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all text-xs font-semibold ${category === cat.value ? 'border-[#7f13ec] bg-[#7f13ec]/10 text-[#7f13ec]' : 'border-slate-200 dark:border-white/8 bg-slate-50 dark:bg-white/3 text-slate-500 dark:text-slate-400 hover:border-[#7f13ec]/40 hover:text-[#7f13ec]'}`}>
+                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center`}><span className="material-symbols-outlined text-white text-base">{cat.icon}</span></div>
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Link Google Drive / Tải về <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none"><span className="material-symbols-outlined text-slate-400">link</span></div>
+                  <input required type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="https://drive.google.com/..." />
+                </div>
+              </div>
+
+              <div onClick={() => setIsFeatured(!isFeatured)} className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${isFeatured ? 'border-amber-500 bg-amber-500/10' : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/3 hover:border-amber-400/50'}`}>
+                <div className="flex items-center gap-3">
+                  <span className={`material-symbols-outlined text-2xl ${isFeatured ? 'text-amber-400' : 'text-slate-400'}`}>star</span>
+                  <div>
+                    <p className={`font-semibold text-sm ${isFeatured ? 'text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>Ghim làm Tài liệu nổi bật</p>
+                    <p className="text-xs text-slate-500">Hiển thị ở đầu trang Tài Liệu Học Free</p>
+                  </div>
+                </div>
+                <div className={`w-12 h-6 rounded-full transition-all relative ${isFeatured ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-600'}`}>
+                  <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${isFeatured ? 'left-6' : 'left-0.5'}`} />
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <button type="submit" disabled={loading} className="w-full py-4 bg-[#7f13ec] text-white rounded-xl font-bold text-lg shadow-lg shadow-[#7f13ec]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:scale-100 flex items-center justify-center gap-2">
+                  {loading ? <span className="material-symbols-outlined animate-spin">sync</span> : <span className="material-symbols-outlined">{docId ? 'save' : 'cloud_upload'}</span>}
+                  {loading ? 'Đang xử lý...' : (docId ? 'Cập nhật tài liệu' : 'Đăng tải tài liệu')}
+                </button>
+              </div>
+            </form>
+
+            {/* List of Documents */}
+            <div className="mt-12">
+              <h3 className="text-md font-bold mb-4 flex items-center gap-2 border-t border-slate-200 dark:border-white/10 pt-8">
+                <span className="material-symbols-outlined text-slate-400">format_list_bulleted</span>
+                Danh sách tài liệu hệ thống
+              </h3>
+
+              {loadingDocs ? (
+                <div className="flex justify-center py-8"><span className="material-symbols-outlined animate-spin text-[#7f13ec]">sync</span></div>
+              ) : documents.length === 0 ? (
+                <p className="text-center text-sm text-slate-500 italic py-6">Chưa có tài liệu nào.</p>
+              ) : (
+                <div className="space-y-3">
+                  {documents.map(doc => {
+                    const catInfo = CATEGORIES.find(c => c.value === doc.category) || CATEGORIES[CATEGORIES.length - 1];
+                    return (
+                      <div key={doc.id} className="flex flex-col sm:flex-row gap-4 p-4 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 hover:border-[#7f13ec]/30 transition-all group">
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${doc.is_featured ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
+                              {doc.is_featured ? 'Nổi bật' : catInfo.label}
+                            </span>
+                            <h4 className="font-bold text-sm truncate" title={doc.title}>{doc.title}</h4>
+                          </div>
+                          <p className="text-xs text-slate-500 truncate">{doc.description || 'Không có mô tả'}</p>
+                          <p className="mt-1 text-[11px] text-slate-400">
+                            Up lúc: {formatViDateTime(getDocumentUploadDate(doc)) || 'Chưa rõ'}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 border-slate-200 dark:border-white/10 pt-3 sm:pt-0">
+                          <button
+                            onClick={() => toggleFeatured(doc.id, doc.is_featured)}
+                            title={doc.is_featured ? "Bỏ ghim" : "Ghim nổi bật"}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${doc.is_featured ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20' : 'bg-slate-200 dark:bg-slate-800 text-slate-400 hover:text-amber-500'}`}
+                          >
+                            <span className="material-symbols-outlined text-[18px]">star</span>
+                          </button>
+                          <button
+                            onClick={() => handleEdit(doc)}
+                            title="Sửa"
+                            className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#7f13ec]/10 hover:text-[#7f13ec] flex items-center justify-center transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">edit</span>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(doc.id)}
+                            title="Xóa"
+                            className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-red-500/10 hover:text-red-500 flex items-center justify-center transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Thong Soai Tab */}
+        {mainTab === 'thongsoai' && (
+          <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-xl space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-black text-red-600 dark:text-red-400 flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-3xl">local_fire_department</span>
+                Sắc phong Bang Chủ
+              </h2>
+              <p className="text-sm font-medium text-slate-500 mt-2">Duyệt những Phó Bang Chủ rèn luyện xuất sắc (50+ chiến dịch) thăng cấp thành Bang Chủ.</p>
+            </div>
+
+            {loadingCandidates ? (
+              <div className="flex justify-center py-8"><span className="material-symbols-outlined animate-spin text-red-500 text-3xl">sync</span></div>
+            ) : candidates.length === 0 ? (
+              <div className="text-center bg-slate-50 dark:bg-[#1a0f12] p-8 rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner">
+                <span className="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-700 mb-3">group_off</span>
+                <p className="font-bold text-slate-500">Chưa có ai đủ điều kiện (&gt;= 50 chiến dịch).</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {candidates.map(candidate => (
+                  <div key={candidate.id} className="flex flex-col sm:flex-row items-center gap-4 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1a0f12] hover:shadow-md transition-shadow">
+                    <Avatar 
+                      src={candidate.avatar_url} 
+                      name={candidate.display_name || candidate.full_name || 'Ẩn danh'} 
+                      id={candidate.id}
+                      size="w-16 h-16"
+                      className="border-2 border-amber-400 shadow-sm"
+                    />
+                    <div className="flex-1 text-center sm:text-left">
+                      <h3 className="font-bold text-xl text-slate-800 dark:text-white mb-1">{candidate.display_name || candidate.full_name || 'Ẩn danh'}</h3>
+                      <p className="text-sm font-bold text-amber-600 dark:text-amber-500 bg-amber-100 dark:bg-amber-900/30 inline-block px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/50">
+                        ⚡ Đã cày {candidate.completedCount} chiến dịch
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => approveBangChu(candidate.id, candidate.is_approved_bang_chu)}
+                      className={`px-5 py-3 rounded-2xl font-black flex items-center gap-2 transition-all shadow-md shrink-0 ${candidate.is_approved_bang_chu ? 'bg-slate-200 text-slate-600 dark:bg-white/10 dark:text-slate-300 hover:bg-red-100 hover:text-red-600 border border-slate-300 dark:border-white/20' : 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-amber-500/30 hover:scale-105 active:scale-95 border border-amber-500'}`}
+                    >
+                      <span className="material-symbols-outlined text-[20px]">{candidate.is_approved_bang_chu ? 'cancel' : 'workspace_premium'}</span>
+                      {candidate.is_approved_bang_chu ? 'Thu hồi sắc phong' : 'Sắc phong Bang Chủ'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Collaborators Tab */}
+        {mainTab === 'collaborators' && (
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-xl">
+              <h2 className="text-xl font-bold flex items-center gap-2 text-[#10b981] mb-2">
+                <span className="material-symbols-outlined">person_search</span>
+                Tìm kiếm User để cấp quyền
+              </h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Tìm kiếm qua Tên, Email hoặc Nickname để thêm/xóa quyền Truyền Đạo Sư (Cộng tác viên).</p>
+
+              {message.text && (
+                <div className={`p-4 rounded-xl mb-6 text-sm font-medium ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'}`}>
+                  {message.text}
+                </div>
+              )}
+
+              {directoryWarning && (
+                <div className="p-4 rounded-xl mb-6 text-sm font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                  {directoryWarning}
+                </div>
+              )}
+
+              <form onSubmit={searchUsers} className="flex gap-2">
+                <input
+                  required
+                  value={collabSearchTerm}
+                  onChange={e => setCollabSearchTerm(e.target.value)}
+                  className="flex-1 bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all"
+                  placeholder="Nhập email, tên..."
+                />
+                <button type="submit" className="bg-[#10b981] hover:bg-[#059669] text-white px-6 rounded-xl font-bold transition-colors flex items-center gap-2">
+                  {loadingCollabs ? <span className="material-symbols-outlined animate-spin text-[20px]">sync</span> : <span className="material-symbols-outlined text-[20px]">search</span>}
+                  Tìm kiếm
+                </button>
+              </form>
+
+              {searchResults.length > 0 && (
+                <div className="mt-6 space-y-3">
+                  <h3 className="font-bold text-sm text-slate-500">Kết quả tìm kiếm:</h3>
+                  {searchResults.map(user => (
+                    <div key={user.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1a0f12]">
+                      <div className="flex items-center gap-4">
+                        <Avatar 
+                          src={user.avatar_url} 
+                          name={user.display_name || user.full_name || 'Khuyết danh'} 
+                          id={user.id}
+                        />
+                        <div>
+                          <div className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            {user.display_name || user.full_name || 'Khuyết danh'}
+                            {user.role === 'collaborator' && <span className="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded border border-emerald-200 uppercase font-black">TĐ. Sư</span>}
+                          </div>
+                          <div className="text-xs text-slate-500">{user.email}</div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => setCollaboratorRole(user.id, user.role !== 'collaborator')}
+                        className={`px-4 py-2 font-bold text-sm flex items-center gap-2 rounded-lg transition-colors border ${user.role === 'collaborator' ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-900/50' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-900/50'}`}
+                      >
+                        {user.role === 'collaborator' ? 'Hủy sách phong' : 'Sắc phong Truyền Đạo Sư'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-xl">
+              <h2 className="text-xl font-bold flex items-center gap-2 text-[#10b981] mb-6">
+                <span className="material-symbols-outlined">groups</span>
+                Danh sách Truyền Đạo Sư hiện tại
+              </h2>
+
+              {loadingCollabs && searchResults.length === 0 ? (
+                <div className="flex justify-center py-4"><span className="material-symbols-outlined animate-spin text-[#10b981]">sync</span></div>
+              ) : collaborators.length === 0 ? (
+                <p className="text-center text-slate-500 py-6 italic border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-white/5">Hệ thống chưa có Truyền Đạo Sư nào.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {collaborators.map(user => (
+                    <div key={user.id} className="flex flex-col p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-900/10">
+                      <div className="flex items-center gap-4 mb-4">
+                        <Avatar 
+                          src={user.avatar_url} 
+                          name={user.display_name || user.full_name || 'Khuyết danh'} 
+                          id={user.id}
+                          className="border border-emerald-200"
+                        />
+                        <div>
+                          <div className="font-bold text-slate-800 dark:text-white">{user.display_name || user.full_name || 'Khuyết danh'}</div>
+                          <div className="text-xs text-slate-500">{user.email}</div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setCollaboratorRole(user.id, false)}
+                        className="w-full py-2 bg-white dark:bg-[#1a0f12] text-red-500 border border-slate-200 dark:border-white/10 rounded-lg text-sm font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      >
+                        Hủy quyền
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Subject Management Modal */}
+      {isSubjectModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#201216] w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-slate-200 dark:border-white/10 flex items-center justify-between bg-slate-50 dark:bg-white/5">
+              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-indigo-500">category</span>
+                {editingSubject ? `Sửa môn: ${editingSubject}` : 'Thêm môn học mới'}
+              </h3>
+              <button onClick={() => setIsSubjectModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            
+            <form onSubmit={handleSaveSubject} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-black text-slate-500 uppercase mb-1.5 ml-1">Mã môn học (ID)</label>
+                <input
+                  type="text"
+                  required
+                  disabled={!!editingSubject}
+                  placeholder="toan, ly, hoa, sinh..."
+                  value={subjectForm.id}
+                  onChange={e => setSubjectForm({ ...subjectForm, id: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-slate-900 dark:text-white disabled:opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-black text-slate-500 uppercase mb-1.5 ml-1">Tên môn học</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Toán Học, Vật Lý..."
+                  value={subjectForm.name}
+                  onChange={e => setSubjectForm({ ...subjectForm, name: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-slate-900 dark:text-white"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-black text-slate-500 uppercase mb-1.5 ml-1">Icon (Material)</label>
+                  <input
+                    type="text"
+                    placeholder="functions, science..."
+                    value={subjectForm.icon}
+                    onChange={e => setSubjectForm({ ...subjectForm, icon: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-500 uppercase mb-1.5 ml-1">Thứ tự hiển thị</label>
+                  <input
+                    type="number"
+                    value={subjectForm.order}
+                    onChange={e => setSubjectForm({ ...subjectForm, order: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-black text-slate-500 uppercase mb-1.5 ml-1">Màu sắc (Tailwind gradients)</label>
+                <input
+                  type="text"
+                  placeholder="from-blue-500 to-indigo-600"
+                  value={subjectForm.color}
+                  onChange={e => setSubjectForm({ ...subjectForm, color: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-slate-900 dark:text-white"
+                />
+              </div>
+              
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsSubjectModalOpen(false)}
+                  className="flex-1 py-3 border border-slate-200 dark:border-white/10 rounded-xl font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingExam}
+                  className="flex-1 py-3 bg-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+                >
+                  {savingExam ? <span className="material-symbols-outlined animate-spin">sync</span> : <span className="material-symbols-outlined">save</span>}
+                  Lưu môn học
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

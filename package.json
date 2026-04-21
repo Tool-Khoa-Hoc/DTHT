@@ -1,0 +1,45 @@
+{
+  "name": "tram_hs_sv",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "exam-index": "node scripts/generate-exam-index.mjs",
+    "predev": "npm run exam-index -- --silent",
+    "dev": "vite",
+    "prebuild": "npm run exam-index -- --silent",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "sync": "python dtht.py sync --upload",
+    "build-index": "python dtht.py build",
+    "status": "python dtht.py status",
+    "distribute": "python dtht.py sync"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.98.0",
+    "@vercel/speed-insights": "^2.0.0",
+    "katex": "^0.16.38",
+    "pdfjs-dist": "^4.8.69",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-pdf": "^9.1.0",
+    "react-router-dom": "^7.13.1",
+    "swr": "^2.4.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@tailwindcss/vite": "^4.2.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "tailwindcss": "^4.2.1",
+    "vite": "^7.3.1",
+    "vite-imagetools": "^10.0.0",
+    "vite-plugin-compression2": "^2.5.3"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "provider": "gemini",
+  "auto_model": false,
+  "model": "gemini-2.5-flash",
+  "output_dir": "D:/DTHT/output",
+  "asset_dir": "",
+  "dump_raw_dir": "",
+  "max_retries": 1,
+  "remember_api_key": false,
+  "api_key": ""
+}
