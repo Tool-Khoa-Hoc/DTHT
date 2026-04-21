@@ -18,19 +18,19 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
  *   - `initPdfWorker()` chỉ được gọi khi component mount → lazy
  */
 let workerInitPromise = null;
+const LOCAL_PDF_WORKER_SRC = '/pdf.worker.min.mjs';
 
 function initPdfWorker() {
   if (workerInitPromise) return workerInitPromise;
 
   workerInitPromise = new Promise((resolve) => {
     try {
-      // Ưu tiên dùng unpkg CDN để giảm tải băng thông server local và tận dụng cache
-      pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+      // Always use same-origin worker to avoid CSP / cross-origin module import failures in production.
+      pdfjs.GlobalWorkerOptions.workerSrc = LOCAL_PDF_WORKER_SRC;
       resolve();
     } catch (err) {
-      console.warn('[SecurePdfViewer] CDN worker init failed, falling back to local fallback', err?.message);
-      // Fallback
-      pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+      console.warn('[SecurePdfViewer] Local worker init failed, retrying with same-origin fallback', err?.message);
+      pdfjs.GlobalWorkerOptions.workerSrc = LOCAL_PDF_WORKER_SRC;
       resolve();
     }
   });
