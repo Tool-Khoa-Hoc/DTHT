@@ -40,16 +40,12 @@ export default function RootLayout() {
   const isExamTakingRoute = /^\/exam\/[^/]+\/[^/]+$/.test(location.pathname);
 
   useEffect(() => {
-    if (!isMobileMenuOpen) {
-      return undefined;
-    }
-
-    const timerId = window.setTimeout(() => {
+    const frameId = window.requestAnimationFrame(() => {
       setIsMobileMenuOpen(false);
-    }, 0);
+    });
 
-    return () => window.clearTimeout(timerId);
-  }, [isMobileMenuOpen, location.pathname]);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [location.pathname]);
 
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0, behavior: 'instant' });
@@ -68,7 +64,10 @@ export default function RootLayout() {
     return <PageSkeleton />;
   }
 
-  if (!loading && !user) {
+  // Cho phép xem trang Home mà không cần login
+  const isPublicRoute = location.pathname === '/home';
+
+  if (!loading && !user && !isPublicRoute) {
     return <Navigate to="/auth" replace />;
   }
 
@@ -91,6 +90,8 @@ export default function RootLayout() {
             onClick={() => setIsMobileMenuOpen(true)}
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 transition-colors active:bg-white/10"
             aria-label="Menu"
+            aria-controls="mobile-main-menu"
+            aria-expanded={isMobileMenuOpen}
           >
             <span className="material-symbols-outlined text-xl text-slate-400">menu</span>
           </button>
@@ -103,7 +104,11 @@ export default function RootLayout() {
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <aside className="safe-top gpu animate-page-in absolute left-0 top-0 bottom-0 flex w-72 flex-col bg-[#1a0f12]">
+          <aside
+            id="mobile-main-menu"
+            className="safe-top gpu animate-page-in absolute left-0 top-0 bottom-0 flex w-72 flex-col bg-[#1a0f12]"
+            aria-label="Menu chính"
+          >
             <div className="flex items-center justify-between px-5 pt-5 pb-4">
               <div className="flex flex-col">
                 <h2 className="text-lg font-[1000] uppercase leading-none tracking-tighter text-[#e36488]">Đấu Trường</h2>
@@ -118,7 +123,14 @@ export default function RootLayout() {
               </button>
             </div>
 
-            <nav className="scroll-touch flex-1 space-y-1 overflow-y-auto px-3 py-2">
+            <nav
+              className="scroll-touch flex-1 space-y-1 overflow-y-auto px-3 py-2"
+              onClick={(event) => {
+                if (event.target instanceof Element && event.target.closest('a')) {
+                  setIsMobileMenuOpen(false);
+                }
+              }}
+            >
               <MobileNavLink to="/home" icon="home" active={isActive('/home')} routeModuleKey="Home">Trang chủ</MobileNavLink>
               <MobileNavLink to="/gpa" icon="calculate" active={isActive('/gpa')} routeModuleKey="GPACalculator">Tính điểm</MobileNavLink>
               <MobileNavLink to="/schools" icon="apartment" active={isActive('/schools')} color="blue" routeModuleKey="SchoolFinder">Trường phù hợp</MobileNavLink>

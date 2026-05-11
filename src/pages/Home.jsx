@@ -1,20 +1,69 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { comboHs12Course } from '../content/courseCatalog';
 import { preloadRouteModule } from '../lib/routeModules';
 
-const planCardStyles = [
-  'border-cyan-100 bg-cyan-50/90 text-cyan-700',
-  'border-emerald-100 bg-emerald-50/90 text-emerald-700',
-  'border-teal-100 bg-teal-50/90 text-teal-700',
-  'border-sky-100 bg-sky-50/90 text-sky-700',
-  'border-violet-100 bg-violet-50/90 text-violet-700',
+const lmsKeywords = [
+  'nền tảng LMS',
+  'tài liệu học',
+  'ngân hàng đề',
+  'luyện tập theo môn',
+  'ôn thi THPT',
+  'ĐGNL / ĐGTD',
+  'lộ trình học',
+  'theo dõi mục tiêu',
+];
+
+const lmsHighlights = [
+  {
+    icon: 'folder_open',
+    title: 'Thư viện tài liệu',
+    copy: 'Tập trung tài liệu THPT và đại học theo môn, chuyên đề, tác giả và ngày cập nhật.',
+    to: '/library',
+    label: 'Mở thư viện',
+    routeModuleKey: 'Library',
+    accent: 'bg-sky-500/12 text-sky-700',
+  },
+  {
+    icon: 'quiz',
+    title: 'Luyện tập theo đề',
+    copy: 'Vào phòng thi, chọn môn cần luyện và tiếp tục theo dõi các đề đã hoàn thành.',
+    to: '/exam-room',
+    label: 'Vào phòng thi',
+    routeModuleKey: 'ExamRoom',
+    accent: 'bg-rose-500/12 text-rose-700',
+  },
+  {
+    icon: 'timeline',
+    title: 'Lộ trình ôn thi',
+    copy: 'Sắp xếp mục tiêu học theo tuần để việc ôn thi THPT, ĐGNL và ĐGTD rõ ràng hơn.',
+    to: '/roadmap',
+    label: 'Xem lộ trình',
+    routeModuleKey: 'Roadmap',
+    accent: 'bg-emerald-500/12 text-emerald-700',
+  },
+];
+
+const lmsFocusAreas = [
+  {
+    label: 'Học liệu',
+    value: '10k+',
+    copy: 'Tài liệu, đề cương và file học tập được gom vào một thư viện dễ tra cứu.',
+  },
+  {
+    label: 'Luyện tập',
+    value: 'Theo môn',
+    copy: 'Ngân hàng đề hỗ trợ luyện tập theo môn học, trạng thái đã làm và mục tiêu cá nhân.',
+  },
+  {
+    label: 'Ôn thi',
+    value: 'THPT',
+    copy: 'Nội dung hướng tới kỳ thi THPT, đánh giá năng lực và đánh giá tư duy.',
+  },
 ];
 
 export default function Home() {
   const { user, profile } = useAuth();
-  const course = comboHs12Course;
 
   const renderStatus = () => {
     if (!user || !profile) {
@@ -57,29 +106,39 @@ export default function Home() {
           <section className="flex flex-col gap-6 md:flex-row">
             <div className="group relative flex-1 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md transition-colors hover:border-[#e36488]/30">
               <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#e36488]/20 blur-2xl" />
-              <h2 className="text-3xl font-extrabold leading-tight">
-                Tính điểm nhanh.
+              <h2 className="text-2xl font-extrabold leading-tight sm:text-3xl md:text-4xl">
+                Nền tảng LMS.
                 <br />
-                <span className="text-[#e36488]">Học nhẹ hơn</span> mỗi ngày.
+                <span className="text-[#e36488]">Tài liệu, luyện tập</span> và ôn thi.
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-slate-400">
-                Máy tính điểm GPA/điểm trung bình cùng thư viện tài liệu và khu vực khóa học online dành cho học sinh, sinh viên Việt Nam.
+                Không gian học tập cho học sinh, sinh viên Việt Nam: tìm tài liệu, luyện đề, theo dõi mục tiêu và xây lộ trình ôn thi trên cùng một hệ thống.
               </p>
               <div className="mt-6 flex flex-col gap-3">
-                <Link to="/gpa" className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#e36488] font-bold text-white shadow-lg shadow-[#e36488]/20 transition-colors hover:bg-[#d05378]">
-                  <span className="material-symbols-outlined">calculate</span>
-                  Tính điểm ngay
+                <Link
+                  to="/library"
+                  onMouseEnter={() => preloadRouteModule('Library')}
+                  onFocus={() => preloadRouteModule('Library')}
+                  className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#e36488] font-bold text-white shadow-lg shadow-[#e36488]/20 transition-colors hover:bg-[#d05378]"
+                >
+                  <span className="material-symbols-outlined">folder_open</span>
+                  Mở thư viện LMS
                 </Link>
                 <Link
-                  to={course.path}
-                  onMouseEnter={() => preloadRouteModule('CourseComboHs12')}
-                  onFocus={() => preloadRouteModule('CourseComboHs12')}
+                  to="/exam-room"
+                  onMouseEnter={() => preloadRouteModule('ExamRoom')}
+                  onFocus={() => preloadRouteModule('ExamRoom')}
                   className="flex h-12 items-center justify-center rounded-full border border-white/10 bg-white/5 font-bold text-slate-200 transition-colors hover:bg-white/10"
                 >
-                  Xem các khóa học
+                  Vào phòng luyện tập
                 </Link>
-                <Link to="/library" className="flex h-11 items-center justify-center rounded-full border border-white/8 bg-transparent font-bold text-slate-300 transition-colors hover:bg-white/5">
-                  Xem tài liệu
+                <Link
+                  to="/roadmap"
+                  onMouseEnter={() => preloadRouteModule('Roadmap')}
+                  onFocus={() => preloadRouteModule('Roadmap')}
+                  className="flex h-11 items-center justify-center rounded-full border border-white/8 bg-transparent font-bold text-slate-300 transition-colors hover:bg-white/5"
+                >
+                  Xem lộ trình ôn thi
                 </Link>
               </div>
             </div>
@@ -95,79 +154,91 @@ export default function Home() {
             </Link>
           </section>
 
-          <section className="w-full max-w-5xl overflow-hidden rounded-[30px] border border-[#f3c7b6]/30 bg-[linear-gradient(180deg,#f5fbfb_0%,#edf5f4_40%,#f7f1f8_100%)] p-5 text-slate-900 shadow-[0_24px_80px_rgba(44,84,77,0.18)] md:p-6">
-            <div className="grid gap-6 md:grid-cols-[minmax(0,1.15fr)_290px] md:items-start">
-              <div className="relative overflow-hidden rounded-[28px] border border-white/60 bg-white/60 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-sm">
-                <div className="absolute -left-16 top-4 h-28 w-28 rounded-full bg-cyan-200/40 blur-3xl" />
-                <div className="absolute -right-10 bottom-0 h-24 w-24 rounded-full bg-violet-200/40 blur-3xl" />
-                <div className="relative">
-                  <span className="inline-flex rounded-full bg-[#dff2ea] px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-[#225e53]">
-                    {course.badge}
-                  </span>
-                  <p className="mt-5 text-xs font-black uppercase tracking-[0.28em] text-[#386f66]">Khóa học online</p>
-                  <h3 className="mt-3 max-w-2xl text-3xl font-black leading-tight tracking-[-0.04em] text-[#143530]">
-                    {course.title}
-                  </h3>
-                  <p className="mt-3 max-w-2xl text-base leading-8 text-slate-600">{course.summary}</p>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {course.highlights.map((item) => (
-                      <span key={item} className="rounded-full border border-white/70 bg-white/70 px-3 py-1.5 text-xs font-semibold text-slate-700">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                    <Link
-                      to={course.path}
-                      onMouseEnter={() => preloadRouteModule('CourseComboHs12')}
-                      onFocus={() => preloadRouteModule('CourseComboHs12')}
-                      className="inline-flex h-12 items-center justify-center rounded-full bg-[#2c7a6c] px-6 text-sm font-bold text-white shadow-lg shadow-[#2c7a6c]/20 transition-colors hover:bg-[#24695d]"
-                    >
-                      Xem bảng giá và khóa học
-                    </Link>
-                    <Link to="/library" className="inline-flex h-12 items-center justify-center rounded-full border border-slate-200 bg-white px-6 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50">
-                      Xem tài liệu miễn phí
-                    </Link>
-                  </div>
+          <section className="w-full max-w-5xl overflow-hidden rounded-[30px] border border-[#c7dff3]/40 bg-[linear-gradient(135deg,#f7fbff_0%,#edf8f5_48%,#fff7ed_100%)] p-5 text-slate-900 shadow-[0_24px_80px_rgba(35,69,91,0.16)] md:p-6">
+            <div className="grid gap-6 md:grid-cols-[minmax(0,1.2fr)_320px] md:items-stretch">
+              <div className="rounded-[28px] border border-white/70 bg-white/75 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.76)] backdrop-blur-sm md:p-6">
+                <span className="inline-flex rounded-full bg-sky-100 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-sky-700">
+                  Nền tảng LMS
+                </span>
+                <p className="mt-5 text-[10px] font-black uppercase tracking-[0.28em] text-emerald-700 sm:text-xs">Tài liệu học - Luyện tập - Ôn thi</p>
+                <h3 className="mt-3 max-w-2xl text-2xl font-black leading-tight tracking-tight text-[#143530] sm:text-3xl">
+                  Tổ chức học liệu và tiến độ ôn thi trong một không gian rõ ràng
+                </h3>
+                <p className="mt-3 max-w-2xl text-base leading-8 text-slate-600">
+                  Đấu Trường Học Tập gom thư viện tài liệu, ngân hàng đề, phòng luyện tập và lộ trình mục tiêu để người học có thể tìm đúng nội dung, luyện đúng phần còn yếu và chuẩn bị cho kỳ thi quan trọng.
+                </p>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {lmsKeywords.map((item) => (
+                    <span key={item} className="rounded-full border border-white/80 bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    to="/library"
+                    onMouseEnter={() => preloadRouteModule('Library')}
+                    onFocus={() => preloadRouteModule('Library')}
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#236a8c] px-6 text-sm font-bold text-white shadow-lg shadow-[#236a8c]/20 transition-colors hover:bg-[#1d5874]"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">folder_open</span>
+                    Khám phá tài liệu
+                  </Link>
+                  <Link
+                    to="/exam-room"
+                    onMouseEnter={() => preloadRouteModule('ExamRoom')}
+                    onFocus={() => preloadRouteModule('ExamRoom')}
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">quiz</span>
+                    Luyện đề ngay
+                  </Link>
                 </div>
               </div>
 
-              <div className="rounded-[28px] border border-white/60 bg-white/70 p-4 shadow-[0_18px_40px_rgba(23,60,53,0.12)] backdrop-blur-sm">
-                <div className="rounded-[24px] bg-[linear-gradient(180deg,#f7fffd_0%,#eef7f5_100%)] p-5">
-                  <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#386f66]">Giá ưu đãi</p>
-                  <p className="mt-2 text-5xl font-black tracking-[-0.06em] text-[#18443d]">{course.price}</p>
-                  <p className="mt-3 text-sm leading-7 text-slate-600">{course.subtitle}</p>
-                </div>
-                <div className="mt-4 rounded-[22px] bg-[#21453f] px-4 py-4 text-white">
-                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-white/70">Dành cho</p>
-                  <p className="mt-2 text-sm font-semibold leading-7">{course.audience}</p>
-                </div>
+              <div className="grid gap-3">
+                {lmsFocusAreas.map((item) => (
+                  <div key={item.label} className="rounded-[24px] border border-white/70 bg-white/80 p-5 shadow-[0_14px_34px_rgba(23,60,53,0.1)] backdrop-blur-sm">
+                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">{item.label}</p>
+                    <p className="mt-2 text-3xl font-black tracking-tight text-[#18443d]">{item.value}</p>
+                    <p className="mt-2 text-sm font-medium leading-6 text-slate-600">{item.copy}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="mt-6 rounded-[28px] border border-white/70 bg-white/55 p-4 backdrop-blur-sm md:p-5">
+            <div className="mt-6">
               <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.24em] text-[#386f66]">Bảng giá ưu đãi</p>
-                  <h3 className="mt-2 text-2xl font-black tracking-[-0.03em] text-[#153631]">Chọn gói học phù hợp với đúng nhu cầu</h3>
+                  <p className="text-xs font-black uppercase tracking-[0.24em] text-[#236a8c]">Không gian học tập</p>
+                  <h3 className="mt-2 text-2xl font-black tracking-tight text-[#153631]">Ba trụ cột cho học liệu, luyện tập và ôn thi</h3>
                 </div>
-                <p className="max-w-2xl text-sm leading-7 text-slate-600">{course.pricingIntro}</p>
+                <p className="max-w-2xl text-sm leading-7 text-slate-600">
+                  Trang chủ ưu tiên các điểm vào quan trọng của LMS: mở tài liệu, chọn đề luyện tập và theo dõi lộ trình học theo mục tiêu.
+                </p>
               </div>
 
-              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-                {course.pricingPlans.map((plan, index) => (
-                  <div
-                    key={plan.name}
-                    className={`rounded-[24px] border p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] ${planCardStyles[index] ?? planCardStyles[0]}`}
+              <div className="mt-5 grid gap-3 md:grid-cols-3">
+                {lmsHighlights.map((item) => (
+                  <Link
+                    key={item.title}
+                    to={item.to}
+                    onMouseEnter={() => preloadRouteModule(item.routeModuleKey)}
+                    onFocus={() => preloadRouteModule(item.routeModuleKey)}
+                    className="group flex min-h-[230px] flex-col rounded-[24px] border border-white/70 bg-white/75 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-all hover:-translate-y-0.5 hover:bg-white"
                   >
-                    <p className="text-xl font-black leading-tight">{plan.name}</p>
-                    <p className="mt-2 min-h-[48px] text-sm font-medium leading-6 text-slate-600">{plan.subtitle}</p>
-                    <div className="mt-5 flex items-end gap-1">
-                      <span className="text-5xl font-black tracking-[-0.05em]">{plan.price}</span>
-                      {plan.unit ? <span className="pb-1 text-lg font-bold">{plan.unit}</span> : null}
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.accent}`}>
+                      <span className="material-symbols-outlined text-[24px]">{item.icon}</span>
                     </div>
-                    <p className="mt-4 text-sm leading-6 text-slate-600">{plan.note}</p>
-                  </div>
+                    <h4 className="mt-4 text-xl font-black leading-tight tracking-tight text-[#153631]">{item.title}</h4>
+                    <p className="mt-3 flex-1 text-sm font-medium leading-7 text-slate-600">{item.copy}</p>
+                    <span className="mt-5 inline-flex items-center gap-1 text-sm font-black text-[#236a8c]">
+                      {item.label}
+                      <span className="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
+                    </span>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -227,7 +298,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold">Thư viện</h4>
-                  <p className="text-[10px] text-slate-400">Tài liệu dạng details</p>
+                  <p className="text-[10px] text-slate-400">Tài liệu theo môn</p>
                 </div>
                 <span className="flex items-center gap-1 text-[11px] font-bold text-sky-400">
                   Xem ngay

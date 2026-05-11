@@ -2,6 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../components/ui/toastContext';
+
+function getFriendlyAuthError(error) {
+  const message = error?.message?.toLowerCase() || '';
+
+  if (message.includes('invalid login credentials')) {
+    return 'Email hoặc mật khẩu chưa đúng. Vui lòng kiểm tra lại.';
+  }
+
+  if (message.includes('email not confirmed')) {
+    return 'Email chưa được xác nhận. Vui lòng kiểm tra hộp thư của bạn.';
+  }
+
+  if (message.includes('password')) {
+    return 'Mật khẩu chưa hợp lệ. Vui lòng dùng mật khẩu đủ mạnh hơn.';
+  }
+
+  if (message.includes('email')) {
+    return 'Email chưa hợp lệ hoặc đã được sử dụng.';
+  }
+
+  return 'Không thể xử lý yêu cầu lúc này. Vui lòng thử lại sau.';
+}
 
 export default function AuthScreen() {
   const { user, loading: authLoading } = useAuth();
@@ -12,6 +35,7 @@ export default function AuthScreen() {
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -41,11 +65,15 @@ export default function AuthScreen() {
           }
         });
         if (error) throw error;
-        alert('Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.');
+        showToast({
+          type: 'success',
+          title: 'Đăng ký thành công',
+          description: 'Bạn có thể đăng nhập ngay bây giờ.',
+        });
         setIsLogin(true);
       }
     } catch (error) {
-      setError(error.message);
+      setError(getFriendlyAuthError(error));
     } finally {
       setLoading(false);
     }
@@ -62,12 +90,12 @@ export default function AuthScreen() {
       if (error) throw error;
     } catch (error) {
       console.error("Lỗi đăng nhập Google:", error);
-      setError(error.message);
+      setError(getFriendlyAuthError(error));
     }
   };
 
   const toggleMode = () => {
-    setIsLogin(!isLogin);
+    setIsLogin((current) => !current);
     setError(null);
   };
 
@@ -98,6 +126,9 @@ export default function AuthScreen() {
 
         {/* Error Message — animated */}
         <div
+          id="auth-error"
+          role={error ? 'alert' : undefined}
+          aria-hidden={!error}
           className={`overflow-hidden transition-all duration-300 ease-out ${
             error ? 'max-h-24 opacity-100 mb-5' : 'max-h-0 opacity-0 mb-0'
           }`}
@@ -109,6 +140,7 @@ export default function AuthScreen() {
 
         {/* Social Login */}
         <button
+          type="button"
           onClick={handleGoogleLogin}
           className="mb-6 flex h-14 w-full items-center justify-center gap-3 rounded-2xl border border-white/[0.12] bg-white/[0.07] text-white shadow-lg transition-transform active:scale-[0.97]"
         >
@@ -131,37 +163,50 @@ export default function AuthScreen() {
         {/* Form Fields */}
         <form onSubmit={handleAuth} className="space-y-3 mb-4">
           <div className="relative group">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+            <label htmlFor="auth-email" className="mb-2 block text-sm font-semibold text-slate-200">
+              Email
+            </label>
+            <div className="absolute bottom-0 left-4 flex h-14 items-center pointer-events-none">
               <span className="material-symbols-outlined text-slate-500 text-xl group-focus-within:text-[#e36488] transition-colors">mail</span>
             </div>
             <input
+              id="auth-email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 pl-12 pr-4 text-white outline-none transition-all placeholder:text-slate-500 focus:border-[#e36488]/60 focus:ring-2 focus:ring-[#e36488]/40"
-              placeholder="Email"
+              placeholder="you@example.com"
               type="email"
               autoComplete="email"
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'auth-error' : undefined}
               required
             />
           </div>
           <div className="relative group">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+            <label htmlFor="auth-password" className="mb-2 block text-sm font-semibold text-slate-200">
+              Mật khẩu
+            </label>
+            <div className="absolute bottom-0 left-4 flex h-14 items-center pointer-events-none">
               <span className="material-symbols-outlined text-slate-500 text-xl group-focus-within:text-[#e36488] transition-colors">lock</span>
             </div>
             <input
+              id="auth-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 pl-12 pr-14 text-white outline-none transition-all placeholder:text-slate-500 focus:border-[#e36488]/60 focus:ring-2 focus:ring-[#e36488]/40"
-              placeholder="Mật khẩu"
+              placeholder="Nhập mật khẩu"
               type={showPassword ? 'text' : 'password'}
               autoComplete={isLogin ? 'current-password' : 'new-password'}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'auth-error' : undefined}
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-3 flex items-center px-1 text-slate-500 active:text-slate-300"
-              tabIndex={-1}
+              className="absolute bottom-0 right-3 flex h-14 items-center px-1 text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36488]/60"
+              aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              aria-pressed={showPassword}
             >
               <span className="material-symbols-outlined text-xl">
                 {showPassword ? 'visibility_off' : 'visibility'}

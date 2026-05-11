@@ -1,26 +1,84 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function WelcomeModal() {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(() => {
+        return !localStorage.getItem('hasSeenWelcomeNotice_v1');
+    });
+    const modalRef = useRef(null);
 
-    useEffect(() => {
-        // Checking if the user has already seen the modal in this session/browser
-        const hasSeenNotice = localStorage.getItem('hasSeenWelcomeNotice_v1');
-        if (!hasSeenNotice) {
-            setIsOpen(true);
-        }
-    }, []);
-
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         setIsOpen(false);
         localStorage.setItem('hasSeenWelcomeNotice_v1', 'true');
-    };
+    }, []);
+
+    useEffect(() => {
+        if (!isOpen) {
+            return undefined;
+        }
+
+        const previouslyFocused = document.activeElement;
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        modalRef.current?.focus();
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                handleClose();
+                return;
+            }
+
+            if (event.key !== 'Tab' || !modalRef.current) {
+                return;
+            }
+
+            const focusableElements = modalRef.current.querySelectorAll(
+                'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+            );
+
+            if (!focusableElements.length) {
+                return;
+            }
+
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+
+            if (event.shiftKey && document.activeElement === firstElement) {
+                event.preventDefault();
+                lastElement.focus();
+            } else if (!event.shiftKey && document.activeElement === lastElement) {
+                event.preventDefault();
+                firstElement.focus();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = previousOverflow;
+            previouslyFocused?.focus?.();
+        };
+    }, [handleClose, isOpen]);
 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-[#1a0f12] w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-white/10 animate-[scale-in_0.3s_ease-out]">
+        <div
+            className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            onMouseDown={(event) => {
+                if (event.target === event.currentTarget) {
+                    handleClose();
+                }
+            }}
+        >
+            <div
+                ref={modalRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="welcome-modal-title"
+                tabIndex={-1}
+                className="bg-white dark:bg-[#1a0f12] w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-white/10 animate-dialog-in focus:outline-none"
+            >
                 {/* Header Decoration */}
                 <div className="h-24 bg-gradient-to-r from-[#fe5f36] via-[#e36488] to-[#7f13ec] relative">
                     <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-white dark:bg-[#1a0f12] rounded-full flex items-center justify-center p-1.5 shadow-lg">
@@ -31,7 +89,7 @@ export default function WelcomeModal() {
                 </div>
 
                 <div className="pt-12 pb-6 px-6 text-center">
-                    <h3 className="text-xl font-black text-slate-800 dark:text-white mb-2">
+                    <h3 id="welcome-modal-title" className="text-xl font-black text-slate-800 dark:text-white mb-2">
                         Thông báo hệ thống
                     </h3>
                     

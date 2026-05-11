@@ -16,7 +16,6 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     overscroll-behavior-y: none;
-    font-size: 13px;
   }
 
   body {
@@ -58,6 +57,13 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 
   /* Safe area padding for notch phones */
   .safe-top {
@@ -90,6 +96,24 @@
   .thin-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
   }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 999px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.55);
+  }
+  .custom-scrollbar {
+    scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+    scrollbar-width: thin;
+  }
 
   /* GPU-accelerated animations */
   .gpu {
@@ -118,6 +142,44 @@
   }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialogScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 .animate-page-in {
   animation: fadeSlideIn 0.3s ease-out;
+}
+
+.animate-dialog-in {
+  animation: dialogScaleIn 0.24s ease-out;
+}
+
+.animate-in {
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+}
+
+.animate-in.fade-in {
+  animation-name: fadeIn;
+}
+
+.animate-in.zoom-in-95 {
+  animation-name: dialogScaleIn;
 }

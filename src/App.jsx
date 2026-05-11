@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import SecurityWrapper from './components/SecurityWrapper';
 import ErrorBoundary from './components/ErrorBoundary';
 import { PageSkeleton } from './components/ui/Skeleton';
+import { ToastProvider } from './components/ui/ToastProvider';
 import AuthScreen from './pages/AuthScreen';
 import { routeModuleLoaders } from './lib/routeModules';
 
@@ -107,39 +108,41 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <SecurityWrapper>
-          <DeferredSpeedInsights />
-          <ErrorBoundary>
-            <Suspense fallback={<PageSkeleton />}>
-              <Routes>
-                <Route path="/" element={<AuthScreen />} />
-                <Route path="/auth" element={<AuthScreen />} />
+        <ToastProvider>
+          <SecurityWrapper>
+            <DeferredSpeedInsights />
+            <ErrorBoundary>
+              <Suspense fallback={<PageSkeleton />}>
+                <Routes>
+                  <Route path="/" element={<AuthScreen />} />
+                  <Route path="/auth" element={<AuthScreen />} />
 
-                <Route element={<RootLayout />}>
-                  <Route path="home" element={<Home />} />
-                  <Route path="gpa" element={<GPACalculator />} />
-                  <Route path="library" element={<Library />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="roadmap" element={<Roadmap />} />
-                  <Route path="admin" element={<Admin />} />
-                  <Route path="admission" element={<AdmissionCalculator />} />
-                  <Route path="schools" element={<SchoolFinder />} />
-                  <Route path="arena" element={<StudyArena />} />
-                  <Route path="collaborator" element={<Collaborator />} />
-                  <Route path="profile/:id" element={<UserProfile />} />
-                  <Route path="exam-room" element={<ExamRoom />} />
-                  <Route path="exam/:subjectFolder/:examPath" element={<ExamTaking />} />
-                  <Route path="exam/:subjectFolder/:examPath/result" element={<ExamResult />} />
-                  <Route path="pricing" element={<Pricing />} />
-                  <Route path="courses/combo-dtht-hs12-2k9-chinh-phuc-dai-hoc" element={<CourseComboHs12 />} />
-                  <Route path="payment/waiting/:orderId" element={<PaymentWaiting />} />
-                  <Route path="payment/success" element={<PaymentSuccess />} />
-                  <Route path="notes" element={<Notes />} />
-                </Route>
-              </Routes>
-            </Suspense>
-          </ErrorBoundary>
-        </SecurityWrapper>
+                  <Route element={<RootLayout />}>
+                    <Route path="home" element={<Home />} />
+                    <Route path="gpa" element={<GPACalculator />} />
+                    <Route path="library" element={<Library />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="roadmap" element={<Roadmap />} />
+                    <Route path="admin" element={<Admin />} />
+                    <Route path="admission" element={<AdmissionCalculator />} />
+                    <Route path="schools" element={<SchoolFinder />} />
+                    <Route path="arena" element={<StudyArena />} />
+                    <Route path="collaborator" element={<Collaborator />} />
+                    <Route path="profile/:id" element={<UserProfile />} />
+                    <Route path="exam-room" element={<ExamRoom />} />
+                    <Route path="exam/:subjectFolder/:examPath" element={<ExamTaking />} />
+                    <Route path="exam/:subjectFolder/:examPath/result" element={<ExamResult />} />
+                    <Route path="pricing" element={<Pricing />} />
+                    <Route path="courses/combo-dtht-hs12-2k9-chinh-phuc-dai-hoc" element={<CourseComboHs12 />} />
+                    <Route path="payment/waiting/:orderId" element={<PaymentWaiting />} />
+                    <Route path="payment/success" element={<PaymentSuccess />} />
+                    <Route path="notes" element={<Notes />} />
+                  </Route>
+                </Routes>
+              </Suspense>
+            </ErrorBoundary>
+          </SecurityWrapper>
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   );

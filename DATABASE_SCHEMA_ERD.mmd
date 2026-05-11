@@ -1,0 +1,342 @@
+erDiagram
+  public__campaigns {
+    uuid id "PK"
+    uuid user_id "FK"
+    text title
+    text description
+    boolean is_completed
+    boolean is_public
+    timestamp_with_time_zone created_at
+    jsonb targets
+    date start_date
+    date end_date
+    text target
+  }
+  public__deleted_exam_tombstones {
+    uuid id "PK"
+    text identity_key
+    text exam_id
+    text subject_folder
+    text exam_path
+    uuid deleted_by "FK"
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone updated_at
+  }
+  public__document_reports {
+    uuid id "PK"
+    uuid document_id "FK"
+    uuid reported_by "FK"
+    text reason
+    timestamp_with_time_zone created_at
+  }
+  public__document_reviews {
+    uuid id "PK"
+    uuid document_id "FK"
+    uuid user_id "FK"
+    integer rating
+    text review_text
+    timestamp_with_time_zone created_at
+  }
+  public__documents {
+    uuid id "PK"
+    text title
+    text description
+    text category_id
+    text author_name
+    text file_url
+    text file_type
+    bigint file_size
+    integer downloads_count
+    numeric_2_1 avg_rating
+    boolean is_public
+    uuid uploaded_by "FK"
+    timestamp_with_time_zone created_at
+    text category
+    boolean is_featured
+    text education_level
+    date publish_date
+    text major
+    timestamp_with_time_zone uploaded_at
+  }
+  public__exam_draft_revisions {
+    uuid id "PK"
+    uuid draft_id "FK"
+    integer revision_no
+    jsonb content_json
+    jsonb answer_key_json
+    text raw_source_text
+    uuid created_by "FK"
+    timestamp_with_time_zone created_at
+  }
+  public__exam_drafts {
+    uuid id "PK"
+    text title
+    text subject
+    integer duration_min
+    text status
+    jsonb content_json
+    jsonb answer_key_json
+    text raw_source_text
+    uuid created_by "FK"
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone updated_at
+    timestamp_with_time_zone published_at
+  }
+  public__exam_import_jobs {
+    uuid id "PK"
+    text filename
+    text status
+    text parse_error
+    jsonb preview_json
+    uuid created_by "FK"
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone updated_at
+  }
+  public__exam_keys {
+    text exam_id "PK"
+    jsonb answer_key
+    timestamp_with_time_zone created_at
+    jsonb resources
+    timestamp_with_time_zone last_synced_at
+    text scoring_format
+    text subject_folder
+  }
+  public__exam_progress {
+    uuid id "PK"
+    uuid user_id "FK"
+    text exam_id
+    text subject_folder
+    jsonb answers
+    integer time_left_seconds
+    text status
+    timestamp_with_time_zone started_at
+    timestamp_with_time_zone updated_at
+    jsonb answers_snapshot
+  }
+  public__exam_results {
+    uuid id "PK"
+    uuid user_id "FK"
+    text exam_id
+    text subject_folder
+    text exam_title
+    numeric score
+    numeric max_score
+    integer correct_count
+    integer total_questions
+    jsonb answers_snapshot
+    timestamp_with_time_zone submitted_at
+    boolean is_scored
+    timestamp_with_time_zone scored_at
+  }
+  public__exam_subjects {
+    text id "PK"
+    text name
+    text icon
+    text color
+    integer display_order
+    timestamp_with_time_zone created_at
+  }
+  public__follows {
+    uuid id "PK"
+    uuid follower_id "FK"
+    uuid following_id "FK"
+    timestamp_with_time_zone created_at
+  }
+  public__notifications {
+    uuid id "PK"
+    uuid user_id "FK"
+    text title
+    text message
+    text link
+    boolean is_read
+    timestamp_with_time_zone created_at
+  }
+  public__orders {
+    uuid id "PK"
+    uuid user_id "FK"
+    text package_id
+    integer amount
+    integer vip_days
+    text status
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone updated_at
+    text transfer_code
+  }
+  public__payment_logs {
+    uuid id "PK"
+    jsonb raw_payload
+    text status
+    text error_message
+    timestamp_with_time_zone created_at
+    uuid order_id "FK"
+    uuid user_id "FK"
+    integer amount
+    text provider
+    jsonb payload
+  }
+  public__profiles {
+    uuid id "PK, FK"
+    text display_name
+    text avatar_url
+    text university
+    text major
+    integer starting_year
+    numeric_3_2 target_gpa
+    numeric_3_2 current_gpa
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone updated_at
+    text role
+    jsonb admission_scores
+    boolean is_approved_bang_chu
+    text user_mode
+    numeric target_thpt
+    numeric target_dgnl
+    text email
+    text full_name
+    jsonb roadmap_data
+    boolean is_vip
+    timestamp_with_time_zone vip_expired_at
+  }
+  public__roadmap_milestones {
+    uuid id "PK"
+    uuid user_id "FK"
+    text mode
+    integer sort_order
+    text title
+    text subtitle
+    text status
+    integer progress
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone updated_at
+  }
+  public__school_scores {
+    uuid id "PK"
+    text university_name
+    text university_code
+    text major_name
+    text subject_groups
+    numeric score
+    text method
+    integer year
+    timestamp_with_time_zone created_at
+  }
+  public__semesters {
+    uuid id "PK"
+    uuid user_id "FK"
+    text name
+    date start_date
+    date end_date
+    text status
+    integer total_credits
+    numeric_3_2 gpa
+    timestamp_with_time_zone created_at
+  }
+  public__study_sessions {
+    uuid id "PK"
+    uuid user_id "FK"
+    uuid subject_id "FK"
+    date study_date
+    integer duration_minutes
+    integer focus_score
+    text notes
+    timestamp_with_time_zone created_at
+  }
+  public__subjects {
+    uuid id "PK"
+    uuid semester_id "FK"
+    uuid user_id "FK"
+    text name
+    text code
+    integer credits
+    text grade_letter
+    numeric_3_1 grade_number
+    numeric_3_1 expected_grade
+    text status
+    integer progress_percentage
+    timestamp_with_time_zone created_at
+  }
+  public__sync_logs {
+    uuid id "PK"
+    text exam_id
+    text status
+    text action
+    jsonb details
+    timestamp_with_time_zone created_at
+  }
+  public__transactions {
+    uuid id "PK"
+    text tid
+    uuid order_id "FK"
+    uuid user_id "FK"
+    integer amount
+    text description
+    text bank
+    timestamp_with_time_zone processed_at
+    text transaction_code
+    jsonb raw_data
+    timestamp_with_time_zone created_at
+  }
+  public__user_access_log {
+    uuid id "PK"
+    uuid user_id "FK"
+    text exam_id
+    timestamp_with_time_zone created_at
+  }
+  public__user_grades {
+    uuid id "PK"
+    uuid user_id
+    text subject
+    integer credits
+    numeric score
+    timestamp_with_time_zone created_at
+  }
+  public__user_notes {
+    uuid id "PK"
+    uuid user_id "FK"
+    text title
+    text content
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone updated_at
+  }
+  public__user_saved_documents {
+    uuid id "PK"
+    uuid user_id "FK"
+    uuid document_id "FK"
+    timestamp_with_time_zone saved_at
+    timestamp_with_time_zone last_accessed
+  }
+  auth__users {
+    unknown id "referenced"
+  }
+  public__profiles ||--o{ public__campaigns : "campaigns_user_id_fkey"
+  auth__users ||--o{ public__deleted_exam_tombstones : "deleted_exam_tombstones_deleted_by_fkey"
+  public__documents ||--o{ public__document_reports : "document_reports_document_id_fkey"
+  public__profiles ||--o{ public__document_reports : "document_reports_reported_by_fkey"
+  public__documents ||--o{ public__document_reviews : "document_reviews_document_id_fkey"
+  public__profiles ||--o{ public__document_reviews : "document_reviews_user_id_fkey"
+  public__profiles ||--o{ public__documents : "documents_uploaded_by_fkey"
+  auth__users ||--o{ public__exam_draft_revisions : "exam_draft_revisions_created_by_fkey"
+  public__exam_drafts ||--o{ public__exam_draft_revisions : "exam_draft_revisions_draft_id_fkey"
+  auth__users ||--o{ public__exam_drafts : "exam_drafts_created_by_fkey"
+  auth__users ||--o{ public__exam_import_jobs : "exam_import_jobs_created_by_fkey"
+  public__profiles ||--o{ public__exam_progress : "exam_progress_user_id_fkey"
+  public__profiles ||--o{ public__exam_results : "exam_results_user_id_fkey"
+  public__profiles ||--o{ public__follows : "follows_follower_id_fkey"
+  public__profiles ||--o{ public__follows : "follows_following_id_fkey"
+  public__profiles ||--o{ public__notifications : "notifications_user_id_fkey"
+  public__profiles ||--o{ public__orders : "orders_user_id_fkey"
+  public__orders ||--o{ public__payment_logs : "payment_logs_order_id_fkey"
+  auth__users ||--o{ public__payment_logs : "payment_logs_user_id_fkey"
+  auth__users ||--o| public__profiles : "profiles_id_fkey"
+  public__profiles ||--o{ public__roadmap_milestones : "roadmap_milestones_user_id_fkey"
+  public__profiles ||--o{ public__semesters : "semesters_user_id_fkey"
+  public__subjects ||--o{ public__study_sessions : "study_sessions_subject_id_fkey"
+  public__profiles ||--o{ public__study_sessions : "study_sessions_user_id_fkey"
+  public__semesters ||--o{ public__subjects : "subjects_semester_id_fkey"
+  public__profiles ||--o{ public__subjects : "subjects_user_id_fkey"
+  public__orders ||--o{ public__transactions : "transactions_order_id_fkey"
+  public__profiles ||--o{ public__transactions : "transactions_user_id_fkey"
+  public__profiles ||--o{ public__user_access_log : "user_access_log_user_id_fkey"
+  auth__users ||--o{ public__user_notes : "user_notes_user_id_fkey"
+  public__documents ||--o{ public__user_saved_documents : "user_saved_documents_document_id_fkey"
+  public__profiles ||--o{ public__user_saved_documents : "user_saved_documents_user_id_fkey"
