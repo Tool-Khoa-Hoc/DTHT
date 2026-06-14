@@ -10,24 +10,15 @@ import useSWR from 'swr';
 
 const AuthContext = createContext();
 
-function normalizeProfile(data) {
-  if (!data) {
-    return null;
-  }
-
-  const isVipExpired = data.is_vip && data.vip_expired_at && new Date(data.vip_expired_at) < new Date();
-  return isVipExpired ? { ...data, is_vip: false } : data;
-}
-
 const fetcherProfile = async (userId) => {
   if (!userId) return null;
-  
+
   const { data, error } = await supabase
     .from('profiles')
     .select(`
       id, display_name, avatar_url, role, university,
       user_mode, target_gpa, target_thpt, target_dgnl, current_gpa,
-      is_vip, vip_expired_at, admission_scores
+      admission_scores
     `)
     .eq('id', userId)
     .single();
@@ -37,7 +28,7 @@ const fetcherProfile = async (userId) => {
     return null;
   }
 
-  return normalizeProfile(data);
+  return data;
 };
 
 export function AuthProvider({ children }) {

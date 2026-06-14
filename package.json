@@ -4,17 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "exam-index": "node scripts/generate-exam-index.mjs",
-    "predev": "npm run exam-index -- --silent",
     "dev": "vite",
-    "prebuild": "npm run exam-index -- --silent",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "sync": "python dtht.py sync --upload",
-    "build-index": "python dtht.py build",
-    "status": "python dtht.py status",
-    "distribute": "python dtht.py sync"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",

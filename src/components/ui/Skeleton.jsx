@@ -78,7 +78,7 @@ export function PageSkeleton() {
 }
 
 /**
- * CardSkeleton — dùng cho các card trong danh sách đề thi, phòng thi
+ * CardSkeleton — dùng cho các card trong danh sách nội dung học tập
  * Aspect ratio 4/3 = tỷ lệ chuẩn cho card ngang
  */
 export function CardSkeleton({ className = '' }) {
@@ -90,35 +90,6 @@ export function CardSkeleton({ className = '' }) {
       <div className="mt-auto flex items-center gap-2 pt-2">
         <Skeleton className="w-8 h-8 rounded-full" aspectRatio="1/1" />
         <Skeleton className="flex-1 h-4 rounded-md" />
-      </div>
-    </div>
-  );
-}
-
-/**
- * ExamResultSkeleton — dùng khi ExamResult page đang load
- * Split-pane layout: PDF viewer (left 68%) + answer panel (right 32%)
- */
-export function ExamResultSkeleton() {
-  return (
-    <div className="flex min-h-dvh w-full bg-[#0f0a0c] gap-0" aria-busy="true">
-      {/* PDF area placeholder */}
-      <div className="flex-[2] p-4 flex flex-col gap-4">
-        <Skeleton className="w-full rounded-2xl" aspectRatio="1/1.414" /> {/* A4 ratio */}
-      </div>
-      {/* Answer sheet placeholder */}
-      <div className="w-80 shrink-0 flex flex-col gap-3 p-4 border-l border-white/5">
-        <Skeleton className="w-full h-8 rounded-xl" />
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <Skeleton className="w-7 h-7 rounded-full shrink-0" aspectRatio="1/1" />
-            <div className="flex gap-2 flex-1">
-              {['A', 'B', 'C', 'D'].map((l) => (
-                <Skeleton key={l} className="flex-1 h-7 rounded-full" />
-              ))}
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );

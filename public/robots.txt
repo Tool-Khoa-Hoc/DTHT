@@ -3,18 +3,15 @@ Allow: /
 
 # Disallow private/app-only routes
 Disallow: /admin
-Disallow: /payment/
 Disallow: /collaborator
 Disallow: /auth
 
 # Allow all crawlers to access public pages
 Allow: /home
-Allow: /exam-room
 Allow: /gpa
 Allow: /arena
 Allow: /library
 Allow: /roadmap
 Allow: /schools
-Allow: /pricing
 
 Sitemap: https://www.dautruonghoctap.io.vn/sitemap.xml

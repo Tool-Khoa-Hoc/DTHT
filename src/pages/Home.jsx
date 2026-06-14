@@ -6,7 +6,7 @@ import { preloadRouteModule } from '../lib/routeModules';
 const lmsKeywords = [
   'nền tảng LMS',
   'tài liệu học',
-  'ngân hàng đề',
+  'học online',
   'luyện tập theo môn',
   'ôn thi THPT',
   'ĐGNL / ĐGTD',
@@ -25,12 +25,12 @@ const lmsHighlights = [
     accent: 'bg-sky-500/12 text-sky-700',
   },
   {
-    icon: 'quiz',
-    title: 'Luyện tập theo đề',
-    copy: 'Vào phòng thi, chọn môn cần luyện và tiếp tục theo dõi các đề đã hoàn thành.',
-    to: '/exam-room',
-    label: 'Vào phòng thi',
-    routeModuleKey: 'ExamRoom',
+    icon: 'calculate',
+    title: 'Tính điểm mục tiêu',
+    copy: 'Tính GPA, điểm hệ 10 và theo dõi mục tiêu học tập cá nhân trên cùng một không gian.',
+    to: '/gpa',
+    label: 'Tính điểm ngay',
+    routeModuleKey: 'GPACalculator',
     accent: 'bg-rose-500/12 text-rose-700',
   },
   {
@@ -42,6 +42,15 @@ const lmsHighlights = [
     routeModuleKey: 'Roadmap',
     accent: 'bg-emerald-500/12 text-emerald-700',
   },
+  {
+    icon: 'cast_for_education',
+    title: 'Học online',
+    copy: 'Vào sheet COMBO HS12 2027, mở tab khóa học và tài liệu đã được cấp quyền bằng Google.',
+    to: '/hoc-online',
+    label: 'Vào lớp học',
+    routeModuleKey: 'OnlineLearning',
+    accent: 'bg-teal-500/12 text-teal-700',
+  },
 ];
 
 const lmsFocusAreas = [
@@ -51,9 +60,9 @@ const lmsFocusAreas = [
     copy: 'Tài liệu, đề cương và file học tập được gom vào một thư viện dễ tra cứu.',
   },
   {
-    label: 'Luyện tập',
-    value: 'Theo môn',
-    copy: 'Ngân hàng đề hỗ trợ luyện tập theo môn học, trạng thái đã làm và mục tiêu cá nhân.',
+    label: 'Công cụ',
+    value: 'GPA/THPT',
+    copy: 'Các công cụ tính điểm và theo dõi mục tiêu giúp người học nắm rõ tiến độ cá nhân.',
   },
   {
     label: 'Ôn thi',
@@ -112,7 +121,7 @@ export default function Home() {
                 <span className="text-[#e36488]">Tài liệu, luyện tập</span> và ôn thi.
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-slate-400">
-                Không gian học tập cho học sinh, sinh viên Việt Nam: tìm tài liệu, luyện đề, theo dõi mục tiêu và xây lộ trình ôn thi trên cùng một hệ thống.
+                Không gian học tập cho học sinh, sinh viên Việt Nam: tìm tài liệu, học online, theo dõi mục tiêu và xây lộ trình ôn thi trên cùng một hệ thống.
               </p>
               <div className="mt-6 flex flex-col gap-3">
                 <Link
@@ -123,14 +132,6 @@ export default function Home() {
                 >
                   <span className="material-symbols-outlined">folder_open</span>
                   Mở thư viện LMS
-                </Link>
-                <Link
-                  to="/exam-room"
-                  onMouseEnter={() => preloadRouteModule('ExamRoom')}
-                  onFocus={() => preloadRouteModule('ExamRoom')}
-                  className="flex h-12 items-center justify-center rounded-full border border-white/10 bg-white/5 font-bold text-slate-200 transition-colors hover:bg-white/10"
-                >
-                  Vào phòng luyện tập
                 </Link>
                 <Link
                   to="/roadmap"
@@ -165,7 +166,7 @@ export default function Home() {
                   Tổ chức học liệu và tiến độ ôn thi trong một không gian rõ ràng
                 </h3>
                 <p className="mt-3 max-w-2xl text-base leading-8 text-slate-600">
-                  Đấu Trường Học Tập gom thư viện tài liệu, ngân hàng đề, phòng luyện tập và lộ trình mục tiêu để người học có thể tìm đúng nội dung, luyện đúng phần còn yếu và chuẩn bị cho kỳ thi quan trọng.
+                  Đấu Trường Học Tập gom thư viện tài liệu, khóa học online, công cụ luyện tập và lộ trình mục tiêu để người học có thể tìm đúng nội dung, luyện đúng phần còn yếu và chuẩn bị cho kỳ thi quan trọng.
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-2">
@@ -187,13 +188,13 @@ export default function Home() {
                     Khám phá tài liệu
                   </Link>
                   <Link
-                    to="/exam-room"
-                    onMouseEnter={() => preloadRouteModule('ExamRoom')}
-                    onFocus={() => preloadRouteModule('ExamRoom')}
+                    to="/gpa"
+                    onMouseEnter={() => preloadRouteModule('GPACalculator')}
+                    onFocus={() => preloadRouteModule('GPACalculator')}
                     className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
                   >
-                    <span className="material-symbols-outlined text-[20px]">quiz</span>
-                    Luyện đề ngay
+                    <span className="material-symbols-outlined text-[20px]">calculate</span>
+                    Tính điểm ngay
                   </Link>
                 </div>
               </div>
@@ -216,11 +217,11 @@ export default function Home() {
                   <h3 className="mt-2 text-2xl font-black tracking-tight text-[#153631]">Ba trụ cột cho học liệu, luyện tập và ôn thi</h3>
                 </div>
                 <p className="max-w-2xl text-sm leading-7 text-slate-600">
-                  Trang chủ ưu tiên các điểm vào quan trọng của LMS: mở tài liệu, chọn đề luyện tập và theo dõi lộ trình học theo mục tiêu.
+                  Trang chủ ưu tiên các điểm vào quan trọng của LMS: mở tài liệu, vào lớp học online và theo dõi lộ trình học theo mục tiêu.
                 </p>
               </div>
 
-              <div className="mt-5 grid gap-3 md:grid-cols-3">
+              <div className="mt-5 grid gap-3 md:grid-cols-4">
                 {lmsHighlights.map((item) => (
                   <Link
                     key={item.title}
@@ -250,8 +251,8 @@ export default function Home() {
               Công cụ học tập
             </h3>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              <Link to="/gpa" className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-all hover:border-[#e36488]/30 hover:bg-[#e36488]/10">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/20">
+              <Link to="/gpa" className="group flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-[#e36488]/30 hover:bg-[#e36488]/10">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/20">
                   <span className="material-symbols-outlined text-blue-400">add_chart</span>
                 </div>
                 <div>
@@ -260,12 +261,12 @@ export default function Home() {
                 </div>
                 <span className="flex items-center gap-1 text-[11px] font-bold text-[#e36488]">
                   Dùng ngay
-                  <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                  <span className="material-symbols-outlined text-xs transition-transform group-hover:translate-x-0.5">arrow_forward</span>
                 </span>
               </Link>
 
-              <Link to="/schools" className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all hover:border-orange-500/30 hover:bg-orange-500/10">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/20">
+              <Link to="/schools" className="group flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-orange-500/10">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500/20">
                   <span className="material-symbols-outlined text-orange-400">apartment</span>
                 </div>
                 <div>
@@ -274,12 +275,12 @@ export default function Home() {
                 </div>
                 <span className="flex items-center gap-1 text-[11px] font-bold text-orange-400">
                   Mở ngay
-                  <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                  <span className="material-symbols-outlined text-xs transition-transform group-hover:translate-x-0.5">arrow_forward</span>
                 </span>
               </Link>
 
-              <Link to="/roadmap" className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all hover:border-green-500/30 hover:bg-green-500/10">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20">
+              <Link to="/roadmap" className="group flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-green-500/30 hover:bg-green-500/10">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-500/20">
                   <span className="material-symbols-outlined text-green-400">timeline</span>
                 </div>
                 <div>
@@ -288,12 +289,12 @@ export default function Home() {
                 </div>
                 <span className="flex items-center gap-1 text-[11px] font-bold text-green-400">
                   Theo dõi
-                  <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                  <span className="material-symbols-outlined text-xs transition-transform group-hover:translate-x-0.5">arrow_forward</span>
                 </span>
               </Link>
 
-              <Link to="/library" className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all hover:border-sky-500/30 hover:bg-sky-500/10">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-500/20">
+              <Link to="/library" className="group flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-sky-500/30 hover:bg-sky-500/10">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/20">
                   <span className="material-symbols-outlined text-sky-400">folder_open</span>
                 </div>
                 <div>
@@ -302,7 +303,7 @@ export default function Home() {
                 </div>
                 <span className="flex items-center gap-1 text-[11px] font-bold text-sky-400">
                   Xem ngay
-                  <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                  <span className="material-symbols-outlined text-xs transition-transform group-hover:translate-x-0.5">arrow_forward</span>
                 </span>
               </Link>
             </div>

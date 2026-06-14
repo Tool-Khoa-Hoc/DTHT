@@ -11,12 +11,7 @@ export const routeModuleLoaders = {
   StudyArena: () => import('../pages/StudyArena'),
   Collaborator: () => import('../pages/Collaborator'),
   UserProfile: () => import('../pages/UserProfile'),
-  ExamRoom: () => import('../pages/ExamRoom'),
-  ExamTaking: () => import('../pages/ExamTaking'),
-  ExamResult: () => import('../pages/ExamResult'),
-  Pricing: () => import('../pages/Pricing'),
-  PaymentWaiting: () => import('../pages/PaymentWaiting'),
-  PaymentSuccess: () => import('../pages/PaymentSuccess'),
+  OnlineLearning: () => import('../pages/OnlineLearning'),
   Notes: () => import('../pages/Notes'),
   CourseComboHs12: () => import('../pages/CourseComboHs12'),
 };

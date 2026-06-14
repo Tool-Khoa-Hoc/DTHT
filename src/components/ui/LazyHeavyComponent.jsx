@@ -34,15 +34,14 @@ export default function LazyHeavyComponent({
   className = '',
   keepMounted = true,
 }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [hasBeenVisible, setHasBeenVisible] = useState(false);
+  const shouldRenderImmediately = typeof IntersectionObserver !== 'function';
+  const [isVisible, setIsVisible] = useState(shouldRenderImmediately);
+  const [hasBeenVisible, setHasBeenVisible] = useState(shouldRenderImmediately);
   const containerRef = useRef(null);
 
   useEffect(() => {
     // Fallback: nếu browser không hỗ trợ IntersectionObserver → render ngay
-    if (typeof IntersectionObserver !== 'function') {
-      setIsVisible(true);
-      setHasBeenVisible(true);
+    if (shouldRenderImmediately) {
       return;
     }
 
@@ -69,7 +68,7 @@ export default function LazyHeavyComponent({
     }
 
     return () => observer.disconnect();
-  }, [rootMargin]);
+  }, [rootMargin, shouldRenderImmediately]);
 
   // Decide whether to render the heavy content
   const shouldRender = keepMounted ? hasBeenVisible : isVisible;
@@ -111,7 +110,7 @@ export function LazyMath({ children, className = '' }) {
 /**
  * LazyPdfSection — Preset cho các section hiển thị PDF
  * rootMargin nhỏ hơn (200px) vì PDF đã có IntersectionObserver trong
- * SecurePdfViewer — đây chỉ dùng khi cần defer mount toàn bộ Document
+ * PDF viewer — đây chỉ dùng khi cần defer mount toàn bộ Document
  */
 export function LazyPdfSection({ children, className = '' }) {
   return (
@@ -121,7 +120,7 @@ export function LazyPdfSection({ children, className = '' }) {
       placeholder={
         <div className="w-full rounded-2xl bg-slate-900/80 animate-pulse flex items-center justify-center gap-3 text-slate-500 py-16">
           <span className="material-symbols-outlined text-3xl">picture_as_pdf</span>
-          <span className="text-sm font-medium">Đang chuẩn bị đề thi...</span>
+          <span className="text-sm font-medium">Đang chuẩn bị tài liệu...</span>
         </div>
       }
     >

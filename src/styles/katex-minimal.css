@@ -5,7 +5,7 @@
    katex-minimal.css — Safety Fallback
    
    Các font family dưới đây đã bị xoá để giảm bandwidth.
-   Nếu đề thi có ký tự hiếm (\mathcal, \mathfrak, v.v.),
+   Nếu tài liệu có ký tự hiếm (\mathcal, \mathfrak, v.v.),
    chữ vẫn render được với KaTeX_Main (không bị □ ô vuông).
    ============================================================ */
 

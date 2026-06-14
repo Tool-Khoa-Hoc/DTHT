@@ -98,7 +98,7 @@ export default function WelcomeModal() {
                             Chào mừng bạn đến với <strong className="text-[#fe5f36] font-black">Đấu Trường Học Tập!</strong>
                         </p>
                         <p>
-                            Hiện tại, hệ thống trang web đang trong quá trình nâng cấp và hoàn thiện. Đặc biệt, tính năng <b className="text-[#3b82f6]">Phòng Thi</b> đang được gấp rút cập nhật để mang lại trải nghiệm tốt nhất.
+                            Hiện tại, hệ thống trang web đang trong quá trình nâng cấp và hoàn thiện. Các khu vực tài liệu, công cụ tính điểm và lộ trình học đang được cập nhật để mang lại trải nghiệm ổn định hơn.
                         </p>
                         <p className="italic text-xs mt-2 text-slate-500">
                             Nếu xảy ra lỗi trong quá trình sử dụng, kính mong quý khách thông cảm!

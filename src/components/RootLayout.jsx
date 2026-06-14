@@ -8,7 +8,6 @@ import { preloadRouteModule } from '../lib/routeModules';
 
 const BOTTOM_TABS = [
   { path: '/home', icon: 'home', label: 'Trang chủ' },
-  { path: '/exam-room', icon: 'quiz', label: 'Phòng thi' },
   { path: '/gpa', icon: 'calculate', label: 'Tính điểm' },
   { path: '/arena', icon: 'local_fire_department', label: 'Đấu trường' },
   { path: '/profile', icon: 'person', label: 'Cá nhân' },
@@ -37,7 +36,6 @@ export default function RootLayout() {
   const [shouldLoadWelcomeModal, setShouldLoadWelcomeModal] = useState(false);
   const mainRef = useRef(null);
   const isActive = (path) => location.pathname === path;
-  const isExamTakingRoute = /^\/exam\/[^/]+\/[^/]+$/.test(location.pathname);
 
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => {
@@ -52,13 +50,9 @@ export default function RootLayout() {
   }, [location.pathname]);
 
   useEffect(() => {
-    if (isExamTakingRoute) {
-      return undefined;
-    }
-
     const cleanup = scheduleIdleTask(() => setShouldLoadWelcomeModal(true));
     return cleanup;
-  }, [isExamTakingRoute]);
+  }, []);
 
   if (loading && !user) {
     return <PageSkeleton />;
@@ -69,16 +63,6 @@ export default function RootLayout() {
 
   if (!loading && !user && !isPublicRoute) {
     return <Navigate to="/auth" replace />;
-  }
-
-  if (isExamTakingRoute) {
-    return (
-      <div className="h-dvh overflow-hidden bg-[#f8f6f6] font-display text-slate-900 dark:bg-[#201216] dark:text-slate-100">
-        <main className="h-dvh overflow-hidden">
-          <Outlet />
-        </main>
-      </div>
-    );
   }
 
   return (
@@ -134,7 +118,6 @@ export default function RootLayout() {
               <MobileNavLink to="/home" icon="home" active={isActive('/home')} routeModuleKey="Home">Trang chủ</MobileNavLink>
               <MobileNavLink to="/gpa" icon="calculate" active={isActive('/gpa')} routeModuleKey="GPACalculator">Tính điểm</MobileNavLink>
               <MobileNavLink to="/schools" icon="apartment" active={isActive('/schools')} color="blue" routeModuleKey="SchoolFinder">Trường phù hợp</MobileNavLink>
-              <MobileNavLink to="/exam-room" icon="quiz" active={isActive('/exam-room')} color="blue" routeModuleKey="ExamRoom">Phòng thi</MobileNavLink>
               <MobileNavLink to="/roadmap" icon="timeline" active={isActive('/roadmap')} routeModuleKey="Roadmap">Lộ trình</MobileNavLink>
               <MobileNavLink to="/library" icon="folder_open" active={isActive('/library')} routeModuleKey="Library">Tài Liệu Học Free</MobileNavLink>
               <MobileNavLink
@@ -146,7 +129,7 @@ export default function RootLayout() {
               >
                 Các khóa học
               </MobileNavLink>
-              <MobileNavLink to="/pricing" icon="workspace_premium" active={isActive('/pricing')} routeModuleKey="Pricing">Nâng cấp VIP</MobileNavLink>
+              <MobileNavLink to="/hoc-online" icon="cast_for_education" active={isActive('/hoc-online')} color="green" routeModuleKey="OnlineLearning">Học online</MobileNavLink>
               <MobileNavLink to="/arena" icon="local_fire_department" active={isActive('/arena')} color="orange" routeModuleKey="StudyArena">Đấu trường</MobileNavLink>
               <MobileNavLink to="/notes" icon="edit_note" active={isActive('/notes')} color="orange" routeModuleKey="Notes">Ghi chú</MobileNavLink>
               {profile?.role === 'admin' && (
@@ -191,7 +174,6 @@ export default function RootLayout() {
           <DesktopNavLink to="/home" icon="home" active={isActive('/home')} routeModuleKey="Home">Trang chủ</DesktopNavLink>
           <DesktopNavLink to="/gpa" icon="calculate" active={isActive('/gpa')} routeModuleKey="GPACalculator">Tính điểm</DesktopNavLink>
           <DesktopNavLink to="/schools" icon="apartment" active={isActive('/schools')} color="#306ee8" routeModuleKey="SchoolFinder">Trường phù hợp</DesktopNavLink>
-          <DesktopNavLink to="/exam-room" icon="quiz" active={isActive('/exam-room')} color="#3b82f6" routeModuleKey="ExamRoom">Phòng thi</DesktopNavLink>
           <DesktopNavLink to="/roadmap" icon="timeline" active={isActive('/roadmap')} routeModuleKey="Roadmap">Lộ trình</DesktopNavLink>
           <DesktopNavLink to="/library" icon="folder_open" active={isActive('/library')} routeModuleKey="Library">Tài Liệu Học Free</DesktopNavLink>
           <DesktopNavLink
@@ -203,7 +185,7 @@ export default function RootLayout() {
           >
             Các khóa học
           </DesktopNavLink>
-          <DesktopNavLink to="/pricing" icon="workspace_premium" active={isActive('/pricing')} routeModuleKey="Pricing">Nâng cấp VIP</DesktopNavLink>
+          <DesktopNavLink to="/hoc-online" icon="cast_for_education" active={isActive('/hoc-online')} color="#10b981" routeModuleKey="OnlineLearning">Học online</DesktopNavLink>
           <DesktopNavLink to="/arena" icon="local_fire_department" active={isActive('/arena')} color="#fe5f36" routeModuleKey="StudyArena">Đấu trường</DesktopNavLink>
           <DesktopNavLink to="/notes" icon="edit_note" active={isActive('/notes')} color="#fe5f36" routeModuleKey="Notes">Ghi chú</DesktopNavLink>
           {profile?.role === 'admin' && (
@@ -299,8 +281,6 @@ function tabPrefetchKey(path) {
   switch (path) {
     case '/home':
       return 'Home';
-    case '/exam-room':
-      return 'ExamRoom';
     case '/gpa':
       return 'GPACalculator';
     case '/arena':
