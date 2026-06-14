@@ -50,15 +50,36 @@ export default function StudyArena() {
         setLoadingData(false);
     };
 
+    // Fetch public profile info (safe columns only) for a set of user ids via
+    // public_profile_view — the profiles table is locked to own-row + admin, so
+    // cross-user reads must go through this definer view.
+    const fetchPublicProfilesMap = async (userIds) => {
+        const ids = [...new Set((userIds || []).filter(Boolean))];
+        if (ids.length === 0) return {};
+        const { data, error } = await supabase
+            .from('public_profile_view')
+            .select('id, display_name, avatar_url, role, is_approved_bang_chu')
+            .in('id', ids);
+        if (error || !data) return {};
+        const map = {};
+        data.forEach((p) => { map[p.id] = p; });
+        return map;
+    };
+
     const fetchPublicCampaigns = async () => {
         setLoadingData(true);
         const { data, error } = await supabase
             .from('campaigns')
-            .select('id, user_id, title, description, start_date, end_date, targets, is_completed, is_public, created_at, profiles:user_id(display_name, avatar_url, role, is_approved_bang_chu)')
+            .select('id, user_id, title, description, start_date, end_date, targets, is_completed, is_public, created_at')
             .eq('is_public', true)
             .order('created_at', { ascending: false });
 
-        if (!error) setPublicCampaigns(data || []);
+        if (!error && data) {
+            const profilesMap = await fetchPublicProfilesMap(data.map((c) => c.user_id));
+            setPublicCampaigns(data.map((c) => ({ ...c, profiles: profilesMap[c.user_id] || null })));
+        } else if (!error) {
+            setPublicCampaigns([]);
+        }
         setLoadingData(false);
     };
 
@@ -66,18 +87,15 @@ export default function StudyArena() {
         setLoadingData(true);
         const { data, error } = await supabase
             .from('campaigns')
-            .select('user_id, profiles:user_id(display_name, avatar_url, role, is_approved_bang_chu)')
+            .select('user_id')
             .eq('is_completed', true);
 
         if (!error && data) {
             const counts = {};
-            const profilesMap = {};
             data.forEach(camp => {
                 counts[camp.user_id] = (counts[camp.user_id] || 0) + 1;
-                if (camp.profiles && !profilesMap[camp.user_id]) {
-                    profilesMap[camp.user_id] = camp.profiles;
-                }
             });
+            const profilesMap = await fetchPublicProfilesMap(Object.keys(counts));
 
             // Also populate userRanks so rank badges work everywhere
             setUserRanks(counts);
