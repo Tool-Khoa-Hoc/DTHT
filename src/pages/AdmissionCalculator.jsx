@@ -422,8 +422,6 @@ export default function AdmissionCalculator() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('hsa');
 
-  const currentTab = TABS.find(t => t.id === activeTab);
-
   return (
     <div className="bg-[#0b0f1a] font-display text-white min-h-screen pb-24">
       <div className="fixed inset-0 bg-[radial-gradient(at_0%_0%,rgba(227,100,136,0.12)_0,transparent_55%),radial-gradient(at_100%_0%,rgba(48,110,232,0.12)_0,transparent_55%)] pointer-events-none" />

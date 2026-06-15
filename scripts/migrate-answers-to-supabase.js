@@ -211,7 +211,6 @@ async function main() {
 
                 // Trích xuất từ cấu trúc parts -> questions
                 const parts = raw.parts || raw.questions || [];
-                let questionOffset = 0;
                 let globalIdx = 0;
 
                 for (const part of parts) {
@@ -246,7 +245,6 @@ async function main() {
                             answerKey[qId] = ans;
                         }
                     }
-                    questionOffset += questions.length;
                 }
 
                 if (Object.keys(answerKey).length > 0) {

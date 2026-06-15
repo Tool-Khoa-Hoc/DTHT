@@ -1,4 +1,3 @@
-/* global process */
 import { buildAnswerKeyFromParts, loadExamJson, saveExamJson } from './exam-utils.js';
 
 function printUsage() {

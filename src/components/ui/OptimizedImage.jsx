@@ -46,7 +46,7 @@ export default function OptimizedImage({
   ...rest
 }) {
   // Validate: bắt buộc có width, và ít nhất một trong height hoặc aspectRatio
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     if (!width) {
       console.warn('[OptimizedImage] Missing `width` prop. This WILL cause CLS!\n  src:', src);
     }

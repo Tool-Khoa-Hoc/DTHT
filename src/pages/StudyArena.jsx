@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -30,15 +30,7 @@ export default function StudyArena() {
 
     const [loadingData, setLoadingData] = useState(true);
 
-    useEffect(() => {
-        if (user) {
-            if (activeTab === 'my_campaigns') fetchMyCampaigns();
-            if (activeTab === 'public') fetchPublicCampaigns();
-            if (activeTab === 'leaderboard') fetchLeaderboard();
-        }
-    }, [activeTab, user]);
-
-    const fetchMyCampaigns = async () => {
+    const fetchMyCampaigns = useCallback(async () => {
         setLoadingData(true);
         const { data, error } = await supabase
             .from('campaigns')
@@ -48,12 +40,12 @@ export default function StudyArena() {
 
         if (!error) setMyCampaigns(data || []);
         setLoadingData(false);
-    };
+    }, [user]);
 
     // Fetch public profile info (safe columns only) for a set of user ids via
     // public_profile_view — the profiles table is locked to own-row + admin, so
     // cross-user reads must go through this definer view.
-    const fetchPublicProfilesMap = async (userIds) => {
+    const fetchPublicProfilesMap = useCallback(async (userIds) => {
         const ids = [...new Set((userIds || []).filter(Boolean))];
         if (ids.length === 0) return {};
         const { data, error } = await supabase
@@ -64,9 +56,9 @@ export default function StudyArena() {
         const map = {};
         data.forEach((p) => { map[p.id] = p; });
         return map;
-    };
+    }, []);
 
-    const fetchPublicCampaigns = async () => {
+    const fetchPublicCampaigns = useCallback(async () => {
         setLoadingData(true);
         const { data, error } = await supabase
             .from('campaigns')
@@ -81,9 +73,9 @@ export default function StudyArena() {
             setPublicCampaigns([]);
         }
         setLoadingData(false);
-    };
+    }, [fetchPublicProfilesMap]);
 
-    const fetchLeaderboard = async () => {
+    const fetchLeaderboard = useCallback(async () => {
         setLoadingData(true);
         const { data, error } = await supabase
             .from('campaigns')
@@ -109,7 +101,15 @@ export default function StudyArena() {
             setLeaderboard(lb);
         }
         setLoadingData(false);
-    };
+    }, [fetchPublicProfilesMap]);
+
+    useEffect(() => {
+        if (user) {
+            if (activeTab === 'my_campaigns') fetchMyCampaigns();
+            if (activeTab === 'public') fetchPublicCampaigns();
+            if (activeTab === 'leaderboard') fetchLeaderboard();
+        }
+    }, [activeTab, user, fetchMyCampaigns, fetchPublicCampaigns, fetchLeaderboard]);
 
     const handleAddSubTarget = (e) => {
         e.preventDefault();

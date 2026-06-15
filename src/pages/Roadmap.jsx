@@ -26,7 +26,6 @@ export default function Roadmap() {
 
     // Settings
     const [creditsPerSemester, setCreditsPerSemester] = useState(18);
-    const subjectCount = Math.round(creditsPerSemester / 3);
     const [targetTHPT, setTargetTHPT] = useState(24);
     const [targetDGNL, setTargetDGNL] = useState(850);
 
@@ -152,11 +151,6 @@ export default function Roadmap() {
         } finally {
             if (quiet !== true) setIsSaving(false);
         }
-    };
-
-    // No-op: kept for API compatibility but DB operations are done individually
-    const handleSaveMilestones = (newMilestones) => {
-        setMilestones(newMilestones);
     };
 
     const openEditModal = (milestone = null) => {
@@ -365,7 +359,7 @@ export default function Roadmap() {
                             milestones.map((m, index) => {
                                 const isLast = index === milestones.length - 1;
                                 
-                                let iconBg, ringColor, lineGrad, cardBg, titleColor, statusBadge, badgeColor;
+                                let iconBg, lineGrad, cardBg, titleColor, statusBadge, badgeColor;
                                 if (m.status === 'done') {
                                     iconBg = 'bg-[#7f13ec] text-white shadow-[0_0_15px_rgba(127,19,236,0.5)]';
                                     lineGrad = 'bg-[#7f13ec]';

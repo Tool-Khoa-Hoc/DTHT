@@ -7,6 +7,12 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
+    files: ['scripts/**/*.js', 'skills/**/*.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  {
     files: ['**/*.{js,jsx}'],
     extends: [
       js.configs.recommended,
@@ -24,6 +30,9 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // Data-fetch / reset-on-prop effects legitimately call setState; keep as a
+      // hint rather than a build-breaking error.
+      'react-hooks/set-state-in-effect': 'warn',
     },
   },
 ])

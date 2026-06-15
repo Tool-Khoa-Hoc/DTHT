@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -159,7 +159,7 @@ function SchoolCard({ school, myScores, subjectGroupFilter, query }) {
 export default function SchoolFinder() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [loadingScores, setLoadingScores] = useState(true);
+  const [, setLoadingScores] = useState(true);
   const [dbScores, setDbScores] = useState(null);
 
   // Data fetching

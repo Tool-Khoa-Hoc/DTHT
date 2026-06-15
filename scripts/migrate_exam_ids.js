@@ -27,18 +27,6 @@ function normalizePartId(id) {
   return id;
 }
 
-// Normalize question.id: "q13" → the new sequential number within part
-// Returns a string number like "1", "2", etc.
-function normalizeQuestionId(rawId) {
-  if (!rawId) return rawId;
-  const s = String(rawId).trim().toLowerCase();
-  // Already a plain number: "1", "13", etc.
-  if (/^[0-9]+$/.test(s)) return s;
-  // "q13" → "13"
-  const m = s.match(/^q([0-9]+)$/);
-  if (m) return m[1];
-  return rawId;
-}
 
 // Normalize statement.id: "q13a" → "a", "q14b" → "b" etc.
 function normalizeStatementId(rawId) {
@@ -73,7 +61,6 @@ function processExamFile(examJsonPath, dryRun = false) {
     let qCounter = 0;
     const newQuestions = (part.questions || []).map(q => {
       qCounter++;
-      const rawQId = normalizeQuestionId(q.id);
       const newQId = String(qCounter); // reset within part
       
       if (newQId !== q.id) {

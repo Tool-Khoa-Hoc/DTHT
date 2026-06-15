@@ -433,11 +433,6 @@ function extractMathFromOle(blob, mathId) {
     return [`\\text{${mathId}}`, "ole_placeholder"];
 }
 
-// Helper to reliably check child namespaces
-function selectNodesNS(root, localName, nsURI) {
-    return Array.from(root.getElementsByTagNameNS(nsURI, localName));
-}
-
 // Main parser function
 export async function parseDocx(fileBlob) {
     const lines = [];
@@ -454,7 +449,6 @@ export async function parseDocx(fileBlob) {
     }
 
     const relMap = await readRels(zip);
-    const zipFileContents = {};
 
     const docXmlStr = await zip.file("word/document.xml").async("string");
     const parser = new DOMParser();

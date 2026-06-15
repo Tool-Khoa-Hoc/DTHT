@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -436,14 +436,12 @@ function BKHCMCalc() {
           if (d.hb3) setHb3(d.hb3);
           if (d.diemCong) setDiemCong(d.diemCong);
           if (d.uuTien) setUuTien(d.uuTien);
-        } catch { }
+        } catch { /* ignore malformed saved data */ }
       }
     }
   }, [profile]);
 
   // ─── Calculations (memoised so they only re-run when relevant deps change) ───
-  const p = useCallback((v) => parseFloat(v) || 0, []);
-
   const { dgnlAdj, maxDGNL, divTHPT, tnthptQD, hbQD, diemNL, diemHL, diemXT } = useMemo(() => {
     const pf = (v) => parseFloat(v) || 0;
     const dgnlBase = pf(dgnlTV) + pf(dgnlAnh) + pf(dgnlToan) + pf(dgnlKH);
