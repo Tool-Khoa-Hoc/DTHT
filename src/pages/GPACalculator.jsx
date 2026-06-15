@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -760,22 +760,22 @@ function UniCalc() {
   const [isRenaming, setRenaming] = useState(false);
   const [renameVal, setRenameVal] = useState('');
 
-  useEffect(() => { if (user) loadSems(); }, [user]);
-  useEffect(() => {
-    if (selectedSem) loadSubs(selectedSem);
-    else setSubjects([{ id: Date.now(), name: '', credits: 2, grade: 0 }]);
-  }, [selectedSem]);
-
-  const loadSems = async () => {
+  const loadSems = useCallback(async () => {
     const { data } = await supabase.from('semesters').select('id, name, created_at').eq('user_id', user.id).order('created_at', { ascending: false });
     setSemesters(data || []);
-    if (data?.length > 0 && !selectedSem) setSelSem(data[0].id);
-  };
-  const loadSubs = async (id) => {
+    if (data?.length > 0) setSelSem(prev => prev || data[0].id);
+  }, [user]);
+  const loadSubs = useCallback(async (id) => {
     const { data } = await supabase.from('subjects').select('id, name, credits, grade_number, semester_id, created_at').eq('semester_id', id).order('created_at');
     if (data?.length > 0) setSubjects(data.map(s => ({ id: s.id, name: s.name, credits: s.credits, grade: s.grade_number })));
     else setSubjects([{ id: Date.now(), name: '', credits: 2, grade: 0 }]);
-  };
+  }, []);
+
+  useEffect(() => { if (user) loadSems(); }, [user, loadSems]);
+  useEffect(() => {
+    if (selectedSem) loadSubs(selectedSem);
+    else setSubjects([{ id: Date.now(), name: '', credits: 2, grade: 0 }]);
+  }, [selectedSem, loadSubs]);
   const createSem = async () => {
     if (!newSemName.trim()) return;
     setCreating(true);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 
 const ADMIN_USER_DIRECTORY_SELECT_LIMIT = 200;
@@ -7,21 +7,15 @@ export default function AdminThongSoai({ isActive }) {
   const [candidates, setCandidates] = useState([]);
   const [loadingCandidates, setLoadingCandidates] = useState(false);
 
-  useEffect(() => {
-    if (isActive) {
-      fetchCandidates();
-    }
-  }, [isActive]);
-
-  const adminUserDirectory = async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
+  const adminUserDirectory = useCallback(async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
     const { data, error } = await supabase.rpc('admin_user_directory', {
       p_search: search, p_role: role, p_ids: ids, p_limit: limit,
     });
     if (error) throw error;
     return Array.isArray(data) ? data : [];
-  };
+  }, []);
 
-  const fetchCandidates = async () => {
+  const fetchCandidates = useCallback(async () => {
     setLoadingCandidates(true);
     try {
       const { data: camps } = await supabase.from('campaigns').select('user_id').eq('is_completed', true);
@@ -53,7 +47,13 @@ export default function AdminThongSoai({ isActive }) {
     } finally {
       setLoadingCandidates(false);
     }
-  };
+  }, [adminUserDirectory]);
+
+  useEffect(() => {
+    if (isActive) {
+      fetchCandidates();
+    }
+  }, [isActive, fetchCandidates]);
 
   const approveBangChu = async (userId, currentStatus) => {
     try {

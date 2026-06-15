@@ -30,9 +30,6 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      // Data-fetch / reset-on-prop effects legitimately call setState; keep as a
-      // hint rather than a build-breaking error.
-      'react-hooks/set-state-in-effect': 'warn',
     },
   },
 ])

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const COLORS = [
   'bg-blue-500', 
@@ -34,11 +34,13 @@ const getInitial = (name = '') => {
 export default function Avatar({ src, name, id, size = 'w-12 h-12', rounded = 'rounded-xl', className = '' }) {
   const [error, setError] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [prevSrc, setPrevSrc] = useState(src);
 
-  // Reset error if src changes
-  useEffect(() => {
+  // Reset error when src changes (adjust state during render, no effect needed)
+  if (prevSrc !== src) {
+    setPrevSrc(src);
     setError(false);
-  }, [src]);
+  }
 
   const initials = getInitial(name);
   const bgColor = getDeterministicColor(id || name || 'default');

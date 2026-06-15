@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import Avatar from '../Avatar';
 
@@ -10,21 +10,15 @@ export default function AdminCollaborator({ isActive }) {
   const [collaborators, setCollaborators] = useState([]);
   const [loadingCollabs, setLoadingCollabs] = useState(false);
 
-  useEffect(() => {
-    if (isActive) {
-      fetchCollaborators();
-    }
-  }, [isActive]);
-
-  const adminUserDirectory = async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
+  const adminUserDirectory = useCallback(async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
     const { data, error } = await supabase.rpc('admin_user_directory', {
       p_search: search, p_role: role, p_ids: ids, p_limit: limit,
     });
     if (error) throw error;
     return Array.isArray(data) ? data : [];
-  };
+  }, []);
 
-  const fetchCollaborators = async () => {
+  const fetchCollaborators = useCallback(async () => {
     setLoadingCollabs(true);
     try {
       const data = await adminUserDirectory({
@@ -37,7 +31,13 @@ export default function AdminCollaborator({ isActive }) {
     } finally {
       setLoadingCollabs(false);
     }
-  };
+  }, [adminUserDirectory]);
+
+  useEffect(() => {
+    if (isActive) {
+      fetchCollaborators();
+    }
+  }, [isActive, fetchCollaborators]);
 
   const searchUsers = async (e) => {
     e.preventDefault();

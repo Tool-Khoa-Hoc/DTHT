@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -14,6 +14,27 @@ const defaultUniversityMilestones = [
     { id: 'u2', title: 'Học kỳ 2 - Năm 1', subtitle: 'Bắt đầu học môn cơ sở ngành.', status: 'active', progress: 35 },
     { id: 'u3', title: 'Học kỳ 1 - Năm 2', subtitle: 'Dự kiến học chuyên ngành.', status: 'locked', progress: 0 }
 ];
+
+const mapMilestoneRow = (row) => ({
+    id: row.id,
+    title: row.title,
+    subtitle: row.subtitle || '',
+    status: row.status || 'locked',
+    progress: typeof row.progress === 'number' ? row.progress : 0,
+});
+
+const normalizeStatus = (value) => {
+    if (value === 'done' || value === 'active' || value === 'locked') return value;
+    return 'locked';
+};
+
+const normalizeProgress = (value) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return 0;
+    if (parsed < 0) return 0;
+    if (parsed > 100) return 100;
+    return Math.round(parsed);
+};
 
 export default function Roadmap() {
     const { user, profile } = useAuth();
@@ -44,33 +65,7 @@ export default function Roadmap() {
     }, [profile]);
 
     // Load milestones from Supabase (with localStorage migration on first use)
-    useEffect(() => {
-        if (!user) return;
-        loadMilestones();
-    }, [user, mode]);
-
-    const mapMilestoneRow = (row) => ({
-        id: row.id,
-        title: row.title,
-        subtitle: row.subtitle || '',
-        status: row.status || 'locked',
-        progress: typeof row.progress === 'number' ? row.progress : 0,
-    });
-
-    const normalizeStatus = (value) => {
-        if (value === 'done' || value === 'active' || value === 'locked') return value;
-        return 'locked';
-    };
-
-    const normalizeProgress = (value) => {
-        const parsed = Number(value);
-        if (!Number.isFinite(parsed)) return 0;
-        if (parsed < 0) return 0;
-        if (parsed > 100) return 100;
-        return Math.round(parsed);
-    };
-
-    const loadMilestones = async () => {
+    const loadMilestones = useCallback(async () => {
         setMilestonesLoading(true);
         try {
             const { data, error } = await supabase
@@ -128,7 +123,12 @@ export default function Roadmap() {
         } finally {
             setMilestonesLoading(false);
         }
-    };
+    }, [user, mode]);
+
+    useEffect(() => {
+        if (!user) return;
+        loadMilestones();
+    }, [user, mode, loadMilestones]);
 
     const handleSaveSettings = async (quiet = false) => {
         if (quiet !== true) setIsSaving(true);

@@ -105,9 +105,13 @@ export default function StudyArena() {
 
     useEffect(() => {
         if (user) {
+            // Each fetcher flips a loading flag synchronously before awaiting the
+            // network — an intentional spinner-on-tab-change, not a render cascade.
+            /* eslint-disable react-hooks/set-state-in-effect */
             if (activeTab === 'my_campaigns') fetchMyCampaigns();
             if (activeTab === 'public') fetchPublicCampaigns();
             if (activeTab === 'leaderboard') fetchLeaderboard();
+            /* eslint-enable react-hooks/set-state-in-effect */
         }
     }, [activeTab, user, fetchMyCampaigns, fetchPublicCampaigns, fetchLeaderboard]);
 

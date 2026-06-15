@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { getUserRank } from '../utils/rankHelper';
@@ -23,6 +23,52 @@ export default function Profile() {
     const [completedCampaignsCount, setCompletedCampaignsCount] = useState(0);
     const [uploadCount, setUploadCount] = useState(0);
 
+    const fetchUploadCount = useCallback(async () => {
+        try {
+            if (!user) return;
+            const { count, error } = await supabase
+                .from('documents')
+                .select('*', { count: 'exact', head: true })
+                .eq('uploaded_by', user.id);
+            if (!error) {
+                setUploadCount(count || 0);
+            }
+        } catch (error) {
+            console.error('Lỗi lấy số tài liệu:', error);
+        }
+    }, [user]);
+
+    const fetchSubjects = useCallback(async () => {
+        try {
+            const { data, error } = await supabase
+                .from('subjects')
+                .select('id, name, credits, grade_number, created_at')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            setSubjects(data || []);
+        } catch (error) {
+            console.error('Lỗi tải môn học:', error);
+        } finally {
+            setLoadingSubjects(false);
+        }
+    }, [user]);
+
+    const fetchCampaignsCount = useCallback(async () => {
+        try {
+            const { count, error } = await supabase
+                .from('campaigns')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', user.id)
+                .eq('is_completed', true);
+            if (!error) {
+                setCompletedCampaignsCount(count || 0);
+            }
+        } catch (error) {
+            console.error('Lỗi lấy số chiến dịch:', error);
+        }
+    }, [user]);
+
     useEffect(() => {
         if (user) {
             fetchSubjects();
@@ -41,53 +87,7 @@ export default function Profile() {
                 fetchUploadCount();
             }
         }
-    }, [user, profile]);
-
-    const fetchUploadCount = async () => {
-        try {
-            if (!user) return;
-            const { count, error } = await supabase
-                .from('documents')
-                .select('*', { count: 'exact', head: true })
-                .eq('uploaded_by', user.id);
-            if (!error) {
-                setUploadCount(count || 0);
-            }
-        } catch (error) {
-            console.error('Lỗi lấy số tài liệu:', error);
-        }
-    };
-
-    const fetchSubjects = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('subjects')
-                .select('id, name, credits, grade_number, created_at')
-                .eq('user_id', user.id)
-                .order('created_at', { ascending: false });
-            if (error) throw error;
-            setSubjects(data || []);
-        } catch (error) {
-            console.error('Lỗi tải môn học:', error);
-        } finally {
-            setLoadingSubjects(false);
-        }
-    };
-
-    const fetchCampaignsCount = async () => {
-        try {
-            const { count, error } = await supabase
-                .from('campaigns')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', user.id)
-                .eq('is_completed', true);
-            if (!error) {
-                setCompletedCampaignsCount(count || 0);
-            }
-        } catch (error) {
-            console.error('Lỗi lấy số chiến dịch:', error);
-        }
-    };
+    }, [user, profile, fetchSubjects, fetchCampaignsCount, fetchUploadCount]);
 
     const handleDeleteSubject = async (subjectId) => {
         if (!window.confirm("Bạn có chắc chắn muốn xoá môn học này? Điểm GPA trung bình ở trang Tính GPA sẽ cần được lưu lại để cập nhật chính xác.")) return;
