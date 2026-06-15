@@ -129,7 +129,7 @@ export default function RootLayout() {
               >
                 Các khóa học
               </MobileNavLink>
-              <MobileNavLink to="/hoc-online" icon="cast_for_education" active={isActive('/hoc-online')} color="green" routeModuleKey="OnlineLearning">Học online</MobileNavLink>
+              <MobileNavLink to="/hoc-online" icon="computer" active={isActive('/hoc-online')} color="green" routeModuleKey="OnlineLearning">Học online</MobileNavLink>
               <MobileNavLink to="/arena" icon="local_fire_department" active={isActive('/arena')} color="orange" routeModuleKey="StudyArena">Đấu trường</MobileNavLink>
               <MobileNavLink to="/notes" icon="edit_note" active={isActive('/notes')} color="orange" routeModuleKey="Notes">Ghi chú</MobileNavLink>
               {profile?.role === 'admin' && (
@@ -185,7 +185,7 @@ export default function RootLayout() {
           >
             Các khóa học
           </DesktopNavLink>
-          <DesktopNavLink to="/hoc-online" icon="cast_for_education" active={isActive('/hoc-online')} color="#10b981" routeModuleKey="OnlineLearning">Học online</DesktopNavLink>
+          <DesktopNavLink to="/hoc-online" icon="computer" active={isActive('/hoc-online')} color="#10b981" routeModuleKey="OnlineLearning">Học online</DesktopNavLink>
           <DesktopNavLink to="/arena" icon="local_fire_department" active={isActive('/arena')} color="#fe5f36" routeModuleKey="StudyArena">Đấu trường</DesktopNavLink>
           <DesktopNavLink to="/notes" icon="edit_note" active={isActive('/notes')} color="#fe5f36" routeModuleKey="Notes">Ghi chú</DesktopNavLink>
           {profile?.role === 'admin' && (

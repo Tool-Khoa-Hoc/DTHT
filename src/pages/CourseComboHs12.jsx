@@ -298,8 +298,13 @@ export default function CourseComboHs12() {
               <div className="mt-4 space-y-3">
                 {course.outcomes.map((item) => (
                   <div key={item} className="flex items-start gap-3 rounded-lg border border-[#e0ece7] bg-[#f8fcfa] p-4">
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#087f5b]/12 text-[#087f5b]">
-                      <span className="material-symbols-outlined text-[18px] leading-none">done</span>
+                    <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#087f5b]/12 text-[#087f5b]">
+                      <span
+                        className="material-symbols-outlined block text-[18px] leading-none"
+                        style={{ fontVariationSettings: "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20" }}
+                      >
+                        done
+                      </span>
                     </span>
                     <p className="text-[15px] leading-7 text-slate-600">{item}</p>
                   </div>

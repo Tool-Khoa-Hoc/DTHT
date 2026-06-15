@@ -1,0 +1,3 @@
+-- Remote history placeholder.
+-- The live database received this hotfix through the Supabase MCP on 2026-06-14.
+-- See 20260614133000_fix_profiles_policy_recursion.sql for the ordered source migration.

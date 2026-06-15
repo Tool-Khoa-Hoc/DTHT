@@ -43,7 +43,7 @@ const lmsHighlights = [
     accent: 'bg-emerald-500/12 text-emerald-700',
   },
   {
-    icon: 'cast_for_education',
+    icon: 'computer',
     title: 'Học online',
     copy: 'Vào sheet COMBO HS12 2027, mở tab khóa học và tài liệu đã được cấp quyền bằng Google.',
     to: '/hoc-online',
@@ -230,8 +230,8 @@ export default function Home() {
                     onFocus={() => preloadRouteModule(item.routeModuleKey)}
                     className="group flex min-h-[230px] flex-col rounded-[24px] border border-white/70 bg-white/75 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-all hover:-translate-y-0.5 hover:bg-white"
                   >
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.accent}`}>
-                      <span className="material-symbols-outlined text-[24px]">{item.icon}</span>
+                    <div className={`grid h-12 w-12 place-items-center rounded-2xl ${item.accent}`}>
+                      <span className="material-symbols-outlined text-[25px] leading-none">{item.icon}</span>
                     </div>
                     <h4 className="mt-4 text-xl font-black leading-tight tracking-tight text-[#153631]">{item.title}</h4>
                     <p className="mt-3 flex-1 text-sm font-medium leading-7 text-slate-600">{item.copy}</p>

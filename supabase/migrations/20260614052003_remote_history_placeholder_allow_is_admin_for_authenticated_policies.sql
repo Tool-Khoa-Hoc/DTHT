@@ -1,0 +1,3 @@
+-- Remote history placeholder.
+-- The live database received this hotfix through the Supabase MCP on 2026-06-14.
+-- See 20260614134000_revoke_is_admin_direct_execute.sql for the ordered source migration.

@@ -58,7 +58,9 @@ export default function OnlineLearning() {
         <div className="mx-auto max-w-[1280px]">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex min-w-0 items-start gap-3">
-              <span className="material-symbols-outlined mt-0.5 text-[#10b981]">cast_for_education</span>
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#10b981]/12 text-[#10b981]">
+                <span className="material-symbols-outlined text-[22px] leading-none">computer</span>
+              </span>
               <div className="min-w-0">
                 <h1 className="text-base font-black leading-tight sm:text-lg">Học online</h1>
                 <p className="truncate text-[11px] font-medium text-slate-400 sm:text-xs">{ONLINE_SHEET_TITLE}</p>
