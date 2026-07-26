@@ -5,6 +5,7 @@ import Avatar from './Avatar';
 import OptimizedImage from './ui/OptimizedImage';
 import { PageSkeleton } from './ui/Skeleton';
 import { preloadRouteModule } from '../lib/routeModules';
+import { getUserRank } from '../utils/rankHelper';
 
 const BOTTOM_TABS = [
   { path: '/home', icon: 'home', label: 'Trang chủ' },
@@ -37,6 +38,11 @@ export default function RootLayout() {
   const mainRef = useRef(null);
   const isActive = (path) => location.pathname === path;
 
+  // Danh hiệu hiển thị: chức danh thật cho admin/cộng tác viên, còn lại là "Học viên".
+  const rank = getUserRank(0, profile?.role, profile?.is_approved_bang_chu);
+  const isTitledRole = ['admin', 'collaborator', 'editor'].includes(profile?.role);
+  const roleLabel = isTitledRole ? rank.name : 'Học viên';
+
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => {
       setIsMobileMenuOpen(false);
@@ -66,8 +72,8 @@ export default function RootLayout() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col bg-[#f8f6f6] font-display text-slate-900 selection:bg-[#e36488]/30 md:flex-row dark:bg-[#201216] dark:text-slate-100">
-      <header className="safe-top sticky left-0 right-0 top-0 z-40 border-b border-white/5 bg-[#201216]/90 px-4 backdrop-blur-xl md:hidden">
+    <div className="min-h-dvh flex flex-col bg-ink-950 font-display text-slate-100 selection:bg-ember-500/30 md:flex-row">
+      <header className="safe-top sticky left-0 right-0 top-0 z-40 border-b border-white/5 bg-ink-850/90 px-4 backdrop-blur-xl md:hidden">
         <div className="flex h-12 items-center justify-between">
           <NavBrand />
           <button
@@ -90,13 +96,13 @@ export default function RootLayout() {
           />
           <aside
             id="mobile-main-menu"
-            className="safe-top gpu animate-page-in absolute left-0 top-0 bottom-0 flex w-72 flex-col bg-[#1a0f12]"
+            className="safe-top gpu animate-page-in absolute left-0 top-0 bottom-0 flex w-72 flex-col border-r border-ember-500/10 bg-ink-900"
             aria-label="Menu chính"
           >
             <div className="flex items-center justify-between px-5 pt-5 pb-4">
               <div className="flex flex-col">
-                <h2 className="text-lg font-[1000] uppercase leading-none tracking-tighter text-[#e36488]">Đấu Trường</h2>
-                <span className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">Học Tập</span>
+                <h2 className="font-arena text-lg font-extrabold uppercase leading-none tracking-tight text-ember-400">Đấu Trường</h2>
+                <span className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.24em] text-gold-300/80">Học Tập</span>
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -162,11 +168,11 @@ export default function RootLayout() {
         </div>
       )}
 
-      <aside className="fixed left-0 top-0 z-[100] hidden h-screen w-64 flex-col border-r border-[#e36488]/10 bg-white/50 p-6 backdrop-blur-2xl md:flex dark:bg-[#1a0f12]/80">
+      <aside className="fixed left-0 top-0 z-[100] hidden h-screen w-64 flex-col border-r border-ember-500/10 bg-ink-900/85 p-6 backdrop-blur-2xl md:flex">
         <div className="mb-8">
           <div className="flex flex-col">
-            <h2 className="text-xl font-[1000] uppercase leading-none tracking-tighter text-[#e36488]">Đấu Trường</h2>
-            <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Học Tập</span>
+            <h2 className="font-arena text-xl font-extrabold uppercase leading-none tracking-tight text-ember-400">Đấu Trường</h2>
+            <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.24em] text-gold-300/80">Học Tập</span>
           </div>
         </div>
 
@@ -199,20 +205,28 @@ export default function RootLayout() {
         <div className="mt-auto">
           <Link
             to="/profile"
-            className={`flex items-center gap-4 rounded-xl px-4 py-3 transition-all ${
+            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50 ${
               isActive('/profile')
-                ? 'border border-white/20 bg-white/10 font-semibold text-white'
-                : 'text-slate-500 hover:bg-white/5'
+                ? 'border border-white/15 bg-white/10 font-semibold text-white'
+                : 'text-slate-300 hover:bg-white/5'
             }`}
           >
             <Avatar
               src={profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture}
               name={profile?.display_name || user?.user_metadata?.full_name || 'Cá nhân'}
               id={user?.id}
-              size="w-8 h-8"
-              rounded="rounded-full"
+              size="w-9 h-9"
+              rounded="rounded-xl"
             />
-            <span className="truncate">{profile?.display_name || user?.user_metadata?.full_name || 'Cá nhân'}</span>
+            <div className="flex min-w-0 flex-col">
+              <span className="truncate text-sm font-semibold">
+                {profile?.display_name || user?.user_metadata?.full_name || 'Cá nhân'}
+              </span>
+              <span className="flex items-center gap-1 truncate text-[11px] font-medium text-gold-300/90">
+                <span className="material-symbols-outlined text-[13px]">{rank.icon}</span>
+                {roleLabel}
+              </span>
+            </div>
           </Link>
         </div>
       </aside>
@@ -229,7 +243,7 @@ export default function RootLayout() {
         ) : null}
       </main>
 
-      <nav className="safe-bottom fixed bottom-0 left-0 right-0 z-50 border-t border-white/5 bg-[#1a0f12]/95 backdrop-blur-xl md:hidden">
+      <nav className="safe-bottom fixed bottom-0 left-0 right-0 z-50 border-t border-white/5 bg-ink-900/95 backdrop-blur-xl md:hidden">
         <div className="flex h-16 items-center justify-around px-1">
           {BOTTOM_TABS.map((tab) => {
             const active = isActive(tab.path);
@@ -239,8 +253,8 @@ export default function RootLayout() {
                 to={tab.path}
                 onMouseEnter={() => preloadRouteModule(tabPrefetchKey(tab.path))}
                 onFocus={() => preloadRouteModule(tabPrefetchKey(tab.path))}
-                className={`flex flex-1 flex-col items-center justify-center gap-0.5 rounded-xl py-1 transition-all active:scale-95 ${
-                  active ? 'text-[#e36488]' : 'text-slate-500'
+                className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-xl py-1 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50 ${
+                  active ? 'text-ember-400' : 'text-slate-500'
                 }`}
               >
                 <span
@@ -249,11 +263,11 @@ export default function RootLayout() {
                 >
                   {tab.icon}
                 </span>
-                <span className={`text-[10px] font-semibold leading-none ${active ? 'text-[#e36488]' : 'text-slate-600'}`}>
+                <span className={`text-[10px] font-semibold leading-none ${active ? 'text-ember-400' : 'text-slate-600'}`}>
                   {tab.label}
                 </span>
                 {active && (
-                  <div className="absolute -top-px left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-[#e36488]" />
+                  <div className="absolute -top-px left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-ember-400" />
                 )}
               </Link>
             );
@@ -272,7 +286,7 @@ function NavBrand() {
   return (
     <Link to="/home" onMouseEnter={handlePrefetch} onFocus={handlePrefetch} className="flex items-center gap-2">
       <OptimizedImage src="/logo.webp" alt="Đấu Trường Học Tập" width={28} height={28} priority className="h-7 rounded-lg object-contain" />
-      <span className="text-sm font-[900] uppercase tracking-tight text-[#e36488]">Đấu Trường</span>
+      <span className="font-arena text-sm font-extrabold uppercase tracking-tight text-ember-400">Đấu Trường</span>
     </Link>
   );
 }
@@ -313,7 +327,7 @@ function MobileNavLink({ to, icon, active, color = 'pink', routeModuleKey, child
       onMouseEnter={handlePrefetch}
       onTouchStart={handlePrefetch}
       onFocus={handlePrefetch}
-      className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all active:scale-[0.97] ${
+      className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50 ${
         active
           ? `${palette.bg} text-white shadow-lg ${palette.shadow} font-semibold`
           : `text-slate-400 ${palette.hover} active:bg-white/5`
@@ -342,7 +356,7 @@ function DesktopNavLink({ to, icon, active, color = '#e36488', routeModuleKey, c
       to={to}
       onMouseEnter={handlePrefetch}
       onFocus={handlePrefetch}
-      className={`flex items-center gap-4 rounded-xl px-4 py-3 transition-all ${
+      className={`flex items-center gap-4 rounded-xl px-4 py-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50 ${
         active
           ? 'font-semibold text-white'
           : 'text-slate-500 hover:bg-white/5'

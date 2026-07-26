@@ -138,38 +138,39 @@ export default function Profile() {
     };
 
     return (
-        <div className="bg-gradient-to-br from-[#0f0716] via-[#1a0b2e] to-[#2d0a3d] min-h-screen pb-24 text-white font-display flex flex-col items-center">
-            <div className="w-full max-w-4xl">
+        <div className="relative min-h-screen bg-ink-950 pb-24 text-white font-display">
+            <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(55%_45%_at_85%_-5%,rgba(227,100,136,0.15),transparent_60%),radial-gradient(45%_35%_at_-5%_5%,rgba(242,193,89,0.07),transparent_55%),radial-gradient(60%_55%_at_50%_115%,rgba(139,92,246,0.1),transparent_60%)]" />
+            <div className="relative z-10 mx-auto w-full max-w-4xl">
                 <header className="flex items-center justify-between px-6 pt-8 pb-4">
-                    <h1 className="text-xl font-bold tracking-tight">Trang Cá nhân</h1>
-                    <button className="flex h-10 w-10 items-center justify-center rounded-full bg-[#7f13ec]/20 text-white hover:bg-[#7f13ec]/30 transition-colors">
+                    <h1 className="font-arena text-2xl font-extrabold tracking-tight">Trang cá nhân</h1>
+                    <button className="flex h-10 w-10 items-center justify-center rounded-full bg-ember-500/15 text-ember-300 hover:bg-ember-500/25 transition-colors">
                         <span className="material-symbols-outlined">settings</span>
                     </button>
                 </header>
 
                 <section className="flex flex-col items-center px-6 py-6">
                     <div className="relative group">
-                        <Avatar 
+                        <Avatar
                             src={profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture}
                             name={profile?.display_name || user?.user_metadata?.full_name || 'Học sinh'}
                             id={user?.id}
                             size="h-32 w-32"
                             rounded="rounded-full"
-                            className="relative border-4 border-[#0f0716]"
+                            className="relative rounded-full ring-4 ring-ember-500/25 ring-offset-4 ring-offset-ink-950"
                         />
                     </div>
                     <div className="mt-4 text-center">
                         {isEditing ? (
                             <input
                                 autoFocus
-                                className="text-2xl font-bold bg-transparent border-b-2 border-[#7f13ec] text-center outline-none text-white w-56 pb-1 mt-1 placeholder-slate-500"
+                                className="font-arena text-2xl font-extrabold bg-transparent border-b-2 border-ember-500 text-center outline-none text-white w-56 pb-1 mt-1 placeholder-slate-500"
                                 placeholder="Tên hiển thị..."
                                 value={editData.display_name}
                                 onChange={(e) => setEditData({ ...editData, display_name: e.target.value })}
                                 maxLength={30}
                             />
                         ) : (
-                            <h2 className="text-2xl font-bold">{profile?.display_name || user?.user_metadata?.full_name || 'Học sinh'}</h2>
+                            <h2 className="font-arena text-2xl font-extrabold tracking-tight">{profile?.display_name || user?.user_metadata?.full_name || 'Học sinh'}</h2>
                         )}
 
                         {isEditing ? (
@@ -178,19 +179,19 @@ export default function Profile() {
                                 <div className="flex bg-white/5 border border-white/10 p-1 rounded-xl w-64">
                                     <button
                                         onClick={() => setEditData({ ...editData, user_mode: 'student' })}
-                                        className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${editData.user_mode === 'student' ? 'bg-[#7f13ec] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                                        className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${editData.user_mode === 'student' ? 'bg-ember-500 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
                                     >
                                         Học Sinh
                                     </button>
                                     <button
                                         onClick={() => setEditData({ ...editData, user_mode: 'university' })}
-                                        className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${editData.user_mode === 'university' ? 'bg-[#7f13ec] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                                        className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${editData.user_mode === 'university' ? 'bg-ember-500 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
                                     >
                                         Sinh Viên
                                     </button>
                                 </div>
                                 <input
-                                    className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-1 focus:ring-[#7f13ec] text-center w-64 text-white placeholder-slate-500"
+                                    className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-1 focus:ring-ember-500 text-center w-64 text-white placeholder-slate-500"
                                     placeholder={editData.user_mode === 'student' ? "Trường THPT đang theo học..." : "Trường Đại học đang theo học..."}
                                     value={editData.university}
                                     onChange={(e) => setEditData({ ...editData, university: e.target.value })}
@@ -205,14 +206,14 @@ export default function Profile() {
 
                         {/* Upload Stat for Collaborator/Admin */}
                         {(profile?.role === 'collaborator' || profile?.role === 'admin') && !isEditing && (
-                            <div className="mt-5 border border-[#10b981]/30 bg-[#10b981]/10 rounded-2xl p-4 flex flex-col justify-center shadow-lg md:min-w-[320px] max-w-sm mx-auto relative overflow-hidden">
-                                <span className="absolute -right-4 -top-4 material-symbols-outlined text-8xl text-[#10b981]/10 -rotate-12 pointer-events-none">auto_stories</span>
+                            <div className="mt-5 border border-jade-400/30 bg-jade-400/10 rounded-2xl p-4 flex flex-col justify-center shadow-lg md:min-w-[320px] max-w-sm mx-auto relative overflow-hidden">
+                                <span className="absolute -right-4 -top-4 material-symbols-outlined text-8xl text-jade-400/10 -rotate-12 pointer-events-none">auto_stories</span>
                                 <div className="flex items-center gap-4 relative z-10 w-fit mx-auto">
-                                    <div className="w-12 h-12 rounded-xl bg-[#10b981]/20 flex items-center justify-center text-[#10b981] border border-[#10b981]/30">
+                                    <div className="rank-seal w-12 h-12 flex items-center justify-center text-jade-300 bg-jade-400/15">
                                         <span className="material-symbols-outlined text-[24px]">upload_file</span>
                                     </div>
                                     <div className="text-left">
-                                        <p className="text-[10px] text-[#10b981] uppercase tracking-widest font-black mb-0.5">Tài liệu đã chia sẻ</p>
+                                        <p className="text-[10px] text-jade-300 uppercase tracking-widest font-black mb-0.5">Tài liệu đã chia sẻ</p>
                                         <p className="text-2xl font-black text-white leading-none">{uploadCount} <span className="text-sm text-slate-400 font-medium tracking-normal lowercase">tài liệu</span></p>
                                     </div>
                                 </div>
@@ -224,13 +225,13 @@ export default function Profile() {
                             const rankInfo = getUserRank(completedCampaignsCount, profile?.role);
                             return (
                                 <div className={`mt-6 p-4 rounded-2xl border ${rankInfo.bg} ${rankInfo.border} md:min-w-[320px] max-w-sm mx-auto shadow-lg`}>
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 border-white/20 bg-white/10 ${rankInfo.color}`}>
-                                            <span className="material-symbols-outlined text-2xl filter drop-shadow-md">{rankInfo.icon}</span>
+                                    <div className="flex items-center gap-3.5">
+                                        <div className={`rank-seal w-14 h-14 flex items-center justify-center bg-white/10 ring-1 ring-white/20 ${rankInfo.color}`}>
+                                            <span className="material-symbols-outlined text-2xl filter drop-shadow-md" style={{ fontVariationSettings: "'FILL' 1" }}>{rankInfo.icon}</span>
                                         </div>
                                         <div className="text-left flex-1">
-                                            <p className="text-xs uppercase tracking-widest font-black opacity-60 text-slate-500 mb-0.5">Danh hiệu hiện tại</p>
-                                            <h3 className={`text-xl font-black ${rankInfo.color} uppercase tracking-wide flex items-center gap-2 drop-shadow-sm`}>
+                                            <p className="text-[10px] uppercase tracking-[0.24em] font-black text-gold-300/80 mb-0.5">Danh hiệu hiện tại</p>
+                                            <h3 className={`font-arena text-xl font-extrabold ${rankInfo.color} uppercase tracking-wide flex items-center gap-2 drop-shadow-sm`}>
                                                 {rankInfo.name}
                                             </h3>
                                         </div>
@@ -269,7 +270,7 @@ export default function Profile() {
                     {/* Conditional Target UI Rendering */}
                     {(isEditing ? editData.user_mode : profile?.user_mode) === 'student' ? (
                         <>
-                            <div className="bg-[#7f13ec]/10 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col gap-4 shadow-lg">
+                            <div className="bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col gap-4 shadow-lg">
                                 {/* THPT Target */}
                                 <div className="flex items-center justify-between border-b border-white/5 pb-4">
                                     <div className="flex flex-col gap-1">
@@ -277,7 +278,7 @@ export default function Profile() {
                                         {isEditing ? (
                                             <div className="mt-1 flex items-center gap-2">
                                                 <input
-                                                    className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 w-20 text-xl font-bold outline-none focus:ring-1 focus:ring-[#7f13ec] text-white"
+                                                    className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 w-20 text-xl font-bold outline-none focus:ring-1 focus:ring-ember-500 text-white"
                                                     type="number" step="0.25" max="30"
                                                     value={editData.target_thpt}
                                                     onChange={(e) => setEditData({ ...editData, target_thpt: e.target.value })}
@@ -285,13 +286,13 @@ export default function Profile() {
                                                 <span className="text-sm text-slate-500"> /30</span>
                                             </div>
                                         ) : (
-                                            <div className="text-3xl font-bold text-white mt-1">{profile?.target_thpt || '24'}<span className="text-lg text-slate-500">/30</span></div>
+                                            <div className="font-arena text-3xl font-extrabold text-white mt-1">{profile?.target_thpt || '24'}<span className="text-lg text-slate-500">/30</span></div>
                                         )}
                                     </div>
                                     <div className="relative flex items-center justify-center">
                                         <svg className="h-16 w-16 transform -rotate-90" viewBox="0 0 64 64">
                                             <circle className="text-white/10" cx="32" cy="32" fill="transparent" r="27" stroke="currentColor" strokeWidth="4"></circle>
-                                            <circle className="text-[#7f13ec]" cx="32" cy="32" fill="transparent" r="27" stroke="currentColor" strokeDasharray="169.65" strokeDashoffset={`${169.65 - (169.65 * Math.min(Number(profile?.target_thpt || 24) / 30, 1))}`} strokeLinecap="round" strokeWidth="4"></circle>
+                                            <circle className="text-ember-500" cx="32" cy="32" fill="transparent" r="27" stroke="currentColor" strokeDasharray="169.65" strokeDashoffset={`${169.65 - (169.65 * Math.min(Number(profile?.target_thpt || 24) / 30, 1))}`} strokeLinecap="round" strokeWidth="4"></circle>
                                         </svg>
                                     </div>
                                 </div>
@@ -303,7 +304,7 @@ export default function Profile() {
                                             {isEditing ? (
                                                 <div className="mt-1 flex items-center gap-2">
                                                     <input
-                                                        className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 w-20 text-xl font-bold outline-none focus:ring-1 focus:ring-blue-500 text-white placeholder-slate-600"
+                                                        className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 w-20 text-xl font-bold outline-none focus:ring-1 focus:ring-violet-500 text-white placeholder-slate-600"
                                                         type="number" step="1" max="1200"
                                                         placeholder="Không thi"
                                                         value={editData.target_dgnl || ''}
@@ -321,7 +322,7 @@ export default function Profile() {
                                             <div className="relative flex items-center justify-center">
                                                 <svg className="h-12 w-12 transform -rotate-90" viewBox="0 0 48 48">
                                                     <circle className="text-white/10" cx="24" cy="24" fill="transparent" r="19" stroke="currentColor" strokeWidth="3"></circle>
-                                                    <circle className="text-blue-500" cx="24" cy="24" fill="transparent" r="19" stroke="currentColor" strokeDasharray="119.38" strokeDashoffset={`${119.38 - (119.38 * Math.min(Number(profile?.target_dgnl || 850) / 1200, 1))}`} strokeLinecap="round" strokeWidth="3"></circle>
+                                                    <circle className="text-violet-400" cx="24" cy="24" fill="transparent" r="19" stroke="currentColor" strokeDasharray="119.38" strokeDashoffset={`${119.38 - (119.38 * Math.min(Number(profile?.target_dgnl || 850) / 1200, 1))}`} strokeLinecap="round" strokeWidth="3"></circle>
                                                 </svg>
                                             </div>
                                         )}
@@ -330,13 +331,13 @@ export default function Profile() {
                             </div>
                         </>
                     ) : (
-                        <div className="bg-[#7f13ec]/10 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+                        <div className="bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
                             <div className="flex flex-col gap-1">
                                 <span className="text-slate-400 text-xs uppercase tracking-widest font-semibold flex items-center gap-1"><span className="material-symbols-outlined text-sm">grade</span> Mục tiêu GPA</span>
                                 {isEditing ? (
                                     <div className="mt-1 flex items-center gap-2">
                                         <input
-                                            className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 w-16 text-xl font-bold outline-none focus:ring-1 focus:ring-[#7f13ec] text-white"
+                                            className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 w-16 text-xl font-bold outline-none focus:ring-1 focus:ring-ember-500 text-white"
                                             type="number"
                                             step="0.1"
                                             max="4.0"
@@ -346,16 +347,16 @@ export default function Profile() {
                                         <span className="text-lg text-slate-500">/4.0</span>
                                     </div>
                                 ) : (
-                                    <div className="text-3xl font-bold text-white mt-1">{profile?.target_gpa || '4.0'}<span className="text-lg text-slate-500">/4.0</span></div>
+                                    <div className="font-arena text-3xl font-extrabold text-white mt-1">{profile?.target_gpa || '4.0'}<span className="text-lg text-slate-500">/4.0</span></div>
                                 )}
-                                <div className="mt-3 py-1 px-3 rounded-full bg-[#7f13ec]/20 w-fit">
-                                    <p className="text-[#7f13ec] text-xs font-medium">Hiện tại: {profile?.current_gpa || '0.0'}</p>
+                                <div className="mt-3 py-1 px-3 rounded-full bg-ember-500/20 w-fit">
+                                    <p className="text-ember-300 text-xs font-medium">Hiện tại: {profile?.current_gpa || '0.0'}</p>
                                 </div>
                             </div>
                             <div className="relative flex items-center justify-center">
                                 <svg className="h-20 w-20 transform -rotate-90" viewBox="0 0 80 80">
                                     <circle className="text-white/10" cx="40" cy="40" fill="transparent" r="33" stroke="currentColor" strokeWidth="6"></circle>
-                                    <circle className="text-[#7f13ec]" cx="40" cy="40" fill="transparent" r="33" stroke="currentColor" strokeDasharray="207.35" strokeDashoffset={`${207.35 - (207.35 * Math.min(Number(profile?.current_gpa || 0) / Number(profile?.target_gpa || 4), 1))}`} strokeLinecap="round" strokeWidth="6"></circle>
+                                    <circle className="text-ember-500" cx="40" cy="40" fill="transparent" r="33" stroke="currentColor" strokeDasharray="207.35" strokeDashoffset={`${207.35 - (207.35 * Math.min(Number(profile?.current_gpa || 0) / Number(profile?.target_gpa || 4), 1))}`} strokeLinecap="round" strokeWidth="6"></circle>
                                 </svg>
                                 <span className="absolute text-sm font-bold">{Math.round(Math.min(Number(profile?.current_gpa || 0) / Number(profile?.target_gpa || 4), 1) * 100)}%</span>
                             </div>
@@ -365,8 +366,8 @@ export default function Profile() {
 
                 <section className="px-6 py-4">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-bold">Đang học kỳ này</h3>
-                        <span className="text-[#7f13ec] text-sm font-medium">HK241</span>
+                        <h3 className="font-arena text-lg font-extrabold tracking-tight">Đang học kỳ này</h3>
+                        <span className="text-gold-300 text-sm font-bold">HK241</span>
                     </div>
                     <div className="flex flex-col gap-3">
                         {loadingSubjects ? (
@@ -379,23 +380,23 @@ export default function Profile() {
                             </div>
                         ) : (
                             subjects.map(sub => (
-                                <div key={sub.id} className="bg-[#7f13ec]/10 backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col gap-3 relative group">
+                                <div key={sub.id} className="bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col gap-3 relative group">
                                     <div className="flex justify-between items-start pr-8">
                                         <div>
                                             <h4 className="font-semibold text-white">{sub.name}</h4>
                                             <p className="text-xs text-slate-400">{sub.credits} Tín chỉ / Hệ số</p>
                                         </div>
-                                        <span className="text-xs font-bold bg-[#7f13ec]/20 text-[#c88df3] px-2 py-1 rounded">
+                                        <span className="text-xs font-bold bg-ember-500/20 text-ember-300 px-2 py-1 rounded">
                                             Điểm: {sub.grade_number}
                                         </span>
                                     </div>
                                     {/* Calculate progress visually based on base 10 */}
                                     <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                                        <div className="bg-[#7f13ec] h-full rounded-full" style={{ width: `${Math.min((sub.grade_number / 10) * 100, 100)}%` }}></div>
+                                        <div className="bg-ember-500 h-full rounded-full" style={{ width: `${Math.min((sub.grade_number / 10) * 100, 100)}%` }}></div>
                                     </div>
                                     <button
                                         onClick={() => handleDeleteSubject(sub.id)}
-                                        className="absolute top-4 right-4 text-slate-500 hover:text-red-400 transition-colors opacity-100 md:opacity-0 group-hover:opacity-100 bg-[#1a0b2e] rounded-full p-1"
+                                        className="absolute top-4 right-4 text-slate-500 hover:text-red-400 transition-colors opacity-100 md:opacity-0 group-hover:opacity-100 bg-ink-800 rounded-full p-1"
                                         title="Xoá môn học"
                                     >
                                         <span className="material-symbols-outlined text-sm">delete</span>
@@ -411,14 +412,14 @@ export default function Profile() {
                         <div className="flex gap-3 w-full">
                             <button
                                 onClick={() => setIsEditing(false)}
-                                className="flex-1 py-4 rounded-xl bg-slate-800 border border-slate-700 font-semibold text-white hover:bg-slate-700 transition-colors shadow-lg"
+                                className="flex-1 py-4 rounded-xl bg-white/5 border border-white/10 font-semibold text-white hover:bg-white/10 transition-colors shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                             >
-                                Há»§y
+                                Hủy
                             </button>
                             <button
                                 onClick={handleSaveProfile}
                                 disabled={isSaving}
-                                className="flex-[2] py-4 rounded-xl bg-[#7f13ec] font-semibold text-white hover:bg-[#9125fc] transition-colors shadow-lg shadow-[#7f13ec]/30 flex items-center justify-center disabled:opacity-70"
+                                className="flex-[2] py-4 rounded-xl bg-gradient-to-r from-ember-500 to-ember-600 font-semibold text-white hover:from-ember-600 hover:to-ember-600 transition-colors shadow-lg shadow-ember-500/30 flex items-center justify-center disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950"
                             >
                                 {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
                             </button>
@@ -426,7 +427,7 @@ export default function Profile() {
                     ) : (
                         <button
                             onClick={() => setIsEditing(true)}
-                            className="w-full py-4 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 font-semibold text-white hover:bg-white/10 transition-colors shadow-lg flex items-center justify-center gap-2"
+                            className="w-full py-4 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 font-semibold text-white hover:bg-white/10 transition-colors shadow-lg flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50"
                         >
                             <span className="material-symbols-outlined text-sm">edit</span>
                             Chỉnh sửa hồ sơ

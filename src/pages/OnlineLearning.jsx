@@ -11,7 +11,7 @@ import {
 } from '../config/onlineLearning';
 
 const focusRing =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#eaf3f6]';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-jade-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950';
 
 const IFRAME_STALL_MS = 9000;
 
@@ -48,9 +48,9 @@ function SubjectButton({ active, compact = false, onSelect, subject }) {
       onClick={onSelect}
       aria-pressed={active}
       className={cn(
-        'group flex items-center gap-3 rounded-lg border text-left shadow-[0_14px_34px_rgba(38,70,83,0.06)] transition-all hover:-translate-y-0.5 active:scale-[0.98]',
+        'group flex items-center gap-3 rounded-lg border text-left shadow-[0_10px_30px_rgba(0,0,0,0.25)] transition-all hover:-translate-y-0.5 active:scale-[0.98]',
         compact ? 'min-h-[70px] p-3' : 'min-h-[104px] p-4',
-        active ? 'text-white' : 'border-white bg-white text-[#07384a] hover:border-[#10b981]/50',
+        active ? 'text-white' : 'border-white/10 bg-white/[0.04] text-white hover:border-jade-400/50 hover:bg-white/[0.06]',
         focusRing,
       )}
       style={
@@ -58,7 +58,7 @@ function SubjectButton({ active, compact = false, onSelect, subject }) {
           ? {
               backgroundColor: subject.color,
               borderColor: subject.color,
-              boxShadow: `0 18px 40px ${subject.color}30`,
+              boxShadow: `0 18px 40px ${subject.color}40`,
             }
           : undefined
       }
@@ -67,15 +67,15 @@ function SubjectButton({ active, compact = false, onSelect, subject }) {
         className={cn(
           'grid shrink-0 place-items-center rounded-md transition-colors',
           compact ? 'h-11 w-11' : 'h-12 w-12',
-          active ? 'bg-white/18 text-white' : 'bg-[#eef7f4]',
+          active ? 'bg-white/18 text-white' : 'bg-white/5',
         )}
         style={!active ? { color: subject.color } : undefined}
       >
         <span className={cn('material-symbols-outlined', compact ? 'text-[23px]' : 'text-[26px]')}>{subject.icon}</span>
       </span>
       <span className="min-w-0 flex-1">
-        <span className={cn('block font-black leading-tight', compact ? 'text-base' : 'text-lg')}>{subject.label}</span>
-        <span className={cn('mt-1 block text-xs font-bold', active ? 'text-white/80' : 'text-slate-500')}>
+        <span className={cn('font-arena block font-extrabold leading-tight', compact ? 'text-base' : 'text-lg')}>{subject.label}</span>
+        <span className={cn('mt-1 block text-xs font-bold', active ? 'text-white/80' : 'text-slate-400')}>
           {subject.teachers.length} sheet
         </span>
       </span>
@@ -89,8 +89,8 @@ function TeacherCard({ active, index, onSelect, subject, teacher }) {
   return (
     <article
       className={cn(
-        'group grid gap-2 rounded-lg border bg-white p-2.5 shadow-[0_14px_34px_rgba(38,70,83,0.06)] transition-all sm:grid-cols-[1fr_auto]',
-        active ? 'border-[#10b981] shadow-[0_18px_44px_rgba(16,185,129,0.16)]' : 'border-[#d7e5e9] hover:border-[#10b981]/45',
+        'group grid gap-2 rounded-lg border bg-white/[0.04] p-2.5 shadow-[0_10px_30px_rgba(0,0,0,0.25)] transition-all sm:grid-cols-[1fr_auto]',
+        active ? 'border-jade-400 shadow-[0_18px_44px_rgba(95,207,166,0.18)]' : 'border-white/10 hover:border-jade-400/45 hover:bg-white/[0.06]',
       )}
     >
       <button
@@ -102,7 +102,7 @@ function TeacherCard({ active, index, onSelect, subject, teacher }) {
         <div className="flex items-start gap-3">
           <span
             className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-md text-xs font-black text-white"
-            style={{ backgroundColor: active ? '#10b981' : subject.color }}
+            style={{ backgroundColor: active ? '#5fcfa6' : subject.color }}
           >
             {String(index + 1).padStart(2, '0')}
           </span>
@@ -111,19 +111,19 @@ function TeacherCard({ active, index, onSelect, subject, teacher }) {
               <span
                 className={cn(
                   'rounded-md px-2 py-1 text-[11px] font-black uppercase leading-none',
-                  active ? 'bg-[#10b981]/12 text-[#047857]' : 'bg-slate-100 text-slate-500',
+                  active ? 'bg-jade-400/15 text-jade-300' : 'bg-white/8 text-slate-300',
                 )}
               >
                 {active ? 'Đang xem' : subject.shortLabel}
               </span>
-              <span className="rounded-md bg-[#eef7f4] px-2 py-1 text-[11px] font-black uppercase leading-none text-[#0f766e]">
+              <span className="rounded-md bg-white/6 px-2 py-1 text-[11px] font-black uppercase leading-none text-jade-300">
                 Sheet riêng
               </span>
             </span>
-            <span className="mt-1.5 line-clamp-1 block text-[14px] font-black leading-snug text-[#07384a] sm:text-[15px]">
+            <span className="mt-1.5 line-clamp-1 block text-[14px] font-black leading-snug text-white sm:text-[15px]">
               {mainTitle}
             </span>
-            {detail && <span className="mt-1 line-clamp-1 block text-xs font-semibold leading-5 text-slate-500">{detail}</span>}
+            {detail && <span className="mt-1 line-clamp-1 block text-xs font-semibold leading-5 text-slate-400">{detail}</span>}
           </span>
         </div>
       </button>
@@ -133,8 +133,8 @@ function TeacherCard({ active, index, onSelect, subject, teacher }) {
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
-          'inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md border px-2.5 text-xs font-black text-[#07384a] transition-all hover:-translate-y-0.5 hover:border-[#10b981] hover:bg-[#ecfdf5] active:scale-[0.98] sm:self-start',
-          active ? 'border-[#10b981]/60 bg-[#ecfdf5]' : 'border-[#d7e5e9] bg-white',
+          'inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md border px-2.5 text-xs font-black text-slate-200 transition-all hover:-translate-y-0.5 hover:border-jade-400 hover:bg-jade-400/10 hover:text-jade-200 active:scale-[0.98] sm:self-start',
+          active ? 'border-jade-400/60 bg-jade-400/10' : 'border-white/10 bg-white/5',
           focusRing,
         )}
       >
@@ -256,25 +256,25 @@ export default function OnlineLearning() {
 
   if (loading && !user) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-[#eaf3f6] text-[#07384a]">
-        <span className="material-symbols-outlined animate-spin text-3xl text-[#10b981]">progress_activity</span>
+      <div className="flex min-h-[60vh] items-center justify-center bg-ink-950 text-white">
+        <span className="material-symbols-outlined animate-spin text-3xl text-jade-400">progress_activity</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#eaf3f6_0%,#f7fbfa_46%,#eef6f4_100%)] pb-24 font-display text-[#07384a] xl:flex xl:h-dvh xl:flex-col xl:overflow-hidden xl:pb-0">
-      <header className="sticky top-[calc(3rem+env(safe-area-inset-top,0px))] z-30 shrink-0 border-b border-white/70 bg-[#eaf3f6]/92 px-4 py-3 shadow-[0_10px_30px_rgba(38,70,83,0.08)] backdrop-blur-xl md:top-0 xl:py-2 sm:px-6">
+    <div className="min-h-screen bg-[radial-gradient(70%_45%_at_82%_-8%,rgba(95,207,166,0.1),transparent_60%),radial-gradient(48%_38%_at_-2%_2%,rgba(227,100,136,0.07),transparent_55%)] bg-ink-950 pb-24 font-display text-slate-100 xl:flex xl:h-dvh xl:flex-col xl:overflow-hidden xl:pb-0">
+      <header className="sticky top-[calc(3rem+env(safe-area-inset-top,0px))] z-30 shrink-0 border-b border-white/8 bg-ink-900/85 px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.3)] backdrop-blur-xl md:top-0 xl:py-2 sm:px-6">
         <div className="mx-auto max-w-[1760px]">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex min-w-0 items-start gap-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[#07384a] text-white shadow-[0_14px_30px_rgba(7,56,74,0.18)] xl:h-10 xl:w-10">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-jade-400/15 text-jade-300 ring-1 ring-jade-400/25 xl:h-10 xl:w-10">
                 <span className="material-symbols-outlined text-[24px] leading-none">school</span>
               </span>
               <div className="min-w-0">
-                <p className="text-[11px] font-black uppercase text-[#10b981]">Học online</p>
-                <h1 className="text-xl font-black leading-tight text-[#07384a] xl:text-[22px] sm:text-2xl">{ONLINE_SHEET_TITLE}</h1>
-                <p className="mt-1 text-sm font-semibold text-slate-600">
+                <p className="font-arena text-[11px] font-bold uppercase tracking-[0.24em] text-jade-300">Học online</p>
+                <h1 className="font-arena text-xl font-extrabold leading-tight text-white xl:text-[22px] sm:text-2xl">{ONLINE_SHEET_TITLE}</h1>
+                <p className="mt-1 text-sm font-semibold text-slate-400">
                   {ONLINE_SUBJECTS.length} môn · {ONLINE_TEACHER_COUNT} sheet giáo viên
                 </p>
               </div>
@@ -286,7 +286,7 @@ export default function OnlineLearning() {
                 onClick={refreshIframe}
                 disabled={!activeTeacher}
                 className={cn(
-                  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-[#10b981]/45 bg-[#10b981]/12 px-4 text-sm font-black text-[#047857] transition-all hover:-translate-y-0.5 hover:bg-[#10b981]/18 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50',
+                  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-jade-400/40 bg-jade-400/12 px-4 text-sm font-black text-jade-200 transition-all hover:-translate-y-0.5 hover:bg-jade-400/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50',
                   focusRing,
                 )}
               >
@@ -300,7 +300,7 @@ export default function OnlineLearning() {
                 rel="noopener noreferrer"
                 aria-disabled={!activeTeacher}
                 className={cn(
-                  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-[#07384a] px-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(7,56,74,0.18)] transition-all hover:-translate-y-0.5 hover:bg-[#0a4b62] active:scale-[0.98]',
+                  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-jade-500 px-4 text-sm font-black text-ink-950 shadow-lg shadow-jade-500/20 transition-all hover:-translate-y-0.5 hover:bg-jade-400 active:scale-[0.98]',
                   !activeTeacher && 'pointer-events-none opacity-50',
                   focusRing,
                 )}
@@ -312,7 +312,7 @@ export default function OnlineLearning() {
           </div>
 
           {!googleLinked && (
-            <div className="mt-3 grid gap-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-3 text-sm text-amber-950 shadow-[0_12px_28px_rgba(180,83,9,0.08)] md:grid-cols-[1fr_auto] md:items-center">
+            <div className="mt-3 grid gap-3 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-3 text-sm text-amber-100 shadow-[0_12px_28px_rgba(0,0,0,0.2)] md:grid-cols-[1fr_auto] md:items-center">
               <span className="font-semibold leading-6">
                 Tài khoản hiện tại chưa liên kết Google. Sheet private cần đúng email đã được cấp quyền.
               </span>
@@ -320,7 +320,7 @@ export default function OnlineLearning() {
                 type="button"
                 onClick={handleGoogleLogin}
                 className={cn(
-                  'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-md bg-amber-500 px-3 text-sm font-black text-white transition-all hover:-translate-y-0.5 hover:bg-amber-600 active:scale-[0.98]',
+                  'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-md bg-amber-500 px-3 text-sm font-black text-ink-950 transition-all hover:-translate-y-0.5 hover:bg-amber-400 active:scale-[0.98]',
                   focusRing,
                 )}
               >
@@ -342,10 +342,10 @@ export default function OnlineLearning() {
           <aside className="xl:flex xl:min-h-0 xl:flex-col xl:self-stretch">
             <div className="mb-3 flex items-end justify-between gap-3 px-1">
               <div>
-                <h2 className="text-lg font-black leading-tight text-[#07384a]">Chọn môn</h2>
-                <p className="mt-1 text-xs font-bold text-slate-500">Môn đang chọn: {activeSubject.shortLabel}</p>
+                <h2 className="font-arena text-lg font-extrabold leading-tight text-white">Chọn môn</h2>
+                <p className="mt-1 text-xs font-bold text-slate-400">Môn đang chọn: {activeSubject.shortLabel}</p>
               </div>
-              <span className="rounded-md bg-white px-2.5 py-1 text-xs font-black text-slate-500 shadow-[0_10px_20px_rgba(38,70,83,0.06)]">
+              <span className="rounded-md bg-white/8 px-2.5 py-1 text-xs font-black text-slate-300">
                 {ONLINE_SUBJECTS.length}
               </span>
             </div>
@@ -367,20 +367,20 @@ export default function OnlineLearning() {
         <section className="min-w-0 xl:h-full xl:min-h-0">
           {!activeSubject ? (
             <section
-              className="rounded-lg border border-[#d7e5e9] bg-white/90 p-4 shadow-[0_22px_60px_rgba(38,70,83,0.08)] xl:flex xl:h-full xl:min-h-0 xl:flex-col"
+              className="rounded-lg border border-white/10 bg-white/[0.03] p-4 shadow-[0_22px_60px_rgba(0,0,0,0.28)] xl:flex xl:h-full xl:min-h-0 xl:flex-col"
               aria-labelledby="subject-picker-title"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="text-xs font-black uppercase text-[#10b981]">Bước 1</p>
-                  <h2 id="subject-picker-title" className="mt-1 text-2xl font-black leading-tight text-[#07384a]">
+                  <p className="font-arena text-xs font-bold uppercase tracking-[0.24em] text-jade-300">Bước 1</p>
+                  <h2 id="subject-picker-title" className="font-arena mt-1 text-2xl font-extrabold leading-tight text-white">
                     Chọn môn học
                   </h2>
-                  <p className="mt-1 text-sm font-semibold text-slate-500">
+                  <p className="mt-1 text-sm font-semibold text-slate-400">
                     Chọn môn trước, sau đó chọn giáo viên để mở sheet học.
                   </p>
                 </div>
-                <span className="inline-flex h-9 items-center rounded-md bg-[#eef7f4] px-3 text-sm font-black text-[#0f766e]">
+                <span className="inline-flex h-9 items-center rounded-md bg-jade-400/12 px-3 text-sm font-black text-jade-300">
                   {ONLINE_SUBJECTS.length} môn
                 </span>
               </div>
@@ -398,20 +398,20 @@ export default function OnlineLearning() {
             </section>
           ) : activeTeacher ? (
             <section
-              className="min-w-0 rounded-lg border border-[#d7e5e9] bg-[#07384a] shadow-[0_24px_60px_rgba(7,56,74,0.18)] xl:flex xl:h-full xl:min-h-0 xl:flex-col"
+              className="min-w-0 rounded-lg border border-white/10 bg-ink-900 shadow-[0_24px_60px_rgba(0,0,0,0.35)] xl:flex xl:h-full xl:min-h-0 xl:flex-col"
               aria-labelledby="sheet-preview-title"
             >
               <div className="grid shrink-0 gap-3 border-b border-white/10 p-2.5 text-white lg:grid-cols-[1fr_auto] lg:items-center">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-md bg-white/10 px-2 py-1 text-[11px] font-black uppercase text-[#9ee8cc]">
+                    <span className="rounded-md bg-jade-400/12 px-2 py-1 text-[11px] font-black uppercase text-jade-300">
                       {activeSubject.label}
                     </span>
                     <span className="rounded-md bg-white/10 px-2 py-1 text-[11px] font-black uppercase text-white/70">
                       Đang xem sheet
                     </span>
                   </div>
-                  <h2 id="sheet-preview-title" className="mt-1 truncate text-lg font-black leading-tight xl:text-xl">
+                  <h2 id="sheet-preview-title" className="font-arena mt-1 truncate text-lg font-extrabold leading-tight xl:text-xl">
                     {splitTeacherTitle(activeTeacher.title).mainTitle}
                   </h2>
                   <p className="mt-0.5 line-clamp-1 text-sm font-semibold leading-5 text-white/68">
@@ -458,7 +458,7 @@ export default function OnlineLearning() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      'inline-flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-xs font-black text-[#07384a] transition-all hover:-translate-y-0.5 active:scale-[0.98]',
+                      'inline-flex h-10 items-center justify-center gap-1.5 rounded-md bg-jade-500 px-3 text-xs font-black text-ink-950 transition-all hover:-translate-y-0.5 hover:bg-jade-400 active:scale-[0.98]',
                       focusRing,
                     )}
                   >
@@ -468,14 +468,14 @@ export default function OnlineLearning() {
                 </div>
               </div>
 
-              <div className="relative min-h-[620px] overflow-hidden rounded-b-lg bg-white xl:min-h-0 xl:flex-1">
+              <div className="relative min-h-[620px] overflow-hidden rounded-b-lg bg-ink-900 xl:min-h-0 xl:flex-1">
                 {iframeLoading && (
-                  <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/94 px-4">
-                    <div className="max-w-sm rounded-lg border border-[#d7e5e9] bg-white px-4 py-4 text-center shadow-[0_20px_54px_rgba(38,70,83,0.14)]">
-                      <span className="material-symbols-outlined animate-spin text-3xl text-[#10b981]">progress_activity</span>
-                      <p className="mt-2 text-sm font-black text-[#07384a]">Đang tải sheet giáo viên</p>
+                  <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-ink-950/85 px-4">
+                    <div className="max-w-sm rounded-lg border border-white/10 bg-ink-900 px-4 py-4 text-center shadow-[0_20px_54px_rgba(0,0,0,0.4)]">
+                      <span className="material-symbols-outlined animate-spin text-3xl text-jade-400">progress_activity</span>
+                      <p className="mt-2 text-sm font-black text-white">Đang tải sheet giáo viên</p>
                       {iframeTimedOut && (
-                        <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">
+                        <p className="mt-2 text-xs font-semibold leading-5 text-slate-400">
                           Nếu Google chặn xem trước, dùng nút mở sheet để vào trực tiếp.
                         </p>
                       )}
@@ -498,21 +498,21 @@ export default function OnlineLearning() {
             </section>
           ) : (
             <section className="xl:flex xl:h-full xl:min-h-0 xl:flex-col" aria-labelledby="teacher-list-title">
-              <div className="rounded-lg border border-[#d7e5e9] bg-white p-3 shadow-[0_18px_48px_rgba(38,70,83,0.08)]">
+              <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
                 <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end">
                   <div>
-                    <p className="text-xs font-black uppercase text-[#10b981]">Bước 2 · {activeSubject.label}</p>
-                    <h2 id="teacher-list-title" className="mt-1 text-xl font-black leading-tight text-[#07384a]">
+                    <p className="font-arena text-xs font-bold uppercase tracking-[0.2em] text-jade-300">Bước 2 · {activeSubject.label}</p>
+                    <h2 id="teacher-list-title" className="font-arena mt-1 text-xl font-extrabold leading-tight text-white">
                       Chọn giáo viên
                     </h2>
-                    <p className="mt-1 text-sm font-semibold text-slate-500">
+                    <p className="mt-1 text-sm font-semibold text-slate-400">
                       Chọn một giáo viên để mở sheet học ở chế độ rộng.
                     </p>
                   </div>
 
                   <div className="grid gap-2 sm:grid-cols-[minmax(220px,320px)_auto]">
                     <label className="relative block w-full">
-                      <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[19px] text-slate-400">
+                      <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[19px] text-slate-500">
                         search
                       </span>
                       <input
@@ -520,7 +520,7 @@ export default function OnlineLearning() {
                         onChange={(event) => setTeacherSearch(event.target.value)}
                         placeholder="Tìm giáo viên"
                         className={cn(
-                          'h-10 w-full rounded-lg border border-[#d7e5e9] bg-[#f8fcfa] pl-10 pr-3 text-sm font-semibold text-[#07384a] outline-none transition focus:border-[#10b981] focus:bg-white',
+                          'h-10 w-full rounded-lg border border-white/10 bg-white/5 pl-10 pr-3 text-sm font-semibold text-white placeholder-slate-500 outline-none transition focus:border-jade-400 focus:bg-white/8',
                           focusRing,
                         )}
                       />
@@ -529,7 +529,7 @@ export default function OnlineLearning() {
                       type="button"
                       onClick={handleChangeSubject}
                       className={cn(
-                        'inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-[#d7e5e9] bg-white px-3 text-xs font-black text-[#07384a] transition-all hover:-translate-y-0.5 hover:border-[#10b981] hover:bg-[#ecfdf5] active:scale-[0.98]',
+                        'inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 text-xs font-black text-slate-200 transition-all hover:-translate-y-0.5 hover:border-jade-400 hover:bg-jade-400/10 hover:text-jade-200 active:scale-[0.98]',
                         focusRing,
                       )}
                     >
@@ -553,10 +553,10 @@ export default function OnlineLearning() {
                     />
                   ))
                 ) : (
-                  <div className="grid min-h-[260px] place-items-center rounded-lg border border-dashed border-[#b8cfd5] bg-white/70 px-5 py-8 text-center">
+                  <div className="grid min-h-[260px] place-items-center rounded-lg border border-dashed border-white/15 bg-white/[0.03] px-5 py-8 text-center">
                     <div>
-                      <span className="material-symbols-outlined text-3xl text-slate-400">manage_search</span>
-                      <p className="mt-2 text-sm font-bold text-slate-500">Không tìm thấy sheet phù hợp.</p>
+                      <span className="material-symbols-outlined text-3xl text-slate-500">manage_search</span>
+                      <p className="mt-2 text-sm font-bold text-slate-400">Không tìm thấy sheet phù hợp.</p>
                     </div>
                   </div>
                 )}

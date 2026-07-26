@@ -1,5 +1,44 @@
 @import "tailwindcss";
 
+/*
+  ═══════════ Design tokens — "Môn phái học tập" ═══════════
+  Bảng màu lấy từ chính thế giới của sản phẩm: nền plum-đen của một
+  đại sảnh về đêm, năng lượng "ember" hồng của thương hiệu, ánh "gold"
+  của huy hiệu/thứ bậc (Bang Chủ, Thống Soái…), sắc "jade" mượn từ logo,
+  và "violet" cho các bậc cao. Dùng cho UI mới; hex cũ vẫn chạy song song.
+*/
+@theme {
+  /* Nền — plum đen của đấu trường về đêm */
+  --color-ink-950: #120a0d;
+  --color-ink-900: #190e12;
+  --color-ink-850: #201216;
+  --color-ink-800: #2b1621;
+  --color-ink-700: #3a1f2c;
+
+  /* Ember — năng lượng chính (hồng thương hiệu) */
+  --color-ember-300: #f4a6bd;
+  --color-ember-400: #ec7c9c;
+  --color-ember-500: #e36488;
+  --color-ember-600: #cf4f74;
+
+  /* Gold — huy hiệu, thứ bậc, chiến thắng */
+  --color-gold-300: #f8d78a;
+  --color-gold-400: #f2c159;
+  --color-gold-500: #dda23a;
+
+  /* Jade — sắc dịu mượn từ logo, đối trọng với ember */
+  --color-jade-300: #9fe6cd;
+  --color-jade-400: #5fcfa6;
+  --color-jade-500: #33b488;
+
+  /* Violet — các bậc cao / chiều sâu */
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+
+  /* Display face cho tiêu đề kiểu "đấu trường" */
+  --font-arena: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
 @layer base {
   :root {
     --app-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -49,6 +88,11 @@
 @layer utilities {
   .font-display {
     font-family: var(--app-font-sans);
+  }
+  /* Display face cho tiêu đề "đấu trường" — tách khỏi body để tạo tương phản */
+  .font-arena {
+    font-family: var(--font-arena);
+    letter-spacing: -0.01em;
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -182,4 +226,76 @@
 
 .animate-in.zoom-in-95 {
   animation-name: dialogScaleIn;
+}
+
+/*
+  ═══════════ Arena signature ═══════════
+  Điểm nhấn duy nhất của trang chủ: dải sáng quét ngang tiêu đề hero
+  (như đèn rọi sân đấu) + viền huy hiệu thứ bậc. Giữ tiết chế, mọi thứ
+  quanh nó im lặng. Tôn trọng prefers-reduced-motion.
+*/
+@keyframes arenaSweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes emberPulse {
+  0%, 100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Dải sáng quét qua tiêu đề hero */
+.arena-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.arena-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(248, 215, 138, 0.14),
+    rgba(227, 100, 136, 0.1),
+    transparent
+  );
+  transform: translateX(-120%);
+  animation: arenaSweep 5.5s ease-in-out 1.2s infinite;
+  pointer-events: none;
+}
+
+/* Huy hiệu thứ bậc — khung bát giác cho icon công cụ/rank */
+.rank-seal {
+  clip-path: polygon(
+    30% 0%, 70% 0%, 100% 30%, 100% 70%,
+    70% 100%, 30% 100%, 0% 70%, 0% 30%
+  );
+}
+
+.ember-pulse {
+  animation: emberPulse 3.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arena-sweep::after,
+  .ember-pulse,
+  .animate-page-in,
+  .animate-dialog-in {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }
