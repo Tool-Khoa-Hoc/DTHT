@@ -18,7 +18,8 @@ const fetcherProfile = async (userId) => {
     .select(`
       id, display_name, avatar_url, role, university,
       user_mode, target_gpa, target_thpt, target_dgnl, current_gpa,
-      admission_scores
+      admission_scores, is_approved_bang_chu,
+      exp, study_seconds, study_streak, last_study_date
     `)
     .eq('id', userId)
     .single();

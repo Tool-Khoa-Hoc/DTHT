@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { getUserRank } from '../utils/rankHelper';
+import { getLevelFromExp, getLevelAccent, formatStudyTime } from '../utils/levelHelper';
 import Avatar from '../components/Avatar';
 
 export default function Profile() {
@@ -260,6 +261,56 @@ export default function Profile() {
                                             <p className="text-sm text-center font-bold opacity-80">Bạn đã đạt cảnh giới tối cao! 👑</p>
                                         </div>
                                     )}
+                                </div>
+                            );
+                        })()}
+
+                        {/* Level / Công Lực Card — earned by studying online */}
+                        {(() => {
+                            const lvl = getLevelFromExp(profile?.exp || 0);
+                            const accent = getLevelAccent(lvl.level);
+                            const streak = profile?.study_streak || 0;
+                            return (
+                                <div className="mt-4 p-4 rounded-2xl border border-white/10 bg-white/[0.04] md:min-w-[320px] max-w-sm mx-auto shadow-lg relative overflow-hidden">
+                                    <span
+                                        className="pointer-events-none absolute -right-5 -top-5 material-symbols-outlined text-8xl opacity-10 -rotate-12"
+                                        style={{ color: `rgb(${accent.glow})` }}
+                                    >
+                                        bolt
+                                    </span>
+                                    <div className="flex items-center gap-3.5 relative z-10">
+                                        <div className={`rank-seal w-14 h-14 flex items-center justify-center bg-white/10 ring-1 ${accent.ring}`}>
+                                            <span className={`font-arena text-2xl font-black ${accent.text}`}>{lvl.level}</span>
+                                        </div>
+                                        <div className="text-left flex-1">
+                                            <p className="text-[10px] uppercase tracking-[0.24em] font-black text-gold-300/80 mb-0.5">Cấp độ · Công lực</p>
+                                            <h3 className={`font-arena text-xl font-extrabold ${accent.text} uppercase tracking-wide drop-shadow-sm`}>
+                                                Cấp {lvl.level}
+                                            </h3>
+                                        </div>
+                                        {streak > 0 && (
+                                            <div className="flex flex-col items-center text-amber-300" title={`Chuỗi ${streak} ngày học liên tiếp`}>
+                                                <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
+                                                <span className="text-xs font-black leading-none">{streak}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="mt-4 pt-4 border-t border-white/10">
+                                        <div className="flex justify-between items-end mb-1.5">
+                                            <span className="text-xs font-bold text-slate-400">Tiến trình lên Cấp {lvl.level + 1}</span>
+                                            <span className="text-sm font-black text-slate-200">{lvl.expIntoLevel.toLocaleString('vi-VN')} / {lvl.expForThisLevel.toLocaleString('vi-VN')}</span>
+                                        </div>
+                                        <div className="w-full h-2 rounded-full overflow-hidden bg-black/30 border border-white/10">
+                                            <div
+                                                className={`h-full bg-gradient-to-r ${accent.bar} transition-all duration-1000 ease-out rounded-full`}
+                                                style={{ width: `${lvl.progressPct}%` }}
+                                            />
+                                        </div>
+                                        <p className="text-xs text-center mt-2.5 text-slate-500 font-medium">
+                                            Đã học tổng cộng {formatStudyTime(profile?.study_seconds || 0)} · học online để tăng công lực
+                                        </p>
+                                    </div>
                                 </div>
                             );
                         })()}

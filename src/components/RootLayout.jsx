@@ -6,6 +6,7 @@ import OptimizedImage from './ui/OptimizedImage';
 import { PageSkeleton } from './ui/Skeleton';
 import { preloadRouteModule } from '../lib/routeModules';
 import { getUserRank } from '../utils/rankHelper';
+import { getLevelFromExp, getLevelAccent } from '../utils/levelHelper';
 
 const BOTTOM_TABS = [
   { path: '/home', icon: 'home', label: 'Trang chủ' },
@@ -42,6 +43,8 @@ export default function RootLayout() {
   const rank = getUserRank(0, profile?.role, profile?.is_approved_bang_chu);
   const isTitledRole = ['admin', 'collaborator', 'editor'].includes(profile?.role);
   const roleLabel = isTitledRole ? rank.name : 'Học viên';
+  const levelInfo = getLevelFromExp(profile?.exp || 0);
+  const levelAccent = getLevelAccent(levelInfo.level);
 
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => {
@@ -222,9 +225,12 @@ export default function RootLayout() {
               <span className="truncate text-sm font-semibold">
                 {profile?.display_name || user?.user_metadata?.full_name || 'Cá nhân'}
               </span>
-              <span className="flex items-center gap-1 truncate text-[11px] font-medium text-gold-300/90">
+              <span className="flex items-center gap-1.5 truncate text-[11px] font-medium text-gold-300/90">
                 <span className="material-symbols-outlined text-[13px]">{rank.icon}</span>
-                {roleLabel}
+                <span className="truncate">{roleLabel}</span>
+                <span className={`ml-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-black leading-none bg-white/8 ring-1 ${levelAccent.ring} ${levelAccent.text}`}>
+                  Cấp {levelInfo.level}
+                </span>
               </span>
             </div>
           </Link>

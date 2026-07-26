@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { useStudyTracker } from '../hooks/useStudyTracker';
+import { getLevelAccent, formatStudyTime } from '../utils/levelHelper';
 import {
   ONLINE_SHEET_TITLE,
   ONLINE_SUBJECTS,
@@ -146,7 +148,7 @@ function TeacherCard({ active, index, onSelect, subject, teacher }) {
 }
 
 export default function OnlineLearning() {
-  const { user, loading } = useAuth();
+  const { user, loading, profile, refreshProfile } = useAuth();
 
   const [activeSubjectId, setActiveSubjectId] = useState('');
   const [activeTeacherKey, setActiveTeacherKey] = useState('');
@@ -177,6 +179,24 @@ export default function OnlineLearning() {
   const activeTeacher = activeTeacherEntry?.teacher ?? null;
   const openSheetUrl = activeTeacher ? buildSheetOpenUrl(activeTeacher) : '#';
   const embedSheetUrl = activeTeacher ? buildSheetEmbedUrl(activeTeacher, refreshToken) : '';
+
+  // EXP accrues only while an actual lesson sheet is open.
+  const study = useStudyTracker({
+    enabled: Boolean(user && activeTeacher),
+    initialExp: profile?.exp,
+    initialStudySeconds: profile?.study_seconds,
+    initialStreak: profile?.study_streak,
+    onSync: refreshProfile,
+  });
+  const { levelInfo, streak, studySeconds, isAccruing, flash, clearFlash } = study;
+  const levelAccent = getLevelAccent(levelInfo.level);
+
+  // Auto-dismiss the reward toast a few seconds after it appears.
+  useEffect(() => {
+    if (!flash) return undefined;
+    const timeoutId = window.setTimeout(clearFlash, 3600);
+    return () => window.clearTimeout(timeoutId);
+  }, [flash, clearFlash]);
 
   const filteredTeacherEntries = useMemo(() => {
     if (!activeSubject) return [];
@@ -310,6 +330,61 @@ export default function OnlineLearning() {
               </a>
             </div>
           </div>
+
+          {user && (
+            <div
+              className="mt-3 flex items-center gap-3 rounded-lg border border-white/8 bg-white/[0.03] px-3 py-2.5 shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
+              title="Học online để tích Công Lực và thăng Cấp độ. 10 công lực mỗi phút học."
+            >
+              <div className={cn('rank-seal grid h-11 w-11 shrink-0 place-items-center bg-white/8 ring-1', levelAccent.ring)}>
+                <span className={cn('font-arena text-base font-black leading-none', levelAccent.text)}>{levelInfo.level}</span>
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-arena text-[11px] font-bold uppercase tracking-[0.16em] text-gold-300/85">
+                    Cấp {levelInfo.level} · Công lực
+                  </span>
+                  <span className="text-[11px] font-black text-slate-300">
+                    {levelInfo.expIntoLevel.toLocaleString('vi-VN')}
+                    <span className="text-slate-500"> / {levelInfo.expForThisLevel.toLocaleString('vi-VN')}</span>
+                  </span>
+                </div>
+                <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-black/35 ring-1 ring-white/10">
+                  <div
+                    className={cn('h-full rounded-full bg-gradient-to-r transition-all duration-700 ease-out', levelAccent.bar)}
+                    style={{ width: `${levelInfo.progressPct}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="hidden items-center gap-1.5 text-slate-400 sm:flex" title="Tổng thời gian đã học">
+                <span className="material-symbols-outlined text-[18px]">schedule</span>
+                <span className="text-xs font-black text-slate-300">{formatStudyTime(studySeconds)}</span>
+              </div>
+
+              {streak > 0 && (
+                <div className="flex items-center gap-1 text-amber-300" title={`Chuỗi ${streak} ngày học liên tiếp`}>
+                  <span className="material-symbols-outlined text-[19px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    local_fire_department
+                  </span>
+                  <span className="text-sm font-black">{streak}</span>
+                </div>
+              )}
+
+              <div
+                className={cn(
+                  'flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[11px] font-black uppercase tracking-wide transition-colors',
+                  isAccruing ? 'bg-jade-400/15 text-jade-200' : 'bg-white/5 text-slate-500',
+                )}
+              >
+                <span className={cn('material-symbols-outlined text-[15px]', isAccruing && 'animate-pulse')}>
+                  {isAccruing ? 'bolt' : 'pause_circle'}
+                </span>
+                <span>{isAccruing ? 'Đang tích' : 'Tạm dừng'}</span>
+              </div>
+            </div>
+          )}
 
           {!googleLinked && (
             <div className="mt-3 grid gap-3 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-3 text-sm text-amber-100 shadow-[0_12px_28px_rgba(0,0,0,0.2)] md:grid-cols-[1fr_auto] md:items-center">
@@ -565,6 +640,34 @@ export default function OnlineLearning() {
           )}
         </section>
       </main>
+
+      {flash && (
+        <div
+          key={flash.id}
+          className="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 px-4 xl:bottom-8"
+          role="status"
+          aria-live="polite"
+        >
+          {flash.type === 'levelup' ? (
+            <div className="flex items-center gap-3 rounded-2xl border border-gold-400/50 bg-ink-900/95 px-5 py-3.5 shadow-[0_24px_60px_rgba(0,0,0,0.55)] backdrop-blur ember-pulse">
+              <span className="rank-seal grid h-11 w-11 place-items-center bg-gold-400/15 ring-1 ring-gold-400/50 text-gold-300">
+                <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  military_tech
+                </span>
+              </span>
+              <div className="text-left">
+                <p className="font-arena text-[11px] font-bold uppercase tracking-[0.2em] text-gold-300/85">Thăng cấp!</p>
+                <p className="font-arena text-lg font-extrabold leading-tight text-white">Đạt Cấp {flash.level}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 rounded-xl border border-jade-400/40 bg-ink-900/95 px-4 py-2.5 shadow-[0_18px_44px_rgba(0,0,0,0.5)] backdrop-blur">
+              <span className="material-symbols-outlined text-[19px] text-jade-300">bolt</span>
+              <span className="font-arena text-sm font-black text-white">+{flash.amount} công lực</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
