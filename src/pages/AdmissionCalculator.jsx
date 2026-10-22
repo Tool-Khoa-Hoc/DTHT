@@ -1,476 +1,793 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { EXAMS, REGION_PRIORITY, CATEGORY_PRIORITY } from '../lib/admission/exams';
+import { migrateLegacyScores, validateScoreInput } from '../lib/admission/scores';
+import { priorityApplied } from '../lib/admission/predict';
 
-// ==================== TABS CONFIG ====================
-const TABS = [
-  { id: 'hsa',  label: 'HSA',  full: 'ĐGNL ĐHQG HCM', color: '#e36488' },
-  { id: 'vact', label: 'VACT', full: 'ĐGNL ĐHQG HN',   color: '#8b5cf6' },
-  { id: 'tsa',  label: 'TSA',  full: 'ĐGTD Bách Khoa', color: '#306ee8' },
-  { id: 'bca',  label: 'BCA',  full: 'ĐGNL Bộ Công An', color: '#10b981' },
+// Trang nhập điểm hợp nhất — thay bản cũ từng đảo nhãn HSA/V-ACT và dùng sai
+// thang 1200 cho cả hai. Mọi nhãn/thang lấy từ registry src/lib/admission/exams.js:
+//   HSA = ĐHQG Hà Nội, thang 150 · V-ACT = ĐHQG TP.HCM, thang 1200
+//   TSA = thang 100 · BCA = thang 100
+// Điểm lưu vào profiles.admission_scores dạng v2 (scores.js), merge sâu giữ
+// nguyên các key khác; pattern ref chống ghi đè stale như GPACalculator.
+
+const DRAFT_KEY = 'admission_scores_v2';
+const ENTRY_EXAMS = ['thpt', 'hocba', 'hsa', 'vact', 'tsa', 'spt', 'hsca', 'bca', 'vsat'];
+const PART_EXAMS = ['hsa', 'vact', 'tsa', 'bca'];
+const TRIO_EXAMS = ['spt', 'hsca']; // điểm từng môn thang 10, tổng tổ hợp thang 30
+
+const SUBJECTS = [
+  { key: 'toan', label: 'Toán' },
+  { key: 'van', label: 'Ngữ văn' },
+  { key: 'ly', label: 'Vật lí' },
+  { key: 'hoa', label: 'Hoá học' },
+  { key: 'sinh', label: 'Sinh học' },
+  { key: 'su', label: 'Lịch sử' },
+  { key: 'dia', label: 'Địa lí' },
+  { key: 'anh', label: 'Tiếng Anh' },
+  { key: 'gdkp', label: 'GDKT & Pháp luật' },
 ];
 
-// ==================== HSA CALCULATOR ====================
-// Đánh giá năng lực ĐHQG HCM (HSA) - Thang 1200 điểm
-// Phần 1: Ngôn ngữ (TV 300 + EN 300 = 600), P2: Toán 300, P3: Tư duy KH 300
-function HSACalculator() {
-  const { user, profile, refreshProfile } = useAuth();
-  const [tv, setTv] = useState('');
-  const [en, setEn] = useState('');
-  const [toan, setToan] = useState('');
-  const [kh, setKh] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
+// Map tên môn v1 (GPACalculator lưu tên tiếng Việt) -> key chuẩn
+const SUBJECT_ALIASES = {
+  toan: 'toan', 'ngu van': 'van', van: 'van', 'vat li': 'ly', 'vat ly': 'ly', ly: 'ly',
+  'hoa hoc': 'hoa', hoa: 'hoa', 'sinh hoc': 'sinh', sinh: 'sinh', 'lich su': 'su', su: 'su',
+  'dia li': 'dia', 'dia ly': 'dia', dia: 'dia', 'tieng anh': 'anh', anh: 'anh',
+  'giao duc kinh te va phap luat': 'gdkp', gdkp: 'gdkp', gdcd: 'gdkp',
+};
 
-  useEffect(() => {
-    if (profile?.admission_scores?.hsa) {
-      const d = profile.admission_scores.hsa;
-      if (d.tv) setTv(d.tv);
-      if (d.en) setEn(d.en);
-      if (d.toan) setToan(d.toan);
-      if (d.kh) setKh(d.kh);
-    }
-  }, [profile]);
+const COMBOS = {
+  A00: ['toan', 'ly', 'hoa'],
+  A01: ['toan', 'ly', 'anh'],
+  A02: ['toan', 'ly', 'sinh'],
+  B00: ['toan', 'hoa', 'sinh'],
+  C00: ['van', 'su', 'dia'],
+  D01: ['toan', 'van', 'anh'],
+  D07: ['toan', 'hoa', 'anh'],
+  K01: ['toan', 'van', 'ly'],
+};
 
-  const total = (parseFloat(tv) || 0) + (parseFloat(en) || 0) + (parseFloat(toan) || 0) + (parseFloat(kh) || 0);
-  const quyDoi30 = ((total / 1200) * 30).toFixed(2);
+const PART_LABELS = {
+  hsa: { dinh_luong: 'Định lượng', dinh_tinh: 'Định tính', khoa_hoc: 'Khoa học' },
+  vact: { ngon_ngu: 'Sử dụng ngôn ngữ', toan: 'Toán học', tu_duy_kh: 'Tư duy khoa học' },
+  tsa: { toan: 'Tư duy Toán học', doc_hieu: 'Tư duy Đọc hiểu', khoa_hoc: 'Tư duy Khoa học & GQVĐ' },
+  bca: {
+    tu_luan: 'Nghị luận xã hội (tự luận)', toan: 'Toán trắc nghiệm', lich_su: 'Lịch sử',
+    ngoai_ngu: 'Ngoại ngữ', tu_chon: 'Môn tự chọn (Lý / Hoá / Sinh / Địa)',
+  },
+};
 
-  const handleSave = async () => {
-    if (!user) { setMessage({ type: 'error', text: 'Đăng nhập để lưu.' }); return; }
-    setIsSaving(true);
-    setMessage({ type: '', text: '' });
-    try {
-      const currentScores = profile?.admission_scores || {};
-      const data = { tv, en, toan, kh, total, quyDoi: quyDoi30, savedAt: new Date().toISOString() };
-      const { error } = await supabase.from('profiles').update({
-        admission_scores: { ...currentScores, hsa: data }
-      }).eq('id', user.id);
-      if (error) throw error;
-      await refreshProfile?.();
-      setMessage({ type: 'success', text: 'Đã lưu điểm HSA!' });
-      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-    } catch (err) {
-      setMessage({ type: 'error', text: 'Lỗi: ' + err.message });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+const STATUS_OPTIONS = [
+  { value: 'actual', label: 'Điểm thật' },
+  { value: 'mock', label: 'Điểm thi thử' },
+  { value: 'target', label: 'Điểm mục tiêu (what-if)' },
+];
+const STATUS_LABEL = { actual: 'Điểm thật', mock: 'Thi thử', target: 'Mục tiêu', none: '—' };
 
-  return (
-    <div className="space-y-6">
-      <div className="bg-[#e36488]/10 border border-[#e36488]/20 rounded-xl p-4 text-sm text-slate-300 space-y-1">
-        <p className="font-bold text-[#e36488] text-base">Bài thi ĐGNL – ĐHQG TP.HCM (HSA)</p>
-        <p>📝 120 câu trắc nghiệm · Làm bài 150 phút</p>
-        <p>📊 Thang điểm: <b>1200 điểm</b> · Sử dụng IRT (trọng số theo độ khó)</p>
-        <p>💡 Điểm quy đổi hệ 30: <b>Điểm HSA × 30 / 1200</b></p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Tiếng Việt (0–300)" value={tv} onChange={setTv} max={300} color="#e36488" />
-        <Field label="Tiếng Anh (0–300)" value={en} onChange={setEn} max={300} color="#e36488" />
-        <Field label="Toán học (0–300)" value={toan} onChange={setToan} max={300} color="#e36488" />
-        <Field label="Tư duy KH (0–300)" value={kh} onChange={setKh} max={300} color="#e36488" />
-      </div>
-
-      <ScoreResult total={total} maxTotal={1200} quyDoi={quyDoi30} label="Tổng điểm HSA" color="#e36488" 
-        onSave={handleSave} isSaving={isSaving} message={message} />
-    </div>
-  );
+function normalizeText(str) {
+  if (!str) return '';
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 }
 
-// ==================== VACT CALCULATOR ====================
-// Đánh giá năng lực ĐHQG HN (VACT) - Thang 1200 điểm
-// TV 300 + EN 300 + Toán 300 + Tư duy KH 300
-function VACTCalculator() {
-  const { user, profile, refreshProfile } = useAuth();
-  const [tv, setTv] = useState('');
-  const [en, setEn] = useState('');
-  const [toan, setToan] = useState('');
-  const [kh, setKh] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
-
-  useEffect(() => {
-    if (profile?.admission_scores?.vact) {
-      const d = profile.admission_scores.vact;
-      if (d.tv) setTv(d.tv);
-      if (d.en) setEn(d.en);
-      if (d.toan) setToan(d.toan);
-      if (d.kh) setKh(d.kh);
-    }
-  }, [profile]);
-
-  const total = (parseFloat(tv) || 0) + (parseFloat(en) || 0) + (parseFloat(toan) || 0) + (parseFloat(kh) || 0);
-  const quyDoi30 = ((total / 1200) * 30).toFixed(2);
-
-  const handleSave = async () => {
-    if (!user) { setMessage({ type: 'error', text: 'Đăng nhập để lưu.' }); return; }
-    setIsSaving(true);
-    setMessage({ type: '', text: '' });
-    try {
-      const currentScores = profile?.admission_scores || {};
-      const data = { tv, en, toan, kh, total, quyDoi: quyDoi30, savedAt: new Date().toISOString() };
-      const { error } = await supabase.from('profiles').update({
-        admission_scores: { ...currentScores, vact: data }
-      }).eq('id', user.id);
-      if (error) throw error;
-      await refreshProfile?.();
-      setMessage({ type: 'success', text: 'Đã lưu điểm VACT!' });
-      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-    } catch (err) {
-      setMessage({ type: 'error', text: 'Lỗi: ' + err.message });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-[#8b5cf6]/10 border border-[#8b5cf6]/20 rounded-xl p-4 text-sm text-slate-300 space-y-1">
-        <p className="font-bold text-[#8b5cf6] text-base">Bài thi ĐGNL – ĐHQG Hà Nội (VACT)</p>
-        <p>📝 120 câu trắc nghiệm · Làm bài 150 phút · Thi trên giấy</p>
-        <p>📊 Thang điểm: <b>1200 điểm</b> · Sử dụng IRT (trọng số theo độ khó)</p>
-        <p>💡 Điểm quy đổi hệ 30: <b>Điểm VACT × 30 / 1200</b></p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Tiếng Việt (0–300)" value={tv} onChange={setTv} max={300} color="#8b5cf6" />
-        <Field label="Tiếng Anh (0–300)" value={en} onChange={setEn} max={300} color="#8b5cf6" />
-        <Field label="Toán học (0–300)" value={toan} onChange={setToan} max={300} color="#8b5cf6" />
-        <Field label="Tư duy KH (0–300)" value={kh} onChange={setKh} max={300} color="#8b5cf6" />
-      </div>
-
-      <ScoreResult total={total} maxTotal={1200} quyDoi={quyDoi30} label="Tổng điểm VACT" color="#8b5cf6" 
-        onSave={handleSave} isSaving={isSaving} message={message} />
-    </div>
-  );
+function canonicalSubjects(subjects) {
+  const out = {};
+  for (const [k, v] of Object.entries(subjects || {})) {
+    const key = SUBJECT_ALIASES[normalizeText(k)] || k;
+    const n = parseFloat(v);
+    if (Number.isFinite(n)) out[key] = n;
+  }
+  return out;
 }
 
-// ==================== TSA CALCULATOR ====================
-// Đánh giá tư duy Bách Khoa HN (TSA) - Thang 100 điểm
-// Toán: 40đ, Đọc hiểu: 20đ, KHTN/GQVĐ: 40đ
-function TSACalculator() {
-  const { user, profile, refreshProfile } = useAuth();
-  const [toan, setToan] = useState('');
-  const [doc, setDoc] = useState('');
-  const [kh, setKh] = useState('');
-  const [uuTien, setUuTien] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
+const fmt = (n, digits = 2) =>
+  n == null || !Number.isFinite(Number(n))
+    ? '—'
+    : Number(n).toLocaleString('vi-VN', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 
-  useEffect(() => {
-    if (profile?.admission_scores?.tsa) {
-      const d = profile.admission_scores.tsa;
-      if (d.toan) setToan(d.toan);
-      if (d.doc) setDoc(d.doc);
-      if (d.kh) setKh(d.kh);
-      if (d.uuTien) setUuTien(d.uuTien);
-    }
-  }, [profile]);
-
-  const total = (parseFloat(toan) || 0) + (parseFloat(doc) || 0) + (parseFloat(kh) || 0);
-  const totalWithPriority = Math.min(total + (parseFloat(uuTien) || 0), 100);
-
-  const handleSave = async () => {
-    if (!user) { setMessage({ type: 'error', text: 'Đăng nhập để lưu.' }); return; }
-    setIsSaving(true);
-    setMessage({ type: '', text: '' });
-    try {
-      const currentScores = profile?.admission_scores || {};
-      const data = { toan, doc, kh, uuTien, total, totalWithPriority, savedAt: new Date().toISOString() };
-      const { error } = await supabase.from('profiles').update({
-        admission_scores: { ...currentScores, tsa: data }
-      }).eq('id', user.id);
-      if (error) throw error;
-      await refreshProfile?.();
-      setMessage({ type: 'success', text: 'Đã lưu điểm TSA!' });
-      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-    } catch (err) {
-      setMessage({ type: 'error', text: 'Lỗi: ' + err.message });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-[#306ee8]/10 border border-[#306ee8]/20 rounded-xl p-4 text-sm text-slate-300 space-y-1">
-        <p className="font-bold text-[#306ee8] text-base">Bài thi ĐGTD – Bách Khoa Hà Nội (TSA)</p>
-        <p>📝 Thi trên máy tính · 150 phút</p>
-        <p>📊 Thang điểm: <b>100 điểm</b></p>
-        <p>🔢 Toán: 40đ · Đọc hiểu: 20đ · KH/GQVĐ: 40đ</p>
-        <p>💡 Kết quả có giá trị sử dụng trong <b>2 năm</b></p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Tư duy Toán (0–40)" value={toan} onChange={setToan} max={40} color="#306ee8" />
-        <Field label="Tư duy Đọc hiểu (0–20)" value={doc} onChange={setDoc} max={20} color="#306ee8" />
-        <Field label="KH / Giải quyết VĐ (0–40)" value={kh} onChange={setKh} max={40} color="#306ee8" />
-        <Field label="Điểm ưu tiên (+)" value={uuTien} onChange={setUuTien} max={10} color="#64748b" />
-      </div>
-
-      <ScoreResult total={total} maxTotal={100} quyDoi={null} totalWithPriority={totalWithPriority} label="Tổng điểm TSA" color="#306ee8" 
-        onSave={handleSave} isSaving={isSaving} message={message} />
-    </div>
-  );
+function readLocalKeys() {
+  try {
+    return {
+      my_tsa: localStorage.getItem('my_tsa'),
+      my_hsa: localStorage.getItem('my_hsa'),
+      my_vact: localStorage.getItem('my_vact'),
+    };
+  } catch {
+    return {};
+  }
 }
 
-// ==================== BCA CALCULATOR ====================
-// Bài thi Đánh giá năng lực – Bộ Công An (BCA) - Thang 100 điểm
-// Tự luận 25 + Toán 35 + Sử 10 + NN 15 + Tự chọn 15 = 100
-// Công thức xét tuyển: ĐXT = (M1+M2+M3)*2/5 + BCA*3/5 + ĐC
-function BCACalculator() {
+function readDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.version === 2 ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+export default function AdmissionCalculator() {
+  const navigate = useNavigate();
   const { user, profile, refreshProfile } = useAuth();
-  const [tuLuan, setTuLuan] = useState('');
-  const [toan, setToan] = useState('');
-  const [lich, setLich] = useState('');
-  const [nn, setNn] = useState('');
-  const [tuChon, setTuChon] = useState('');
 
-  // For admission formula (Method 3)
-  const [m1, setM1] = useState('');
-  const [m2, setM2] = useState('');
-  const [m3, setM3] = useState('');
-  const [dc, setDc] = useState('');
+  const admissionScoresRef = useRef(null); // object admission_scores thô (chống stale khi merge)
+  const v2Ref = useRef(null); // hồ sơ v2 đã migrate
+  const hydratedForRef = useRef(null);
 
+  const [savedV2, setSavedV2] = useState(null);
+  const [selectedExam, setSelectedExam] = useState('thpt');
+  const [region, setRegion] = useState('KV3');
+  const [category, setCategory] = useState('NONE');
+  const [subjectsThpt, setSubjectsThpt] = useState({});
+  const [subjectsHb, setSubjectsHb] = useState({});
+  const [parts, setParts] = useState({}); // `${code}.${part}` -> string
+  const [totals, setTotals] = useState({}); // code -> string (tổng nhập trực tiếp / vsat)
+  const [trios, setTrios] = useState({}); // `${code}.${idx}` -> string (spt/hsca)
+  const [statuses, setStatuses] = useState({});
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
+  // --- Hydrate từ profile (Supabase) hoặc draft (khách) ---
   useEffect(() => {
-    if (profile?.admission_scores?.bca) {
-      const d = profile.admission_scores.bca;
-      if (d.tuLuan) setTuLuan(d.tuLuan);
-      if (d.toan) setToan(d.toan);
-      if (d.lich) setLich(d.lich);
-      if (d.nn) setNn(d.nn);
-      if (d.tuChon) setTuChon(d.tuChon);
-      if (d.m1) setM1(d.m1);
-      if (d.m2) setM2(d.m2);
-      if (d.m3) setM3(d.m3);
-      if (d.dc) setDc(d.dc);
+    const hydKey = user?.id || 'guest';
+    if (hydratedForRef.current === hydKey) return;
+    if (user && !profile) return; // chờ profile tải xong
+
+    const raw = profile?.admission_scores || null;
+    admissionScoresRef.current = raw || {};
+    const v2 = migrateLegacyScores(raw || readDraft() || {}, readLocalKeys());
+    v2Ref.current = v2;
+    setSavedV2(v2);
+    hydratedForRef.current = hydKey;
+
+    setRegion(v2.candidate?.region || 'KV3');
+    setCategory(v2.candidate?.category || 'NONE');
+
+    const hydrateSubjects = (entry, setter) => {
+      if (!entry) return;
+      const subs = canonicalSubjects(entry.subjects);
+      setter(Object.fromEntries(Object.entries(subs).map(([k, v]) => [k, String(v)])));
+    };
+    hydrateSubjects(v2.scores.thpt, setSubjectsThpt);
+    hydrateSubjects(v2.scores.hocba, setSubjectsHb);
+
+    const nextParts = {};
+    const nextTotals = {};
+    const nextTrios = {};
+    const nextStatuses = {};
+    for (const code of ENTRY_EXAMS) {
+      const entry = v2.scores[code];
+      if (!entry) continue;
+      nextStatuses[code] = entry.status || 'actual';
+      if (PART_EXAMS.includes(code)) {
+        for (const [pk, pv] of Object.entries(entry.parts || {})) {
+          if (pv != null) nextParts[`${code}.${pk}`] = String(pv);
+        }
+        if (entry.total != null) nextTotals[code] = String(entry.total);
+      } else if (TRIO_EXAMS.includes(code)) {
+        const trioParts = entry.parts || {};
+        ['mon_1', 'mon_2', 'mon_3'].forEach((pk, i) => {
+          if (trioParts[pk] != null) nextTrios[`${code}.${i}`] = String(trioParts[pk]);
+        });
+        if (entry.total != null) nextTotals[code] = String(entry.total);
+      } else if (code === 'vsat' && entry.total != null) {
+        nextTotals[code] = String(entry.total);
+      }
     }
-  }, [profile]);
+    setParts(nextParts);
+    setTotals(nextTotals);
+    setTrios(nextTrios);
+    setStatuses((prev) => ({ ...prev, ...nextStatuses }));
+  }, [user, profile]);
 
-  const bcaScore = (parseFloat(tuLuan) || 0) + (parseFloat(toan) || 0) + (parseFloat(lich) || 0) + (parseFloat(nn) || 0) + (parseFloat(tuChon) || 0);
-  
-  const sumThpt = (parseFloat(m1) || 0) + (parseFloat(m2) || 0) + (parseFloat(m3) || 0);
-  const admissionScore = (sumThpt * (2 / 5) + bcaScore * (3 / 5) + (parseFloat(dc) || 0)).toFixed(2);
+  const statusOf = (code) => statuses[code] || 'actual';
+  const setStatus = (code, v) => setStatuses((p) => ({ ...p, [code]: v }));
 
-  const handleSave = async () => {
-    if (!user) { setMessage({ type: 'error', text: 'Đăng nhập để lưu.' }); return; }
+  // --- Lưu ---
+  const persistV2 = async (nextV2) => {
+    v2Ref.current = nextV2;
+    const merged = { ...(admissionScoresRef.current || {}), ...nextV2 };
+    admissionScoresRef.current = merged;
+    if (user) {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ admission_scores: merged })
+        .eq('id', user.id);
+      if (error) throw error;
+      await refreshProfile?.();
+    } else {
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(nextV2));
+      } catch { /* bỏ qua nếu localStorage bị chặn */ }
+    }
+    setSavedV2(nextV2);
+  };
+
+  const saveEntry = async (code, entry) => {
     setIsSaving(true);
     setMessage({ type: '', text: '' });
     try {
-      const currentScores = profile?.admission_scores || {};
-      const data = { tuLuan, toan, lich, nn, tuChon, m1, m2, m3, dc, bcaScore, admissionScore, savedAt: new Date().toISOString() };
-      const { error } = await supabase.from('profiles').update({
-        admission_scores: { ...currentScores, bca: data }
-      }).eq('id', user.id);
-      if (error) throw error;
-      await refreshProfile?.();
-      setMessage({ type: 'success', text: 'Đã lưu điểm BCA!' });
-      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      const base = v2Ref.current || migrateLegacyScores({}, {});
+      const nextV2 = {
+        ...base,
+        version: 2,
+        candidate: { region, category },
+        scores: { ...(base.scores || {}), [code]: entry },
+      };
+      await persistV2(nextV2);
+      setMessage({ type: 'success', text: `Đã lưu điểm ${EXAMS[code].label}${user ? ' vào hồ sơ' : ' (nháp trên thiết bị này)'}!` });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3500);
     } catch (err) {
-      setMessage({ type: 'error', text: 'Lỗi: ' + err.message });
+      setMessage({ type: 'error', text: 'Lỗi khi lưu: ' + err.message });
     } finally {
       setIsSaving(false);
     }
   };
 
+  const saveCandidate = async () => {
+    setIsSaving(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const base = v2Ref.current || migrateLegacyScores({}, {});
+      await persistV2({ ...base, version: 2, candidate: { region, category } });
+      setMessage({ type: 'success', text: 'Đã lưu thông tin ưu tiên!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Lỗi khi lưu: ' + err.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // --- Builders (validate -> entry v2) ---
+  const buildSubjectsEntry = (subjectsState) => {
+    const subjects = {};
+    for (const [k, v] of Object.entries(subjectsState)) {
+      if (v === '' || v == null) continue;
+      const n = parseFloat(v);
+      if (!Number.isFinite(n) || n < 0 || n > 10) {
+        return { error: `Điểm môn ${SUBJECTS.find((s) => s.key === k)?.label || k} phải trong khoảng 0–10` };
+      }
+      subjects[k] = n;
+    }
+    if (Object.keys(subjects).length === 0) return { error: 'Hãy nhập điểm ít nhất một môn.' };
+    const byGroup = {};
+    for (const [combo, keys] of Object.entries(COMBOS)) {
+      if (keys.every((k) => subjects[k] != null)) {
+        byGroup[combo] = Math.round(keys.reduce((s, k) => s + subjects[k], 0) * 100) / 100;
+      }
+    }
+    const total = Object.keys(byGroup).length ? Math.max(...Object.values(byGroup)) : null;
+    return {
+      entry: {
+        status: statusOf(selectedExam),
+        subjects,
+        byGroup,
+        total,
+        updatedAt: new Date().toISOString(),
+      },
+    };
+  };
+
+  const buildPartsEntry = (code) => {
+    const def = EXAMS[code].parts || {};
+    const partValues = {};
+    let filled = 0;
+    for (const [pk, max] of Object.entries(def)) {
+      const raw = parts[`${code}.${pk}`];
+      if (raw === '' || raw == null) continue;
+      const n = parseFloat(raw);
+      if (!Number.isFinite(n) || n < 0 || n > max) {
+        return { error: `Điểm phần ${PART_LABELS[code]?.[pk] || pk} phải trong khoảng 0–${max}` };
+      }
+      partValues[pk] = n;
+      filled += 1;
+    }
+    let total;
+    if (filled === Object.keys(def).length && filled > 0) {
+      total = Math.round(Object.values(partValues).reduce((s, v) => s + v, 0) * 100) / 100;
+    } else if (totals[code] !== '' && totals[code] != null) {
+      const check = validateScoreInput(code, totals[code]);
+      if (!check.ok) return { error: check.error };
+      total = check.value;
+    } else {
+      return { error: 'Hãy nhập đủ điểm từng phần, hoặc nhập thẳng tổng điểm.' };
+    }
+    return {
+      entry: {
+        status: statusOf(code),
+        total,
+        scale: EXAMS[code].scale,
+        ...(filled > 0 ? { parts: partValues } : {}),
+        updatedAt: new Date().toISOString(),
+      },
+    };
+  };
+
+  const buildTrioEntry = (code) => {
+    const values = [0, 1, 2].map((i) => trios[`${code}.${i}`]);
+    if (values.some((v) => v === '' || v == null)) {
+      return { error: 'Hãy nhập điểm cả 3 môn thi chuyên biệt (mỗi môn thang 10).' };
+    }
+    const nums = [];
+    for (const v of values) {
+      const check = validateScoreInput(code, v); // registry spt/hsca: thang 10/môn
+      if (!check.ok) return { error: 'Mỗi môn phải trong khoảng 0–10' };
+      nums.push(check.value);
+    }
+    return {
+      entry: {
+        status: statusOf(code),
+        total: Math.round(nums.reduce((s, v) => s + v, 0) * 100) / 100,
+        scale: 30, // tổng tổ hợp thang 30 — khớp thang điểm chuẩn quy tổ hợp của trường
+        parts: { mon_1: nums[0], mon_2: nums[1], mon_3: nums[2] },
+        scoreMode: 'combo30',
+        updatedAt: new Date().toISOString(),
+      },
+    };
+  };
+
+  const handleSaveSelected = () => {
+    let built;
+    if (selectedExam === 'thpt') built = buildSubjectsEntry(subjectsThpt);
+    else if (selectedExam === 'hocba') built = buildSubjectsEntry(subjectsHb);
+    else if (PART_EXAMS.includes(selectedExam)) built = buildPartsEntry(selectedExam);
+    else if (TRIO_EXAMS.includes(selectedExam)) built = buildTrioEntry(selectedExam);
+    else {
+      const check = validateScoreInput(selectedExam, totals[selectedExam]);
+      built = check.ok
+        ? {
+            entry: {
+              status: statusOf(selectedExam),
+              total: check.value,
+              scale: EXAMS[selectedExam].scale,
+              updatedAt: new Date().toISOString(),
+            },
+          }
+        : { error: check.error };
+    }
+    if (built.error) {
+      setMessage({ type: 'error', text: built.error });
+      return;
+    }
+    saveEntry(selectedExam, built.entry);
+  };
+
+  // --- Tính hiển thị ---
+  const thptPreview = useMemo(() => {
+    const built = buildSubjectsEntryQuiet(subjectsThpt);
+    return built;
+    function buildSubjectsEntryQuiet(state) {
+      const subjects = {};
+      for (const [k, v] of Object.entries(state)) {
+        const n = parseFloat(v);
+        if (Number.isFinite(n)) subjects[k] = n;
+      }
+      const byGroup = {};
+      for (const [combo, keys] of Object.entries(COMBOS)) {
+        if (keys.every((k) => subjects[k] != null)) {
+          byGroup[combo] = keys.reduce((s, k) => s + subjects[k], 0);
+        }
+      }
+      return byGroup;
+    }
+  }, [subjectsThpt]);
+
+  const bestThptRaw = useMemo(() => {
+    const vals = Object.values(thptPreview);
+    return vals.length ? Math.max(...vals) : null;
+  }, [thptPreview]);
+
+  const priorityPreview = bestThptRaw != null ? priorityApplied(bestThptRaw, region, category) : null;
+
+  const legacyKeys = Object.keys(savedV2?.legacy_unverified || {});
+  const savedEntries = useMemo(
+    () =>
+      Object.entries(savedV2?.scores || {}).filter(
+        ([, v]) => v && v.status !== 'none' && (v.total != null || v.subjects),
+      ),
+    [savedV2],
+  );
+
+  const exam = EXAMS[selectedExam];
+
   return (
-    <div className="space-y-6">
-      <div className="bg-[#10b981]/10 border border-[#10b981]/20 rounded-xl p-4 text-sm text-slate-300 space-y-1">
-        <p className="font-bold text-[#10b981] text-base">Bài thi ĐGNL – Bộ Công An (BCA)</p>
-        <p>📝 Thi viết · 180 phút · <b>100 điểm</b></p>
-        <p>📋 Nghị luận XH: 25đ · Toán TN: 35đ · Lịch Sử: 10đ · NN: 15đ · Tự chọn: 15đ</p>
-        <p>🔢 <b>Công thức XT P3: </b>ĐXT = (M1+M2+M3)×2/5 + BCA×3/5 + ĐC</p>
-      </div>
-
-      <p className="text-xs uppercase tracking-widest text-slate-400 font-bold px-1">Điểm từng phần bài thi BCA</p>
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Nghị luận XH (0–25)" value={tuLuan} onChange={setTuLuan} max={25} color="#10b981" />
-        <Field label="Toán học TN (0–35)" value={toan} onChange={setToan} max={35} color="#10b981" />
-        <Field label="Lịch Sử (0–10)" value={lich} onChange={setLich} max={10} color="#10b981" />
-        <Field label="Ngoại Ngữ (0–15)" value={nn} onChange={setNn} max={15} color="#10b981" />
-        <Field label="Môn tự chọn (0–15)" value={tuChon} onChange={setTuChon} max={15} color="#10b981" hintText="Lý / Hóa / Sinh / Địa" />
-      </div>
-
-      <div className="bg-white/5 rounded-xl p-4 flex items-center justify-between">
-        <p className="text-slate-300 font-semibold">Tổng điểm BCA</p>
-        <span className="text-2xl font-extrabold text-[#10b981]">{bcaScore.toFixed(1)} <span className="text-slate-500 text-base font-medium">/ 100</span></span>
-      </div>
-
-      <div className="border-t border-white/10 pt-4 space-y-4">
-        <p className="text-xs uppercase tracking-widest text-slate-400 font-bold px-1">Tính điểm xét tuyển (Phương thức 3)</p>
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="M1 - Môn 1 (0–10)" value={m1} onChange={setM1} max={10} color="#64748b" />
-          <Field label="M2 - Môn 2 (0–10)" value={m2} onChange={setM2} max={10} color="#64748b" />
-          <Field label="M3 - Môn 3 (0–10)" value={m3} onChange={setM3} max={10} color="#64748b" />
-          <Field label="Điểm ưu tiên (+ĐC)" value={dc} onChange={setDc} max={3.5} color="#64748b" />
-        </div>
-        <div className="bg-[#10b981]/10 border border-[#10b981]/20 rounded-xl p-4 flex items-center justify-between">
-          <div>
-            <p className="text-slate-400 text-xs">Điểm xét tuyển cuối cùng</p>
-            <p className="text-slate-500 text-[10px] mt-0.5">= (M1+M2+M3)×2/5 + BCA×3/5 + ĐC</p>
+    <div className="min-h-dvh font-arena text-slate-100 relative" style={{ background: 'var(--arena-ink)' }}>
+      <header
+        className="sticky top-0 z-20 backdrop-blur-md border-b border-white/10"
+        style={{ background: 'rgba(25,14,18,0.85)' }}
+      >
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            aria-label="Quay lại"
+            className="w-11 h-11 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined" aria-hidden="true">arrow_back_ios_new</span>
+          </button>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-arena-display font-bold text-xl leading-tight">Nhập điểm xét tuyển</h1>
+            <p className="text-xs text-slate-400">Một hồ sơ điểm duy nhất cho mọi kỳ thi — dùng ở trang Tìm trường</p>
           </div>
-          <span className="text-3xl font-extrabold text-[#10b981]">{admissionScore}</span>
+          <button onClick={() => navigate('/tim-truong')} className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer shrink-0">
+            <span className="material-symbols-outlined text-base" aria-hidden="true">school</span>
+            Tìm trường
+          </button>
         </div>
-        
-        <button onClick={handleSave} disabled={isSaving}
-          className={`w-full py-3.5 mt-2 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${message.type === 'success' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-[#10b981]/20 hover:bg-[#10b981]/40 text-white border border-[#10b981]/30'} disabled:opacity-50`}>
-          <span className="material-symbols-outlined text-base">{isSaving ? 'sync' : (message.type === 'success' ? 'check_circle' : 'save')}</span>
-          {isSaving ? 'Đang lưu...' : (message.type === 'success' ? 'Đã lưu điểm!' : 'Lưu kết quả BCA')}
-        </button>
-        {message.text && (
-          <p className={`text-center text-[11px] font-medium mt-1 ${message.type === 'error' ? 'text-rose-400' : 'text-green-400'}`}>
-            {message.text}
-          </p>
+      </header>
+
+      <main className="max-w-3xl mx-auto px-4 py-5 space-y-4">
+        {!user && (
+          <div className="arena-card p-4 flex gap-3">
+            <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">info</span>
+            <p className="text-xs leading-relaxed text-slate-300">
+              Bạn chưa đăng nhập — điểm sẽ lưu nháp trên thiết bị này. Đăng nhập để điểm đồng bộ vào hồ sơ
+              và dùng được trên mọi thiết bị.
+            </p>
+          </div>
         )}
-      </div>
+
+        {legacyKeys.length > 0 && (
+          <div className="arena-card p-4 flex gap-3" style={{ borderColor: 'rgba(242,193,89,0.5)' }}>
+            <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">warning</span>
+            <p className="text-xs leading-relaxed text-slate-300">
+              Điểm HSA / V-ACT bạn lưu ở bản cũ đang bị cách ly vì bản cũ ghi sai thang điểm hai kỳ thi này
+              (HSA đúng là thang 150 của ĐHQG Hà Nội, V-ACT đúng là thang 1200 của ĐHQG TP.HCM).
+              Hãy nhập lại điểm ở hai mục HSA và V-ACT bên dưới — điểm cũ không được tự gán lại để tránh sai lệch.
+            </p>
+          </div>
+        )}
+
+        {/* Điểm đã lưu */}
+        {savedEntries.length > 0 && (
+          <section className="arena-card p-4">
+            <h2 className="font-arena-display font-bold">Điểm đã lưu trong hồ sơ</h2>
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {savedEntries.map(([code, v]) => (
+                <span key={code} className="arena-chip">
+                  {EXAMS[code]?.label || code.toUpperCase()}:
+                  <span className="tabular">
+                    {v.total != null ? `${fmt(parseFloat(v.total), code === 'vact' || code === 'vsat' ? 0 : 2)} / ${v.scale ?? EXAMS[code]?.scale ?? ''}` : 'theo tổ hợp'}
+                  </span>
+                  <span>({STATUS_LABEL[v.status] || 'Điểm thật'})</span>
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Ưu tiên khu vực / đối tượng */}
+        <section className="arena-card p-4 space-y-3">
+          <h2 className="font-arena-display font-bold">Khu vực & đối tượng ưu tiên</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="region-select" className="block text-xs font-semibold mb-1.5 text-slate-300">Khu vực ưu tiên</label>
+              <select
+                id="region-select"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                className="w-full min-h-[44px] bg-white/5 border border-white/10 rounded-xl px-3 text-sm outline-none cursor-pointer"
+                style={{ backgroundColor: 'var(--arena-surface)' }}
+              >
+                {Object.entries(REGION_PRIORITY).map(([k, v]) => (
+                  <option key={k} value={k}>{k} (+{fmt(v)} điểm danh nghĩa)</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="category-select" className="block text-xs font-semibold mb-1.5 text-slate-300">Nhóm đối tượng ưu tiên</label>
+              <select
+                id="category-select"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full min-h-[44px] bg-white/5 border border-white/10 rounded-xl px-3 text-sm outline-none cursor-pointer"
+                style={{ backgroundColor: 'var(--arena-surface)' }}
+              >
+                <option value="NONE">Không thuộc nhóm ưu tiên (+0)</option>
+                <option value="UT1">Nhóm UT1 (+2,0 điểm danh nghĩa)</option>
+                <option value="UT2">Nhóm UT2 (+1,0 điểm danh nghĩa)</option>
+              </select>
+            </div>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Theo quy chế của Bộ GD&ĐT, từ mốc tổng điểm 22,5 trở lên điểm ưu tiên thực tế giảm dần:
+            ưu tiên thực = (30 − tổng điểm) / 7,5 × ưu tiên danh nghĩa.
+            {priorityPreview != null && bestThptRaw != null && (
+              <>
+                {' '}Với tổ hợp THPT cao nhất hiện tại (<span className="tabular">{fmt(bestThptRaw)}</span>),
+                ưu tiên thực của bạn là <span className="tabular font-bold text-slate-200">+{fmt(priorityPreview)}</span> — không phải cộng thẳng điểm danh nghĩa.
+              </>
+            )}
+          </p>
+          <button onClick={saveCandidate} disabled={isSaving} className="btn-arena btn-arena-sm btn-arena-ghost cursor-pointer">
+            <span className="material-symbols-outlined text-base" aria-hidden="true">save</span>
+            {isSaving ? 'Đang lưu...' : 'Lưu thông tin ưu tiên'}
+          </button>
+        </section>
+
+        {/* Chọn kỳ thi */}
+        <section aria-label="Chọn kỳ thi">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            {ENTRY_EXAMS.map((code) => {
+              const e = EXAMS[code];
+              const active = selectedExam === code;
+              const has = !!savedV2?.scores?.[code];
+              return (
+                <button
+                  key={code}
+                  onClick={() => { setSelectedExam(code); setMessage({ type: '', text: '' }); }}
+                  aria-pressed={active}
+                  className="arena-card arena-card-interactive p-3 text-left cursor-pointer"
+                  style={active ? { borderColor: 'var(--arena-ember)', background: 'rgba(227,100,136,0.10)' } : undefined}
+                >
+                  <span className="font-arena-display font-bold block" style={active ? { color: 'var(--arena-ember)' } : undefined}>
+                    {e.label}
+                  </span>
+                  <span className="text-[11px] text-slate-400 block leading-snug mt-0.5">{e.org}</span>
+                  <span className="text-[11px] text-slate-500 block mt-0.5">
+                    Thang {code === 'spt' || code === 'hsca' ? '10/môn' : e.scale}
+                    {has ? ' · Đã lưu' : ''}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Form nhập điểm của kỳ thi đang chọn */}
+        <section className="arena-card p-4 sm:p-5 space-y-5">
+          <div>
+            <h2 className="font-arena-display font-bold text-lg">{exam.full}</h2>
+            <p className="text-xs text-slate-400 mt-1">
+              Đơn vị tổ chức: {exam.org} · Thang điểm:{' '}
+              {selectedExam === 'spt' || selectedExam === 'hsca'
+                ? '10 điểm/môn — tổng tổ hợp 30 để so với điểm chuẩn của trường'
+                : `${exam.scale} (${exam.unit})`}
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="status-select" className="block text-xs font-semibold mb-1.5 text-slate-300">Loại điểm</label>
+            <select
+              id="status-select"
+              value={statusOf(selectedExam)}
+              onChange={(e) => setStatus(selectedExam, e.target.value)}
+              className="w-full sm:w-64 min-h-[44px] bg-white/5 border border-white/10 rounded-xl px-3 text-sm outline-none cursor-pointer"
+              style={{ backgroundColor: 'var(--arena-surface)' }}
+            >
+              {STATUS_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            {statusOf(selectedExam) !== 'actual' && (
+              <p className="text-[11px] text-slate-500 mt-1.5">
+                Đang ở chế độ điểm {statusOf(selectedExam) === 'mock' ? 'thi thử' : 'mục tiêu'} — ước tính ở trang Tìm trường là kịch bản giả định, không phải điểm thật.
+              </p>
+            )}
+          </div>
+
+          {(selectedExam === 'thpt' || selectedExam === 'hocba') && (
+            <SubjectForm
+              subjectsState={selectedExam === 'thpt' ? subjectsThpt : subjectsHb}
+              onChange={selectedExam === 'thpt' ? setSubjectsThpt : setSubjectsHb}
+              transcript={selectedExam === 'hocba'}
+            />
+          )}
+
+          {PART_EXAMS.includes(selectedExam) && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                {Object.entries(EXAMS[selectedExam].parts).map(([pk, max]) => (
+                  <NumberField
+                    key={pk}
+                    label={`${PART_LABELS[selectedExam]?.[pk] || pk} (0–${max})`}
+                    value={parts[`${selectedExam}.${pk}`] ?? ''}
+                    onChange={(v) => setParts((p) => ({ ...p, [`${selectedExam}.${pk}`]: v }))}
+                    max={max}
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span className="flex-1 border-t border-white/10" />
+                hoặc nhập thẳng tổng điểm nếu bạn chỉ nhớ tổng
+                <span className="flex-1 border-t border-white/10" />
+              </div>
+              <NumberField
+                label={`Tổng điểm ${exam.label} (0–${exam.scale})`}
+                value={totals[selectedExam] ?? ''}
+                onChange={(v) => setTotals((p) => ({ ...p, [selectedExam]: v }))}
+                max={exam.scale}
+              />
+              {selectedExam === 'bca' && (
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Lưu ý: điểm xét tuyển khối Công an (phương thức 3) = điểm tổ hợp THPT × 2/5 + điểm bài thi
+                  BCA × 3/5 + điểm cộng. Hãy nhập thêm điểm THPT ở mục THPT để trang Tìm trường ước tính đúng.
+                </p>
+              )}
+              <TotalPreview
+                label={`Tổng điểm ${exam.label}`}
+                value={previewPartsTotal(selectedExam, parts, totals)}
+                scale={exam.scale}
+              />
+            </div>
+          )}
+
+          {TRIO_EXAMS.includes(selectedExam) && (
+            <div className="space-y-4">
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Nhập điểm 3 môn bạn đã thi trong kỳ thi chuyên biệt (mỗi môn thang 10). Hệ thống cộng thành
+                tổng tổ hợp thang 30 — đúng thang các trường dùng khi công bố điểm chuẩn quy tổ hợp.
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                {[0, 1, 2].map((i) => (
+                  <NumberField
+                    key={i}
+                    label={`Môn thi ${i + 1} (0–10)`}
+                    value={trios[`${selectedExam}.${i}`] ?? ''}
+                    onChange={(v) => setTrios((p) => ({ ...p, [`${selectedExam}.${i}`]: v }))}
+                    max={10}
+                  />
+                ))}
+              </div>
+              <TotalPreview
+                label="Tổng tổ hợp (thang 30)"
+                value={previewTrioTotal(selectedExam, trios)}
+                scale={30}
+              />
+            </div>
+          )}
+
+          {selectedExam === 'vsat' && (
+            <div className="space-y-4">
+              <NumberField
+                label="Tổng điểm tổ hợp V-SAT (0–450, 3 môn × 150)"
+                value={totals.vsat ?? ''}
+                onChange={(v) => setTotals((p) => ({ ...p, vsat: v }))}
+                max={450}
+              />
+              <TotalPreview label="Tổng điểm V-SAT" value={parseFloat(totals.vsat) || null} scale={450} digits={0} />
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <button
+              onClick={handleSaveSelected}
+              disabled={isSaving}
+              className={`btn-arena w-full cursor-pointer ${message.type === 'success' ? 'btn-arena-jade' : 'btn-arena-primary'}`}
+            >
+              <span className="material-symbols-outlined text-base" aria-hidden="true">
+                {isSaving ? 'sync' : message.type === 'success' ? 'check_circle' : 'save'}
+              </span>
+              {isSaving ? 'Đang lưu...' : message.type === 'success' ? 'Đã lưu điểm!' : `Lưu điểm ${exam.label}`}
+            </button>
+            {message.text && (
+              <p className={`text-center text-xs font-medium ${message.type === 'error' ? 'text-red-400' : ''}`} style={message.type === 'success' ? { color: 'var(--arena-jade)' } : undefined} role="status">
+                {message.text}
+              </p>
+            )}
+          </div>
+        </section>
+
+        <p className="text-[11px] text-slate-500 text-center leading-relaxed pb-4">
+          Điểm bạn nhập được dùng để ước tính khả năng ở trang Tìm trường. Ước tính dựa trên điểm chuẩn
+          các năm trước — không phải cam kết trúng tuyển. Điểm 0 là giá trị hợp lệ và được lưu như các điểm khác.
+        </p>
+      </main>
     </div>
   );
 }
 
-// ==================== SHARED COMPONENTS ====================
-function Field({ label, value, onChange, max, color, hintText }) {
+function previewPartsTotal(code, parts, totals) {
+  const def = EXAMS[code].parts || {};
+  const keys = Object.keys(def);
+  const filled = keys.filter((pk) => parts[`${code}.${pk}`] !== '' && parts[`${code}.${pk}`] != null);
+  if (filled.length === keys.length && keys.length > 0) {
+    return keys.reduce((s, pk) => s + (parseFloat(parts[`${code}.${pk}`]) || 0), 0);
+  }
+  const t = parseFloat(totals[code]);
+  return Number.isFinite(t) ? t : null;
+}
+
+function previewTrioTotal(code, trios) {
+  const vals = [0, 1, 2].map((i) => parseFloat(trios[`${code}.${i}`]));
+  if (vals.some((v) => !Number.isFinite(v))) return null;
+  return vals.reduce((s, v) => s + v, 0);
+}
+
+function SubjectForm({ subjectsState, onChange, transcript }) {
+  const byGroup = useMemo(() => {
+    const out = {};
+    for (const [combo, keys] of Object.entries(COMBOS)) {
+      if (keys.every((k) => subjectsState[k] !== '' && subjectsState[k] != null && Number.isFinite(parseFloat(subjectsState[k])))) {
+        out[combo] = keys.reduce((s, k) => s + parseFloat(subjectsState[k]), 0);
+      }
+    }
+    return out;
+  }, [subjectsState]);
+
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-slate-400 leading-relaxed">
+        {transcript
+          ? 'Nhập điểm trung bình môn dùng cho xét học bạ (theo cách tính của bạn / của trường). Tổng tổ hợp được tính tự động cho các tổ hợp đủ 3 môn.'
+          : 'Nhập điểm từng môn thi tốt nghiệp THPT. Tổng các tổ hợp đủ 3 môn được tính tự động — trang Tìm trường sẽ dùng tổ hợp khớp với từng ngành.'}
+      </p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {SUBJECTS.map((s) => (
+          <NumberField
+            key={s.key}
+            label={`${s.label} (0–10)`}
+            value={subjectsState[s.key] ?? ''}
+            onChange={(v) => onChange((p) => ({ ...p, [s.key]: v }))}
+            max={10}
+            step="0.05"
+          />
+        ))}
+      </div>
+      {Object.keys(byGroup).length > 0 && (
+        <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+          <p className="text-xs text-slate-400 mb-1.5">Tổng theo tổ hợp (chưa gồm điểm ưu tiên):</p>
+          <div className="flex flex-wrap gap-1.5">
+            {Object.entries(byGroup).map(([combo, sum]) => (
+              <span key={combo} className="arena-chip">
+                {combo}: <span className="tabular">{fmt(sum)}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NumberField({ label, value, onChange, max, step = '0.1' }) {
   return (
     <div>
-      <label className="block text-xs font-semibold mb-1 text-slate-400">{label}</label>
-      {hintText && <p className="text-[10px] text-slate-500 mb-1">{hintText}</p>}
+      <label className="block text-xs font-semibold mb-1.5 text-slate-300">{label}</label>
       <input
         type="number"
         min="0"
         max={max}
-        step="0.1"
+        step={step}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-white/5 border border-white/10 rounded-xl py-2 px-3 text-sm text-white outline-none focus:ring-2 transition-all"
-        style={{ '--tw-ring-color': color }}
         placeholder="0"
+        className="w-full min-h-[44px] bg-white/5 border border-white/10 rounded-xl px-3 text-sm tabular outline-none focus:ring-2"
+        style={{ '--tw-ring-color': 'var(--arena-ember)' }}
       />
     </div>
   );
 }
 
-function ScoreResult({ total, maxTotal, quyDoi, totalWithPriority, label, color, onSave, isSaving, message }) {
-  const pct = Math.min((total / maxTotal) * 100, 100);
+function TotalPreview({ label, value, scale, digits = 2 }) {
+  const pct = value != null && scale ? Math.min((value / scale) * 100, 100) : 0;
   return (
-    <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: `linear-gradient(135deg, ${color}15, transparent)` }}>
-      <div className="p-5 pb-4">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">{label}</p>
-            <p className="text-4xl font-extrabold text-white mt-1">
-              {total.toLocaleString('vi-VN')}
-              <span className="text-slate-500 text-lg font-medium"> / {maxTotal.toLocaleString('vi-VN')}</span>
-            </p>
-          </div>
-
-          {/* Ring */}
-          <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
-              <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
-              <circle
-                cx="40" cy="40" r="33" fill="none"
-                stroke={color} strokeWidth="6"
-                strokeDasharray="207.35"
-                strokeDashoffset={207.35 - (207.35 * pct) / 100}
-                strokeLinecap="round"
-                style={{ transition: 'stroke-dashoffset 0.8s ease' }}
-              />
-            </svg>
-            <span className="absolute text-sm font-bold text-white">{Math.round(pct)}%</span>
-          </div>
-        </div>
-
-        {quyDoi && (
-          <div className="bg-white/5 rounded-xl px-4 py-3 flex items-center justify-between">
-            <p className="text-slate-400 text-sm">Quy đổi hệ 30</p>
-            <p className="font-extrabold text-white text-xl">{quyDoi} <span className="text-slate-500 text-sm font-medium">/ 30</span></p>
-          </div>
-        )}
-
-        {totalWithPriority !== undefined && (
-          <div className="bg-white/5 rounded-xl px-4 py-3 flex items-center justify-between">
-            <p className="text-slate-400 text-sm">Điểm sau ưu tiên</p>
-            <p className="font-extrabold text-white text-xl">{totalWithPriority.toFixed(1)} <span className="text-slate-500 text-sm font-medium">/ 100</span></p>
-          </div>
-        )}
-
-        {onSave && (
-          <div className="mt-4 space-y-2">
-            <button onClick={onSave} disabled={isSaving}
-              className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${message?.type === 'success' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'} disabled:opacity-50`}>
-              <span className="material-symbols-outlined text-sm">{isSaving ? 'sync' : (message?.type === 'success' ? 'check_circle' : 'save')}</span>
-              {isSaving ? 'Đang lưu...' : (message?.type === 'success' ? 'Đã lưu điểm!' : 'Lưu kết quả vào hồ sơ')}
-            </button>
-            {message?.text && (
-              <p className={`text-center text-[10px] font-medium ${message.type === 'error' ? 'text-rose-400' : 'text-green-400'}`}>
-                {message.text}
-              </p>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ==================== MAIN PAGE ====================
-export default function AdmissionCalculator() {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('hsa');
-
-  return (
-    <div className="bg-[#0b0f1a] font-display text-white min-h-screen pb-24">
-      <div className="fixed inset-0 bg-[radial-gradient(at_0%_0%,rgba(227,100,136,0.12)_0,transparent_55%),radial-gradient(at_100%_0%,rgba(48,110,232,0.12)_0,transparent_55%)] pointer-events-none" />
-
-      {/* Header */}
-      <header className="relative z-50 px-4 py-4 flex items-center justify-between bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10">
-        <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-slate-800/50 flex items-center justify-center hover:bg-slate-700 transition-colors">
-          <span className="material-symbols-outlined">arrow_back_ios_new</span>
-        </button>
-        <div className="text-center">
-          <h1 className="text-base font-bold tracking-tight text-white">Tính Điểm Xét Tuyển</h1>
-          <p className="text-[11px] text-slate-400">Phương thức đặc biệt 2026</p>
-        </div>
-        <div className="w-10" />
-      </header>
-
-      <main className="max-w-2xl mx-auto px-4 pt-6 relative z-10 space-y-6">
-        {/* Tab Selector */}
-        <div className="grid grid-cols-4 gap-2 bg-[#0f172a]/60 border border-white/10 rounded-2xl p-2">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center py-3 px-1 rounded-xl text-center transition-all ${
-                activeTab === tab.id
-                  ? 'text-white shadow-lg'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-              style={activeTab === tab.id ? { background: `${tab.color}22`, outline: `1.5px solid ${tab.color}55` } : {}}
-            >
-              <span className="text-sm font-extrabold" style={{ color: activeTab === tab.id ? tab.color : undefined }}>{tab.label}</span>
-              <span className="text-[9px] font-medium mt-0.5 leading-tight opacity-70">{tab.full}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Active Tab Content */}
-        <div className="bg-[#0f172a]/60 border border-white/10 rounded-2xl p-5">
-          {activeTab === 'hsa'  && <HSACalculator  />}
-          {activeTab === 'vact' && <VACTCalculator />}
-          {activeTab === 'tsa'  && <TSACalculator  />}
-          {activeTab === 'bca'  && <BCACalculator  />}
-        </div>
-
-        {/* Disclaimer */}
-        <p className="text-[11px] text-slate-500 text-center pb-4">
-          ⚠️ Điểm tham khảo. Kết quả thực tế tùy theo hệ thống IRT (HSA/VACT) và quy định từng trường.
+    <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 flex items-center justify-between gap-3">
+      <div>
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="font-arena-display font-bold text-2xl leading-tight">
+          <span className="tabular">{value != null ? fmt(value, digits) : '—'}</span>
+          <span className="text-sm text-slate-500 font-medium"> / {scale}</span>
         </p>
-      </main>
+      </div>
+      <div
+        className="w-24 h-2.5 rounded-full bg-white/10 overflow-hidden shrink-0"
+        role="progressbar"
+        aria-valuenow={Math.round(pct)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={label}
+      >
+        <div
+          className="h-full rounded-full transition-all"
+          style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--arena-jade), var(--arena-jade-strong))' }}
+        />
+      </div>
     </div>
   );
 }

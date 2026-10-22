@@ -1,402 +1,991 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { EXAMS, getExam } from '../lib/admission/exams';
+import {
+  estimateChannel,
+  forecastCutoff,
+  equipercentile,
+  priorityApplied,
+  portfolioHealth,
+  DISCLAIMER,
+} from '../lib/admission/predict';
+import { migrateLegacyScores, getScore } from '../lib/admission/scores';
+import { loadCutoffs, clearCutoffCache, groupHistories } from '../lib/admission/cutoffs';
 
-// Helper to normalize Vietnamese text for search
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
 function normalizeText(str) {
   if (!str) return '';
-  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 }
 
-// Helper to determine score type from method string
-function getScoreType(method = '') {
-  const m = method.toLowerCase();
-  if (m.includes('thpt') || m.includes('tốt nghiệp')) return 'thpt';
-  if (m.includes('học bạ') || m.includes('hba')) return 'hb';
-  if (m.includes('đgnl') && (m.includes('hcm') || m.includes('hồ chí minh') || m.includes('đại học quốc gia tp. hcm'))) return 'vact';
-  if (m.includes('đgnl') && (m.includes('hn') || m.includes('hà nội') || m.includes('quốc gia hà nội'))) return 'hsa';
-  if (m.includes('tsa') || m.includes('tư duy') || m.includes('bách khoa')) return 'tsa';
-  return 'other';
+function fmt(n, digits = 2) {
+  if (n == null || !Number.isFinite(Number(n))) return '—';
+  return Number(n).toLocaleString('vi-VN', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
 }
 
-const METHOD_LABELS = { thpt: 'THPT', tsa: 'TSA', vact: 'ĐGNL HCM', hsa: 'ĐGNL HN', hb: 'Học bạ', other: 'Theo PT Khác' };
-const METHOD_COLORS = { thpt: '#306ee8', tsa: '#8b5cf6', vact: '#e36488', hsa: '#10b981', hb: '#f59e0b', other: '#64748b' };
+// Tổ hợp môn — key môn chuẩn hoá (AdmissionCalculator có bản khai tương ứng)
+const COMBOS = {
+  A00: ['toan', 'ly', 'hoa'],
+  A01: ['toan', 'ly', 'anh'],
+  A02: ['toan', 'ly', 'sinh'],
+  B00: ['toan', 'hoa', 'sinh'],
+  C00: ['van', 'su', 'dia'],
+  D01: ['toan', 'van', 'anh'],
+  D07: ['toan', 'hoa', 'anh'],
+  K01: ['toan', 'van', 'ly'],
+};
 
-function MethodBadge({ type }) {
-  if (type === 'other') return null;
-  return (
-    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md whitespace-nowrap"
-      style={{ background: METHOD_COLORS[type] + '22', color: METHOD_COLORS[type], border: `1px solid ${METHOD_COLORS[type]}44` }}>
-      {METHOD_LABELS[type]}
-    </span>
-  );
+const SUBJECT_ALIASES = {
+  toan: 'toan',
+  'ngu van': 'van',
+  van: 'van',
+  'vat li': 'ly',
+  'vat ly': 'ly',
+  ly: 'ly',
+  'hoa hoc': 'hoa',
+  hoa: 'hoa',
+  'sinh hoc': 'sinh',
+  sinh: 'sinh',
+  'lich su': 'su',
+  su: 'su',
+  'dia li': 'dia',
+  'dia ly': 'dia',
+  dia: 'dia',
+  'tieng anh': 'anh',
+  anh: 'anh',
+  'giao duc kinh te va phap luat': 'gdkp',
+  gdkp: 'gdkp',
+  gdcd: 'gdkp',
+};
+
+function canonicalSubjects(subjects) {
+  const out = {};
+  for (const [k, v] of Object.entries(subjects || {})) {
+    const key = SUBJECT_ALIASES[normalizeText(k)] || k;
+    const n = parseFloat(v);
+    if (Number.isFinite(n)) out[key] = n;
+  }
+  return out;
 }
 
-function SchoolCard({ school, myScores, subjectGroupFilter, query }) {
-  const [open, setOpen] = useState(false);
-  
-  // Filter majors based on subjectGroupFilter if provided
-  const filteredMajors = useMemo(() => {
-    let majors = school.majors;
-    if (subjectGroupFilter && subjectGroupFilter.trim() !== '') {
-      const sgQuery = normalizeText(subjectGroupFilter.trim());
-      majors = majors.filter(m => m.subject_groups && normalizeText(m.subject_groups).includes(sgQuery));
+// Điểm thô (chưa ưu tiên) của thí sinh cho 1 tổ hợp — từ byGroup đã lưu,
+// hoặc tính từ điểm từng môn, hoặc total đã migrate từ v1.
+function comboRaw(entry, comboStr) {
+  if (!entry) return null;
+  const subjects = canonicalSubjects(entry.subjects);
+  const byGroup = entry.byGroup || {};
+  const combos = comboStr
+    ? comboStr.split('/').map((s) => s.trim()).filter(Boolean)
+    : Object.keys(byGroup);
+  let best = null;
+  for (const c of combos) {
+    if (byGroup[c] != null && Number.isFinite(parseFloat(byGroup[c]))) {
+      best = Math.max(best ?? -Infinity, parseFloat(byGroup[c]));
     }
-    if (query && query.trim() !== '') {
-      const q = normalizeText(query.trim());
-      const matchesSchool = normalizeText(school.university_name).includes(q) || normalizeText(school.university_code).includes(q);
-      if (!matchesSchool) {
-        majors = majors.filter(m => 
-          normalizeText(m.major_name).includes(q) || 
-          normalizeText(m.subject_groups).includes(q)
-        );
+    const def = COMBOS[c];
+    if (def && def.every((k) => subjects[k] != null)) {
+      const sum = def.reduce((s, k) => s + subjects[k], 0);
+      best = Math.max(best ?? -Infinity, sum);
+    }
+  }
+  if (best != null && Number.isFinite(best)) return best;
+  // Hồ sơ migrate từ v1: chỉ có total, không có môn/tổ hợp — dùng total cho mọi tổ hợp
+  if (
+    entry.total != null &&
+    Object.keys(subjects).length === 0 &&
+    Object.keys(byGroup).length === 0
+  ) {
+    return parseFloat(entry.total);
+  }
+  return null;
+}
+
+// Khu vực suy từ mã trường trong dữ liệu seed (dữ liệu chưa có trường region riêng)
+const REGION_BY_SCHOOL = {
+  HUST: 'bac', NEU: 'bac', FTU: 'bac', HMU: 'bac', UET: 'bac', UED: 'bac',
+  ULIS: 'bac', HNUE: 'bac', HPU2: 'bac', HLU: 'bac', HVCSND: 'bac',
+  TMU: 'bac', HVQUANY: 'bac',
+  HCMUT: 'nam', UEH: 'nam', UMP: 'nam', UIT: 'nam', HCMUS: 'nam',
+  HCMUE: 'nam', HUTECH: 'nam', ULAW_HCM: 'nam',
+};
+const REGION_LABELS = { bac: 'Miền Bắc', trung: 'Miền Trung', nam: 'Miền Nam', khac: 'Khu vực khác' };
+const regionOf = (code) => REGION_BY_SCHOOL[code] || 'khac';
+
+const BAND_STYLE = {
+  safe: { color: 'var(--arena-jade)', border: 'rgba(95,207,166,0.55)', bg: 'rgba(95,207,166,0.12)' },
+  likely: { color: 'var(--arena-jade)', border: 'rgba(95,207,166,0.35)', bg: 'rgba(95,207,166,0.07)' },
+  borderline: { color: 'var(--arena-gold)', border: 'rgba(242,193,89,0.45)', bg: 'rgba(242,193,89,0.10)' },
+  reach: { color: 'var(--arena-ember)', border: 'rgba(227,100,136,0.45)', bg: 'rgba(227,100,136,0.10)' },
+  // far: màu destructive red-400 — áp qua class text-red-400 ở nơi render, không hardcode hex
+  far: { color: null, border: 'rgba(248,113,113,0.45)', bg: 'rgba(248,113,113,0.10)' },
+};
+
+// Bảng neo quy đổi (vd HSA -> THPT) nằm trong records dạng record đặc biệt
+// major_name bắt đầu bằng "__" + note chứa các cặp "src->dst". Trích tại runtime,
+// không hardcode số neo trong code.
+function extractAnchors(records) {
+  const map = {};
+  for (const r of records || []) {
+    if (!String(r.major_name || '').startsWith('__')) continue;
+    const pairs = [...String(r.note || '').matchAll(/(\d+(?:\.\d+)?)\s*->\s*(\d+(?:\.\d+)?)/g)].map(
+      (m) => ({ src: parseFloat(m[1]), dst: parseFloat(m[2]) }),
+    );
+    if (pairs.length >= 2) {
+      const method = r.method === 'THPT_QG' ? 'thpt' : String(r.method || '').toLowerCase();
+      map[method] = pairs.sort((a, b) => b.src - a.src);
+    }
+  }
+  return map;
+}
+
+// ---------------------------------------------------------------------------
+// Ước tính cho 1 nhóm (ngành x tổ hợp x phương thức)
+// Trả { estimate, viaMethod, channel, marginNative, forecastNative, reason }
+// ---------------------------------------------------------------------------
+
+function buildEstimate(group, profileV2, anchors, spectrumMethods, baseYear) {
+  const region = profileV2?.candidate?.region || 'KV3';
+  const category = profileV2?.candidate?.category || 'NONE';
+  const latestYear = group.history[0]?.year;
+  const ctxBase = {
+    hasSpectrum: spectrumMethods.has(group.method) ? 'official' : 'none',
+    quotaYears: 0,
+    latestYearIsCurrentSeason: baseYear != null && latestYear >= baseYear,
+  };
+
+  // --- THPT / Học bạ: thang 30 ---
+  if (group.method === 'thpt' || group.method === 'hocba') {
+    const entry = getScore(profileV2, group.method);
+    const raw = comboRaw(entry, group.combo);
+    if (raw != null) {
+      const candidate = raw + priorityApplied(raw, region, category);
+      const estimate = estimateChannel(candidate, group.history, group.method, {
+        ...ctxBase,
+        channel: 'direct',
+      });
+      return {
+        estimate,
+        viaMethod: group.method,
+        channel: 'direct',
+        marginNative: estimate ? estimate.margin : candidate - forecastCutoff(group.history),
+        forecastNative: estimate ? estimate.cutoffForecast : forecastCutoff(group.history),
+        reason: null,
+      };
+    }
+    if (group.method === 'hocba') {
+      // Học bạ cấm quy đổi chéo (registry noCrossConvert) — không có điểm học bạ là dừng.
+      return {
+        estimate: null,
+        reason: entry
+          ? 'Chưa tính được điểm tổ hợp học bạ cho ngành này — bổ sung điểm từng môn ở trang Nhập điểm.'
+          : 'Bạn chưa nhập điểm học bạ. Phương thức học bạ không quy đổi từ kỳ thi khác.',
+      };
+    }
+    // THPT: thử quy đổi equiprecentile từ kỳ thi khác có bảng neo (hiện có HSA)
+    for (const other of ['hsa', 'vact', 'tsa']) {
+      const otherEntry = getScore(profileV2, other);
+      const table = anchors[other];
+      if (otherEntry?.total != null && table) {
+        const conv = equipercentile(parseFloat(otherEntry.total), table);
+        if (conv.value != null) {
+          const candidate = conv.value + priorityApplied(conv.value, region, category);
+          const estimate = estimateChannel(candidate, group.history, 'thpt', {
+            ...ctxBase,
+            channel: 'equi-official',
+          });
+          return {
+            estimate,
+            viaMethod: other,
+            channel: 'equi-official',
+            marginNative: estimate ? estimate.margin : candidate - forecastCutoff(group.history),
+            forecastNative: estimate ? estimate.cutoffForecast : forecastCutoff(group.history),
+            reason: null,
+          };
+        }
       }
     }
-    return majors;
-  }, [school.majors, subjectGroupFilter, query, school.university_name, school.university_code]);
+    const hasAnyScore = Object.keys(profileV2?.scores || {}).length > 0;
+    return {
+      estimate: null,
+      reason: hasAnyScore
+        ? 'Chưa quy đổi được điểm hiện có sang thang THPT cho ngành này (chưa có bảng quy đổi tương đương).'
+        : 'Bạn chưa nhập điểm — nhập điểm để xem ước tính cho ngành này.',
+    };
+  }
 
-  // Find which methods this school has across all its FILTERED majors
-  const schoolMethodTypes = new Set();
-  
-  filteredMajors.forEach(m => {
-    const type = getScoreType(m.method);
-    schoolMethodTypes.add(type);
+  // --- Phương thức có thang riêng (HSA/V-ACT/TSA/BCA/V-SAT/SPT/combined...) ---
+  const entry = getScore(profileV2, group.method);
+  if (entry?.total == null) {
+    return {
+      estimate: null,
+      reason:
+        group.method === 'combined'
+          ? 'Phương thức xét tuyển tổng hợp theo công thức riêng của trường — hiện chưa ước tính được từ điểm thành phần.'
+          : `Bạn chưa nhập điểm ${getExam(group.method).label} — nhập điểm để xem ước tính theo phương thức này.`,
+    };
+  }
+  const scale = group.scale;
+  if (!scale) {
+    return { estimate: null, reason: 'Dữ liệu điểm chuẩn chưa ghi rõ thang điểm — chưa ước tính được.' };
+  }
+  const entryScale = entry.scale != null ? parseFloat(entry.scale) : getExam(group.method).scale;
+  if (entryScale !== scale) {
+    return {
+      estimate: null,
+      reason: `Điểm ${getExam(group.method).label} đã lưu ở thang ${entryScale}, điểm chuẩn ngành này ở thang ${scale} — hãy nhập lại điểm đúng thang ở trang Nhập điểm.`,
+    };
+  }
+  const candidateNative = parseFloat(entry.total);
+  const forecastNative = forecastCutoff(group.history);
+  const factor = 30 / scale; // chuẩn hoá cùng thang 30 để σ sàn của predict.js có nghĩa
+  const history30 = group.history.map((h) => ({ year: h.year, cutoff: h.cutoff * factor }));
+  const estimate = estimateChannel(candidateNative * factor, history30, group.method, {
+    ...ctxBase,
+    channel: 'direct',
   });
+  return {
+    estimate,
+    viaMethod: group.method,
+    channel: 'direct',
+    marginNative: candidateNative - forecastNative,
+    forecastNative,
+    reason: null,
+  };
+}
 
-  // Calculate qualification
-  let hasEligibleMajor = false;
-  filteredMajors.forEach(m => {
-    const type = getScoreType(m.method);
-    if (type !== 'other' && myScores[type] > 0 && myScores[type] >= m.score) {
-      hasEligibleMajor = true;
-    }
-  });
+// ---------------------------------------------------------------------------
+// Sparkline điểm chuẩn theo năm
+// ---------------------------------------------------------------------------
 
-  const methodsList = Array.from(schoolMethodTypes);
-  
-  // Group majors by method type for rendering inside
-  const groupedMajors = useMemo(() => {
-    const groups = {};
-    filteredMajors.forEach(m => {
-      const type = getScoreType(m.method);
-      if (!groups[type]) groups[type] = [];
-      groups[type].push(m);
+function Sparkline({ history }) {
+  const points = useMemo(() => {
+    const asc = [...history].sort((a, b) => a.year - b.year);
+    if (asc.length === 0) return null;
+    if (asc.length === 1) return { single: asc[0] };
+    const min = Math.min(...asc.map((h) => h.cutoff));
+    const max = Math.max(...asc.map((h) => h.cutoff));
+    const span = max - min || 1;
+    const W = 96;
+    const H = 30;
+    const coords = asc.map((h, i) => {
+      const x = 4 + (i / (asc.length - 1)) * (W - 8);
+      const y = 4 + (1 - (h.cutoff - min) / span) * (H - 8);
+      return { x, y, ...h };
     });
-    return groups;
-  }, [filteredMajors]);
-  
+    return { coords, line: coords.map((c) => `${c.x},${c.y}`).join(' ') };
+  }, [history]);
+
+  if (!points) return null;
+  if (points.single) {
+    return (
+      <span className="text-xs text-slate-400">
+        Chỉ có dữ liệu 1 năm ({points.single.year}: <span className="tabular">{fmt(points.single.cutoff)}</span>)
+      </span>
+    );
+  }
   return (
-    <div className={`bg-[#0f172a]/60 border rounded-2xl overflow-hidden transition-all ${hasEligibleMajor ? 'border-green-500/30' : 'border-white/10'}`}>
-      <div className="p-4 cursor-pointer flex items-start gap-3" onClick={() => setOpen(o => !o)}>
-        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold ${hasEligibleMajor ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-slate-500'}`}>
-          {hasEligibleMajor ? <span className="material-symbols-outlined text-base">check_circle</span>
-            : <span className="material-symbols-outlined text-base">apartment</span>}
+    <svg width="96" height="30" viewBox="0 0 96 30" role="img" aria-label="Xu hướng điểm chuẩn qua các năm" className="shrink-0">
+      <polyline points={points.line} fill="none" stroke="var(--arena-ember)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+      {points.coords.map((c) => (
+        <circle key={c.year} cx={c.x} cy={c.y} r="2.5" fill="var(--arena-gold)" />
+      ))}
+    </svg>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Thẻ ngành
+// ---------------------------------------------------------------------------
+
+function ProgramCard({ group, built, inWishlist, onToggleWish, onGoScores }) {
+  const exam = getExam(group.method);
+  const latest = group.history[0];
+  const latestSource = group.sources.find((s) => s.year === latest?.year) || group.sources[0];
+  const { estimate } = built;
+  const bandStyle = estimate ? BAND_STYLE[estimate.band] : null;
+
+  return (
+    <article className="arena-card p-4 space-y-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-arena font-bold text-base leading-snug">{group.majorName}</p>
+          <p className="text-sm text-slate-300 mt-0.5">{group.schoolName}</p>
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <p className="font-bold text-sm text-white leading-tight">{school.university_name}</p>
-              <p className="text-[10px] text-slate-500 mt-0.5">
-                {school.university_code}
-              </p>
-            </div>
-            <span className="material-symbols-outlined text-slate-500 text-base shrink-0 mt-0.5">{open ? 'expand_less' : 'expand_more'}</span>
-          </div>
-          <div className="flex flex-wrap gap-1 mt-2">
-             {/* Show unique method badges */}
-             {methodsList.map(m => <MethodBadge key={m} type={m} />)}
-          </div>
-        </div>
+        <span className="material-symbols-outlined text-slate-500 shrink-0" aria-hidden="true">apartment</span>
       </div>
 
-      {open && (
-        <div className="border-t border-white/8 px-4 py-3 space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
-          {Object.entries(groupedMajors).map(([type, majors]) => {
-            const hasMyScore = type !== 'other' && myScores[type] > 0;
-            return (
-              <div key={type} className="mb-4 last:mb-0">
-                <div className="flex items-center gap-2 mb-2 sticky top-0 bg-[#0f172a] pb-1 z-10 border-b border-white/5">
-                  <span className="text-xs font-bold text-white px-2 py-0.5 rounded-md" style={{ background: METHOD_COLORS[type] }}>{METHOD_LABELS[type]}</span>
-                  {hasMyScore && (
-                     <span className="text-[10px] text-slate-400">Điểm của bạn: <b className="text-white">{myScores[type].toFixed(2)}</b></span>
-                  )}
-                </div>
-                
-                <div className="space-y-1.5">
-                  {majors.map((m, idx) => {
-                    const isEligible = hasMyScore && myScores[type] >= m.score;
-                    return (
-                      <div key={idx} className="flex items-start justify-between gap-3 text-xs bg-white/5 p-2 rounded-lg border border-white/5">
-                         <div className="flex-1">
-                           <p className="font-semibold text-slate-200">{m.major_name}</p>
-                           <p className="text-[9px] text-slate-500 mt-0.5">{m.subject_groups || 'Không ghi rõ tổ hợp'}</p>
-                           {type === 'other' && <p className="text-[9px] text-slate-400 mt-0.5 italic">{m.method}</p>}
-                         </div>
-                         <div className="text-right shrink-0">
-                           <p className="font-bold text-white mb-0.5">{m.score}</p>
-                           {hasMyScore && (
-                             <p className={`text-[10px] font-bold ${isEligible ? 'text-green-400' : 'text-rose-400'}`}>
-                               {isEligible ? 'Đỗ' : 'Trượt'}
-                             </p>
-                           )}
-                         </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            );
-          })}
-          
+      <div className="flex flex-wrap gap-1.5">
+        <span className="arena-chip">{exam.label} · thang {group.scale ?? exam.scale ?? '—'}</span>
+        {group.combo && <span className="arena-chip">Tổ hợp {group.combo}</span>}
+        <span className="arena-chip">{REGION_LABELS[regionOf(group.schoolCode)]}</span>
+        {group.majorCode && <span className="arena-chip">Mã {group.majorCode}</span>}
+      </div>
 
+      <div className="flex items-center gap-3 flex-wrap">
+        <Sparkline history={group.history} />
+        <p className="text-xs text-slate-400">
+          {[...group.history]
+            .sort((a, b) => a.year - b.year)
+            .map((h) => `${h.year}: ${fmt(h.cutoff)}`)
+            .join(' · ')}
+        </p>
+      </div>
+
+      <p className="text-sm">
+        <span className="text-slate-400">Điểm chuẩn {latest.year}: </span>
+        <span className="tabular font-bold">{fmt(latest.cutoff)}</span>
+        <span className="text-slate-400"> / {group.scale}</span>
+        {built.forecastNative != null && (
+          <>
+            <span className="text-slate-400"> · Dự báo năm tới ≈ </span>
+            <span className="tabular font-bold">{fmt(built.forecastNative)}</span>
+            {estimate && <span className="text-slate-400"> ± {fmt(estimate.sigma * ((group.scale || 30) / 30))}</span>}
+          </>
+        )}
+      </p>
+
+      {estimate ? (
+        <div
+          className="rounded-xl px-3 py-2.5 border space-y-1"
+          style={{ borderColor: bandStyle.border, background: bandStyle.bg }}
+        >
+          <div className="flex items-center gap-2 flex-wrap">
+            <span
+              className={`font-arena-display font-bold text-base ${estimate.band === 'far' ? 'text-red-400' : ''}`}
+              style={bandStyle.color ? { color: bandStyle.color } : undefined}
+            >
+              {estimate.bandLabel}
+            </span>
+            {estimate.showPercent ? (
+              <span className="tabular text-sm font-bold">
+                {estimate.probabilityRounded}% khả năng
+                <span className="text-slate-400 font-medium">
+                  {' '}(khoảng {Math.round(estimate.pLow * 100)}–{Math.round(estimate.pHigh * 100)}%)
+                </span>
+              </span>
+            ) : (
+              <span className="text-xs text-slate-300">Độ tin cậy thấp — chỉ hiện mức đánh giá, chưa hiện %</span>
+            )}
+          </div>
+          <p className="text-xs text-slate-300">
+            Điểm của bạn {built.viaMethod !== group.method ? `(quy đổi từ ${getExam(built.viaMethod).label}) ` : ''}
+            {built.marginNative >= 0 ? 'cao hơn' : 'thấp hơn'} dự báo{' '}
+            <span className="tabular font-bold">{fmt(Math.abs(built.marginNative))} điểm</span>
+            {' '}· Độ tin cậy ước tính: {estimate.confidenceLabel.toLowerCase()}
+          </p>
+        </div>
+      ) : (
+        <div className="rounded-xl px-3 py-2.5 border border-white/10 bg-white/5">
+          <p className="text-xs text-slate-300 flex items-start gap-2">
+            <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">info</span>
+            <span>{built.reason || 'Chưa đủ dữ liệu để ước tính cho ngành này.'}</span>
+          </p>
         </div>
       )}
-    </div>
+
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <p className="text-[11px] text-slate-500">
+          Căn cứ: điểm chuẩn {group.history.map((h) => h.year).join(', ')}
+          {latestSource?.url && (
+            <>
+              {' '}· Nguồn:{' '}
+              <a href={latestSource.url} target="_blank" rel="noreferrer" className="underline text-slate-400">
+                {(() => { try { return new URL(latestSource.url).hostname; } catch { return 'nguồn dữ liệu'; } })()}
+              </a>
+            </>
+          )}
+        </p>
+        <div className="flex gap-2">
+          {!estimate && built.reason && built.reason.startsWith('Bạn chưa nhập') && (
+            <button onClick={onGoScores} className="btn-arena btn-arena-sm btn-arena-ghost cursor-pointer">
+              <span className="material-symbols-outlined text-base" aria-hidden="true">edit_note</span>
+              Nhập điểm
+            </button>
+          )}
+          <button
+            onClick={onToggleWish}
+            aria-pressed={inWishlist}
+            className={`btn-arena btn-arena-sm cursor-pointer ${inWishlist ? 'btn-arena-jade' : 'btn-arena-ghost'}`}
+          >
+            <span className="material-symbols-outlined text-base" aria-hidden="true">
+              {inWishlist ? 'bookmark_added' : 'bookmark_add'}
+            </span>
+            {inWishlist ? 'Đã lưu NV' : 'Lưu nguyện vọng'}
+          </button>
+        </div>
+      </div>
+    </article>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Trang chính
+// ---------------------------------------------------------------------------
+
+const WISHLIST_KEY = 'admission_wishlist';
+const DRAFT_KEY = 'admission_scores_v2';
+
+function loadWishlist() {
+  try {
+    const raw = localStorage.getItem(WISHLIST_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
 }
 
 export default function SchoolFinder() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [, setLoadingScores] = useState(true);
-  const [dbScores, setDbScores] = useState(null);
+  const { user, profile } = useAuth();
 
-  // Data fetching
-  const [schoolsData, setSchoolsData] = useState([]);
-  const [loadingData, setLoadingData] = useState(true);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch('/data/all_schools_scores.json', {
-      cache: 'force-cache',
-      signal: controller.signal,
-    })
-      .then(res => res.json())
-      .then(data => {
-        setSchoolsData(data);
-        setLoadingData(false);
-      })
-      .catch(err => {
-        if (err?.name === 'AbortError') {
-          return;
-        }
-        console.error('Error fetching data:', err);
-        setLoadingData(false);
-      });
-
-    return () => controller.abort();
-  }, []);
-
-  useEffect(() => {
-    const fetchScores = async () => {
-      if (!user) {
-        setLoadingScores(false);
-        return;
-      }
-      try {
-        const { data, error } = await supabase.from('profiles').select('admission_scores').eq('id', user.id).single();
-        if (error) throw error;
-        setDbScores(data?.admission_scores || {});
-      } catch (err) {
-        console.error("Error fetching admission scores:", err);
-      } finally {
-        setLoadingScores(false);
-      }
-    };
-    fetchScores();
-  }, [user]);
-
-  const myScores = useMemo(() => {
-    if (!dbScores) return { thpt: 0, vact: 0, tsa: 0, hsa: 0, hb: 0 };
-    const thpt = parseFloat(dbScores.thpt_exam_total) || 0;
-    const hb = parseFloat(dbScores.thpt_transcript_total) || 0;
-    const tsa  = parseFloat(localStorage.getItem('my_tsa') || '0') || 0;
-    const hsa  = parseFloat(localStorage.getItem('my_hsa') || '0') || 0;
-    const vact = parseFloat(localStorage.getItem('my_vact') || '0') || 0;
-    return { thpt, vact, tsa, hsa, hb };
-  }, [dbScores]);
+  const [data, setData] = useState(null);
+  const [loadError, setLoadError] = useState(null);
+  const [retryTick, setRetryTick] = useState(0);
 
   const [query, setQuery] = useState('');
   const [methodFilter, setMethodFilter] = useState('all');
-  const [subjectGroupFilter, setSubjectGroupFilter] = useState('');
+  const [regionFilter, setRegionFilter] = useState('all');
+  const [bandFilter, setBandFilter] = useState('all');
   const [displayLimit, setDisplayLimit] = useState(20);
+  const [showWishlist, setShowWishlist] = useState(false);
+  const [wishlist, setWishlist] = useState(loadWishlist);
 
-  // Filtering
-  const filtered = useMemo(() => {
-    let result = schoolsData;
-    
-    if (query) {
-       const q = normalizeText(query);
-       result = result.filter(s => 
-         normalizeText(s.university_name).includes(q) || 
-         normalizeText(s.university_code).includes(q) ||
-         s.majors.some(m => 
-           normalizeText(m.major_name).includes(q) || 
-           normalizeText(m.subject_groups).includes(q)
-         )
-       );
-    }
-    
-    if (methodFilter !== 'all') {
-       result = result.filter(s => {
-         return s.majors.some(m => getScoreType(m.method) === methodFilter);
-       });
-    }
-
-    if (subjectGroupFilter.trim() !== '') {
-       const sgQuery = normalizeText(subjectGroupFilter.trim());
-       result = result.filter(s => {
-         return s.majors.some(m => normalizeText(m.subject_groups).includes(sgQuery));
-       });
-    }
-
-    return result;
-  }, [schoolsData, query, methodFilter, subjectGroupFilter]);
-
-  // Sort: those where user qualifies are put first, but only if they have scores to qualify with.
-  const hasAnyScore = myScores.thpt > 0 || myScores.tsa > 0 || myScores.vact > 0 || myScores.hsa > 0 || myScores.hb > 0;
-
-  const sorted = useMemo(() => {
-    if (!hasAnyScore) return filtered;
-    
-    const checkEligible = (school) => {
-       for (const m of school.majors) {
-          const type = getScoreType(m.method);
-          if (type !== 'other' && myScores[type] > 0 && myScores[type] >= m.score) {
-             return true;
-          }
-       }
-       return false;
+  // --- Tải dữ liệu điểm chuẩn ---
+  useEffect(() => {
+    let cancelled = false;
+    loadCutoffs()
+      .then((d) => {
+        if (!cancelled) {
+          setData(d);
+          setLoadError(null);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setLoadError(err.message || 'Không tải được dữ liệu điểm chuẩn');
+      });
+    return () => {
+      cancelled = true;
     };
+  }, [retryTick]);
 
-    return [...filtered].sort((a, b) => {
-      const elA = checkEligible(a);
-      const elB = checkEligible(b);
-      if (elA && !elB) return -1;
-      if (!elA && elB) return 1;
-      return 0;
+  const handleRetry = useCallback(() => {
+    clearCutoffCache();
+    setData(null);
+    setRetryTick((t) => t + 1);
+  }, []);
+
+  // --- Hồ sơ điểm v2 ---
+  const profileV2 = useMemo(() => {
+    const local = {
+      my_tsa: (() => { try { return localStorage.getItem('my_tsa'); } catch { return null; } })(),
+      my_hsa: (() => { try { return localStorage.getItem('my_hsa'); } catch { return null; } })(),
+      my_vact: (() => { try { return localStorage.getItem('my_vact'); } catch { return null; } })(),
+    };
+    if (profile?.admission_scores) return migrateLegacyScores(profile.admission_scores, local);
+    try {
+      const draft = localStorage.getItem(DRAFT_KEY);
+      if (draft) {
+        const parsed = JSON.parse(draft);
+        if (parsed?.version === 2) return migrateLegacyScores(parsed, local);
+      }
+    } catch { /* bỏ qua draft lỗi */ }
+    return migrateLegacyScores({}, local);
+  }, [profile]);
+
+  const legacyKeys = useMemo(
+    () => Object.keys(profileV2?.legacy_unverified || {}),
+    [profileV2],
+  );
+
+  const anchors = useMemo(() => extractAnchors(data?.records), [data]);
+  const spectrumMethods = useMemo(() => {
+    const s = new Set();
+    for (const d of data?.score_distributions || []) {
+      const code = String(d.exam || '').toUpperCase();
+      s.add(code === 'THPT_QG' ? 'thpt' : code.toLowerCase());
+    }
+    return s;
+  }, [data]);
+
+  const groups = useMemo(() => (data ? groupHistories(data.records) : []), [data]);
+  const methodsPresent = useMemo(
+    () => [...new Set(groups.map((g) => g.method))],
+    [groups],
+  );
+  const regionsPresent = useMemo(
+    () => [...new Set(groups.map((g) => regionOf(g.schoolCode)))],
+    [groups],
+  );
+
+  // --- Gắn ước tính vào từng nhóm ---
+  const rows = useMemo(() => {
+    const built = groups.map((group) => ({
+      group,
+      built: buildEstimate(group, profileV2, anchors, spectrumMethods, data?.meta?.base_year),
+    }));
+    built.sort((a, b) => {
+      const pa = a.built.estimate?.probability;
+      const pb = b.built.estimate?.probability;
+      if (pa != null && pb != null) return pb - pa;
+      if (pa != null) return -1;
+      if (pb != null) return 1;
+      const ca = (a.group.history[0]?.cutoff || 0) / (a.group.scale || 30);
+      const cb = (b.group.history[0]?.cutoff || 0) / (b.group.scale || 30);
+      return cb - ca;
     });
-  }, [filtered, myScores, hasAnyScore]);
+    return built;
+  }, [groups, profileV2, anchors, spectrumMethods, data]);
 
-  const displayedSchools = useMemo(() => {
-    return sorted.slice(0, displayLimit);
-  }, [sorted, displayLimit]);
+  const filtered = useMemo(() => {
+    let result = rows;
+    if (query.trim()) {
+      const q = normalizeText(query);
+      result = result.filter(
+        ({ group }) =>
+          normalizeText(group.schoolName).includes(q) ||
+          normalizeText(group.majorName).includes(q) ||
+          normalizeText(group.schoolCode).includes(q) ||
+          normalizeText(group.majorCode || '').includes(q),
+      );
+    }
+    if (methodFilter !== 'all') result = result.filter(({ group }) => group.method === methodFilter);
+    if (regionFilter !== 'all') result = result.filter(({ group }) => regionOf(group.schoolCode) === regionFilter);
+    if (bandFilter !== 'all') {
+      result = result.filter(({ built }) => {
+        if (bandFilter === 'none') return !built.estimate;
+        if (bandFilter === 'good') return built.estimate && built.estimate.probability >= 0.7;
+        if (bandFilter === 'mid') return built.estimate && built.estimate.probability >= 0.4 && built.estimate.probability < 0.7;
+        if (bandFilter === 'low') return built.estimate && built.estimate.probability < 0.4;
+        return true;
+      });
+    }
+    return result;
+  }, [rows, query, methodFilter, regionFilter, bandFilter]);
+
+  const displayed = filtered.slice(0, displayLimit);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const bottom = document.documentElement.scrollHeight - document.documentElement.scrollTop <= document.documentElement.clientHeight + 100;
-      if (bottom && displayLimit < sorted.length) {
-        setDisplayLimit(prev => prev + 20);
-      }
+    const onScroll = () => {
+      const bottom =
+        document.documentElement.scrollHeight - document.documentElement.scrollTop <=
+        document.documentElement.clientHeight + 120;
+      if (bottom) setDisplayLimit((prev) => (prev < filtered.length ? prev + 20 : prev));
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [displayLimit, sorted.length]);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [filtered.length]);
+
+  // --- Nguyện vọng ---
+  const wishKeyOf = (g) => [g.schoolCode, g.majorName, g.method, g.combo || ''].join('|');
+  const wishKeys = useMemo(() => new Set(wishlist.map((w) => w.key)), [wishlist]);
+
+  const persistWishlist = useCallback((next) => {
+    setWishlist(next);
+    try {
+      localStorage.setItem(WISHLIST_KEY, JSON.stringify(next));
+    } catch { /* localStorage đầy/chặn — giữ state trong phiên */ }
+  }, []);
+
+  const toggleWish = useCallback(
+    (group, built) => {
+      const key = wishKeyOf(group);
+      const exists = wishlist.some((w) => w.key === key);
+      if (exists) {
+        persistWishlist(wishlist.filter((w) => w.key !== key));
+        if (user) {
+          supabase
+            .from('admission_wishlists')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('school_code', group.schoolCode)
+            .eq('major_name', group.majorName)
+            .eq('method', group.method)
+            .then(() => {}, () => {});
+        }
+        return;
+      }
+      const item = {
+        key,
+        schoolCode: group.schoolCode,
+        schoolName: group.schoolName,
+        majorName: group.majorName,
+        majorCode: group.majorCode,
+        combo: group.combo,
+        method: group.method,
+        estimateSnapshot: built.estimate
+          ? {
+              probability: built.estimate.probability,
+              band: built.estimate.band,
+              bandLabel: built.estimate.bandLabel,
+              marginNative: built.marginNative,
+              forecastNative: built.forecastNative,
+              viaMethod: built.viaMethod,
+              savedAt: new Date().toISOString(),
+            }
+          : null,
+      };
+      const next = [...wishlist, item];
+      persistWishlist(next);
+      if (user) {
+        // Bảng admission_wishlists do migration 20261022100000 tạo — nếu chưa áp
+        // migration thì ghi đồng bộ thất bại lặng lẽ, localStorage vẫn là nguồn chính.
+        supabase
+          .from('admission_wishlists')
+          .upsert(
+            {
+              user_id: user.id,
+              school_code: group.schoolCode,
+              major_name: group.majorName,
+              method: group.method,
+              rank: next.length,
+              estimate_snapshot: item.estimateSnapshot,
+            },
+            { onConflict: 'user_id,school_code,major_name,method' },
+          )
+          .then(() => {}, () => {});
+      }
+    },
+    [wishlist, persistWishlist, user],
+  );
+
+  const moveWish = useCallback(
+    (idx, dir) => {
+      const next = [...wishlist];
+      const target = idx + dir;
+      if (target < 0 || target >= next.length) return;
+      [next[idx], next[target]] = [next[target], next[idx]];
+      persistWishlist(next);
+    },
+    [wishlist, persistWishlist],
+  );
+
+  const wishHealth = useMemo(() => {
+    const withP = wishlist.filter((w) => w.estimateSnapshot?.probability != null);
+    if (withP.length === 0) return null;
+    return portfolioHealth(
+      withP.map((w) => ({ probability: w.estimateSnapshot.probability, schoolCode: w.schoolCode })),
+    );
+  }, [wishlist]);
+
+  const myScoreEntries = useMemo(
+    () =>
+      Object.entries(profileV2?.scores || {}).filter(
+        ([, v]) => v && v.status !== 'none' && (v.total != null || v.byGroup || v.subjects),
+      ),
+    [profileV2],
+  );
+  const hasAnyScore = myScoreEntries.length > 0;
 
   return (
-    <div className="bg-[#0b0f1a] text-white min-h-screen flex flex-col font-display relative">
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(at_30%_0%,rgba(48,110,232,0.10)_0,transparent_60%)]" />
-
-      {/* Header and Top Filters */}
-      <header className="shrink-0 px-4 py-4 md:px-6 md:py-5 flex flex-col bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10 z-20">
-        <div className="flex items-center justify-between w-full max-w-4xl mx-auto">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-slate-800/50 flex items-center justify-center hover:bg-slate-700 transition-colors shrink-0">
-            <span className="material-symbols-outlined">arrow_back_ios_new</span>
+    <div className="min-h-dvh font-arena text-slate-100 relative" style={{ background: 'var(--arena-ink)' }}>
+      {/* Header */}
+      <header
+        className="sticky top-0 z-20 backdrop-blur-md border-b border-white/10"
+        style={{ background: 'rgba(25,14,18,0.85)' }}
+      >
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            aria-label="Quay lại"
+            className="w-11 h-11 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined" aria-hidden="true">arrow_back_ios_new</span>
           </button>
-          <h1 className="text-lg md:text-xl font-bold tracking-tight">Tìm trường phù hợp</h1>
-          <div className="w-10" />
-        </div>
-
-        {/* Filters Panel */}
-        <div className="w-full max-w-4xl mx-auto mt-4 md:mt-5 flex flex-col md:flex-row gap-3">
-           <div className="relative flex-1">
-             <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-base">search</span>
-             <input value={query} onChange={e => {setQuery(e.target.value); setDisplayLimit(20);}}
-               placeholder="Nhập tên trường, ngành học..."
-               className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-[#306ee8]/40 placeholder:text-slate-500 transition-all" />
-           </div>
-
-           <div className="flex gap-2">
-             <input value={subjectGroupFilter} onChange={e => {setSubjectGroupFilter(e.target.value); setDisplayLimit(20);}}
-               placeholder="Khối (VD: A00, D01)"
-               className="flex-1 md:w-40 text-sm bg-white/5 border border-white/10 text-slate-300 rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-[#306ee8] placeholder:text-slate-500" />
-
-             <select value={methodFilter} onChange={e => {setMethodFilter(e.target.value); setDisplayLimit(20);}}
-               className="flex-1 md:w-48 text-sm bg-white/5 border border-white/10 text-slate-300 rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-[#306ee8]">
-               <option value="all"  className="bg-[#0b0f1a]">Tất cả PT</option>
-               <option value="thpt" className="bg-[#0b0f1a]">THPT Quốc gia</option>
-               <option value="tsa"  className="bg-[#0b0f1a]">TSA (Bách Khoa HN)</option>
-               <option value="vact" className="bg-[#0b0f1a]">VACT (ĐHQG HCM)</option>
-               <option value="hsa"  className="bg-[#0b0f1a]">HSA (ĐHQG HN)</option>
-               <option value="hb"   className="bg-[#0b0f1a]">Học bạ</option>
-             </select>
-           </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-arena-display font-bold text-xl leading-tight">Tìm trường phù hợp</h1>
+            <p className="text-xs text-slate-400">
+              Ước tính khả năng theo điểm chuẩn {data?.meta?.base_year || 'các năm gần nhất'} và các năm trước
+            </p>
+          </div>
+          <button
+            onClick={() => setShowWishlist((s) => !s)}
+            aria-expanded={showWishlist}
+            className="btn-arena btn-arena-sm btn-arena-ghost cursor-pointer shrink-0"
+          >
+            <span className="material-symbols-outlined text-base" aria-hidden="true">bookmark</span>
+            Nguyện vọng ({wishlist.length})
+          </button>
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 pt-5 pb-6 space-y-4 md:space-y-5 relative z-10">
+      <main className="max-w-4xl mx-auto px-4 py-5 space-y-4 relative z-10">
+        {/* Disclaimer bắt buộc (ALGORITHM §5.3) */}
+        <div className="arena-card p-4 flex gap-3">
+          <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">info</span>
+          <p className="text-xs leading-relaxed text-slate-300">{DISCLAIMER}</p>
+        </div>
 
-        {/* My Score Banner */}
-        {hasAnyScore ? (
-          <div className="bg-green-500/10 border border-green-500/25 rounded-xl px-4 py-3 flex items-center gap-3">
-            <span className="material-symbols-outlined text-green-400 text-lg">verified</span>
-            <div className="flex-1">
-              <p className="text-xs font-bold text-green-300">Điểm của bạn đã tải từ trang Tính điểm</p>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {myScores.thpt > 0 && <span className="text-[10px] text-slate-300 bg-[#306ee8]/15 border border-[#306ee8]/25 rounded px-1.5 py-0.5">THPT {myScores.thpt.toFixed(2)}</span>}
-                {myScores.hb > 0 && <span className="text-[10px] text-slate-300 bg-[#f59e0b]/15 border border-[#f59e0b]/25 rounded px-1.5 py-0.5">Học bạ {myScores.hb.toFixed(2)}</span>}
-                {myScores.vact > 0 && <span className="text-[10px] text-slate-300 bg-[#e36488]/15 border border-[#e36488]/25 rounded px-1.5 py-0.5">VACT {myScores.vact}</span>}
-                {myScores.tsa  > 0 && <span className="text-[10px] text-slate-300 bg-[#8b5cf6]/15 border border-[#8b5cf6]/25 rounded px-1.5 py-0.5">TSA {myScores.tsa.toFixed(1)}</span>}
-                {myScores.hsa  > 0 && <span className="text-[10px] text-slate-300 bg-[#10b981]/15 border border-[#10b981]/25 rounded px-1.5 py-0.5">HSA {myScores.hsa.toFixed(1)}</span>}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
-            <span className="material-symbols-outlined text-amber-400 text-lg">info</span>
-            <div>
-              <p className="text-xs text-amber-300 font-semibold">Chưa có điểm</p>
-              <p className="text-[10px] text-slate-400">Vào <button onClick={() => navigate('/gpa')} className="underline text-amber-400">Tính điểm</button> để nhập điểm và tự động so sánh với điểm chuẩn</p>
+        {/* Điểm HSA/V-ACT cũ không tin cậy */}
+        {legacyKeys.length > 0 && (
+          <div className="arena-card p-4 flex gap-3" style={{ borderColor: 'rgba(242,193,89,0.5)' }}>
+            <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">warning</span>
+            <div className="flex-1 space-y-2">
+              <p className="text-sm font-semibold">Điểm HSA / V-ACT đã lưu trước đây cần nhập lại</p>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Bản cũ của trang Tính điểm từng ghi sai thang điểm hai kỳ thi này, nên điểm cũ đang được
+                cách ly và <b>không</b> dùng để ước tính. Hãy nhập lại điểm đúng kỳ thi để kết quả đáng tin.
+              </p>
+              <button onClick={() => navigate('/tim-truong/diem')} className="btn-arena btn-arena-sm btn-arena-gold cursor-pointer">
+                <span className="material-symbols-outlined text-base" aria-hidden="true">edit_note</span>
+                Nhập lại điểm
+              </button>
             </div>
           </div>
         )}
 
-
-
-        {/* ── Result count ── */}
-        <div className="flex items-center justify-between px-1">
-          <p className="text-xs text-slate-400">
-            <span className="font-bold text-white">{sorted.length}</span> trường phù hợp
-          </p>
-          {hasAnyScore && <span className="text-[10px] text-green-400 flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Đủ điều kiện lên trước</span>}
-        </div>
-
-        {/* ── School list ── */}
-        <div className="space-y-3 pb-8">
-          {loadingData ? (
-             <div className="flex justify-center items-center py-10">
-               <span className="material-symbols-outlined text-[#306ee8] text-4xl animate-spin">sync</span>
-             </div>
-          ) : sorted.length === 0 ? (
-            <div className="text-center py-16 text-slate-500">
-              <span className="material-symbols-outlined text-5xl block mb-3">search_off</span>
-              <p className="text-sm">Không tìm thấy trường phù hợp</p>
-              <p className="text-xs mt-1">Thử đổi từ khóa hoặc bỏ lọc</p>
+        {/* Hồ sơ điểm của tôi */}
+        {hasAnyScore ? (
+          <div className="arena-card p-4 flex gap-3">
+            <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-jade)' }} aria-hidden="true">verified</span>
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Điểm của bạn đang dùng để ước tính</p>
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {myScoreEntries.map(([code, v]) => {
+                  const exam = EXAMS[code];
+                  const label = exam?.label || code.toUpperCase();
+                  const shown =
+                    v.total != null
+                      ? `${fmt(parseFloat(v.total), code === 'vact' || code === 'vsat' ? 0 : 2)}${exam?.scale ? ` / ${exam.scale}` : ''}`
+                      : 'theo tổ hợp';
+                  return (
+                    <span key={code} className="arena-chip">
+                      {label}: <span className="tabular">{shown}</span>
+                      {v.status === 'mock' ? ' (thi thử)' : v.status === 'target' ? ' (mục tiêu)' : ''}
+                    </span>
+                  );
+                })}
+              </div>
+              <button onClick={() => navigate('/tim-truong/diem')} className="btn-arena btn-arena-sm btn-arena-ghost cursor-pointer mt-3">
+                <span className="material-symbols-outlined text-base" aria-hidden="true">edit_note</span>
+                Cập nhật điểm
+              </button>
             </div>
-          ) : (
-            displayedSchools.map((s, i) => <SchoolCard key={s.university_code + i} school={s} myScores={myScores} subjectGroupFilter={subjectGroupFilter} query={query} />)
-          )}
-          
-          {displayLimit < sorted.length && !loadingData && (
-             <div className="text-center py-4">
-               <span className="material-symbols-outlined text-slate-500 animate-bounce">expand_more</span>
-             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="arena-card p-4 flex gap-3">
+            <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">info</span>
+            <div className="flex-1 space-y-2">
+              <p className="text-sm font-semibold">Bạn chưa nhập điểm</p>
+              <p className="text-xs text-slate-300">
+                Nhập điểm THPT, HSA, V-ACT, TSA... để xem ước tính khả năng cho từng ngành dưới đây.
+                Chưa nhập điểm, trang chỉ hiện điểm chuẩn các năm để tham khảo.
+              </p>
+              <button onClick={() => navigate('/tim-truong/diem')} className="btn-arena btn-arena-sm btn-arena-primary cursor-pointer">
+                <span className="material-symbols-outlined text-base" aria-hidden="true">edit_note</span>
+                Nhập điểm ngay
+              </button>
+            </div>
+          </div>
+        )}
 
+        {/* Panel nguyện vọng */}
+        {showWishlist && (
+          <section className="arena-card p-4 space-y-3" aria-label="Danh sách nguyện vọng đã lưu">
+            <h2 className="font-arena-display font-bold text-lg">Nguyện vọng của tôi ({wishlist.length})</h2>
+            {wishHealth && wishHealth.warnings.length > 0 && (
+              <div className="space-y-2">
+                {wishHealth.warnings.map((w) => (
+                  <p
+                    key={w.code}
+                    className="text-xs leading-relaxed rounded-xl px-3 py-2 border flex gap-2"
+                    style={{
+                      borderColor: w.level === 'red' ? 'rgba(248,113,113,0.5)' : 'rgba(242,193,89,0.5)',
+                      background: w.level === 'red' ? 'rgba(248,113,113,0.08)' : 'rgba(242,193,89,0.08)',
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+                      {w.level === 'red' ? 'error' : 'warning'}
+                    </span>
+                    <span>{w.text}</span>
+                  </p>
+                ))}
+              </div>
+            )}
+            {wishHealth && (
+              <p className="text-xs text-slate-400">
+                Điểm sức khoẻ danh sách: <span className="tabular font-bold text-slate-200">{wishHealth.score}/100</span>
+                {' '}— phân bổ an toàn / cân nhắc / mạo hiểm hợp lý và có nguyện vọng sàn an toàn sẽ cho điểm cao.
+              </p>
+            )}
+            {wishlist.length === 0 ? (
+              <p className="text-sm text-slate-400">
+                Chưa có nguyện vọng nào. Bấm “Lưu nguyện vọng” ở thẻ ngành bên dưới để thêm vào danh sách này.
+              </p>
+            ) : (
+              <ol className="space-y-2">
+                {wishlist.map((w, idx) => (
+                  <li key={w.key} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                    <span className="font-arena-display font-bold text-sm shrink-0" style={{ color: 'var(--arena-gold)' }}>
+                      NV{idx + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold leading-snug">{w.majorName}</p>
+                      <p className="text-[11px] text-slate-400">
+                        {w.schoolName} · {getExam(w.method).label}
+                        {w.estimateSnapshot
+                          ? ` · Lúc lưu: ${w.estimateSnapshot.bandLabel}${w.estimateSnapshot.probability != null ? ` (${Math.round(w.estimateSnapshot.probability * 20) * 5}%)` : ''}`
+                          : ' · Chưa có ước tính lúc lưu'}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0">
+                      <button
+                        onClick={() => moveWish(idx, -1)}
+                        disabled={idx === 0}
+                        aria-label="Đưa nguyện vọng lên trên"
+                        className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-white/10 disabled:opacity-30 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined" aria-hidden="true">arrow_upward</span>
+                      </button>
+                      <button
+                        onClick={() => moveWish(idx, 1)}
+                        disabled={idx === wishlist.length - 1}
+                        aria-label="Đưa nguyện vọng xuống dưới"
+                        className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-white/10 disabled:opacity-30 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined" aria-hidden="true">arrow_downward</span>
+                      </button>
+                      <button
+                        onClick={() => persistWishlist(wishlist.filter((x) => x.key !== w.key))}
+                        aria-label="Xoá nguyện vọng"
+                        className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-white/10 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined" aria-hidden="true">delete</span>
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <p className="text-[11px] text-slate-500">
+              Danh sách này để chuẩn bị và cân đối nguyện vọng — không thay thế đăng ký nguyện vọng chính thức trên cổng của Bộ GD&ĐT.
+            </p>
+          </section>
+        )}
+
+        {/* Bộ lọc */}
+        <section className="arena-card p-4 space-y-3" aria-label="Bộ lọc tìm trường">
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-base" aria-hidden="true">search</span>
+            <input
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setDisplayLimit(20); }}
+              placeholder="Nhập tên trường, ngành học, mã ngành..."
+              aria-label="Tìm kiếm trường hoặc ngành"
+              className="w-full pl-10 pr-4 min-h-[44px] bg-white/5 border border-white/10 rounded-xl text-sm outline-none focus:ring-2 placeholder:text-slate-500"
+              style={{ '--tw-ring-color': 'var(--arena-ember)' }}
+            />
+          </div>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Lọc theo phương thức">
+            <FilterChip active={methodFilter === 'all'} onClick={() => { setMethodFilter('all'); setDisplayLimit(20); }}>
+              Tất cả phương thức
+            </FilterChip>
+            {methodsPresent.map((m) => (
+              <FilterChip key={m} active={methodFilter === m} onClick={() => { setMethodFilter(m); setDisplayLimit(20); }}>
+                {getExam(m).label}
+              </FilterChip>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2 items-center" role="group" aria-label="Lọc theo khu vực và mức đánh giá">
+            <FilterChip active={regionFilter === 'all'} onClick={() => { setRegionFilter('all'); setDisplayLimit(20); }}>
+              Mọi khu vực
+            </FilterChip>
+            {regionsPresent.map((r) => (
+              <FilterChip key={r} active={regionFilter === r} onClick={() => { setRegionFilter(r); setDisplayLimit(20); }}>
+                {REGION_LABELS[r]}
+              </FilterChip>
+            ))}
+            <select
+              value={bandFilter}
+              onChange={(e) => { setBandFilter(e.target.value); setDisplayLimit(20); }}
+              aria-label="Lọc theo mức đánh giá"
+              className="min-h-[44px] text-sm bg-white/5 border border-white/10 text-slate-200 rounded-xl px-3 outline-none cursor-pointer"
+              style={{ backgroundColor: 'var(--arena-surface)' }}
+            >
+              <option value="all">Mọi mức đánh giá</option>
+              <option value="good">Khả quan (từ 70%)</option>
+              <option value="mid">Cân nhắc (40–70%)</option>
+              <option value="low">Thấp (dưới 40%)</option>
+              <option value="none">Chưa ước tính được</option>
+            </select>
+          </div>
+        </section>
+
+        {/* Trạng thái tải / lỗi / kết quả */}
+        {loadError ? (
+          <div className="arena-card p-6 text-center space-y-3">
+            <span className="material-symbols-outlined text-4xl text-red-400" aria-hidden="true">cloud_off</span>
+            <p className="font-semibold">Không tải được dữ liệu điểm chuẩn</p>
+            <p className="text-sm text-slate-400">{loadError}</p>
+            <button onClick={handleRetry} className="btn-arena btn-arena-primary cursor-pointer">
+              <span className="material-symbols-outlined text-base" aria-hidden="true">refresh</span>
+              Thử lại
+            </button>
+          </div>
+        ) : !data ? (
+          <div className="flex justify-center items-center py-12" role="status" aria-label="Đang tải dữ liệu">
+            <span className="material-symbols-outlined text-4xl animate-spin" style={{ color: 'var(--arena-ember)' }} aria-hidden="true">sync</span>
+          </div>
+        ) : (
+          <>
+            <p className="text-xs text-slate-400 px-1">
+              <span className="tabular font-bold text-slate-100">{filtered.length}</span> ngành có dữ liệu điểm chuẩn
+              {hasAnyScore && ' · ngành có khả năng cao hơn được xếp trước'}
+            </p>
+            {filtered.length === 0 ? (
+              <div className="arena-card p-8 text-center space-y-2">
+                <span className="material-symbols-outlined text-4xl text-slate-500" aria-hidden="true">search_off</span>
+                <p className="text-sm font-semibold">Không tìm thấy ngành phù hợp với bộ lọc</p>
+                <p className="text-xs text-slate-400">Thử đổi từ khoá hoặc bỏ bớt điều kiện lọc.</p>
+              </div>
+            ) : (
+              <div className="space-y-3 pb-4">
+                {displayed.map(({ group, built }) => (
+                  <ProgramCard
+                    key={`${group.schoolCode}|${group.majorName}|${group.method}|${group.combo || ''}`}
+                    group={group}
+                    built={built}
+                    inWishlist={wishKeys.has(wishKeyOf(group))}
+                    onToggleWish={() => toggleWish(group, built)}
+                    onGoScores={() => navigate('/tim-truong/diem')}
+                  />
+                ))}
+                {displayLimit < filtered.length && (
+                  <p className="text-center py-3">
+                    <span className="material-symbols-outlined text-slate-500 animate-bounce" aria-hidden="true">expand_more</span>
+                  </p>
+                )}
+              </div>
+            )}
+            <p className="text-[11px] text-slate-500 text-center pb-6">{DISCLAIMER}</p>
+          </>
+        )}
       </main>
     </div>
+  );
+}
+
+function FilterChip({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-pressed={active}
+      className="arena-chip cursor-pointer min-h-[44px] px-4 transition-all active:scale-[0.98]"
+      style={
+        active
+          ? { borderColor: 'var(--arena-ember)', background: 'rgba(227,100,136,0.16)', color: 'white' }
+          : undefined
+      }
+    >
+      {children}
+    </button>
   );
 }
