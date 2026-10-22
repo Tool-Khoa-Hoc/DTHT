@@ -93,15 +93,33 @@
     Typeface Việt hoá gốc: hỗ trợ dấu tiếng Việt tuyệt đối, các weight nặng
     (700/800) đủ lực cho tiêu đề kiểu "đấu trường". Dùng riêng cho heading —
     body vẫn là Plus Jakarta Sans. Tải non-blocking như các font khác.
+    (Đợt Arena Bento: bổ sung 400/500 cho body/UI của component mới.)
   -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
     media="print"
     onload="this.media='all'"
   />
   <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  </noscript>
+
+  <!--
+    ═══════════ Arena display face — Baloo 2 ═══════════
+    Font display của design system "Arena Bento" (hero, tiêu đề lớn, số EXP):
+    rounded, nặng, đúng chất gamification và CÓ subset vietnamese nên không
+    gãy dấu tiếng Việt. Dùng qua class .font-arena-display / --arena-font-display.
+    Tải non-blocking + display=swap như các font khác; preconnect ở trên đã có.
+  -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap"
+    rel="stylesheet"
+    media="print"
+    onload="this.media='all'"
+  />
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
   </noscript>
 
   <!-- Material Symbols — Icon font, không cần block render -->
