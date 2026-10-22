@@ -6,7 +6,8 @@ import {
 } from '../src/lib/admission/predict.js';
 import { normalizeMethodCode, getExam } from '../src/lib/admission/exams.js';
 import { migrateLegacyScores, validateScoreInput } from '../src/lib/admission/scores.js';
-import { groupHistories } from '../src/lib/admission/cutoffs.js';
+import { groupHistories, normalizeRecord } from '../src/lib/admission/cutoffs.js';
+import { parseComboField } from '../src/lib/admission/combos.js';
 
 let passed = 0;
 const ok = (name, cond) => { assert.ok(cond, name); passed++; console.log('  ✓', name); };
@@ -73,6 +74,24 @@ const groups = groupHistories([
   { school_code: 'HUST', school_name: 'BKHN', major_name: 'IT1', method: 'THPT_QG', scale: 30, cutoff: null, year: 2024, verified: false, source_url: 'https://example.vn' },
 ]);
 ok('groupHistories gom 1 nhóm, 2 năm, mới trước', groups.length === 1 && groups[0].history.length === 2 && groups[0].history[0].year === 2026);
+
+// 8b) Chống hồi quy 22/10/2026: combo từ Supabase là text[] (MẢNG), từ JSON là
+// chuỗi. normalizeRecord phải chuẩn hoá về chuỗi + mảng mã ở mọi nguồn, và
+// parseComboField phải nuốt được cả hai dạng — SchoolFinder.comboRaw từng
+// gọi .split() trên mảng nên sập "s.split is not a function" khi dữ liệu
+// điểm chuẩn đến từ Supabase.
+const recArr = normalizeRecord({ school_code: 'HMU', major_name: 'Y khoa', combo: ['B00', 'A00'], method: 'THPT_QG', scale: 30, cutoff: 27, year: 2026 });
+ok('normalizeRecord combo dạng mảng (Supabase text[]) -> chuỗi "B00/A00"', recArr.combo === 'B00/A00');
+ok('normalizeRecord combo dạng mảng -> combos là mảng mã', Array.isArray(recArr.combos) && recArr.combos.join(',') === 'B00,A00');
+const recStr = normalizeRecord({ school_code: 'HMU', major_name: 'Y khoa', combo: 'B00/A00', method: 'THPT_QG', scale: 30, cutoff: 27, year: 2026 });
+ok('normalizeRecord combo dạng chuỗi (JSON) giữ nguyên', recStr.combo === 'B00/A00' && recStr.combos.join(',') === 'B00,A00');
+const recNull = normalizeRecord({ school_code: 'HMU', major_name: 'Y khoa', combo: null, method: 'hsa', scale: 150, cutoff: 100, year: 2026 });
+ok('normalizeRecord combo null -> combo null, combos rỗng', recNull.combo === null && recNull.combos.length === 0);
+ok('parseComboField nuốt mảng / chuỗi / null / số', parseComboField(['a00']).join() === 'A00' && parseComboField('A00,B00').length === 2 && parseComboField(null).length === 0 && parseComboField(0).length === 0);
+const groupsArr = groupHistories([
+  { school_code: 'HMU', school_name: 'Trường Đại học Y Hà Nội', major_name: 'Y khoa', combo: ['B00'], method: 'THPT_QG', scale: 30, cutoff: 27, year: 2026, verified: true, source_url: 'https://example.vn' },
+]);
+ok('groupHistories với combo mảng không sập, group.combo là chuỗi', groupsArr.length === 1 && groupsArr[0].combo === 'B00');
 
 // 9) Portfolio: toàn NV rủi ro -> cảnh báo đỏ NO_SAFE
 const health = portfolioHealth([{ probability: 0.3, schoolCode: 'A' }, { probability: 0.2, schoolCode: 'B' }]);
