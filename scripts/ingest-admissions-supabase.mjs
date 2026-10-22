@@ -129,7 +129,7 @@ async function upsert(table, rows, onConflict, chunk = 200) {
 
 try {
   await upsert('admission_schools', [...schools.values()], 'code');
-  await upsert('admission_cutoffs', cutoffRows, 'school_code,major_code,major_name,method,year,segment');
+  await upsert('admission_cutoffs', cutoffRows, 'school_code,major_code,major_name,combo,method,year,segment');
   await upsert('admission_conversion_anchors', anchorRows, 'from_exam,to_exam,combo,year,framework,scope,school_code,src');
   await upsert('admission_score_distributions', distRows, 'exam,year,session');
   console.log('\nĐÃ NẠP XONG vào Supabase.');
