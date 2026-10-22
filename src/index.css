@@ -299,3 +299,191 @@
     scroll-behavior: auto;
   }
 }
+
+/*
+  ═══════════ Arena Bento — lớp bổ sung (Đợt 1 + 4) ═══════════
+  Chỉ THÊM token/class mới cho design system "Arena Bento" trên nền bản sắc
+  sẵn có (ink plum + ember + gold + jade). Không xoá/sửa token cũ ở trên.
+  Tài liệu: design-system/MASTER.md.
+*/
+:root {
+  --arena-ink: #120a0d;
+  --arena-surface: #201216;
+  --arena-surface-2: #2b1621;
+  --arena-line: rgba(255, 255, 255, 0.09);
+  --arena-ember: #e36488;
+  --arena-ember-strong: #cf4f74;
+  --arena-gold: #f2c159;
+  --arena-jade: #5fcfa6;
+  --arena-jade-strong: #33b488;
+  --arena-text: #f5eef2;
+  --arena-muted: #b8a7b1;
+  --arena-radius: 20px;
+  --arena-shadow-card:
+    0 18px 44px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --arena-font-display: 'Baloo 2', 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Display face Arena Bento (Baloo 2) — hero, tiêu đề lớn, số EXP */
+.font-arena-display {
+  font-family: var(--arena-font-display);
+  letter-spacing: -0.005em;
+}
+
+/* Số liệu không nhảy layout: EXP, đồng hồ phiên, hạng */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Thẻ bento: nền gradient nhẹ trên ink, viền mảnh, bo lớn, bóng sâu */
+.arena-card {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--arena-line);
+  border-radius: var(--arena-radius);
+  box-shadow: var(--arena-shadow-card);
+  color: var(--arena-text);
+}
+
+/* Thẻ bấm được: hover nhấc nhẹ (desktop), soft-press khi bấm */
+.arena-card-interactive {
+  cursor: pointer;
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
+}
+@media (hover: hover) {
+  .arena-card-interactive:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
+.arena-card-interactive:active {
+  transform: scale(0.99);
+}
+
+/* Trạng thái đang chọn của thẻ (GV/môn) — viền jade + quầng sáng nhẹ */
+.arena-card-active {
+  border-color: rgba(95, 207, 166, 0.65);
+  box-shadow:
+    0 18px 44px rgba(51, 180, 136, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Chip nhỏ: nhãn môn, trạng thái, meta — wrap được, chữ luôn đi kèm ý nghĩa */
+.arena-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--arena-line);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e7dbe1;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: normal;
+}
+
+/* Nút Arena Bento — dùng qua component ArenaButton */
+.btn-arena {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 20px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  font-family: var(--arena-font-display);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out;
+}
+.btn-arena:active {
+  transform: scale(0.98);
+}
+.btn-arena:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(95, 207, 166, 0.55);
+}
+.btn-arena[disabled],
+.btn-arena[aria-disabled='true'] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.btn-arena-sm {
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 13.5px;
+}
+.btn-arena-lg {
+  min-height: 52px;
+  padding: 12px 24px;
+  font-size: 16px;
+}
+.btn-arena-primary {
+  color: #fff;
+  background-image: linear-gradient(135deg, #ec7c9c, var(--arena-ember) 46%, var(--arena-ember-strong));
+  box-shadow: 0 14px 30px rgba(227, 100, 136, 0.32);
+}
+.btn-arena-jade {
+  color: #120a0d;
+  background-image: linear-gradient(135deg, #9fe6cd, var(--arena-jade) 48%, var(--arena-jade-strong));
+  box-shadow: 0 14px 30px rgba(51, 180, 136, 0.28);
+}
+.btn-arena-gold {
+  color: #120a0d;
+  background-image: linear-gradient(135deg, #f8d78a, var(--arena-gold) 52%, #dda23a);
+  box-shadow: 0 14px 30px rgba(242, 193, 89, 0.26);
+}
+.btn-arena-ghost {
+  color: #f1e6ec;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+@media (hover: hover) {
+  .btn-arena:hover {
+    transform: translateY(-1px);
+  }
+  .btn-arena-ghost:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Thanh tiến độ Arena Bento (component ProgressBar) */
+.arena-progress {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+.arena-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 300ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arena-card-interactive,
+  .btn-arena,
+  .arena-progress-fill {
+    transition: none !important;
+  }
+  .arena-card-interactive:hover,
+  .arena-card-interactive:active,
+  .btn-arena:hover,
+  .btn-arena:active {
+    transform: none !important;
+  }
+}
