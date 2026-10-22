@@ -119,6 +119,8 @@ function App() {
                   <Route path="admin" element={<Admin />} />
                   <Route path="admission" element={<AdmissionCalculator />} />
                   <Route path="schools" element={<SchoolFinder />} />
+                  <Route path="tim-truong" element={<SchoolFinder />} />
+                  <Route path="tim-truong/diem" element={<AdmissionCalculator />} />
                   <Route path="arena" element={<StudyArena />} />
                   <Route path="collaborator" element={<Collaborator />} />
                   <Route path="profile/:id" element={<UserProfile />} />
