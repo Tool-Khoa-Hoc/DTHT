@@ -36,6 +36,22 @@ export async function loadCutoffsFromSupabase(supabaseClient) {
       if (!data || data.length < pageSize) break;
     }
     if (!rows.length) return null;
+    // Bảng admission_cutoffs không có tên trường — tên nằm ở admission_schools
+    // (name_vi). Ghép vào từng record để UI/tìm kiếm có school_name như bản
+    // JSON tĩnh; bảng trường đọc lỗi thì bỏ qua, không chặn dữ liệu điểm.
+    try {
+      const { data: schools, error: schoolsError } = await supabaseClient
+        .from('admission_schools')
+        .select('code, name_vi');
+      if (!schoolsError && Array.isArray(schools)) {
+        const nameByCode = new Map(schools.map((s) => [s.code, s.name_vi]));
+        for (const r of rows) {
+          if (!r.school_name && nameByCode.has(r.school_code)) {
+            r.school_name = nameByCode.get(r.school_code);
+          }
+        }
+      }
+    } catch { /* thiếu tên trường không được làm hỏng dữ liệu điểm chuẩn */ }
     return {
       meta: { source: 'supabase', table: 'admission_cutoffs', record_count: rows.length },
       records: rows,
@@ -67,13 +83,20 @@ export function clearCutoffCache() {
 
 // Chuẩn hoá 1 record nguồn về format runtime.
 export function normalizeRecord(r) {
+  // combo có HAI hình dạng tuỳ nguồn: file JSON tĩnh là chuỗi "A00/A01",
+  // còn cột combo trên Supabase là text[] nên client trả về MẢNG ['A00','A01'].
+  // Chuẩn hoá tại đây về 1 dạng duy nhất: combos = mảng mã, combo = chuỗi
+  // "A00/A01" (hoặc null). Mọi nơi tiêu thụ (SchoolFinder.comboRaw từng gọi
+  // combo.split() thẳng) đều an toàn với cả hai nguồn — lỗi "s.split is not
+  // a function" ngày 22/10/2026 đến từ việc giữ nguyên mảng của Supabase.
+  const combos = parseComboField(r.combo);
   return {
     schoolCode: r.school_code,
     schoolName: r.school_name || null,
     majorCode: r.major_code || null,
     majorName: r.major_name,
-    combo: r.combo || null,
-    combos: parseComboField(r.combo),
+    combo: combos.length ? combos.join('/') : null,
+    combos,
     method: normalizeMethodCode(r.method),
     methodRaw: r.method,
     scale: r.scale ?? null,

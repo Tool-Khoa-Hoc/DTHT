@@ -41,7 +41,7 @@ function normalizeText(value) {
 }
 
 function splitTeacherTitle(title) {
-  const [mainTitle, ...detailParts] = title.split(' - ');
+  const [mainTitle, ...detailParts] = String(title ?? '').split(' - ');
   return {
     mainTitle: mainTitle.trim(),
     detail: detailParts.join(' - ').trim(),
@@ -317,8 +317,20 @@ export default function OnlineLearning() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(70%_45%_at_82%_-8%,rgba(95,207,166,0.1),transparent_60%),radial-gradient(48%_38%_at_-2%_2%,rgba(227,100,136,0.07),transparent_55%)] bg-ink-950 pb-24 font-display text-slate-100 xl:flex xl:h-dvh xl:flex-col xl:overflow-hidden xl:pb-0">
-      {/* ── Đầu trang dạng bento (Arena Bento) ───────────────────────── */}
+    <div
+      className={cn(
+        'bg-[radial-gradient(70%_45%_at_82%_-8%,rgba(95,207,166,0.1),transparent_60%),radial-gradient(48%_38%_at_-2%_2%,rgba(227,100,136,0.07),transparent_55%)] bg-ink-950 font-display text-slate-100',
+        // Chế độ tập trung khi đang xem sheet: trang khoá đúng 1 màn hình
+        // (mobile trừ header 3rem + bottom-nav 4rem của RootLayout), không
+        // cuộn, để vùng sheet ở dưới giãn hết phần còn lại.
+        activeTeacher
+          ? 'flex h-[calc(100dvh-7rem)] flex-col overflow-hidden pb-0 md:h-dvh'
+          : 'min-h-screen pb-24 xl:flex xl:h-dvh xl:flex-col xl:overflow-hidden xl:pb-0',
+      )}
+    >
+      {/* ── Đầu trang dạng bento (Arena Bento) — ẩn hẳn khi đang xem sheet,
+          dải bento này chiếm ~40% chiều cao khiến sheet bị thu nhỏ ── */}
+      {!activeTeacher && (
       <header className="shrink-0 px-3 pt-4 sm:px-5 lg:px-6 xl:pt-3">
         <div className="mx-auto max-w-[1760px]">
           <div className={cn('grid gap-3', user ? 'xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)_minmax(0,0.95fr)]' : 'xl:grid-cols-1')}>
@@ -441,12 +453,17 @@ export default function OnlineLearning() {
           )}
         </div>
       </header>
+      )}
 
       <main
-        className={cn(
-          'mx-auto grid w-full max-w-[1760px] gap-5 px-3 py-5 sm:px-5 lg:px-6 xl:min-h-0 xl:flex-1 xl:overflow-hidden xl:py-3',
-          activeTeacher ? 'xl:grid-cols-1' : activeSubject ? 'xl:grid-cols-[260px_minmax(0,1fr)]' : 'xl:grid-cols-1',
-        )}
+        className={
+          activeTeacher
+            ? 'grid min-h-0 w-full flex-1 grid-cols-1 overflow-hidden'
+            : cn(
+                'mx-auto grid w-full max-w-[1760px] gap-5 px-3 py-5 sm:px-5 lg:px-6 xl:min-h-0 xl:flex-1 xl:overflow-hidden xl:py-3',
+                activeSubject ? 'xl:grid-cols-[260px_minmax(0,1fr)]' : 'xl:grid-cols-1',
+              )
+        }
       >
         {!activeTeacher && activeSubject && (
           <aside className="xl:flex xl:min-h-0 xl:flex-col xl:self-stretch">
@@ -472,7 +489,7 @@ export default function OnlineLearning() {
           </aside>
         )}
 
-        <section className="min-w-0 xl:h-full xl:min-h-0">
+        <section className={activeTeacher ? 'flex min-h-0 min-w-0 flex-1 flex-col' : 'min-w-0 xl:h-full xl:min-h-0'}>
           {!activeSubject ? (
             <section
               className="arena-card p-4 sm:p-5 xl:flex xl:h-full xl:min-h-0 xl:flex-col"
@@ -504,10 +521,10 @@ export default function OnlineLearning() {
             </section>
           ) : activeTeacher ? (
             <section
-              className="arena-card min-w-0 overflow-hidden xl:flex xl:h-full xl:min-h-0 xl:flex-col"
+              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-ink-900"
               aria-labelledby="sheet-preview-title"
             >
-              <div className="grid shrink-0 gap-3 border-b border-white/10 p-3 text-white sm:p-4 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div className="grid shrink-0 gap-2 border-b border-white/10 px-3 py-2 text-white lg:grid-cols-[1fr_auto] lg:items-center">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="arena-chip">
@@ -516,10 +533,10 @@ export default function OnlineLearning() {
                     </span>
                     <span className="arena-chip">Đang xem sheet</span>
                   </div>
-                  <h2 id="sheet-preview-title" className="font-arena-display mt-1.5 truncate text-xl font-extrabold leading-tight xl:text-2xl">
+                  <h2 id="sheet-preview-title" className="font-arena-display mt-1 truncate text-base font-extrabold leading-tight sm:text-lg">
                     {splitTeacherTitle(activeTeacher.title).mainTitle}
                   </h2>
-                  <p className="mt-0.5 line-clamp-1 text-sm font-semibold leading-5 text-white/60">
+                  <p className="mt-0.5 hidden line-clamp-1 text-xs font-semibold leading-5 text-white/60 sm:block">
                     {splitTeacherTitle(activeTeacher.title).detail || 'Google Sheet giáo viên'}
                   </p>
                 </div>
@@ -558,8 +575,9 @@ export default function OnlineLearning() {
                 </div>
               </div>
 
-              {/* Thanh phiên học — dính ngay phía trên khu vực học */}
-              <div className="shrink-0 px-3 pt-3 sm:px-4">
+              {/* Thanh phiên học — dính ngay phía trên khu vực học, sát mép để
+                  không ăn thêm chiều cao của sheet */}
+              <div className="shrink-0">
                 <SessionBar
                   status={sessionStatus}
                   fallback={sessionFallback}
@@ -571,7 +589,7 @@ export default function OnlineLearning() {
                 />
               </div>
 
-              <div className="relative min-h-[620px] overflow-hidden rounded-b-[20px] bg-ink-900 xl:min-h-0 xl:flex-1">
+              <div className="relative min-h-0 flex-1 overflow-hidden bg-ink-900">
                 {iframeLoading && (
                   <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-ink-950/85 px-4">
                     <div className="arena-card max-w-sm px-5 py-5 text-center">
@@ -596,7 +614,7 @@ export default function OnlineLearning() {
                     setIframeLoading(false);
                     setIframeTimedOut(false);
                   }}
-                  className="h-[78dvh] min-h-[620px] w-full border-0 bg-white xl:h-full xl:min-h-0"
+                  className="absolute inset-0 h-full w-full border-0 bg-white"
                   loading="lazy"
                 />
               </div>

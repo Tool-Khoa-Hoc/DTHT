@@ -11,7 +11,7 @@ import {
   DISCLAIMER,
 } from '../lib/admission/predict';
 import { convertScore, anchorStatus } from '../lib/admission/conversions';
-import { COMBOS } from '../lib/admission/combos';
+import { COMBOS, parseComboField } from '../lib/admission/combos';
 import { canonicalSubjects, normalizeText } from '../lib/admission/subjects';
 import { regionOfSchool, REGION_LABELS } from '../lib/admission/schools';
 import { bcaCombinedScore, integrated100Score } from '../lib/admission/formulas';
@@ -36,9 +36,12 @@ function comboRaw(entry, comboStr) {
   if (!entry) return null;
   const subjects = canonicalSubjects(entry.subjects);
   const byGroup = entry.byGroup || {};
-  const combos = comboStr
-    ? comboStr.split(/[/,]/).map((s) => s.trim().toUpperCase()).filter(Boolean)
-    : Object.keys(byGroup);
+  // comboStr chấp nhận chuỗi "A00/A01", mảng ['A00','A01'] (cột text[] của
+  // Supabase) hoặc null — parseComboField là nơi duy nhất hiểu định dạng này.
+  // Bản cũ gọi comboStr.split() thẳng nên sập "s.split is not a function"
+  // mỗi khi dữ liệu đến từ Supabase và thí sinh đã có điểm THPT/học bạ.
+  const parsed = parseComboField(comboStr);
+  const combos = parsed.length ? parsed : Object.keys(byGroup);
   let best = null;
   for (const c of combos) {
     if (byGroup[c] != null && Number.isFinite(parseFloat(byGroup[c]))) {
