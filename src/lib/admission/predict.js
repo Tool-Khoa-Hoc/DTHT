@@ -12,7 +12,14 @@
 // Mọi điểm đưa vào estimateChannel phải đã ở THANG 30 TƯƠNG ĐƯƠNG
 // (điểm thô của kênh direct được chuyển qua toScale30 bằng scale của bản ghi).
 
-import { EXAMS } from './exams.js';
+import {
+  EXAMS, REGION_PRIORITY, CATEGORY_PRIORITY, PRIORITY_TAPER_START, PRIORITY_TAPER_SPAN,
+} from './exams.js';
+import { equipercentile } from './conversions.js';
+
+// equipercentile nay sống ở conversions.js (cùng chỗ với dữ liệu neo);
+// re-export để các nơi đang import từ predict.js không gãy.
+export { equipercentile };
 
 export const WEIGHTS_3Y = [0.5, 0.3, 0.2];
 export const SIGMA_CAP = 2.5;
@@ -41,41 +48,30 @@ function sampleSD(values) {
 }
 
 // Điểm ưu tiên THỰC áp dụng — công thức giảm dần của Bộ khi tổng điểm > 22,5.
-// raw30: tổng điểm thô thang 30 CHƯA gồm ưu tiên. Luôn tính trên thang 30,
-// khi dùng cho thang khác phải nhân tỉ lệ thang/30 ở nơi gọi.
+// raw30: tổng điểm thô thang 30 CHƯA gồm ưu tiên. Hằng số KV/ĐT import từ
+// exams.js (nguồn duy nhất) — bản v1 hardcode lại bảng số ngay tại đây.
 export function priorityApplied(raw30, region, category) {
-  const nominal =
-    ({ KV1: 0.75, 'KV2-NT': 0.5, KV2: 0.25, KV3: 0 }[region] || 0) +
-    ({ UT1: 2.0, UT2: 1.0, NONE: 0 }[category] || 0);
-  if (raw30 <= 22.5 || nominal === 0) return nominal;
-  return ((30 - raw30) / 7.5) * nominal;
+  const nominal = (REGION_PRIORITY[region] || 0) + (CATEGORY_PRIORITY[category] || 0);
+  if (raw30 <= PRIORITY_TAPER_START || nominal === 0) return nominal;
+  return ((30 - raw30) / PRIORITY_TAPER_SPAN) * nominal;
 }
 
-// Quy đổi equiprecentile qua bảng neo.
-// anchors: [{ topPct, src, dst }] sắp xếp src GIẢM dần (neo cao -> thấp).
-// Ngoài khoảng neo: kẹp (không ngoại suy tuyến tính ra vô hạn).
-export function equipercentile(score, anchors) {
-  if (!anchors || anchors.length === 0) return { value: null, extrapolated: null };
-  if (score >= anchors[0].src) return { value: anchors[0].dst, extrapolated: 'high' };
-  for (let i = 0; i < anchors.length - 1; i++) {
-    const a = anchors[i];
-    const b = anchors[i + 1];
-    if (score <= a.src && score >= b.src) {
-      const value =
-        b.dst + ((score - b.src) * (a.dst - b.dst)) / (a.src - b.src || 1);
-      return { value, extrapolated: null };
-    }
-  }
-  const last = anchors[anchors.length - 1];
-  return { value: last.dst, extrapolated: 'low' };
+// Đường cộng ưu tiên DUY NHẤT cho mọi thang điểm: tính ưu tiên thực trên
+// thang 30 từ điểm thô quy về thang 30, rồi nhân tỉ lệ thang/30.
+export function priorityAppliedForScale(rawOnScale, scale, region, category) {
+  if (rawOnScale == null || !scale) return 0;
+  const raw30 = (Number(rawOnScale) / scale) * 30;
+  return priorityApplied(raw30, region, category) * (scale / 30);
 }
 
-// Chuyển điểm thô của 1 kênh về thang 30 tương đương để so sánh/phân band.
-// Kênh direct có điểm chuẩn riêng thì nơi gọi nên so trực tiếp trên thang gốc
-// rồi mới chuẩn hoá margin — hàm này dùng cho quy đổi dự phòng + hiển thị.
-export function toScale30(score, scale) {
-  if (score == null || !scale) return null;
-  return (score / scale) * 30;
+// Chuẩn hoá KHOẢNG CHÊNH (margin/σ) về thang 30 — CHỈ dùng cho margin và độ
+// lệch trong mô hình xác suất, TUYỆT ĐỐI không dùng để quy đổi điểm của thí
+// sinh (điểm chỉ quy đổi qua neo equiprecentile ở conversions.js). Hàm tuyến
+// tính toScale30() cũ đã bị xoá khỏi API vì từng bị lạm dụng làm đường quy
+// đổi điểm chính (lỗi P0 F-01/F-01b trong bản thiết kế score-v3).
+export function normalizeMarginTo30(value, scale) {
+  if (value == null || !scale) return null;
+  return (value / scale) * 30;
 }
 
 // Dự báo điểm chuẩn năm nay từ lịch sử (mới -> cũ).
@@ -159,7 +155,10 @@ export function estimateChannel(candidate, history, methodCode, ctx = {}) {
   });
   const z = (candidate - cutoffHat) / sig;
   let p = phi(z);
-  const confidence = computeConfidence(history, ctx);
+  let confidence = computeConfidence(history, ctx);
+  // Bản ghi điểm chuẩn độ tin cậy C (nguồn thứ cấp) bị trừ độ tin cậy và UI
+  // bắt buộc gắn nhãn "nguồn thứ cấp — cần đối chiếu" (thiết kế Mục 2.5).
+  if (ctx.reliability === 'C') confidence = Math.max(0, confidence - 10);
   if (confidence < 50) p = 0.5 + (p - 0.5) * (confidence / 50); // shrinkage
   const band = bandOf(p);
   return {
@@ -173,6 +172,9 @@ export function estimateChannel(candidate, history, methodCode, ctx = {}) {
     sigma: sig,
     margin: candidate - cutoffHat,
     confidence,
+    reliability: ctx.reliability || null,
+    reliabilityWarning:
+      ctx.reliability === 'C' ? 'Điểm chuẩn từ nguồn thứ cấp — cần đối chiếu văn bản chính thức của trường.' : null,
     confidenceLabel: confidence >= 75 ? 'Cao' : confidence >= 50 ? 'Trung bình' : 'Thấp',
     showPercent: confidence >= 50,
     yearsUsed: history.map((h) => h.year),
