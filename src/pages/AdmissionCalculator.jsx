@@ -3,8 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { EXAMS, REGION_PRIORITY, CATEGORY_PRIORITY } from '../lib/admission/exams';
-import { migrateLegacyScores, validateScoreInput } from '../lib/admission/scores';
+import { migrateLegacyScores, validateScoreInput, saveScoreEntry, SCORES_VERSION } from '../lib/admission/scores';
 import { priorityApplied } from '../lib/admission/predict';
+import { SUBJECTS, canonicalSubjects } from '../lib/admission/subjects';
+import { COMBOS as COMBO_DEFS, comboRawScore } from '../lib/admission/combos';
+import { bcaCombinedScore, integrated100Score, hcmutCombinedScore } from '../lib/admission/formulas';
+
+// Tổ hợp dùng chung từ lib/admission/combos.js (đầy đủ — không còn bản 8 tổ
+// hợp tự khai trong trang). Dạng rút gọn { mã: [môn...] } cho các vòng lặp cũ.
+const COMBOS = Object.fromEntries(
+  Object.entries(COMBO_DEFS).map(([code, def]) => [code, def.subjects]),
+);
 
 // Trang nhập điểm hợp nhất — thay bản cũ từng đảo nhãn HSA/V-ACT và dùng sai
 // thang 1200 cho cả hai. Mọi nhãn/thang lấy từ registry src/lib/admission/exams.js:
@@ -13,41 +22,10 @@ import { priorityApplied } from '../lib/admission/predict';
 // Điểm lưu vào profiles.admission_scores dạng v2 (scores.js), merge sâu giữ
 // nguyên các key khác; pattern ref chống ghi đè stale như GPACalculator.
 
-const DRAFT_KEY = 'admission_scores_v2';
+const DRAFT_KEY = 'admission_scores_v2'; // giữ nguyên khoá lưu nháp để không mất dữ liệu v2 của người dùng; nội dung đã là schema v3
 const ENTRY_EXAMS = ['thpt', 'hocba', 'hsa', 'vact', 'tsa', 'spt', 'hsca', 'bca', 'vsat'];
 const PART_EXAMS = ['hsa', 'vact', 'tsa', 'bca'];
 const TRIO_EXAMS = ['spt', 'hsca']; // điểm từng môn thang 10, tổng tổ hợp thang 30
-
-const SUBJECTS = [
-  { key: 'toan', label: 'Toán' },
-  { key: 'van', label: 'Ngữ văn' },
-  { key: 'ly', label: 'Vật lí' },
-  { key: 'hoa', label: 'Hoá học' },
-  { key: 'sinh', label: 'Sinh học' },
-  { key: 'su', label: 'Lịch sử' },
-  { key: 'dia', label: 'Địa lí' },
-  { key: 'anh', label: 'Tiếng Anh' },
-  { key: 'gdkp', label: 'GDKT & Pháp luật' },
-];
-
-// Map tên môn v1 (GPACalculator lưu tên tiếng Việt) -> key chuẩn
-const SUBJECT_ALIASES = {
-  toan: 'toan', 'ngu van': 'van', van: 'van', 'vat li': 'ly', 'vat ly': 'ly', ly: 'ly',
-  'hoa hoc': 'hoa', hoa: 'hoa', 'sinh hoc': 'sinh', sinh: 'sinh', 'lich su': 'su', su: 'su',
-  'dia li': 'dia', 'dia ly': 'dia', dia: 'dia', 'tieng anh': 'anh', anh: 'anh',
-  'giao duc kinh te va phap luat': 'gdkp', gdkp: 'gdkp', gdcd: 'gdkp',
-};
-
-const COMBOS = {
-  A00: ['toan', 'ly', 'hoa'],
-  A01: ['toan', 'ly', 'anh'],
-  A02: ['toan', 'ly', 'sinh'],
-  B00: ['toan', 'hoa', 'sinh'],
-  C00: ['van', 'su', 'dia'],
-  D01: ['toan', 'van', 'anh'],
-  D07: ['toan', 'hoa', 'anh'],
-  K01: ['toan', 'van', 'ly'],
-};
 
 const PART_LABELS = {
   hsa: { dinh_luong: 'Định lượng', dinh_tinh: 'Định tính', khoa_hoc: 'Khoa học' },
@@ -65,21 +43,6 @@ const STATUS_OPTIONS = [
   { value: 'target', label: 'Điểm mục tiêu (what-if)' },
 ];
 const STATUS_LABEL = { actual: 'Điểm thật', mock: 'Thi thử', target: 'Mục tiêu', none: '—' };
-
-function normalizeText(str) {
-  if (!str) return '';
-  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-}
-
-function canonicalSubjects(subjects) {
-  const out = {};
-  for (const [k, v] of Object.entries(subjects || {})) {
-    const key = SUBJECT_ALIASES[normalizeText(k)] || k;
-    const n = parseFloat(v);
-    if (Number.isFinite(n)) out[key] = n;
-  }
-  return out;
-}
 
 const fmt = (n, digits = 2) =>
   n == null || !Number.isFinite(Number(n))
@@ -103,7 +66,7 @@ function readDraft() {
     const raw = localStorage.getItem(DRAFT_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    return parsed?.version === 2 ? parsed : null;
+    return parsed?.version === 2 || parsed?.version === 3 ? parsed : null;
   } catch {
     return null;
   }
@@ -128,6 +91,8 @@ export default function AdmissionCalculator() {
   const [parts, setParts] = useState({}); // `${code}.${part}` -> string
   const [totals, setTotals] = useState({}); // code -> string (tổng nhập trực tiếp / vsat)
   const [trios, setTrios] = useState({}); // `${code}.${idx}` -> string (spt/hsca)
+  const [vsatSubjects, setVsatSubjects] = useState({}); // môn -> điểm V-SAT thang 150
+  const [bonus100, setBonus100] = useState(''); // điểm cộng thang 100 (BKHCM)
   const [statuses, setStatuses] = useState({});
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -175,8 +140,11 @@ export default function AdmissionCalculator() {
           if (trioParts[pk] != null) nextTrios[`${code}.${i}`] = String(trioParts[pk]);
         });
         if (entry.total != null) nextTotals[code] = String(entry.total);
-      } else if (code === 'vsat' && entry.total != null) {
-        nextTotals[code] = String(entry.total);
+      } else if (code === 'vsat') {
+        if (entry.total != null) nextTotals[code] = String(entry.total);
+        if (entry.subjects) {
+          setVsatSubjects(Object.fromEntries(Object.entries(entry.subjects).map(([k, v]) => [k, String(v)])));
+        }
       }
     }
     setParts(nextParts);
@@ -213,12 +181,8 @@ export default function AdmissionCalculator() {
     setMessage({ type: '', text: '' });
     try {
       const base = v2Ref.current || migrateLegacyScores({}, {});
-      const nextV2 = {
-        ...base,
-        version: 2,
-        candidate: { region, category },
-        scores: { ...(base.scores || {}), [code]: entry },
-      };
+      const withCandidate = { ...base, candidate: { region, category } };
+      const nextV2 = saveScoreEntry(withCandidate, code, entry);
       await persistV2(nextV2);
       setMessage({ type: 'success', text: `Đã lưu điểm ${EXAMS[code].label}${user ? ' vào hồ sơ' : ' (nháp trên thiết bị này)'}!` });
       setTimeout(() => setMessage({ type: '', text: '' }), 3500);
@@ -234,7 +198,7 @@ export default function AdmissionCalculator() {
     setMessage({ type: '', text: '' });
     try {
       const base = v2Ref.current || migrateLegacyScores({}, {});
-      await persistV2({ ...base, version: 2, candidate: { region, category } });
+      await persistV2({ ...base, version: SCORES_VERSION, candidate: { region, category } });
       setMessage({ type: 'success', text: 'Đã lưu thông tin ưu tiên!' });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     } catch (err) {
@@ -316,9 +280,9 @@ export default function AdmissionCalculator() {
     }
     const nums = [];
     for (const v of values) {
-      const check = validateScoreInput(code, v); // registry spt/hsca: thang 10/môn
-      if (!check.ok) return { error: 'Mỗi môn phải trong khoảng 0–10' };
-      nums.push(check.value);
+      const n = parseFloat(v); // từng môn SPT/H-SCA thang 10 (registry: subjectScale)
+      if (!Number.isFinite(n) || n < 0 || n > 10) return { error: 'Mỗi môn phải trong khoảng 0–10' };
+      nums.push(n);
     }
     return {
       entry: {
@@ -332,9 +296,35 @@ export default function AdmissionCalculator() {
     };
   };
 
+  const buildVsatEntry = () => {
+    const subjects = {};
+    for (const [k, v] of Object.entries(vsatSubjects)) {
+      if (v === '' || v == null) continue;
+      const n = parseFloat(v);
+      if (!Number.isFinite(n) || n < 0 || n > 150) {
+        return { error: `Điểm V-SAT môn ${SUBJECTS.find((x) => x.key === k)?.label || k} phải trong khoảng 0–150` };
+      }
+      subjects[k] = n;
+    }
+    if (Object.keys(subjects).length > 0) {
+      if (Object.keys(subjects).length < 3) return { error: 'Hãy nhập điểm V-SAT ít nhất 3 môn để tính tổ hợp.' };
+      const byGroup = {};
+      for (const code of Object.keys(COMBOS)) {
+        const sc = comboRawScore(subjects, code);
+        if (sc != null) byGroup[code] = sc;
+      }
+      const total = Object.keys(subjects).length === 3 ? Object.values(subjects).reduce((a, b) => a + b, 0) : null;
+      return { entry: { status: statusOf('vsat'), subjects, byGroup, total, scale: 450, scoreMode: 'per-subject-150', updatedAt: new Date().toISOString() } };
+    }
+    const check = validateScoreInput('vsat', totals.vsat);
+    if (!check.ok) return { error: 'Hãy nhập điểm V-SAT theo từng môn, hoặc nhập thẳng tổng điểm tổ hợp (0–450).' };
+    return { entry: { status: statusOf('vsat'), total: check.value, scale: 450, updatedAt: new Date().toISOString() } };
+  };
+
   const handleSaveSelected = () => {
     let built;
-    if (selectedExam === 'thpt') built = buildSubjectsEntry(subjectsThpt);
+    if (selectedExam === 'vsat') built = buildVsatEntry();
+    else if (selectedExam === 'thpt') built = buildSubjectsEntry(subjectsThpt);
     else if (selectedExam === 'hocba') built = buildSubjectsEntry(subjectsHb);
     else if (PART_EXAMS.includes(selectedExam)) built = buildPartsEntry(selectedExam);
     else if (TRIO_EXAMS.includes(selectedExam)) built = buildTrioEntry(selectedExam);
@@ -384,6 +374,78 @@ export default function AdmissionCalculator() {
   }, [thptPreview]);
 
   const priorityPreview = bestThptRaw != null ? priorityApplied(bestThptRaw, region, category) : null;
+
+  // Máy tính kết hợp — đầu vào lấy từ chính các ô nhập của trang này, công
+  // thức ở lib/admission/formulas.js (không tính trong trang).
+  const thptNums = useMemo(() => {
+    const out = {};
+    for (const [k, v] of Object.entries(subjectsThpt)) {
+      const n = parseFloat(v);
+      if (Number.isFinite(n)) out[k] = n;
+    }
+    return out;
+  }, [subjectsThpt]);
+  const hbNums = useMemo(() => {
+    const out = {};
+    for (const [k, v] of Object.entries(subjectsHb)) {
+      const n = parseFloat(v);
+      if (Number.isFinite(n)) out[k] = n;
+    }
+    return out;
+  }, [subjectsHb]);
+  const bcaPreview = useMemo(() => {
+    const bcaTotal = parseFloat(totals.bca);
+    if (!Number.isFinite(bcaTotal) || bestThptRaw == null) return null;
+    return bcaCombinedScore({ thptComboScore: bestThptRaw, bcaExamScore: bcaTotal, region, category });
+  }, [totals.bca, bestThptRaw, region, category]);
+  const hcmutPreview = useMemo(() => {
+    const comboCodes = Object.keys(thptPreview);
+    if (!comboCodes.length) return null;
+    const bestCombo = comboCodes.reduce((a, b) => (thptPreview[a] >= thptPreview[b] ? a : b));
+    const keys = COMBOS[bestCombo] || [];
+    const thptScores = keys.map((k) => thptNums[k]);
+    const hocbaScores = keys.map((k) => hbNums[k]);
+    if (thptScores.some((v) => v == null) || hocbaScores.some((v) => v == null)) return null;
+    const vactTotal = parseFloat(totals.vact);
+    const vactToanPart = parseFloat(parts['vact.toan']);
+    return hcmutCombinedScore({
+      vactTotal: Number.isFinite(vactTotal) ? vactTotal : null,
+      vactToan: Number.isFinite(vactToanPart) ? vactToanPart : null,
+      doubleMath: keys.includes('toan'),
+      thptScores, thptMathScore: thptNums.toan,
+      hocbaScores, hocbaMathScore: hbNums.toan,
+      bonus: parseFloat(bonus100) || 0, region, category,
+    });
+  }, [thptPreview, thptNums, hbNums, totals.vact, parts, bonus100, region, category]);
+  const uehCheck = useMemo(() => integrated100Score('UEH', {}), []);
+  const handleSaveHcmut = async () => {
+    if (!hcmutPreview) return;
+    setIsSaving(true);
+    try {
+      const base = v2Ref.current || migrateLegacyScores({}, {});
+      const next = {
+        ...base, version: SCORES_VERSION, candidate: { region, category },
+        scores: {
+          ...(base.scores || {}),
+          combined: {
+            ...((base.scores || {}).combined || {}),
+            HCMUT: {
+              status: 'actual', total: hcmutPreview.value, scale: 100,
+              formulaVersion: hcmutPreview.formulaVersion, breakdown: hcmutPreview.breakdown,
+              updatedAt: new Date().toISOString(),
+            },
+          },
+        },
+      };
+      await persistV2(next);
+      setMessage({ type: 'success', text: `Đã lưu điểm tổng hợp BKHCM: ${fmt(hcmutPreview.value)} / 100 vào hồ sơ!` });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3500);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Lỗi khi lưu: ' + err.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const legacyKeys = Object.keys(savedV2?.legacy_unverified || {});
   const savedEntries = useMemo(
@@ -644,6 +706,27 @@ export default function AdmissionCalculator() {
 
           {selectedExam === 'vsat' && (
             <div className="space-y-4">
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Nhập điểm V-SAT theo từng môn (mỗi môn thang 150) — hệ thống tự tính tổng cho từng tổ hợp
+                khi trường chọn tổ hợp khác nhau. Nhập đúng 3 môn thì tổng tổ hợp được lưu kèm.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {SUBJECTS.slice(0, 9).map((sj) => (
+                  <NumberField
+                    key={sj.key}
+                    label={`${sj.label} (0–150)`}
+                    value={vsatSubjects[sj.key] ?? ''}
+                    onChange={(v) => setVsatSubjects((p) => ({ ...p, [sj.key]: v }))}
+                    max={150}
+                    step="1"
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span className="flex-1 border-t border-white/10" />
+                hoặc nhập thẳng tổng điểm tổ hợp nếu bạn chỉ nhớ tổng
+                <span className="flex-1 border-t border-white/10" />
+              </div>
               <NumberField
                 label="Tổng điểm tổ hợp V-SAT (0–450, 3 môn × 150)"
                 value={totals.vsat ?? ''}
@@ -670,6 +753,68 @@ export default function AdmissionCalculator() {
                 {message.text}
               </p>
             )}
+          </div>
+        </section>
+
+        {/* Máy tính kết hợp: BCA + tổng hợp thang 100 (formulas.js) */}
+        <section className="arena-card p-4 sm:p-5 space-y-4">
+          <div>
+            <h2 className="font-arena-display font-bold text-lg">Máy tính điểm kết hợp & tổng hợp</h2>
+            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              Dùng ngay điểm bạn đã nhập ở trên — không phải nhập lại. Công thức nằm ở thư viện dùng chung,
+              kết quả được lưu vào hồ sơ để trang Tìm trường ước tính đúng thang điểm.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-white/10 p-3 space-y-2">
+            <h3 className="font-arena-display font-bold text-sm">Khối Công an (BCA) — phương thức 3</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Điểm xét tuyển thang 30 = điểm tổ hợp THPT × 2/5 + (điểm bài thi BCA quy thang 30) × 3/5 + điểm cộng/ưu tiên.
+            </p>
+            {bcaPreview ? (
+              <p className="text-sm">
+                Điểm kết hợp của bạn: <span className="tabular font-bold" style={{ color: 'var(--arena-jade)' }}>{fmt(bcaPreview.value)} / 30</span>
+                <span className="block text-xs text-slate-400 mt-1">
+                  THPT đóng góp {fmt(bcaPreview.breakdown.thptPhan)} · BCA đóng góp {fmt(bcaPreview.breakdown.bcaPhan)} · Ưu tiên +{fmt(bcaPreview.breakdown.uuTien)}
+                </span>
+              </p>
+            ) : (
+              <p className="text-xs text-slate-500">Nhập điểm tổ hợp THPT (mục THPT) và tổng điểm bài thi BCA (mục BCA) để xem điểm kết hợp.</p>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-white/10 p-3 space-y-2">
+            <h3 className="font-arena-display font-bold text-sm">ĐH Bách khoa TP.HCM (HCMUT) — tổng hợp thang 100</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Điểm học lực = Điểm năng lực × 70% + TNTHPT quy đổi × 20% + Học bạ quy đổi × 10%.
+              Khi tổ hợp không nhân đôi Toán, điểm năng lực chia cho 12 (không phải 15) — lỗi mẫu số ở bản cũ đã được sửa.
+            </p>
+            <NumberField label="Điểm cộng (chứng chỉ / giải thưởng, 0–10)" value={bonus100} onChange={setBonus100} max={10} />
+            {hcmutPreview ? (
+              <div className="text-sm space-y-1">
+                <p>
+                  Điểm tổng hợp của bạn: <span className="tabular font-bold" style={{ color: 'var(--arena-jade)' }}>{fmt(hcmutPreview.value)} / 100</span>
+                  <span className="text-xs text-slate-400"> ({hcmutPreview.breakdown.doiTuong})</span>
+                </p>
+                <p className="text-xs text-slate-400">
+                  Điểm năng lực {fmt(hcmutPreview.breakdown.diemNL)} · TNTHPT quy đổi {fmt(hcmutPreview.breakdown.tnthptQD)} ·
+                  Học bạ quy đổi {fmt(hcmutPreview.breakdown.hbQD)} · Ưu tiên +{fmt(hcmutPreview.breakdown.uuTien)}
+                </p>
+                <button onClick={handleSaveHcmut} disabled={isSaving} className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer">
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">save</span>
+                  Lưu điểm tổng hợp HCMUT vào hồ sơ
+                </button>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500">Nhập đủ điểm THPT từng môn (mục THPT) và điểm học bạ từng môn (mục Học bạ) để tính điểm tổng hợp. Có điểm V-ACT thì nhập thêm ở mục V-ACT (đối tượng ĐT 2.1).</p>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-white/10 p-3 space-y-1">
+            <h3 className="font-arena-display font-bold text-sm">Đại học Kinh tế TP.HCM (UEH) — tổng hợp thang 100</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {uehCheck.explain[0]} Bạn vẫn tra được điểm chuẩn tích hợp của UEH ở trang Tìm trường.
+            </p>
           </div>
         </section>
 

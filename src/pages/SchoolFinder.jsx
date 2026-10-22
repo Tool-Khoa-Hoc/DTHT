@@ -6,22 +6,21 @@ import { EXAMS, getExam } from '../lib/admission/exams';
 import {
   estimateChannel,
   forecastCutoff,
-  equipercentile,
   priorityApplied,
   portfolioHealth,
   DISCLAIMER,
 } from '../lib/admission/predict';
+import { convertScore, anchorStatus } from '../lib/admission/conversions';
+import { COMBOS } from '../lib/admission/combos';
+import { canonicalSubjects, normalizeText } from '../lib/admission/subjects';
+import { regionOfSchool, REGION_LABELS } from '../lib/admission/schools';
+import { bcaCombinedScore, integrated100Score } from '../lib/admission/formulas';
 import { migrateLegacyScores, getScore } from '../lib/admission/scores';
 import { loadCutoffs, clearCutoffCache, groupHistories } from '../lib/admission/cutoffs';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function normalizeText(str) {
-  if (!str) return '';
-  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-}
 
 function fmt(n, digits = 2) {
   if (n == null || !Number.isFinite(Number(n))) return '—';
@@ -31,51 +30,6 @@ function fmt(n, digits = 2) {
   });
 }
 
-// Tổ hợp môn — key môn chuẩn hoá (AdmissionCalculator có bản khai tương ứng)
-const COMBOS = {
-  A00: ['toan', 'ly', 'hoa'],
-  A01: ['toan', 'ly', 'anh'],
-  A02: ['toan', 'ly', 'sinh'],
-  B00: ['toan', 'hoa', 'sinh'],
-  C00: ['van', 'su', 'dia'],
-  D01: ['toan', 'van', 'anh'],
-  D07: ['toan', 'hoa', 'anh'],
-  K01: ['toan', 'van', 'ly'],
-};
-
-const SUBJECT_ALIASES = {
-  toan: 'toan',
-  'ngu van': 'van',
-  van: 'van',
-  'vat li': 'ly',
-  'vat ly': 'ly',
-  ly: 'ly',
-  'hoa hoc': 'hoa',
-  hoa: 'hoa',
-  'sinh hoc': 'sinh',
-  sinh: 'sinh',
-  'lich su': 'su',
-  su: 'su',
-  'dia li': 'dia',
-  'dia ly': 'dia',
-  dia: 'dia',
-  'tieng anh': 'anh',
-  anh: 'anh',
-  'giao duc kinh te va phap luat': 'gdkp',
-  gdkp: 'gdkp',
-  gdcd: 'gdkp',
-};
-
-function canonicalSubjects(subjects) {
-  const out = {};
-  for (const [k, v] of Object.entries(subjects || {})) {
-    const key = SUBJECT_ALIASES[normalizeText(k)] || k;
-    const n = parseFloat(v);
-    if (Number.isFinite(n)) out[key] = n;
-  }
-  return out;
-}
-
 // Điểm thô (chưa ưu tiên) của thí sinh cho 1 tổ hợp — từ byGroup đã lưu,
 // hoặc tính từ điểm từng môn, hoặc total đã migrate từ v1.
 function comboRaw(entry, comboStr) {
@@ -83,14 +37,14 @@ function comboRaw(entry, comboStr) {
   const subjects = canonicalSubjects(entry.subjects);
   const byGroup = entry.byGroup || {};
   const combos = comboStr
-    ? comboStr.split('/').map((s) => s.trim()).filter(Boolean)
+    ? comboStr.split(/[/,]/).map((s) => s.trim().toUpperCase()).filter(Boolean)
     : Object.keys(byGroup);
   let best = null;
   for (const c of combos) {
     if (byGroup[c] != null && Number.isFinite(parseFloat(byGroup[c]))) {
       best = Math.max(best ?? -Infinity, parseFloat(byGroup[c]));
     }
-    const def = COMBOS[c];
+    const def = COMBOS[c]?.subjects;
     if (def && def.every((k) => subjects[k] != null)) {
       const sum = def.reduce((s, k) => s + subjects[k], 0);
       best = Math.max(best ?? -Infinity, sum);
@@ -108,16 +62,9 @@ function comboRaw(entry, comboStr) {
   return null;
 }
 
-// Khu vực suy từ mã trường trong dữ liệu seed (dữ liệu chưa có trường region riêng)
-const REGION_BY_SCHOOL = {
-  HUST: 'bac', NEU: 'bac', FTU: 'bac', HMU: 'bac', UET: 'bac', UED: 'bac',
-  ULIS: 'bac', HNUE: 'bac', HPU2: 'bac', HLU: 'bac', HVCSND: 'bac',
-  TMU: 'bac', HVQUANY: 'bac',
-  HCMUT: 'nam', UEH: 'nam', UMP: 'nam', UIT: 'nam', HCMUS: 'nam',
-  HCMUE: 'nam', HUTECH: 'nam', ULAW_HCM: 'nam',
-};
-const REGION_LABELS = { bac: 'Miền Bắc', trung: 'Miền Trung', nam: 'Miền Nam', khac: 'Khu vực khác' };
-const regionOf = (code) => REGION_BY_SCHOOL[code] || 'khac';
+// Khu vực trường: dữ liệu tĩnh ở lib/admission/schools.js (đích lâu dài là
+// bảng admission_schools trên Supabase) — không hardcode trong trang nữa.
+const regionOf = regionOfSchool;
 
 const BAND_STYLE = {
   safe: { color: 'var(--arena-jade)', border: 'rgba(95,207,166,0.55)', bg: 'rgba(95,207,166,0.12)' },
@@ -128,34 +75,17 @@ const BAND_STYLE = {
   far: { color: null, border: 'rgba(248,113,113,0.45)', bg: 'rgba(248,113,113,0.10)' },
 };
 
-// Bảng neo quy đổi (vd HSA -> THPT) nằm trong records dạng record đặc biệt
-// major_name bắt đầu bằng "__" + note chứa các cặp "src->dst". Trích tại runtime,
-// không hardcode số neo trong code.
-function extractAnchors(records) {
-  const map = {};
-  for (const r of records || []) {
-    if (!String(r.major_name || '').startsWith('__')) continue;
-    const pairs = [...String(r.note || '').matchAll(/(\d+(?:\.\d+)?)\s*->\s*(\d+(?:\.\d+)?)/g)].map(
-      (m) => ({ src: parseFloat(m[1]), dst: parseFloat(m[2]) }),
-    );
-    if (pairs.length >= 2) {
-      const method = r.method === 'THPT_QG' ? 'thpt' : String(r.method || '').toLowerCase();
-      map[method] = pairs.sort((a, b) => b.src - a.src);
-    }
-  }
-  return map;
-}
-
 // ---------------------------------------------------------------------------
 // Ước tính cho 1 nhóm (ngành x tổ hợp x phương thức)
 // Trả { estimate, viaMethod, channel, marginNative, forecastNative, reason }
 // ---------------------------------------------------------------------------
 
-function buildEstimate(group, profileV2, anchors, spectrumMethods, baseYear) {
+function buildEstimate(group, profileV2, spectrumMethods, baseYear) {
   const region = profileV2?.candidate?.region || 'KV3';
   const category = profileV2?.candidate?.category || 'NONE';
   const latestYear = group.history[0]?.year;
   const ctxBase = {
+    reliability: group.reliability || null,
     hasSpectrum: spectrumMethods.has(group.method) ? 'official' : 'none',
     quotaYears: 0,
     latestYearIsCurrentSeason: baseYear != null && latestYear >= baseYear,
@@ -189,12 +119,16 @@ function buildEstimate(group, profileV2, anchors, spectrumMethods, baseYear) {
           : 'Bạn chưa nhập điểm học bạ. Phương thức học bạ không quy đổi từ kỳ thi khác.',
       };
     }
-    // THPT: thử quy đổi equiprecentile từ kỳ thi khác có bảng neo (hiện có HSA)
+    // THPT: thử quy đổi bách phân vị (equipercentile) từ kỳ thi khác qua
+    // conversions.js — neo là dữ liệu có cấu trúc, KHÔNG trích từ note bằng
+    // regex như bản cũ. Chưa có neo chính thức -> trạng thái minh bạch.
     for (const other of ['hsa', 'vact', 'tsa']) {
       const otherEntry = getScore(profileV2, other);
-      const table = anchors[other];
-      if (otherEntry?.total != null && table) {
-        const conv = equipercentile(parseFloat(otherEntry.total), table);
+      if (otherEntry?.total != null) {
+        const firstCombo = (group.combos && group.combos[0]) || 'A00';
+        const conv = convertScore(parseFloat(otherEntry.total), {
+          fromExam: other, combo: firstCombo, year: 2025,
+        });
         if (conv.value != null) {
           const candidate = conv.value + priorityApplied(conv.value, region, category);
           const estimate = estimateChannel(candidate, group.history, 'thpt', {
@@ -210,6 +144,12 @@ function buildEstimate(group, profileV2, anchors, spectrumMethods, baseYear) {
             reason: null,
           };
         }
+        if (anchorStatus(other, 2025).status === 'chua-co-neo-chinh-thuc') {
+          return {
+            estimate: null,
+            reason: `Chưa có bảng quy đổi chính thức cho kỳ thi ${getExam(other).label} — chỉ ước tính được ở ngành có điểm chuẩn ${getExam(other).label} riêng.`,
+          };
+        }
       }
     }
     const hasAnyScore = Object.keys(profileV2?.scores || {}).length > 0;
@@ -221,15 +161,66 @@ function buildEstimate(group, profileV2, anchors, spectrumMethods, baseYear) {
     };
   }
 
-  // --- Phương thức có thang riêng (HSA/V-ACT/TSA/BCA/V-SAT/SPT/combined...) ---
+  // --- BCA: điểm chuẩn là thang 30 KẾT HỢP (THPT ×2/5 + BCA quy 30 ×3/5),
+  // không so điểm bài thi thang 100 với điểm chuẩn thang 30 như bản cũ. ---
+  if (group.method === 'bca' && group.scale === 30) {
+    const bcaEntry = getScore(profileV2, 'bca');
+    const thptEntry = getScore(profileV2, 'thpt');
+    const thptRaw = comboRaw(thptEntry, group.combo);
+    if (bcaEntry?.total == null || thptRaw == null) {
+      return {
+        estimate: null,
+        reason: 'Phương thức Bộ Công An cần cả điểm bài thi BCA và điểm tổ hợp THPT — nhập đủ hai loại điểm ở trang Nhập điểm để tính điểm kết hợp thang 30.',
+      };
+    }
+    const combined = bcaCombinedScore({
+      thptComboScore: thptRaw, bcaExamScore: parseFloat(bcaEntry.total), region, category,
+    });
+    const estimate = estimateChannel(combined.value, group.history, 'thpt', {
+      ...ctxBase, channel: 'direct',
+    });
+    return {
+      estimate, viaMethod: 'bca', channel: 'direct',
+      marginNative: estimate ? estimate.margin : combined.value - forecastCutoff(group.history),
+      forecastNative: estimate ? estimate.cutoffForecast : forecastCutoff(group.history),
+      reason: null,
+    };
+  }
+
+  // --- Tổng hợp thang 100 theo trường (HCMUT...): lấy điểm tổng hợp đã lưu
+  // trong hồ sơ (tính bằng formulas.js ở trang Nhập điểm). ---
+  if (group.method === 'combined') {
+    const saved = profileV2?.scores?.combined?.[group.schoolCode];
+    if (saved?.total == null) {
+      const reg = integrated100Score(group.schoolCode, {});
+      return {
+        estimate: null,
+        reason:
+          reg.reason === 'formula-unverified'
+            ? `Trường này xét tuyển tổng hợp thang 100 nhưng ${reg.explain[0]}`
+            : 'Phương thức xét tuyển tổng hợp theo công thức riêng của trường — hãy tính điểm tổng hợp ở trang Nhập điểm trước.',
+      };
+    }
+    const scale = group.scale || saved.scale || 100;
+    const factor = 30 / scale;
+    const history30 = group.history.map((h) => ({ year: h.year, cutoff: h.cutoff * factor }));
+    const estimate = estimateChannel(parseFloat(saved.total) * factor, history30, 'combined', {
+      ...ctxBase, channel: 'direct',
+    });
+    return {
+      estimate, viaMethod: 'combined', channel: 'direct',
+      marginNative: parseFloat(saved.total) - forecastCutoff(group.history),
+      forecastNative: forecastCutoff(group.history),
+      reason: null,
+    };
+  }
+
+  // --- Phương thức có thang riêng (HSA/V-ACT/TSA/V-SAT/SPT...) ---
   const entry = getScore(profileV2, group.method);
-  if (entry?.total == null) {
+  if (!entry || (entry.total == null && !entry.combos && !entry.byGroup && !entry.subjects)) {
     return {
       estimate: null,
-      reason:
-        group.method === 'combined'
-          ? 'Phương thức xét tuyển tổng hợp theo công thức riêng của trường — hiện chưa ước tính được từ điểm thành phần.'
-          : `Bạn chưa nhập điểm ${getExam(group.method).label} — nhập điểm để xem ước tính theo phương thức này.`,
+      reason: `Bạn chưa nhập điểm ${getExam(group.method).label} — nhập điểm để xem ước tính theo phương thức này.`,
     };
   }
   const scale = group.scale;
@@ -243,7 +234,31 @@ function buildEstimate(group, profileV2, anchors, spectrumMethods, baseYear) {
       reason: `Điểm ${getExam(group.method).label} đã lưu ở thang ${entryScale}, điểm chuẩn ngành này ở thang ${scale} — hãy nhập lại điểm đúng thang ở trang Nhập điểm.`,
     };
   }
-  const candidateNative = parseFloat(entry.total);
+  // SPT/H-SCA: hồ sơ lưu theo tổ hợp (combos) hoặc từng môn — lấy điểm tổ hợp
+  // khớp với tổ hợp của ngành, thang 30.
+  let candidateTotal = entry.total;
+  if ((group.method === 'spt' || group.method === 'hsca') && candidateTotal == null) {
+    const combosSaved = entry.combos || entry.byGroup || {};
+    const wanted = group.combos && group.combos.length ? group.combos : Object.keys(combosSaved);
+    for (const c of wanted) {
+      if (combosSaved[c] != null) { candidateTotal = combosSaved[c]; break; }
+    }
+    if (candidateTotal == null && entry.subjects) {
+      candidateTotal = comboRaw({ subjects: entry.subjects, byGroup: {} }, group.combo);
+    }
+    if (candidateTotal == null) {
+      return { estimate: null, reason: `Bạn chưa có điểm tổ hợp ${getExam(group.method).label} cho ngành này — nhập điểm từng môn ở trang Nhập điểm.` };
+    }
+  }
+  // V-SAT: hồ sơ lưu từng môn x150 — tính tổng tổ hợp khi chưa có total.
+  if (group.method === 'vsat' && candidateTotal == null && entry.subjects) {
+    const vals = Object.values(entry.subjects).filter((v) => v != null).map(Number);
+    if (vals.length === 3) candidateTotal = vals.reduce((a, b) => a + b, 0);
+  }
+  if (candidateTotal == null) {
+    return { estimate: null, reason: `Bạn chưa nhập điểm ${getExam(group.method).label} — nhập điểm để xem ước tính theo phương thức này.` };
+  }
+  const candidateNative = parseFloat(candidateTotal);
   const forecastNative = forecastCutoff(group.history);
   const factor = 30 / scale; // chuẩn hoá cùng thang 30 để σ sàn của predict.js có nghĩa
   const history30 = group.history.map((h) => ({ year: h.year, cutoff: h.cutoff * factor }));
@@ -462,7 +477,7 @@ export default function SchoolFinder() {
   // --- Tải dữ liệu điểm chuẩn ---
   useEffect(() => {
     let cancelled = false;
-    loadCutoffs()
+    loadCutoffs(fetch, supabase)
       .then((d) => {
         if (!cancelled) {
           setData(d);
@@ -495,7 +510,7 @@ export default function SchoolFinder() {
       const draft = localStorage.getItem(DRAFT_KEY);
       if (draft) {
         const parsed = JSON.parse(draft);
-        if (parsed?.version === 2) return migrateLegacyScores(parsed, local);
+        if (parsed?.version === 2 || parsed?.version === 3) return migrateLegacyScores(parsed, local);
       }
     } catch { /* bỏ qua draft lỗi */ }
     return migrateLegacyScores({}, local);
@@ -506,7 +521,6 @@ export default function SchoolFinder() {
     [profileV2],
   );
 
-  const anchors = useMemo(() => extractAnchors(data?.records), [data]);
   const spectrumMethods = useMemo(() => {
     const s = new Set();
     for (const d of data?.score_distributions || []) {
@@ -530,7 +544,7 @@ export default function SchoolFinder() {
   const rows = useMemo(() => {
     const built = groups.map((group) => ({
       group,
-      built: buildEstimate(group, profileV2, anchors, spectrumMethods, data?.meta?.base_year),
+      built: buildEstimate(group, profileV2, spectrumMethods, data?.meta?.base_year),
     }));
     built.sort((a, b) => {
       const pa = a.built.estimate?.probability;
@@ -543,7 +557,7 @@ export default function SchoolFinder() {
       return cb - ca;
     });
     return built;
-  }, [groups, profileV2, anchors, spectrumMethods, data]);
+  }, [groups, profileV2, spectrumMethods, data]);
 
   const filtered = useMemo(() => {
     let result = rows;

@@ -47,7 +47,11 @@ export const EXAMS = {
     org: 'ĐHQG TP. Hồ Chí Minh',
     scale: 1200,
     unit: 'điểm',
+    // Một mô hình phần thi duy nhất, hai mức chi tiết (thiết kế v3 Mục 2.2):
+    // nhập theo `parts` (600/300/300) hoặc theo `subParts` của phần ngôn ngữ
+    // (Tiếng Việt 300 + Tiếng Anh 300) như máy tính BKHCM trước đây.
     parts: { ngon_ngu: 600, toan: 300, tu_duy_kh: 300 },
+    subParts: { ngon_ngu: { tieng_viet: 300, tieng_anh: 300 } },
     sigmaFloor: 0.75,
   },
   tsa: {
@@ -65,8 +69,14 @@ export const EXAMS = {
     label: 'SPT',
     full: 'Đánh giá năng lực chuyên biệt — ĐH Sư phạm Hà Nội',
     org: 'Trường ĐH Sư phạm Hà Nội',
-    scale: 10, // theo môn, quy theo tổ hợp của trường
-    unit: 'điểm/môn',
+    // Tách hai thang (thiết kế v3 Mục 2.2): từng môn thang 10, tổ hợp sau khi
+    // áp hệ số của trường quy về thang 30 — điểm chuẩn SPT trong dữ liệu là
+    // thang 30. `scale` giữ 30 cho đường so điểm chuẩn; validate từng môn
+    // phải dùng `subjectScale`.
+    scale: 30,
+    subjectScale: 10,
+    comboScale: 30,
+    unit: 'điểm tổ hợp thang 30 (từng môn thang 10)',
     sigmaFloor: 0.9,
   },
   hsca: {
@@ -74,8 +84,11 @@ export const EXAMS = {
     label: 'H-SCA',
     full: 'Đánh giá năng lực chuyên biệt — ĐH Sư phạm TP.HCM',
     org: 'Trường ĐH Sư phạm TP. Hồ Chí Minh',
-    scale: 10, // theo môn/phần, chi tiết do exams.json dữ liệu bổ sung
-    unit: 'điểm',
+    scale: 30,
+    subjectScale: 10,
+    comboScale: 30,
+    formulaFamily: 'hsca-weighted', // công thức kết hợp ở formulas.js
+    unit: 'điểm xét tuyển thang 30 (điểm môn chuyên biệt thang 10)',
     sigmaFloor: 0.9,
   },
   bca: {
@@ -86,6 +99,9 @@ export const EXAMS = {
     scale: 100,
     unit: 'điểm bài thi',
     parts: { tu_luan: 25, toan: 35, lich_su: 10, ngoai_ngu: 15, tu_chon: 15 },
+    // Điểm chuẩn BCA là điểm KẾT HỢP thang 30 (phương thức 3), không phải
+    // thang 100 của bài thi — công thức ở formulas.js bcaCombinedScore().
+    combined: { scale: 30, thptWeight: 2 / 5, examWeightOn30: 3 / 5, formulaRef: 'bca-p3' },
     sigmaFloor: 0.9,
   },
   vsat: {
@@ -94,7 +110,10 @@ export const EXAMS = {
     full: 'Kỳ thi V-SAT',
     org: 'Trung tâm Khảo thí Quốc gia',
     scale: 450, // tổ hợp 3 môn x 150
-    unit: 'điểm tổ hợp',
+    subjectScale: 150,
+    parts: { mon_1: 150, mon_2: 150, mon_3: 150 },
+    scoreMode: 'per-subject-150',
+    unit: 'điểm tổ hợp (3 môn × 150)',
     sigmaFloor: 0.9,
   },
   combined: {
@@ -161,5 +180,10 @@ export function getExam(code) {
 }
 
 // Khu vực ưu tiên + nhóm đối tượng ưu tiên (danh nghĩa, thang 30) — Quy chế Bộ GD&ĐT.
+// NGUỒN DUY NHẤT: predict.js/formulas.js import từ đây, cấm hardcode lại.
 export const REGION_PRIORITY = { KV1: 0.75, 'KV2-NT': 0.5, KV2: 0.25, KV3: 0 };
 export const CATEGORY_PRIORITY = { UT1: 2.0, UT2: 1.0, NONE: 0 };
+// Mốc bắt đầu giảm dần điểm ưu tiên và khoảng giảm (quy chế: tổng điểm từ
+// 22,5 trở lên thì ưu tiên thực = (30 - tổng)/7,5 × danh nghĩa).
+export const PRIORITY_TAPER_START = 22.5;
+export const PRIORITY_TAPER_SPAN = 7.5;
