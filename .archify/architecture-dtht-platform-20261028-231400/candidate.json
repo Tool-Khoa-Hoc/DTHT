@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "DTHT Platform Architecture",
+    "output": ".archify/architecture-dtht-platform-20261028-231400/dtht-platform.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    {
+      "id": "students",
+      "type": "external",
+      "icon": "person",
+      "label": "Students",
+      "sublabel": "Browser / Mobile",
+      "pos": [40, 160],
+      "size": [115, 60]
+    },
+    {
+      "id": "cdn",
+      "type": "cloud",
+      "icon": "cloud",
+      "label": "Vercel Edge",
+      "sublabel": "CDN / Static Assets",
+      "pos": [220, 160],
+      "size": [125, 60]
+    },
+    {
+      "id": "spa",
+      "type": "frontend",
+      "icon": "frontend",
+      "label": "DTHT SPA",
+      "sublabel": "React 19 / Vite",
+      "pos": [415, 160],
+      "size": [125, 60]
+    },
+    {
+      "id": "study_engine",
+      "type": "frontend",
+      "icon": "active",
+      "label": "Study Engine",
+      "sublabel": "Arena / Timers / Calc",
+      "pos": [610, 160],
+      "size": [135, 60]
+    },
+    {
+      "id": "supabase_auth",
+      "type": "security",
+      "icon": "security",
+      "label": "Supabase Auth",
+      "sublabel": "OAuth / Session JWT",
+      "pos": [820, 40],
+      "size": [140, 60]
+    },
+    {
+      "id": "supabase_rpc",
+      "type": "backend",
+      "icon": "backend",
+      "label": "Postgres RPC",
+      "sublabel": "SECURITY DEFINER",
+      "pos": [820, 160],
+      "size": [140, 60]
+    },
+    {
+      "id": "supabase_storage",
+      "type": "cloud",
+      "icon": "cloud",
+      "label": "Supabase Storage",
+      "sublabel": "Exam PDFs / Images",
+      "pos": [820, 280],
+      "size": [140, 60]
+    },
+    {
+      "id": "supabase_db",
+      "type": "database",
+      "icon": "database",
+      "label": "PostgreSQL DB",
+      "sublabel": "Supabase / RLS",
+      "pos": [1040, 160],
+      "size": [140, 60]
+    },
+    {
+      "id": "admin",
+      "type": "external",
+      "icon": "briefcase",
+      "label": "Admins",
+      "sublabel": "CLI & Exam Editors",
+      "pos": [40, 280],
+      "size": [115, 60]
+    },
+    {
+      "id": "dtht_cli",
+      "type": "backend",
+      "icon": "backend",
+      "label": "DTHT CLI Tool",
+      "sublabel": "dtht.py / Sync Engine",
+      "pos": [220, 280],
+      "size": [125, 60]
+    },
+    {
+      "id": "gemini_ai",
+      "type": "external",
+      "icon": "external",
+      "label": "Google Gemini",
+      "sublabel": "Word / Math Parser",
+      "pos": [220, 400],
+      "size": [125, 60]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Client Runtime (Browser / Edge)",
+      "wraps": ["cdn", "spa", "study_engine"]
+    },
+    {
+      "kind": "security-group",
+      "label": "Supabase Cloud Platform (RLS Enforced)",
+      "wraps": ["supabase_auth", "supabase_rpc", "supabase_storage", "supabase_db"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "students-to-cdn",
+      "from": "students",
+      "to": "cdn",
+      "label": "HTTPS visit",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cdn-to-spa",
+      "from": "cdn",
+      "to": "spa",
+      "label": "load bundle"
+    },
+    {
+      "id": "spa-to-engine",
+      "from": "spa",
+      "to": "study_engine",
+      "label": "mounts"
+    },
+    {
+      "id": "engine-to-rpc",
+      "from": "study_engine",
+      "to": "supabase_rpc",
+      "label": "RPC call",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rpc-to-db",
+      "from": "supabase_rpc",
+      "to": "supabase_db",
+      "label": "SQL query",
+      "variant": "emphasis"
+    },
+    {
+      "id": "spa-to-auth",
+      "from": "spa",
+      "to": "supabase_auth",
+      "label": "PKCE auth",
+      "variant": "security"
+    },
+    {
+      "id": "engine-to-storage",
+      "from": "study_engine",
+      "to": "supabase_storage",
+      "label": "fetch PDFs"
+    },
+    {
+      "id": "admin-to-cli",
+      "from": "admin",
+      "to": "dtht_cli",
+      "label": "run CLI"
+    },
+    {
+      "id": "cli-to-gemini",
+      "from": "dtht_cli",
+      "to": "gemini_ai",
+      "label": "parse docs"
+    },
+    {
+      "id": "cli-to-storage",
+      "from": "dtht_cli",
+      "to": "supabase_storage",
+      "label": "sync-db & assets",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Client & Edge",
+      "items": [
+        "React 19 Single Page Application deployed to Vercel Edge with Brotli compression",
+        "Modules include Study Timers, Arena EXP ladder, GPA Calc, and Admission Analytics"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Backend as a Service",
+      "items": [
+        "PostgreSQL schema secured by strict Row-Level Security policies",
+        "SECURITY DEFINER RPCs isolate EXP increments and VIP session tracking"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Data Pipeline & Tooling",
+      "items": [
+        "dtht.py CLI handles exam discovery, answer key sanitization, and Supabase push",
+        "Google Gemini API sanitizes raw Word exam documents into KaTeX Markdown"
+      ]
+    }
+  ]
+}

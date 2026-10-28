@@ -36,7 +36,6 @@
     Thứ tự quan trọng:
     1. Supabase (API, Auth, Storage) — critical path cho app
     2. Google Fonts — render-blocking nếu không preconnect
-    3. CDN phụ (unpkg cho PDF.js cmaps)
   -->
 
   <!-- Supabase Auth endpoint (khác domain với API) -->
@@ -45,9 +44,6 @@
   <!-- Google Fonts — phải preconnect CẢ HAI domain -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <!-- unpkg CDN — dùng cho pdfjs cmap files -->
-  <link rel="dns-prefetch" href="https://unpkg.com" />
 
   <!--
     ═══════════ TASK 1: PRELOAD — Ưu tiên tài nguyên LCP ═══════════

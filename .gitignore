@@ -83,6 +83,19 @@ status.txt
 # Backups
 backups/
 
+# Archify candidate/review scratch (chỉ commit HTML + SVG + JSON nguồn của sơ đồ)
+.archify/**/review-*/
+.archify/**/*.browser-check.json
+.archify/**/*.finalize.json
+.archify/**/*.finalize-summary.json
+.archify/**/*.delivery.json
+
+# Receipt kiểm định của Archify — chỉ là bằng chứng cục bộ, tái tạo được
+docs/*.browser-check.json
+docs/*.finalize.json
+docs/*.finalize-summary.json
+docs/*.delivery.json
+
 # Local/Test Scripts (Tùy chọn: nếu muốn giữ lại trên local nhưng không đẩy lên Git)
 test_*.py
 test_*.js

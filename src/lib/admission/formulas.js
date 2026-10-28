@@ -193,7 +193,17 @@ export function integrated100Score(schoolCode, input = {}) {
       explain: [reg.note || 'Chưa có công thức chính thức đã kiểm chứng cho trường này.'],
     };
   }
-  return reg.compute(input);
+  const result = reg.compute(input);
+  if (!result) {
+    return {
+      value: null,
+      reason: 'missing-input',
+      scale: reg.scale || 100,
+      formulaVersion: reg.formulaVersion,
+      explain: ['Chưa đủ dữ liệu điểm để tính theo công thức tổng hợp của trường này.'],
+    };
+  }
+  return result;
 }
 
 // Tên cũ giữ tương thích với bản thiết kế (uehIntegratedScore).

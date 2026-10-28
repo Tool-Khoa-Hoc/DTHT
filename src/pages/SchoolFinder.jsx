@@ -199,8 +199,8 @@ function buildEstimate(group, profileV2, spectrumMethods, baseYear) {
       return {
         estimate: null,
         reason:
-          reg.reason === 'formula-unverified'
-            ? `Trường này xét tuyển tổng hợp thang 100 nhưng ${reg.explain[0]}`
+          reg?.reason === 'formula-unverified'
+            ? `Trường này xét tuyển tổng hợp thang 100 nhưng ${reg?.explain?.[0] || 'chưa có văn bản công thức chính thức.'}`
             : 'Phương thức xét tuyển tổng hợp theo công thức riêng của trường — hãy tính điểm tổng hợp ở trang Nhập điểm trước.',
       };
     }

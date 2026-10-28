@@ -12,10 +12,6 @@ const CHUNK_RULES = [
     name: 'vendor-supabase',
     test: /node_modules[\\/]@supabase[\\/]/,
   },
-  {
-    name: 'vendor-katex',
-    test: /node_modules[\\/]katex[\\/]/,
-  },
 ];
 
 export default defineConfig({
@@ -38,8 +34,7 @@ export default defineConfig({
     minify: 'esbuild',
     // Target modern browsers để tận dụng ES2020+ features
     target: 'es2020',
-    // Tăng warning threshold (pdf.worker là lớn, đây là expected)
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         // Cache-busting: file name có hash → browser cache lâu dài

@@ -179,6 +179,7 @@ ok('TC-12 vsatComboScore(95,110,80) = 285 (khớp điểm chuẩn V-SAT Y khoa H
 ok('TC-13 sptComboScore A00 (8.5, 9, 8) = 25.50 thang 30', near(sptComboScore({ toan: 8.5, ly: 9, hoa: 8 }, 'A00').value, 25.5, 0.01));
 ok('TC-13b hscaComboScore (0.5*9 + 0.35*8 + 0.15*7) * 3 = 25.05', near(hscaComboScore({ monChinh: 9, hb1: 8, hb2: 7 }).value, 25.05, 0.01));
 ok('TC-13c UEH tổng hợp: chưa có văn bản -> formula-unverified minh bạch', integrated100Score('UEH', {}).reason === 'formula-unverified');
+ok('TC-13d HCMUT t?ng h?p thi?u input -> reason missing-input kh?ng tr? null', integrated100Score('HCMUT', {}).reason === 'missing-input');
 
 // TC-14 tổ hợp đầy đủ
 const fullSubjects = { toan: 9, ly: 8.5, hoa: 8, sinh: 7.5, van: 8, su: 7, dia: 7.5, anh: 9, gdkp: 8 };
