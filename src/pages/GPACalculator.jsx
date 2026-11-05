@@ -1,355 +1,451 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { gpaSemester, gpaCumulative, getGpaScale, GPA_SCALES } from '../lib/admission/gpa';
-
-// Trang GPA ĐẠI HỌC — sau tái cấu trúc score-v3, trang này CHỈ còn tính GPA
-// đại học (UniCalc trước đây). Toàn bộ máy tính điểm xét tuyển THPT / học bạ /
-// BKHCM / ĐGNL từng trùng lặp ở đây (kèm 2 công thức sai: quy đổi HSA tuyến
-// tính và BKHCM sai mẫu số) đã bị XOÁ — tính điểm xét tuyển dùng một nơi duy
-// nhất: trang Nhập điểm (/tim-truong/diem, AdmissionCalculator) với thư viện
-// src/lib/admission/ (formulas.js, conversions.js).
-// GPA tính bằng lib/admission/gpa.js; môn chưa nhập điểm (grade rỗng) bị loại
-// khỏi kỳ tính, môn 0 điểm thật vẫn được tính.
-
-const fmt = (n, digits = 2) =>
-  n == null || !Number.isFinite(Number(n))
-    ? '—'
-    : Number(n).toLocaleString('vi-VN', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+import ProgressBar from '../components/ui/ProgressBar';
+import RankSeal from '../components/ui/RankSeal';
 
 export default function GPACalculator() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [subjects, setSubjects] = useState([{ id: 1, name: '', credits: 2, grade: '' }]);
+  const { user, profile } = useAuth();
+
+  const [semester, setSemester] = useState('Học kỳ 1');
+  const [targetScore, setTargetScore] = useState(8.5);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
-  const [semesters, setSemesters] = useState([]);
-  const [selectedSem, setSelSem] = useState('');
-  const [newSemName, setNewSem] = useState('');
-  const [isCreating, setCreating] = useState(false);
-  const [isRenaming, setRenaming] = useState(false);
-  const [renameVal, setRenameVal] = useState('');
-  const [allSubjects, setAllSubjects] = useState([]);
-  const scaleId = 'vn-common';
 
-  const loadSems = useCallback(async () => {
-    const { data } = await supabase
-      .from('semesters')
-      .select('id, name, created_at, gpa')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-    setSemesters(data || []);
-    if (data?.length > 0) setSelSem((prev) => prev || data[0].id);
-    const { data: subs } = await supabase
-      .from('subjects')
-      .select('id, name, credits, grade_number, semester_id')
-      .eq('user_id', user.id);
-    setAllSubjects(subs || []);
-  }, [user]);
+  const [courses, setCourses] = useState([
+    { id: 1, name: 'Toán học', credits: 3, score: 8.5, icon: 'calculate' },
+    { id: 2, name: 'Vật lý', credits: 2, score: 8.0, icon: 'science' },
+    { id: 3, name: 'Ngữ văn', credits: 3, score: 7.5, icon: 'menu_book' },
+    { id: 4, name: 'Tiếng Anh', credits: 3, score: 9.0, icon: 'language' },
+  ]);
 
-  const loadSubs = useCallback(async (id) => {
-    const { data } = await supabase
-      .from('subjects')
-      .select('id, name, credits, grade_number, semester_id, created_at')
-      .eq('semester_id', id)
-      .order('created_at');
-    if (data?.length > 0) {
-      setSubjects(data.map((s) => ({ id: s.id, name: s.name, credits: s.credits, grade: String(s.grade_number ?? '') })));
-    } else {
-      setSubjects([{ id: Date.now(), name: '', credits: 2, grade: '' }]);
-    }
-  }, []);
-
-  useEffect(() => { if (user) loadSems(); }, [user, loadSems]);
   useEffect(() => {
-    if (selectedSem) loadSubs(selectedSem);
-    else setSubjects([{ id: Date.now(), name: '', credits: 2, grade: '' }]);
-  }, [selectedSem, loadSubs]);
-
-  const createSem = async () => {
-    if (!newSemName.trim()) return;
-    setCreating(true);
-    const { data } = await supabase
-      .from('semesters')
-      .insert([{ user_id: user.id, name: newSemName.trim(), status: 'in_progress', gpa: 0 }])
-      .select('id')
-      .single();
-    setNewSem('');
-    await loadSems();
-    if (data?.id) setSelSem(data.id);
-    setCreating(false);
-  };
-
-  const renameSem = async () => {
-    if (!renameVal.trim()) return;
-    await supabase.from('semesters').update({ name: renameVal.trim() }).eq('id', selectedSem).eq('user_id', user.id);
-    setRenaming(false);
-    await loadSems();
-  };
-
-  const update = (id, f, v) => setSubjects((s) => s.map((x) => (x.id === id ? { ...x, [f]: v } : x)));
-  const add = () => setSubjects((s) => [...s, { id: Date.now(), name: '', credits: 2, grade: '' }]);
-  const remove = (id) => { if (subjects.length > 1) setSubjects((s) => s.filter((x) => x.id !== id)); };
-
-  const semResult = useMemo(
-    () =>
-      gpaSemester(
-        subjects.map((s) => ({
-          credits: parseFloat(s.credits) || 0,
-          grade: s.grade === '' || s.grade == null ? null : parseFloat(s.grade),
-        })),
-        scaleId,
-      ),
-    [subjects],
-  );
-  const gpa = semResult.gpa4 != null ? fmt(semResult.gpa4) : '—';
-
-  const cumulative = useMemo(() => {
-    const bySem = {};
-    for (const s of allSubjects) {
-      (bySem[s.semester_id] ||= []).push({ credits: s.credits, grade: s.grade_number });
+    if (profile?.target_gpa) {
+      setTargetScore(profile.target_gpa);
     }
-    return gpaCumulative(Object.values(bySem).map((list) => ({ subjects: list })), scaleId);
-  }, [allSubjects]);
+  }, [profile]);
+
+  const fetchGpaRecord = useCallback(async () => {
+    if (!user) return;
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('gpa_records')
+        .select('courses')
+        .eq('user_id', user.id)
+        .eq('semester', semester)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (data && data.courses && data.courses.length > 0) {
+        setCourses(data.courses);
+      } else {
+        setCourses([
+          { id: 1, name: 'Toán học', credits: 3, score: 8.5, icon: 'calculate' },
+          { id: 2, name: 'Vật lý', credits: 2, score: 8.0, icon: 'science' },
+          { id: 3, name: 'Ngữ văn', credits: 3, score: 7.5, icon: 'menu_book' },
+          { id: 4, name: 'Tiếng Anh', credits: 3, score: 9.0, icon: 'language' },
+        ]);
+      }
+    } catch (error) {
+      console.error('Lỗi khi tải bảng điểm:', error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [semester, user]);
+
+  useEffect(() => {
+    fetchGpaRecord();
+  }, [fetchGpaRecord]);
 
   const handleSave = async () => {
-    if (!user) { setMessage({ type: 'error', text: 'Vui lòng đăng nhập để lưu GPA.' }); return; }
-    if (!selectedSem) { setMessage({ type: 'error', text: 'Hãy chọn hoặc tạo học kỳ trước!' }); return; }
+    if (!user) return;
     setIsSaving(true);
-    setMessage({ type: '', text: '' });
     try {
-      const gpaValue = semResult.gpa4 ?? 0;
-      await supabase.from('semesters').update({ gpa: gpaValue }).eq('id', selectedSem);
-      const payload = subjects
-        .filter((s) => s.name.trim() || s.grade !== '')
-        .map((s, i) => ({
-          user_id: user.id,
-          semester_id: selectedSem,
-          name: s.name || `Môn học ${i + 1}`,
-          credits: parseFloat(s.credits) || 0,
-          grade_number: s.grade === '' ? 0 : parseFloat(s.grade) || 0,
-          status: 'completed',
-        }));
-      if (payload.length > 0) {
-        await supabase.from('subjects').delete().eq('semester_id', selectedSem);
-        const { error } = await supabase.from('subjects').insert(payload);
+      const { data: existing } = await supabase
+        .from('gpa_records')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('semester', semester)
+        .maybeSingle();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('gpa_records')
+          .update({ courses, updated_at: new Date() })
+          .eq('id', existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('gpa_records')
+          .insert([{ user_id: user.id, semester, courses }]);
         if (error) throw error;
       }
-      await supabase.from('profiles').update({ current_gpa: gpaValue }).eq('id', user.id);
-      await loadSems();
-      setMessage({ type: 'success', text: 'Đã lưu GPA học kỳ thành công!' });
-      setTimeout(() => setMessage({ type: '', text: '' }), 4000);
-    } catch (err) {
-      setMessage({ type: 'error', text: 'Lỗi: ' + err.message });
+
+      await supabase.from('profiles').update({ target_gpa: targetScore }).eq('id', user.id);
+
+      alert('Đã lưu bảng điểm thành công!');
+    } catch (error) {
+      console.error('Lỗi khi lưu bảng điểm:', error.message);
+      alert('Có lỗi xảy ra khi lưu: ' + error.message);
     } finally {
       setIsSaving(false);
     }
   };
 
+  const totalCredits = courses.reduce((sum, c) => sum + (parseFloat(c.credits) || 0), 0);
+  const totalPoints = courses.reduce(
+    (sum, c) => sum + (parseFloat(c.credits) || 0) * (parseFloat(c.score) || 0),
+    0,
+  );
+  const gpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : '0.00';
+
+  const getRank = (s) => {
+    if (s >= 9.0)
+      return {
+        label: 'Xuất sắc',
+        color: 'text-completed bg-completed-soft border-completed-border',
+      };
+    if (s >= 8.0)
+      return {
+        label: 'Giỏi',
+        color: 'text-jade bg-jade-soft border-jade-border',
+      };
+    if (s >= 6.5)
+      return {
+        label: 'Khá',
+        color: 'text-gold-dark bg-gold-soft border-gold',
+      };
+    if (s >= 5.0)
+      return {
+        label: 'Trung bình',
+        color: 'text-accent bg-gold-soft/60 border-border-strong',
+      };
+    return {
+      label: 'Yếu',
+      color: 'text-primary bg-primary-soft border-primary/35',
+    };
+  };
+  const rank = getRank(parseFloat(gpa));
+
+  const handleUpdateCourse = (id, field, value) => {
+    setCourses(courses.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
+  };
+
+  const handleAddCourse = () => {
+    const newId = courses.length > 0 ? Math.max(...courses.map((c) => c.id)) + 1 : 1;
+    setCourses([...courses, { id: newId, name: '', credits: 1, score: '', icon: 'book' }]);
+  };
+
+  const handleRemoveCourse = (id) => {
+    setCourses(courses.filter((c) => c.id !== id));
+  };
+
+  const handleReset = () => {
+    if (window.confirm('Bạn có chắc muốn đặt lại toàn bộ điểm trên màn hình?')) {
+      setCourses(courses.map((c) => ({ ...c, score: '' })));
+    }
+  };
+
+  const isTargetReached = parseFloat(gpa) >= parseFloat(targetScore);
+  const diff = (parseFloat(targetScore) - parseFloat(gpa)).toFixed(2);
+
   return (
-    <div className="min-h-dvh font-arena text-slate-100 relative" style={{ background: 'var(--arena-ink)' }}>
-      <header
-        className="sticky top-0 z-20 backdrop-blur-md border-b border-white/10"
-        style={{ background: 'rgba(25,14,18,0.85)' }}
-      >
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            aria-label="Quay lại"
-            className="w-11 h-11 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
-          >
-            <span className="material-symbols-outlined" aria-hidden="true">arrow_back_ios_new</span>
-          </button>
-          <div className="flex-1 min-w-0">
-            <h1 className="font-arena-display font-bold text-xl leading-tight">Tính GPA đại học</h1>
-            <p className="text-xs text-slate-400">Quy đổi điểm hệ 10 sang hệ 4 theo tín chỉ, lưu theo học kỳ</p>
-          </div>
-          <button onClick={() => navigate('/tim-truong/diem')} className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer shrink-0">
-            <span className="material-symbols-outlined text-base" aria-hidden="true">calculate</span>
-            Tính điểm xét tuyển
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-4 py-5 space-y-4">
-        <div className="arena-card p-4 flex gap-3">
-          <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">info</span>
-          <p className="text-xs leading-relaxed text-slate-300">
-            Trang này chỉ tính <b>GPA đại học</b>. Điểm xét tuyển THPT, học bạ, HSA, V-ACT, TSA, BCA,
-            V-SAT và điểm tổng hợp BKHCM được nhập &amp; tính ở trang{' '}
-            <button onClick={() => navigate('/tim-truong/diem')} className="underline cursor-pointer">Nhập điểm xét tuyển</button>{' '}
-            — một hồ sơ điểm duy nhất cho mọi kỳ thi.
-          </p>
-        </div>
-
-        <section className="arena-card p-5 text-center space-y-1">
-          <p className="text-xs uppercase tracking-widest text-slate-400">GPA học kỳ (hệ 4)</p>
-          <p className="font-arena-display font-bold text-5xl tabular" style={{ color: 'var(--arena-jade)' }}>{gpa}</p>
-          <p className="text-xs text-slate-400">
-            {semResult.credits > 0
-              ? `${semResult.credits} tín chỉ đã nhập điểm · Trung bình hệ 10 có trọng số: ${fmt(semResult.gpa10)}`
-              : 'Nhập điểm các môn bên dưới để xem GPA'}
-          </p>
-          {cumulative.credits > 0 && (
-            <p className="text-xs text-slate-300 pt-1">
-              GPA tích luỹ toàn khoá (các kỳ đã lưu):{' '}
-              <span className="tabular font-bold">{fmt(cumulative.gpa4)}</span> trên {cumulative.credits} tín chỉ
-              <span className="text-slate-500"> — khác với GPA của riêng kỳ đang chọn ở trên.</span>
-            </p>
-          )}
-          <p className="text-[11px] text-slate-500 leading-relaxed pt-2">{getGpaScale(scaleId).sourceNote}</p>
-        </section>
-
-        {!user ? (
-          <div className="arena-card p-4">
-            <p className="text-sm text-slate-300">Đăng nhập để lưu học kỳ và môn học vào hồ sơ của bạn.</p>
-          </div>
-        ) : (
-          <section className="arena-card p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <label htmlFor="sem-select" className="text-sm font-semibold text-slate-300">Chọn học kỳ</label>
-              {selectedSem && !isRenaming && (
-                <button
-                  onClick={() => { const s = semesters.find((x) => String(x.id) === String(selectedSem)); setRenameVal(s?.name || ''); setRenaming(true); }}
-                  className="text-xs flex items-center gap-1 cursor-pointer"
-                  style={{ color: 'var(--arena-ember)' }}
-                >
-                  <span className="material-symbols-outlined text-sm" aria-hidden="true">edit</span> Đổi tên
-                </button>
-              )}
-            </div>
-            {isRenaming && (
-              <div className="flex gap-2">
-                <input
-                  autoFocus value={renameVal} onChange={(e) => setRenameVal(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') renameSem(); if (e.key === 'Escape') setRenaming(false); }}
-                  className="flex-1 min-h-[44px] bg-white/5 border border-white/10 rounded-lg text-sm text-white px-3 outline-none"
-                />
-                <button onClick={renameSem} className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer">Lưu</button>
-                <button onClick={() => setRenaming(false)} className="btn-arena btn-arena-sm btn-arena-ghost cursor-pointer">Huỷ</button>
-              </div>
-            )}
-            <select
-              id="sem-select" value={selectedSem} onChange={(e) => setSelSem(e.target.value)}
-              className="w-full min-h-[44px] bg-white/5 border border-white/10 rounded-xl px-3 text-sm outline-none cursor-pointer"
-              style={{ backgroundColor: 'var(--arena-surface)' }}
+    <div className="bg-background font-sans text-foreground min-h-full flex flex-col justify-between pb-24">
+      <div className="max-w-4xl mx-auto w-full">
+        {/* Top App Bar */}
+        <header className="sticky top-0 z-50 bg-paper/95 backdrop-blur-md border-b border-border px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              aria-label="Quay lại"
+              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-alt transition-colors cursor-pointer"
             >
-              <option value="">— Chọn học kỳ —</option>
-              {semesters.map((s) => (
-                <option key={s.id} value={s.id}>{s.name} (GPA: {s.gpa})</option>
-              ))}
-            </select>
-            <div className="flex gap-2 pt-2 border-t border-white/5">
-              <input
-                value={newSemName} onChange={(e) => setNewSem(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') createSem(); }}
-                placeholder="Thêm học kỳ mới (ví dụ: HK241)"
-                className="flex-1 min-h-[44px] bg-white/5 border border-white/10 rounded-lg text-sm text-white px-3 outline-none placeholder:text-slate-500"
-              />
-              <button onClick={createSem} disabled={isCreating || !newSemName.trim()} className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer disabled:opacity-50">Thêm</button>
+              <span className="material-symbols-outlined text-foreground" aria-hidden="true">
+                arrow_back
+              </span>
+            </button>
+            <div>
+              <h1 className="font-display text-lg font-extrabold tracking-tight text-foreground">
+                Bàn Tính Điểm Số
+              </h1>
+              <p className="text-[11px] text-secondary-text">GPA học kỳ · mục tiêu học bạ</p>
             </div>
-          </section>
-        )}
-
-        <section className="space-y-3">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400">Môn học</h2>
-            <span className="text-xs text-slate-500">{subjects.length} môn</span>
           </div>
-          {subjects.map((s, i) => (
-            <div key={s.id} className="arena-card p-3 grid grid-cols-[1fr_76px_92px_40px] gap-2 items-end">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleReset}
+              aria-label="Đặt lại điểm"
+              title="Đặt lại điểm"
+              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-alt transition-colors text-secondary-text hover:text-foreground cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
+                restart_alt
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="btn-arena btn-arena-primary btn-arena-sm"
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                {isSaving ? 'hourglass_empty' : 'save'}
+              </span>
+              {isSaving ? 'Đang lưu...' : 'Lưu điểm'}
+            </button>
+          </div>
+        </header>
+
+        {/* Navigation Tabs */}
+        <div className="px-4 pt-4">
+          <div className="flex border-b border-border gap-6 overflow-x-auto no-scrollbar">
+            <button
+              type="button"
+              className="pb-3 border-b-2 border-primary text-primary font-display font-bold text-sm whitespace-nowrap flex items-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                school
+              </span>
+              Điểm GPA (Cấp 3)
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/admission')}
+              className="pb-3 border-b-2 border-transparent text-secondary-text hover:text-foreground font-display font-semibold text-sm whitespace-nowrap flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                calculate
+              </span>
+              Điểm Xét Tuyển ĐH
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/schools')}
+              className="pb-3 border-b-2 border-transparent text-secondary-text hover:text-foreground font-display font-semibold text-sm whitespace-nowrap flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                account_balance
+              </span>
+              Chọn Trường ĐH
+            </button>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <main className="flex-1 px-4 py-5 space-y-6">
+          {/* Semester Selector & Summary Card */}
+          <div className="imperial-frame p-5 relative overflow-hidden">
+            <span
+              aria-hidden="true"
+              className="hanzi-watermark absolute -top-2 right-4 text-7xl font-bold text-accent/8"
+            >
+              算
+            </span>
+
+            <div className="flex justify-between items-center mb-4 relative z-10">
+              <div className="relative">
+                <select
+                  aria-label="Chọn học kỳ"
+                  value={semester}
+                  onChange={(e) => setSemester(e.target.value)}
+                  className="appearance-none bg-paper text-foreground font-display font-bold text-sm py-2 pl-3.5 pr-9 rounded-xl border border-border-strong focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+                >
+                  <option value="Học kỳ 1">Học kỳ 1</option>
+                  <option value="Học kỳ 2">Học kỳ 2</option>
+                  <option value="Cả năm">Cả năm</option>
+                </select>
+                <span
+                  className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-sm pointer-events-none text-secondary-text"
+                  aria-hidden="true"
+                >
+                  expand_more
+                </span>
+              </div>
+              <span className={`text-xs font-bold px-3 py-1 rounded-full border ${rank.color}`}>
+                Học lực: {rank.label}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 items-end relative z-10 mb-4">
               <div>
-                <label className="block text-[11px] font-semibold mb-1 text-slate-400">Tên môn</label>
-                <input
-                  value={s.name} onChange={(e) => update(s.id, 'name', e.target.value)}
-                  placeholder={`Môn học ${i + 1}`} list="uni-subjects"
-                  className="w-full min-h-[44px] bg-white/5 border border-white/10 rounded-lg text-sm px-3 outline-none placeholder:text-slate-500"
-                />
+                <p className="text-xs text-secondary-text mb-1 font-medium">Điểm trung bình (GPA)</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-display text-4xl font-extrabold tracking-tight text-primary tabular">
+                    {gpa}
+                  </span>
+                  <span className="text-sm text-muted-foreground font-medium">/ 10</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-secondary-text mb-1 font-medium">Tổng hệ số / Tín chỉ</p>
+                <p className="font-display text-xl font-bold text-foreground tabular">{totalCredits}</p>
+              </div>
+            </div>
+
+            <div className="relative z-10">
+              <ProgressBar
+                value={parseFloat(gpa) || 0}
+                max={10}
+                tone="primary"
+                label="Thang điểm 10"
+                sublabel={`${gpa}/10`}
+              />
+            </div>
+          </div>
+
+          {/* Target Goal Section */}
+          <div className="paper-card p-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-gold-soft border border-gold flex items-center justify-center text-accent no-shrink">
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  flag
+                </span>
               </div>
               <div>
-                <label className="block text-[11px] font-semibold mb-1 text-slate-400">Tín chỉ</label>
-                <input
-                  type="number" min="0" max="30" value={s.credits}
-                  onChange={(e) => update(s.id, 'credits', e.target.value)}
-                  className="w-full min-h-[44px] bg-white/5 border border-white/10 rounded-lg text-sm px-3 outline-none tabular"
-                />
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-display font-bold text-foreground">Mục tiêu học kỳ</h2>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    aria-label="Điểm mục tiêu học kỳ"
+                    value={targetScore}
+                    onChange={(e) => setTargetScore(e.target.value)}
+                    className="w-16 bg-paper border border-border-strong rounded-lg px-2 py-0.5 text-xs font-bold text-center text-primary tabular focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+                <p className="text-xs text-secondary-text mt-1">
+                  {isTargetReached ? (
+                    <span className="text-completed font-semibold">
+                      Tuyệt vời! Bạn đã đạt mục tiêu đề ra.
+                    </span>
+                  ) : (
+                    <span>
+                      Cần tăng thêm <span className="text-primary font-bold tabular">{diff}</span> điểm
+                      để đạt mục tiêu.
+                    </span>
+                  )}
+                </p>
               </div>
-              <div>
-                <label className="block text-[11px] font-semibold mb-1 text-slate-400">Điểm hệ 10</label>
-                <input
-                  type="number" min="0" max="10" step="0.1" value={s.grade}
-                  onChange={(e) => update(s.id, 'grade', e.target.value)}
-                  placeholder="Chưa nhập"
-                  className="w-full min-h-[44px] bg-white/5 border border-white/10 rounded-lg text-sm px-3 outline-none tabular placeholder:text-slate-600"
-                />
-              </div>
+            </div>
+            <RankSeal size="sm" variant="gold" icon="emoji_events" label="Mục tiêu" />
+          </div>
+
+          {/* Course List Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-base font-extrabold text-foreground">
+                Danh sách môn học ({courses.length})
+              </h2>
               <button
-                onClick={() => remove(s.id)} aria-label="Xoá môn"
-                className="w-10 h-11 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center cursor-pointer hover:bg-white/10"
+                type="button"
+                onClick={handleAddCourse}
+                className="text-xs font-bold flex items-center gap-1 text-primary hover:underline cursor-pointer"
               >
-                <span className="material-symbols-outlined text-base" aria-hidden="true">delete</span>
+                <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                  add_circle
+                </span>
+                Thêm môn
               </button>
             </div>
-          ))}
-          <button
-            onClick={add}
-            className="w-full min-h-[48px] border-2 border-dashed border-white/15 rounded-xl text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span className="material-symbols-outlined" aria-hidden="true">add_circle</span>
-            <span className="font-semibold text-sm">Thêm môn học mới</span>
-          </button>
-          <p className="text-[11px] text-slate-500 leading-relaxed">
-            Môn để trống ô điểm sẽ không bị tính là 0 — chỉ môn đã nhập điểm (kể cả 0 điểm thật) mới vào mẫu số GPA.
-            Bộ thang quy đổi đang dùng: {GPA_SCALES[scaleId].label}.
-          </p>
-        </section>
 
-        {message.text && (
-          <p
-            className={`text-center text-sm font-medium ${message.type === 'error' ? 'text-red-400' : ''}`}
-            style={message.type === 'success' ? { color: 'var(--arena-jade)' } : undefined}
-            role="status"
-          >
-            {message.text}
-          </p>
-        )}
-        {user && (
-          <button onClick={handleSave} disabled={isSaving} className="btn-arena btn-arena-primary w-full cursor-pointer">
-            <span className="material-symbols-outlined text-base" aria-hidden="true">{isSaving ? 'sync' : 'save'}</span>
-            {isSaving ? 'Đang lưu...' : 'Lưu vào hệ thống'}
-          </button>
-        )}
+            <div className="grid grid-cols-12 gap-2 px-3 text-xs font-bold text-secondary-text">
+              <div className="col-span-6">Tên môn học</div>
+              <div className="col-span-2 text-center">Hệ số</div>
+              <div className="col-span-3 text-center">Điểm TB</div>
+              <div className="col-span-1"></div>
+            </div>
 
-        <button
-          onClick={() => navigate('/tim-truong')}
-          className="w-full py-4 rounded-2xl border border-white/10 hover:border-white/20 transition-all flex items-center justify-between px-5 cursor-pointer"
-        >
-          <span className="text-left">
-            <span className="font-bold text-white text-sm block">Tìm trường phù hợp với điểm của bạn</span>
-            <span className="text-[11px] text-slate-400 mt-0.5 block">So sánh điểm chuẩn mới nhất · Hơn 1.200 ngành và phương thức · Ước tính theo xác suất</span>
-          </span>
-          <span className="material-symbols-outlined text-slate-400" aria-hidden="true">arrow_forward</span>
-        </button>
-      </main>
+            {isLoading ? (
+              <div className="py-8 flex justify-center">
+                <span
+                  className="material-symbols-outlined animate-spin text-primary text-3xl"
+                  aria-hidden="true"
+                >
+                  sync
+                </span>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="grid grid-cols-12 gap-2 items-center paper-card p-2.5 focus-within:border-primary transition-all"
+                  >
+                    <div className="col-span-6 flex items-center gap-2">
+                      <span
+                        className="material-symbols-outlined text-accent text-lg pl-1"
+                        aria-hidden="true"
+                      >
+                        {course.icon || 'book'}
+                      </span>
+                      <input
+                        className="w-full bg-transparent border-none text-sm font-semibold text-foreground focus:outline-none focus:ring-0 p-1 placeholder:text-muted-foreground"
+                        type="text"
+                        placeholder="Nhập tên môn..."
+                        value={course.name}
+                        onChange={(e) => handleUpdateCourse(course.id, 'name', e.target.value)}
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <input
+                        className="w-full bg-paper border border-border rounded-lg text-center text-sm font-medium text-foreground py-1.5 tabular focus:outline-none focus:ring-1 focus:ring-primary"
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={course.credits}
+                        onChange={(e) => handleUpdateCourse(course.id, 'credits', e.target.value)}
+                      />
+                    </div>
+                    <div className="col-span-3">
+                      <input
+                        className="w-full bg-primary-soft border border-primary/30 text-primary rounded-lg text-center text-sm font-bold py-1.5 tabular focus:outline-none focus:ring-1 focus:ring-primary"
+                        step="0.1"
+                        min="0"
+                        max="10"
+                        placeholder="0.0"
+                        type="number"
+                        value={course.score}
+                        onChange={(e) => handleUpdateCourse(course.id, 'score', e.target.value)}
+                      />
+                    </div>
+                    <div className="col-span-1 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCourse(course.id)}
+                        aria-label={`Xoá môn ${course.name || ''}`}
+                        className="text-muted-foreground hover:text-primary transition-colors p-1 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                          delete
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
-      <datalist id="uni-subjects">
-        <option value="Triết học Mác – Lênin" />
-        <option value="Kinh tế chính trị Mác – Lênin" />
-        <option value="Chủ nghĩa xã hội khoa học" />
-        <option value="Tư tưởng Hồ Chí Minh" />
-        <option value="Lịch sử Đảng Cộng sản Việt Nam" />
-        <option value="Toán cao cấp" />
-        <option value="Đại số tuyến tính" />
-        <option value="Giải tích" />
-        <option value="Xác suất thống kê" />
-        <option value="Vật lí đại cương" />
-        <option value="Pháp luật đại cương" />
-        <option value="Tiếng Anh chuyên ngành" />
-        <option value="Tin học đại cương" />
-        <option value="Giáo dục thể chất" />
-        <option value="Giáo dục Quốc phòng – An ninh" />
-      </datalist>
+            <button
+              type="button"
+              onClick={handleAddCourse}
+              className="w-full py-3 border-2 border-dashed border-border-strong rounded-xl text-secondary-text hover:text-primary hover:border-primary hover:bg-primary-soft/40 transition-all flex items-center justify-center gap-2 text-sm font-bold cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                add
+              </span>
+              Thêm môn học mới
+            </button>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

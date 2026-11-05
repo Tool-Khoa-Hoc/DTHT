@@ -1,93 +1,102 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { ToastContext } from './toastContext';
-const TOAST_TIMEOUT = 4200;
+﻿/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useCallback, useContext, useState } from 'react';
 
-const toastStyles = {
+const ToastContext = createContext(null);
+
+const TOAST_STYLES = {
   success: {
+    border: 'border-jade-border bg-jade-soft text-foreground',
     icon: 'check_circle',
-    className: 'border-emerald-400/30 bg-emerald-500/15 text-emerald-50',
-    iconClassName: 'text-emerald-300',
+    iconColor: 'text-jade',
   },
   error: {
+    border: 'border-primary/40 bg-primary-soft text-foreground',
     icon: 'error',
-    className: 'border-red-400/30 bg-red-500/15 text-red-50',
-    iconClassName: 'text-red-300',
+    iconColor: 'text-primary',
+  },
+  warning: {
+    border: 'border-gold bg-gold-soft text-foreground',
+    icon: 'warning',
+    iconColor: 'text-accent',
   },
   info: {
+    border: 'border-border-strong bg-surface text-foreground',
     icon: 'info',
-    className: 'border-sky-400/30 bg-sky-500/15 text-sky-50',
-    iconClassName: 'text-sky-300',
+    iconColor: 'text-primary',
   },
 };
-
-let nextToastId = 0;
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
 
-  const dismissToast = useCallback((id) => {
-    setToasts((current) => current.filter((toast) => toast.id !== id));
+  const dismiss = useCallback((id) => {
+    setToasts((prev) => prev.filter((item) => item.id !== id));
   }, []);
 
-  const showToast = useCallback((toast) => {
-    const id = nextToastId + 1;
-    nextToastId = id;
-
-    setToasts((current) => [...current.slice(-3), { id, type: 'info', ...toast }]);
-
-    if (toast.duration !== 0) {
-      window.setTimeout(() => dismissToast(id), toast.duration || TOAST_TIMEOUT);
-    }
-
-    return id;
-  }, [dismissToast]);
-
-  const value = useMemo(() => ({
-    dismissToast,
-    showToast,
-  }), [dismissToast, showToast]);
+  const showToast = useCallback(
+    (message, type = 'info', duration = 3600) => {
+      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      setToasts((prev) => [...prev.slice(-3), { id, message, type }]);
+      if (duration > 0) {
+        window.setTimeout(() => dismiss(id), duration);
+      }
+    },
+    [dismiss],
+  );
 
   return (
-    <ToastContext.Provider value={value}>
+    <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div
-        className="pointer-events-none fixed left-4 right-4 top-4 z-[1000] flex flex-col gap-3 sm:left-auto sm:w-[360px]"
-        aria-live="polite"
-        aria-relevant="additions"
-      >
-        {toasts.map((toast) => {
-          const style = toastStyles[toast.type] || toastStyles.info;
-          const role = toast.type === 'error' ? 'alert' : 'status';
-
-          return (
-            <div
-              key={toast.id}
-              role={role}
-              className={`pointer-events-auto flex items-start gap-3 rounded-2xl border px-4 py-3 shadow-2xl shadow-black/30 backdrop-blur-xl ${style.className}`}
-            >
-              <span className={`material-symbols-outlined mt-0.5 text-xl ${style.iconClassName}`}>
-                {style.icon}
-              </span>
-              <div className="min-w-0 flex-1">
-                {toast.title ? (
-                  <p className="text-sm font-bold leading-5">{toast.title}</p>
-                ) : null}
-                {toast.description ? (
-                  <p className="mt-0.5 text-sm leading-5 text-white/75">{toast.description}</p>
-                ) : null}
-              </div>
-              <button
-                type="button"
-                onClick={() => dismissToast(toast.id)}
-                className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white"
-                aria-label="Đóng thông báo"
+      {toasts.length > 0 && (
+        <div
+          aria-live="polite"
+          aria-atomic="true"
+          className="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-[min(380px,calc(100vw-2rem))] pointer-events-none"
+        >
+          {toasts.map((toast) => {
+            const style = TOAST_STYLES[toast.type] || TOAST_STYLES.info;
+            return (
+              <div
+                key={toast.id}
+                role="status"
+                className={`pointer-events-auto flex items-start gap-2.5 rounded-xl border px-3.5 py-3 shadow-md transition-all ${style.border}`}
               >
-                <span className="material-symbols-outlined text-lg">close</span>
-              </button>
-            </div>
-          );
-        })}
-      </div>
+                <span
+                  className={`material-symbols-outlined text-lg no-shrink mt-0.5 ${style.iconColor}`}
+                  aria-hidden="true"
+                >
+                  {style.icon}
+                </span>
+                <p className="flex-1 text-xs sm:text-sm font-medium leading-relaxed text-foreground">
+                  {toast.message}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => dismiss(toast.id)}
+                  aria-label="Đóng thông báo"
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">
+                    close
+                  </span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </ToastContext.Provider>
   );
+}
+
+export function useToast() {
+  const ctx = useContext(ToastContext);
+  if (!ctx) {
+    return {
+      showToast: (msg) => {
+        if (typeof window !== 'undefined') console.info('[Toast]', msg);
+      },
+    };
+  }
+  return ctx;
 }

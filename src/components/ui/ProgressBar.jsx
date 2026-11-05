@@ -1,54 +1,57 @@
-import React from 'react';
+﻿import React from 'react';
+
+const TONE_FILL = {
+  jade: 'bg-gradient-to-r from-jade to-completed',
+  ember: 'bg-gradient-to-r from-primary to-gold',
+  primary: 'bg-gradient-to-r from-primary to-gold',
+  gold: 'bg-gradient-to-r from-accent to-gold',
+  completed: 'bg-completed',
+};
 
 /**
- * ProgressBar — thanh tiến độ Arena Bento.
- * Luôn kèm nhãn + số % dạng chữ (không truyền thông tin bằng màu đơn độc),
- * số dùng class `.tabular` để không nhảy layout. Fill animate width 300ms
- * (class `.arena-progress-fill`, tự tắt theo prefers-reduced-motion).
- *
- * Props:
- * - value: 0..100 (tự clamp)
- * - label: nhãn phía trên (vd "Công lực")
- * - valueLabel: text số bên phải (mặc định suy ra `${value}%`)
- * - gradientClassName: class gradient Tailwind cho fill (vd levelAccent.bar)
- * - barHeight: class chiều cao track (mặc định 'h-2.5')
+ * ProgressBar — Thành phần duy nhất trong toàn bộ ứng dụng cập nhật độ rộng thanh tiến độ động
+ * cho EXP, GPA, điểm xét tuyển và hoàn thành lộ trình.
  */
 export default function ProgressBar({
   value = 0,
+  max = 100,
   label,
-  valueLabel,
-  gradientClassName = 'from-jade-400 to-jade-500',
-  barHeight = 'h-2.5',
+  sublabel,
+  tone = 'jade',
+  showPercent = true,
+  size = 'md',
   className = '',
 }) {
-  const pct = Math.min(100, Math.max(0, Math.round(Number(value) || 0)));
+  const safeMax = max > 0 ? max : 100;
+  const pct = Math.max(0, Math.min(100, Math.round((Number(value) / safeMax) * 100)));
+  const fillClass = TONE_FILL[tone] || TONE_FILL.jade;
+  const trackHeight = size === 'sm' ? 'h-2' : size === 'lg' ? 'h-3.5' : 'h-2.5';
 
   return (
     <div className={className}>
-      {(label || valueLabel) && (
-        <div className="flex items-center justify-between gap-2">
+      {(label || sublabel || showPercent) && (
+        <div className="mb-1.5 flex items-baseline justify-between gap-2 text-xs">
           {label ? (
-            <span className="font-arena text-[11px] font-bold uppercase tracking-[0.16em] text-gold-300/85">
-              {label}
-            </span>
+            <span className="font-semibold text-foreground truncate">{label}</span>
           ) : (
             <span />
           )}
-          <span className="tabular text-[11px] font-black text-slate-300">
-            {valueLabel ?? `${pct.toLocaleString('vi-VN')}%`}
+          <span className="tabular font-bold text-secondary-text no-shrink">
+            {sublabel ? <span className="mr-1.5 text-muted-foreground font-medium">{sublabel}</span> : null}
+            {showPercent ? `${pct}%` : null}
           </span>
         </div>
       )}
       <div
-        className={`arena-progress ${barHeight} ${label || valueLabel ? 'mt-1.5' : ''}`}
         role="progressbar"
         aria-valuenow={pct}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={label ?? 'Tiến độ'}
+        aria-label={label || 'Tiến độ'}
+        className={`${trackHeight} w-full overflow-hidden rounded-full bg-surface-alt border border-border`}
       >
         <div
-          className={`arena-progress-fill bg-gradient-to-r ${gradientClassName}`}
+          className={`h-full rounded-full transition-[width] duration-300 ease-out ${fillClass}`}
           style={{ width: `${pct}%` }}
         />
       </div>

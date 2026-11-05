@@ -1,352 +1,626 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { preloadRouteModule } from '../lib/routeModules';
 import { getUserRank, RANK_TIERS } from '../utils/rankHelper';
+import { preloadRouteModule } from '../lib/routeModules';
+import Avatar from '../components/Avatar';
+import WelcomeModal from '../components/WelcomeModal';
+import SectionHeading from '../components/ui/SectionHeading';
+import RankSeal from '../components/ui/RankSeal';
+import ProgressBar from '../components/ui/ProgressBar';
 
-// Bốn cửa chính vào đấu trường — mỗi cửa một sắc riêng lấy từ bảng token.
-const arenaGates = [
+const ARENA_GATES = [
   {
-    icon: 'folder_open',
-    title: 'Thư viện tài liệu',
-    copy: 'Tài liệu THPT và đại học gom theo môn, chuyên đề, tác giả và ngày cập nhật.',
     to: '/library',
-    label: 'Mở thư viện',
-    routeModuleKey: 'Library',
-    accent: 'jade',
+    preloadKey: 'Library',
+    icon: 'menu_book',
+    tag: 'KHO ĐỀ · PDF',
+    hanzi: '書',
+    title: 'Thư viện tài liệu',
+    desc: 'Hơn 10.000 đề thi thử, chuyên đề và sơ đồ tư duy chọn lọc từ các trường chuyên toàn quốc.',
+    cta: 'Vào kho đề',
+    tone: 'primary',
   },
   {
-    icon: 'computer',
-    title: 'Học online',
-    copy: 'Vào sheet COMBO HS12, mở tab khóa học và tài liệu đã cấp quyền bằng Google.',
     to: '/hoc-online',
-    label: 'Vào lớp học',
-    routeModuleKey: 'OnlineLearning',
-    accent: 'violet',
+    preloadKey: 'OnlineLearning',
+    icon: 'cast_for_education',
+    tag: '47 GIÁO VIÊN · SHEET',
+    hanzi: '師',
+    title: 'Học online',
+    desc: 'Kho sheet bài giảng theo từng môn và giáo viên — mở nhanh, theo dõi tiến độ từng buổi.',
+    cta: 'Mở kho sheet',
+    tone: 'gold',
   },
   {
-    icon: 'timeline',
-    title: 'Lộ trình ôn thi',
-    copy: 'Xếp mục tiêu theo tuần để ôn THPT, ĐGNL và ĐGTD rõ ràng từng chặng.',
     to: '/roadmap',
-    label: 'Xem lộ trình',
-    routeModuleKey: 'Roadmap',
-    accent: 'gold',
+    preloadKey: 'Roadmap',
+    icon: 'route',
+    tag: 'CHIẾN LƯỢC · 2K9',
+    hanzi: '道',
+    title: 'Lộ trình ôn thi',
+    desc: 'Từng chặng từ nền tảng đến tổng ôn — phân bổ mục tiêu theo tuần và theo khối xét tuyển.',
+    cta: 'Xem lộ trình',
+    tone: 'jade',
   },
   {
-    icon: 'local_fire_department',
-    title: 'Đấu trường',
-    copy: 'Luyện đề, tích luỹ thành tích và thăng hạng qua từng buổi ôn thi.',
     to: '/arena',
-    label: 'Vào đấu trường',
-    routeModuleKey: 'StudyArena',
-    accent: 'ember',
+    preloadKey: 'StudyArena',
+    icon: 'local_fire_department',
+    tag: 'BẢNG VÀNG · QUÂN HÀM',
+    hanzi: '榜',
+    title: 'Đấu trường',
+    desc: 'Tích luỹ phút học thực tế, leo bậc quân hàm từ Tân Binh đến Thống Soái cùng bạn bè.',
+    cta: 'Vào đấu trường',
+    tone: 'primary',
   },
 ];
 
-// Công cụ nhanh — hàng phụ, giữ tiết chế.
-const quickTools = [
-  { icon: 'calculate', title: 'Tính GPA', copy: 'Hệ 4 và hệ 10', to: '/gpa', routeModuleKey: 'GPACalculator', tint: 'text-jade-300' },
-  { icon: 'apartment', title: 'Tìm trường', copy: 'So khớp mục tiêu', to: '/schools', routeModuleKey: 'SchoolFinder', tint: 'text-violet-400' },
-  { icon: 'add_chart', title: 'Điểm xét tuyển', copy: 'Ước tính tổ hợp', to: '/admission', routeModuleKey: 'AdmissionCalculator', tint: 'text-gold-300' },
-  { icon: 'edit_note', title: 'Ghi chú', copy: 'Ôn nhanh mỗi ngày', to: '/notes', routeModuleKey: 'Notes', tint: 'text-ember-400' },
-];
-
-// Ba trụ cột — số liệu bằng display face, sắc gold cho tinh thần "thành tích".
-const pillars = [
-  { label: 'Học liệu', value: '10k+', copy: 'Tài liệu, đề cương và file học tập trong một thư viện dễ tra cứu.' },
-  { label: 'Công cụ', value: 'GPA · THPT', copy: 'Tính điểm và theo dõi mục tiêu để nắm rõ tiến độ cá nhân.' },
-  { label: 'Ôn thi', value: '2027', copy: 'Nội dung hướng thẳng tới THPT, đánh giá năng lực và tư duy.' },
-];
-
-const accentMap = {
-  jade: {
-    seal: 'bg-jade-400/12 text-jade-300',
-    border: 'hover:border-jade-400/45',
-    glow: 'bg-jade-400/20',
-    cta: 'text-jade-300',
+const QUICK_TOOLS = [
+  {
+    to: '/gpa',
+    preloadKey: 'GPACalculator',
+    icon: 'calculate',
+    title: 'Tính GPA',
+    desc: 'Điểm trung bình học kỳ & mục tiêu học bạ',
+    badge: 'bg-jade-soft text-jade border-jade-border',
   },
-  violet: {
-    seal: 'bg-violet-400/12 text-violet-400',
-    border: 'hover:border-violet-400/45',
-    glow: 'bg-violet-500/20',
-    cta: 'text-violet-400',
+  {
+    to: '/schools',
+    preloadKey: 'SchoolFinder',
+    icon: 'school',
+    title: 'Tìm trường',
+    desc: 'Gợi ý đại học theo điểm và khối thi',
+    badge: 'bg-gold-soft text-gold-dark border-gold',
+  },
+  {
+    to: '/admission',
+    preloadKey: 'AdmissionCalculator',
+    icon: 'trending_up',
+    title: 'Điểm xét tuyển',
+    desc: 'Quy đổi học bạ, ĐGNL và điểm thi THPT',
+    badge: 'bg-primary-soft text-primary border-primary/30',
+  },
+  {
+    to: '/notes',
+    preloadKey: 'Notes',
+    icon: 'edit_note',
+    title: 'Ghi chú',
+    desc: 'Sổ tay công thức & lỗi sai cần nhớ',
+    badge: 'bg-surface-alt text-foreground border-border-strong',
+  },
+];
+
+const GATE_TONE_CLASSES = {
+  primary: {
+    iconWrap: 'bg-primary-soft text-primary border-primary/30',
+    tag: 'text-primary bg-primary-soft border-primary/25',
+    hoverBorder: 'hover:border-primary/45',
   },
   gold: {
-    seal: 'bg-gold-400/14 text-gold-300',
-    border: 'hover:border-gold-400/45',
-    glow: 'bg-gold-400/20',
-    cta: 'text-gold-300',
+    iconWrap: 'bg-gold-soft text-gold-dark border-gold',
+    tag: 'text-gold-dark bg-gold-soft border-gold',
+    hoverBorder: 'hover:border-gold',
   },
-  ember: {
-    seal: 'bg-ember-500/14 text-ember-400',
-    border: 'hover:border-ember-500/45',
-    glow: 'bg-ember-500/25',
-    cta: 'text-ember-400',
+  jade: {
+    iconWrap: 'bg-jade-soft text-jade border-jade-border',
+    tag: 'text-jade bg-jade-soft border-jade-border',
+    hoverBorder: 'hover:border-jade/50',
   },
 };
 
-const focusRing =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950';
-
 export default function Home() {
   const { user, profile } = useAuth();
-
-  // Thứ hạng "sàn" lấy thẳng từ hệ thống rank thật (Tân Binh → Thống Soái).
-  const rank = getUserRank(0, profile?.role, profile?.is_approved_bang_chu);
-
-  const renderTarget = () => {
-    if (!user || !profile) {
-      return <span className="text-slate-400">Đăng nhập để đặt mục tiêu</span>;
-    }
-    if (profile.user_mode === 'university') {
-      return (
-        <>
-          GPA mục tiêu ·{' '}
-          <span className="font-bold text-gold-300">
-            {profile.target_gpa ? `${profile.target_gpa}/4.0` : 'chưa đặt'}
-          </span>
-        </>
-      );
-    }
-    return (
-      <>
-        Mục tiêu THPT ·{' '}
-        <span className="font-bold text-gold-300">
-          {profile.target_thpt ? `${profile.target_thpt} điểm` : 'chưa đặt'}
-        </span>
-      </>
-    );
-  };
+  const studyMinutes = profile?.total_study_minutes || 0;
+  const userRank = getUserRank(studyMinutes, profile?.is_thong_soai);
+  const studyHours = (studyMinutes / 60).toFixed(1);
 
   return (
-    <div className="min-h-screen bg-ink-950 pb-24 text-white">
-      {/* nền: hai vầng ember + một vầng jade dịu, rất mờ */}
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(60%_50%_at_85%_-5%,rgba(227,100,136,0.16),transparent_60%),radial-gradient(50%_40%_at_-5%_10%,rgba(242,193,89,0.08),transparent_55%),radial-gradient(60%_60%_at_50%_110%,rgba(95,207,166,0.07),transparent_60%)]" />
+    <div className="min-h-full bg-background text-foreground font-sans selection:bg-primary/15 selection:text-primary">
+      <WelcomeModal />
 
-      <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-8 md:py-10">
-        {/* ══════════════ HERO — điểm nhấn duy nhất ══════════════ */}
-        <section className="grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-          <div className="arena-sweep relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-ink-800 to-ink-900 p-7 md:p-9">
-            <div className="pointer-events-none absolute -right-10 -top-12 h-44 w-44 rounded-full bg-ember-500/20 blur-3xl ember-pulse" />
+      {/* ═══════════════ 1. HERO — KHOA TRƯỜNG SÁNG ═══════════════ */}
+      <section className="relative overflow-hidden border-b border-border bg-paper">
+        <span
+          aria-hidden="true"
+          className="hanzi-watermark hidden lg:block absolute top-8 right-10 text-[140px] font-bold text-accent/8"
+        >
+          狀元
+        </span>
 
-            {/* eyebrow = khẩu hiệu thương hiệu */}
-            <div className="relative flex items-center gap-2.5">
-              <span className="h-2 w-2 rounded-full bg-gold-400 ember-pulse" />
-              <span className="font-arena text-[11px] font-bold uppercase tracking-[0.34em] text-gold-300">
-                Học tập &amp; Chinh phục
-              </span>
-              <span className="hidden text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500 sm:inline">
-                · Mùa thi 2027
-              </span>
-            </div>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-7 pb-10 md:pt-12 md:pb-14">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-8 items-stretch">
+            {/* Left column — Call to arms */}
+            <div className="lg:col-span-7 flex flex-col justify-between">
+              <div>
+                <div className="mb-5">
+                  <RankSeal
+                    icon="local_fire_department"
+                    label="Học tập & Chinh phục · Mùa thi 2027"
+                  />
+                </div>
 
-            <h1 className="font-arena relative mt-5 text-4xl font-extrabold leading-[0.98] tracking-tight sm:text-5xl md:text-[3.4rem]">
-              Rèn mỗi ngày.
-              <br />
-              <span className="bg-gradient-to-r from-ember-400 via-ember-500 to-gold-400 bg-clip-text text-transparent">
-                Chinh phục
-              </span>{' '}
-              kỳ thi.
-            </h1>
-
-            <p className="relative mt-5 max-w-xl text-sm leading-relaxed text-slate-300/90 sm:text-base">
-              Không gian luyện thi cho học sinh, sinh viên Việt Nam — gom tài liệu, học online,
-              theo dõi mục tiêu và thăng hạng qua từng buổi ôn, tất cả trong một đấu trường.
-            </p>
-
-            <div className="relative mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link
-                to="/library"
-                onMouseEnter={() => preloadRouteModule('Library')}
-                onFocus={() => preloadRouteModule('Library')}
-                className={`flex h-12 items-center justify-center gap-2 rounded-full bg-ember-500 px-6 font-bold text-white shadow-lg shadow-ember-500/25 transition-all hover:bg-ember-600 active:scale-[0.98] ${focusRing}`}
-              >
-                <span className="material-symbols-outlined text-[20px]">folder_open</span>
-                Mở thư viện
-              </Link>
-              <Link
-                to="/roadmap"
-                onMouseEnter={() => preloadRouteModule('Roadmap')}
-                onFocus={() => preloadRouteModule('Roadmap')}
-                className={`flex h-12 items-center justify-center gap-2 rounded-full border border-white/12 px-6 font-bold text-slate-200 transition-colors hover:bg-white/5 ${focusRing}`}
-              >
-                <span className="material-symbols-outlined text-[20px]">timeline</span>
-                Xem lộ trình
-              </Link>
-            </div>
-
-            {/* SIGNATURE — con đường thăng hạng (thang bậc võ lâm có thật) */}
-            <div className="relative mt-8 border-t border-white/8 pt-5">
-              <p className="mb-3 font-arena text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                Con đường thăng hạng
-              </p>
-              <ol className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
-                {RANK_TIERS.map((tier, index) => (
-                  <li key={tier.name} className="flex shrink-0 items-center gap-1.5">
-                    <span
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
-                        index === 0
-                          ? 'border-gold-400/40 bg-gold-400/10 text-gold-300'
-                          : 'border-white/10 bg-white/[0.03] text-slate-400'
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-[14px]">{tier.icon}</span>
-                      {tier.name}
-                    </span>
-                    {index < RANK_TIERS.length - 1 && (
-                      <span className="material-symbols-outlined text-[14px] text-slate-600">chevron_right</span>
-                    )}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-
-          {/* Thẻ hồ sơ / thứ hạng cá nhân */}
-          <Link
-            to="/profile"
-            onMouseEnter={() => preloadRouteModule('Profile')}
-            onFocus={() => preloadRouteModule('Profile')}
-            className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 transition-colors hover:border-gold-400/30 hover:bg-white/[0.06] ${focusRing}`}
-          >
-            <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-gold-400/10 blur-2xl" />
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400">Thứ hạng của bạn</p>
-              <div className="mt-4 flex items-center gap-3.5">
-                <span className="rank-seal grid h-14 w-14 place-items-center bg-gradient-to-br from-gold-400/25 to-ember-500/20 text-gold-300 ring-1 ring-gold-400/30">
-                  <span className="material-symbols-outlined text-[26px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    {rank.icon}
+                <h1 className="font-display text-3xl sm:text-5xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.1] text-foreground mb-4">
+                  Rèn mỗi ngày.
+                  <span className="block mt-1 text-primary">
+                    <span className="brush-underline">Chinh phục kỳ thi.</span>
                   </span>
-                </span>
-                <div>
-                  <p className="font-arena text-xl font-extrabold tracking-tight text-white">{rank.name}</p>
-                  <p className="mt-0.5 text-xs text-slate-400">{renderTarget()}</p>
+                </h1>
+
+                <p className="text-secondary-text text-sm sm:text-base leading-relaxed max-w-xl mb-7">
+                  Không gian học tập tập trung cho học sinh THPT: kho đề thi chọn lọc,
+                  lộ trình rõ ràng, công cụ tính điểm chuẩn xác và bảng xếp hạng thi đua mỗi ngày.
+                </p>
+
+                <div className="flex flex-wrap items-center gap-3 mb-8">
+                  <Link
+                    to="/library"
+                    onMouseEnter={() => preloadRouteModule('Library')}
+                    onFocus={() => preloadRouteModule('Library')}
+                    className="btn-arena btn-arena-primary"
+                  >
+                    <span className="material-symbols-outlined text-xl" aria-hidden="true">
+                      menu_book
+                    </span>
+                    <span>Mở thư viện</span>
+                    <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                      arrow_forward
+                    </span>
+                  </Link>
+
+                  <Link
+                    to="/roadmap"
+                    onMouseEnter={() => preloadRouteModule('Roadmap')}
+                    onFocus={() => preloadRouteModule('Roadmap')}
+                    className="btn-arena btn-arena-secondary"
+                  >
+                    <span className="material-symbols-outlined text-xl text-accent" aria-hidden="true">
+                      route
+                    </span>
+                    <span>Xem lộ trình</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Rank ladder strip — Con đường thăng hạng */}
+              <div className="paper-card p-4 bg-surface/90">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-secondary-text flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm text-accent" aria-hidden="true">
+                      military_tech
+                    </span>
+                    Con đường thăng hạng
+                  </span>
+                  <Link
+                    to="/arena"
+                    onMouseEnter={() => preloadRouteModule('StudyArena')}
+                    onFocus={() => preloadRouteModule('StudyArena')}
+                    className="text-xs font-bold text-primary hover:text-primary-hover flex items-center gap-0.5"
+                  >
+                    Bảng xếp hạng
+                    <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                      chevron_right
+                    </span>
+                  </Link>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {RANK_TIERS.map((tier) => {
+                    const isCurrent = user && userRank.name === tier.name;
+                    return (
+                      <div
+                        key={tier.name}
+                        className={`flex flex-col items-center justify-center px-2 py-2 rounded-xl border text-center transition-all ${
+                          isCurrent
+                            ? 'bg-primary-soft border-primary ring-1 ring-primary/30 shadow-xs'
+                            : 'bg-paper border-border'
+                        }`}
+                      >
+                        <span
+                          className={`material-symbols-outlined text-lg mb-0.5 ${tier.color}`}
+                          aria-hidden="true"
+                        >
+                          {tier.icon}
+                        </span>
+                        <span
+                          className={`text-[11px] font-bold truncate w-full ${
+                            isCurrent ? 'text-primary' : 'text-foreground'
+                          }`}
+                        >
+                          {tier.name}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
-            <div className="mt-6 flex items-center justify-between border-t border-white/8 pt-4">
-              <span className="text-sm font-semibold text-slate-300">Vào hồ sơ của bạn</span>
-              <span className="material-symbols-outlined text-slate-500 transition-transform group-hover:translate-x-0.5">
-                arrow_forward
-              </span>
-            </div>
-          </Link>
-        </section>
 
-        {/* ══════════════ LỐI VÀO ĐẤU TRƯỜNG ══════════════ */}
-        <section>
-          <SectionHeading eyebrow="Bắt đầu mỗi buổi ôn" title="Lối vào đấu trường">
-            Bốn cửa chính: tìm tài liệu, học online, theo dõi lộ trình và luyện đề để thăng hạng.
-          </SectionHeading>
-
-          <div className="mt-6 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-            {arenaGates.map((gate) => {
-              const a = accentMap[gate.accent];
-              return (
-                <Link
-                  key={gate.title}
-                  to={gate.to}
-                  onMouseEnter={() => preloadRouteModule(gate.routeModuleKey)}
-                  onFocus={() => preloadRouteModule(gate.routeModuleKey)}
-                  className={`group relative flex min-h-[218px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] p-5 transition-all hover:-translate-y-0.5 hover:bg-white/[0.06] ${a.border} ${focusRing}`}
-                >
-                  <div className={`pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full blur-2xl ${a.glow}`} />
-                  <span className={`rank-seal grid h-12 w-12 place-items-center ${a.seal}`}>
-                    <span className="material-symbols-outlined text-[24px]">{gate.icon}</span>
+            {/* Right column — Warrior status / Guest invitation */}
+            <div className="lg:col-span-5 flex">
+              {user ? (
+                <div className="w-full imperial-frame p-6 flex flex-col justify-between relative overflow-hidden">
+                  <span
+                    aria-hidden="true"
+                    className="hanzi-watermark absolute -bottom-4 -right-2 text-8xl font-bold text-primary/6"
+                  >
+                    印
                   </span>
-                  <h3 className="font-arena mt-4 text-lg font-bold tracking-tight text-white">{gate.title}</h3>
-                  <p className="mt-2 flex-1 text-[13px] leading-relaxed text-slate-400">{gate.copy}</p>
-                  <span className={`mt-4 inline-flex items-center gap-1 text-[13px] font-bold ${a.cta}`}>
-                    {gate.label}
-                    <span className="material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-0.5">
+
+                  <div>
+                    <div className="flex items-center justify-between gap-3 mb-5">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-jade animate-pulse" aria-hidden="true" />
+                        Hồ sơ chiến binh
+                      </span>
+                      <Link
+                        to="/profile"
+                        onMouseEnter={() => preloadRouteModule('Profile')}
+                        onFocus={() => preloadRouteModule('Profile')}
+                        className="text-xs font-bold text-secondary-text hover:text-primary flex items-center gap-1"
+                      >
+                        Chi tiết
+                        <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                          open_in_new
+                        </span>
+                      </Link>
+                    </div>
+
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="relative">
+                        <Avatar
+                          src={profile?.avatar_url}
+                          name={profile?.full_name || user?.email}
+                          className="w-16 h-16 ring-2 ring-gold/60"
+                          textSize="text-xl"
+                        />
+                        <div
+                          className={`absolute -bottom-1 -right-1 w-7 h-7 rounded-lg ${userRank.bg} ${userRank.border} border flex items-center justify-center shadow-xs`}
+                        >
+                          <span
+                            className={`material-symbols-outlined text-base ${userRank.color}`}
+                            aria-hidden="true"
+                          >
+                            {userRank.icon}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h2 className="font-display text-lg font-extrabold text-foreground truncate">
+                          {profile?.full_name || 'Chiến binh DTHT'}
+                        </h2>
+                        <div className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-soft text-primary border border-primary/30">
+                          <span className="material-symbols-outlined text-sm icon-fill" aria-hidden="true">
+                            {userRank.icon}
+                          </span>
+                          <span>Hạng {userRank.name}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Progress to next rank */}
+                    <div className="p-4 rounded-xl bg-paper border border-border mb-4">
+                      <ProgressBar
+                        value={userRank.progress}
+                        max={100}
+                        tone="primary"
+                        label={
+                          userRank.nextRank
+                            ? `Tiến tới ${userRank.nextRank.name}`
+                            : 'Đã đạt đỉnh Thống Soái'
+                        }
+                        sublabel={
+                          userRank.nextRank
+                            ? `Còn ${Math.max(0, userRank.nextRank.min - studyMinutes)} phút`
+                            : 'Cấp tối đa'
+                        }
+                      />
+                    </div>
+
+                    {/* Stats grid */}
+                    <div className="grid grid-cols-3 gap-2.5">
+                      <div className="p-3 rounded-xl bg-paper border border-border text-center">
+                        <div className="font-display text-lg font-extrabold text-foreground tabular">
+                          {studyHours}h
+                        </div>
+                        <div className="text-[11px] text-secondary-text font-medium">Giờ tích luỹ</div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-paper border border-border text-center">
+                        <div className="font-display text-lg font-extrabold text-accent tabular">
+                          {profile?.target_thpt ? `${profile.target_thpt}đ` : '27.0đ'}
+                        </div>
+                        <div className="text-[11px] text-secondary-text font-medium">Mục tiêu THPT</div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-paper border border-border text-center">
+                        <div className="font-display text-lg font-extrabold text-jade tabular">
+                          {profile?.target_gpa ? profile.target_gpa : '8.5+'}
+                        </div>
+                        <div className="text-[11px] text-secondary-text font-medium">Mục tiêu GPA</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link
+                    to="/arena"
+                    onMouseEnter={() => preloadRouteModule('StudyArena')}
+                    onFocus={() => preloadRouteModule('StudyArena')}
+                    className="mt-5 w-full flex items-center justify-between px-4 py-3 rounded-xl bg-primary-soft hover:bg-primary/15 border border-primary/30 text-sm font-bold text-primary transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                        local_fire_department
+                      </span>
+                      Vào đấu trường tích điểm hôm nay
+                    </span>
+                    <span className="material-symbols-outlined text-base" aria-hidden="true">
                       arrow_forward
                     </span>
+                  </Link>
+                </div>
+              ) : (
+                <div className="w-full imperial-frame p-6 sm:p-7 flex flex-col justify-between relative overflow-hidden">
+                  <span
+                    aria-hidden="true"
+                    className="hanzi-watermark absolute -bottom-4 -right-2 text-8xl font-bold text-primary/6"
+                  >
+                    登科
                   </span>
-                </Link>
-              );
-            })}
+
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-soft border border-gold text-gold-dark text-xs font-bold mb-5">
+                      <span className="material-symbols-outlined text-sm icon-fill" aria-hidden="true">
+                        emoji_events
+                      </span>
+                      Bảng Phong Thần Cá Nhân
+                    </div>
+
+                    <h2 className="font-display text-2xl font-extrabold text-foreground mb-2 leading-snug">
+                      Ghi danh để lưu giờ học &amp; thăng hạng chiến binh
+                    </h2>
+                    <p className="text-sm text-secondary-text leading-relaxed mb-6">
+                      Tự động đếm thời gian ôn luyện khi bạn đọc đề, học online hoặc làm bài.
+                      Mỗi phút học đều giúp bạn tiến gần hơn tới danh hiệu{' '}
+                      <span className="text-primary font-bold">Thống Soái</span>.
+                    </p>
+
+                    <div className="space-y-2.5 mb-6">
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-paper border border-border">
+                        <span
+                          className="material-symbols-outlined text-primary text-xl"
+                          aria-hidden="true"
+                        >
+                          verified
+                        </span>
+                        <span className="text-xs sm:text-sm text-foreground font-medium">
+                          Mở toàn bộ kho tài liệu &amp; 47 sheet giáo viên
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-paper border border-border">
+                        <span
+                          className="material-symbols-outlined text-accent text-xl"
+                          aria-hidden="true"
+                        >
+                          military_tech
+                        </span>
+                        <span className="text-xs sm:text-sm text-foreground font-medium">
+                          Theo dõi mục tiêu GPA, điểm chuẩn &amp; bảng xếp hạng tuần
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link
+                    to="/auth"
+                    className="btn-arena btn-arena-primary w-full"
+                  >
+                    <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                      login
+                    </span>
+                    <span>Đăng nhập / Tạo tài khoản miễn phí</span>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ══════════════ CÔNG CỤ NHANH ══════════════ */}
-        <section>
-          <SectionHeading eyebrow="Trong tầm tay" title="Công cụ nhanh">
-            Những phép tính và ghi chú bạn cần trước mỗi kỳ thi.
-          </SectionHeading>
+      {/* ═══════════════ 2. BỐN CỔNG CHÍNH — LỐI VÀO ĐẤU TRƯỜNG ═══════════════ */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
+        <SectionHeading
+          eyebrow="Bốn mặt trận trọng điểm"
+          title="Lối vào đấu trường"
+          hanzi="門"
+          className="mb-7"
+          action={
+            <span className="text-xs text-secondary-text hidden sm:inline font-medium">
+              Chọn khu vực bạn muốn rèn luyện hôm nay
+            </span>
+          }
+        />
 
-          <div className="mt-6 grid grid-cols-2 gap-3.5 md:grid-cols-4">
-            {quickTools.map((tool) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+          {ARENA_GATES.map((gate) => {
+            const tone = GATE_TONE_CLASSES[gate.tone] || GATE_TONE_CLASSES.primary;
+            return (
               <Link
-                key={tool.title}
-                to={tool.to}
-                onMouseEnter={() => preloadRouteModule(tool.routeModuleKey)}
-                onFocus={() => preloadRouteModule(tool.routeModuleKey)}
-                className={`group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition-all hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.06] ${focusRing}`}
+                key={gate.to}
+                to={gate.to}
+                onMouseEnter={() => preloadRouteModule(gate.preloadKey)}
+                onFocus={() => preloadRouteModule(gate.preloadKey)}
+                className={`group relative overflow-hidden paper-card paper-card-interactive p-6 flex flex-col justify-between ${tone.hoverBorder}`}
               >
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5">
-                  <span className={`material-symbols-outlined text-[22px] ${tool.tint}`}>{tool.icon}</span>
+                <span
+                  aria-hidden="true"
+                  className="hanzi-watermark absolute top-3 right-4 text-6xl font-bold text-accent/8"
+                >
+                  {gate.hanzi}
                 </span>
-                <div className="min-w-0">
-                  <h4 className="truncate text-sm font-bold text-white">{tool.title}</h4>
-                  <p className="truncate text-[11px] text-slate-400">{tool.copy}</p>
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <div
+                      className={`w-12 h-12 rounded-xl border flex items-center justify-center ${tone.iconWrap}`}
+                    >
+                      <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+                        {gate.icon}
+                      </span>
+                    </div>
+                    <span
+                      className={`text-[10px] font-extrabold tracking-[0.14em] px-2.5 py-1 rounded-full border ${tone.tag}`}
+                    >
+                      {gate.tag}
+                    </span>
+                  </div>
+
+                  <h3 className="font-display text-xl font-extrabold text-foreground mb-2 group-hover:text-primary transition-colors">
+                    {gate.title}
+                  </h3>
+                  <p className="text-sm text-secondary-text leading-relaxed mb-5">{gate.desc}</p>
+                </div>
+
+                <div className="relative z-10 flex items-center justify-between pt-3 border-t border-border text-xs font-bold text-foreground group-hover:text-primary">
+                  <span>{gate.cta}</span>
+                  <span
+                    className="material-symbols-outlined text-base transition-transform group-hover:translate-x-1"
+                    aria-hidden="true"
+                  >
+                    arrow_forward
+                  </span>
                 </div>
               </Link>
-            ))}
-          </div>
-        </section>
+            );
+          })}
+        </div>
+      </section>
 
-        {/* ══════════════ BA TRỤ CỘT ══════════════ */}
-        <section className="grid gap-3.5 md:grid-cols-3">
-          {pillars.map((pillar) => (
-            <div
-              key={pillar.label}
-              className="rounded-2xl border border-white/10 bg-white/[0.035] p-6"
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" aria-hidden="true">
+        <div className="lattice-divider" />
+      </div>
+
+      {/* ═══════════════ 3. CÔNG CỤ NHANH — BÀN TÍNH & TRA CỨU ═══════════════ */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+        <SectionHeading
+          eyebrow="Trợ thủ học vụ"
+          title="Công cụ nhanh"
+          hanzi="器"
+          className="mb-6"
+        />
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+          {QUICK_TOOLS.map((tool) => (
+            <Link
+              key={tool.to}
+              to={tool.to}
+              onMouseEnter={() => preloadRouteModule(tool.preloadKey)}
+              onFocus={() => preloadRouteModule(tool.preloadKey)}
+              className="group paper-card paper-card-interactive p-4 sm:p-5 flex flex-col justify-between"
             >
-              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">{pillar.label}</p>
-              <p className="font-arena mt-2 bg-gradient-to-r from-gold-300 to-gold-500 bg-clip-text text-3xl font-extrabold tracking-tight text-transparent">
-                {pillar.value}
-              </p>
-              <p className="mt-2.5 text-[13px] leading-relaxed text-slate-400">{pillar.copy}</p>
-            </div>
+              <div
+                className={`w-10 h-10 rounded-xl border ${tool.badge} flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform`}
+              >
+                <span className="material-symbols-outlined text-xl" aria-hidden="true">
+                  {tool.icon}
+                </span>
+              </div>
+              <div>
+                <h3 className="font-display text-sm sm:text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
+                  {tool.title}
+                </h3>
+                <p className="text-xs text-secondary-text leading-relaxed">{tool.desc}</p>
+              </div>
+            </Link>
           ))}
-        </section>
+        </div>
+      </section>
 
-        {/* ══════════════ CTA BANNER ══════════════ */}
-        <section className="relative overflow-hidden rounded-3xl border border-ember-500/20 bg-gradient-to-r from-ember-600 via-ember-500 to-[#ff8c66] p-8 text-center shadow-xl shadow-ember-500/20 md:p-10">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(40%_120%_at_50%_-20%,rgba(255,255,255,0.22),transparent)]" />
-          <p className="relative font-arena text-[11px] font-bold uppercase tracking-[0.3em] text-white/80">
-            Học tập &amp; Chinh phục
-          </p>
-          <h2 className="font-arena relative mt-3 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-            Sẵn sàng vào đấu trường?
-          </h2>
-          <p className="relative mx-auto mt-3 max-w-lg text-sm text-white/85">
-            Mở thư viện, chọn một buổi luyện đề và bắt đầu hành trình thăng hạng của bạn ngay hôm nay.
-          </p>
+      {/* ═══════════════ 4. BA TRỤ CỘT & CAM KẾT ═══════════════ */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="imperial-frame p-6 sm:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-border">
+            <div className="flex items-start gap-4">
+              <div className="w-11 h-11 rounded-xl bg-primary-soft border border-primary/30 text-primary flex items-center justify-center no-shrink">
+                <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+                  auto_stories
+                </span>
+              </div>
+              <div>
+                <div className="font-display text-xl font-extrabold text-foreground tabular">
+                  10k+ Học liệu
+                </div>
+                <p className="text-xs text-secondary-text mt-1 leading-relaxed">
+                  Đề thi thử, chuyên đề và đáp án chi tiết phân loại theo từng khối lớp 10 · 11 · 12.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 md:pl-6">
+              <div className="w-11 h-11 rounded-xl bg-jade-soft border border-jade-border text-jade flex items-center justify-center no-shrink">
+                <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+                  functions
+                </span>
+              </div>
+              <div>
+                <div className="font-display text-xl font-extrabold text-foreground">
+                  Công cụ GPA · THPT
+                </div>
+                <p className="text-xs text-secondary-text mt-1 leading-relaxed">
+                  Tự động tính điểm học bạ, xét tuyển đại học và gợi ý ngành phù hợp năng lực.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 md:pl-6">
+              <div className="w-11 h-11 rounded-xl bg-gold-soft border border-gold text-gold-dark flex items-center justify-center no-shrink">
+                <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+                  emoji_events
+                </span>
+              </div>
+              <div>
+                <div className="font-display text-xl font-extrabold text-foreground tabular">
+                  Ôn thi 2027
+                </div>
+                <p className="text-xs text-secondary-text mt-1 leading-relaxed">
+                  Bám sát chương trình GDPT mới và cấu trúc đề minh hoạ mới nhất của Bộ GD&amp;ĐT.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════ 5. CTA BANNER CUỐI TRANG ═══════════════ */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
+        <div className="relative overflow-hidden rounded-2xl border border-gold bg-gradient-to-r from-primary-soft via-paper to-gold-soft/50 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 shadow-xs">
+          <span
+            aria-hidden="true"
+            className="hanzi-watermark absolute -right-2 -bottom-4 text-8xl font-bold text-primary/10"
+          >
+            勝
+          </span>
+          <div className="relative z-10">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
+              Đấu Trường Học Tập
+            </span>
+            <h2 className="font-display text-xl sm:text-2xl font-extrabold text-foreground mt-1">
+              Sẵn sàng vào đấu trường?
+            </h2>
+            <p className="text-xs sm:text-sm text-secondary-text mt-1">
+              Chọn ngay một đề thi hoặc mở sheet bài giảng để bắt đầu tích luỹ phút học đầu tiên hôm nay.
+            </p>
+          </div>
           <Link
             to="/library"
             onMouseEnter={() => preloadRouteModule('Library')}
             onFocus={() => preloadRouteModule('Library')}
-            className={`relative mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-7 font-bold text-ember-600 shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] ${focusRing} focus-visible:ring-offset-ember-500`}
+            className="relative z-10 no-shrink btn-arena btn-arena-primary"
           >
-            <span className="material-symbols-outlined text-[20px]">rocket_launch</span>
-            Bắt đầu ngay
+            <span>Bắt đầu ngay</span>
+            <span className="material-symbols-outlined text-base" aria-hidden="true">
+              arrow_forward
+            </span>
           </Link>
-        </section>
-      </main>
-    </div>
-  );
-}
-
-function SectionHeading({ eyebrow, title, children }) {
-  return (
-    <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-      <div>
-        <p className="font-arena text-[10px] font-bold uppercase tracking-[0.28em] text-ember-400">{eyebrow}</p>
-        <h2 className="font-arena mt-2 text-2xl font-extrabold tracking-tight text-white">{title}</h2>
-      </div>
-      <p className="max-w-md text-[13px] leading-relaxed text-slate-400">{children}</p>
+        </div>
+      </section>
     </div>
   );
 }

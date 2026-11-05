@@ -70,12 +70,11 @@ function comboRaw(entry, comboStr) {
 const regionOf = regionOfSchool;
 
 const BAND_STYLE = {
-  safe: { color: 'var(--arena-jade)', border: 'rgba(95,207,166,0.55)', bg: 'rgba(95,207,166,0.12)' },
-  likely: { color: 'var(--arena-jade)', border: 'rgba(95,207,166,0.35)', bg: 'rgba(95,207,166,0.07)' },
-  borderline: { color: 'var(--arena-gold)', border: 'rgba(242,193,89,0.45)', bg: 'rgba(242,193,89,0.10)' },
-  reach: { color: 'var(--arena-ember)', border: 'rgba(227,100,136,0.45)', bg: 'rgba(227,100,136,0.10)' },
-  // far: màu destructive red-400 — áp qua class text-red-400 ở nơi render, không hardcode hex
-  far: { color: null, border: 'rgba(248,113,113,0.45)', bg: 'rgba(248,113,113,0.10)' },
+  safe: { textClass: 'text-completed', boxClass: 'border-completed/35 bg-completed/8' },
+  likely: { textClass: 'text-secondary', boxClass: 'border-secondary/35 bg-secondary/8' },
+  borderline: { textClass: 'text-accent', boxClass: 'border-accent/35 bg-accent/8' },
+  reach: { textClass: 'text-primary', boxClass: 'border-primary/35 bg-primary/8' },
+  far: { textClass: 'text-danger', boxClass: 'border-danger/35 bg-danger/8' },
 };
 
 // ---------------------------------------------------------------------------
@@ -304,16 +303,16 @@ function Sparkline({ history }) {
   if (!points) return null;
   if (points.single) {
     return (
-      <span className="text-xs text-slate-400">
-        Chỉ có dữ liệu 1 năm ({points.single.year}: <span className="tabular">{fmt(points.single.cutoff)}</span>)
+      <span className="text-xs text-text-secondary">
+        Chỉ có dữ liệu 1 năm ({points.single.year}: <span className="tabular font-semibold">{fmt(points.single.cutoff)}</span>)
       </span>
     );
   }
   return (
-    <svg width="96" height="30" viewBox="0 0 96 30" role="img" aria-label="Xu hướng điểm chuẩn qua các năm" className="shrink-0">
-      <polyline points={points.line} fill="none" stroke="var(--arena-ember)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+    <svg width="96" height="30" viewBox="0 0 96 30" role="img" aria-label="Xu hướng điểm chuẩn qua các năm" className="no-shrink">
+      <polyline points={points.line} fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
       {points.coords.map((c) => (
-        <circle key={c.year} cx={c.x} cy={c.y} r="2.5" fill="var(--arena-gold)" />
+        <circle key={c.year} cx={c.x} cy={c.y} r="2.5" fill="var(--color-accent)" />
       ))}
     </svg>
   );
@@ -328,16 +327,16 @@ function ProgramCard({ group, built, inWishlist, onToggleWish, onGoScores }) {
   const latest = group.history[0];
   const latestSource = group.sources.find((s) => s.year === latest?.year) || group.sources[0];
   const { estimate } = built;
-  const bandStyle = estimate ? BAND_STYLE[estimate.band] : null;
+  const bandStyle = estimate ? (BAND_STYLE[estimate.band] || BAND_STYLE.borderline) : null;
 
   return (
-    <article className="arena-card p-4 space-y-3">
+    <article className="arena-card p-4 space-y-3 content-auto">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-arena font-bold text-base leading-snug">{group.majorName}</p>
-          <p className="text-sm text-slate-300 mt-0.5">{group.schoolName}</p>
+          <p className="font-display font-bold text-base leading-snug text-foreground">{group.majorName}</p>
+          <p className="text-sm text-text-secondary mt-0.5">{group.schoolName}</p>
         </div>
-        <span className="material-symbols-outlined text-slate-500 shrink-0" aria-hidden="true">apartment</span>
+        <span className="material-symbols-outlined text-muted no-shrink" aria-hidden="true">apartment</span>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
@@ -349,7 +348,7 @@ function ProgramCard({ group, built, inWishlist, onToggleWish, onGoScores }) {
 
       <div className="flex items-center gap-3 flex-wrap">
         <Sparkline history={group.history} />
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-text-secondary">
           {[...group.history]
             .sort((a, b) => a.year - b.year)
             .map((h) => `${h.year}: ${fmt(h.cutoff)}`)
@@ -357,65 +356,59 @@ function ProgramCard({ group, built, inWishlist, onToggleWish, onGoScores }) {
         </p>
       </div>
 
-      <p className="text-sm">
-        <span className="text-slate-400">Điểm chuẩn {latest.year}: </span>
+      <p className="text-sm text-foreground">
+        <span className="text-text-secondary">Điểm chuẩn {latest.year}: </span>
         <span className="tabular font-bold">{fmt(latest.cutoff)}</span>
-        <span className="text-slate-400"> / {group.scale}</span>
+        <span className="text-text-secondary"> / {group.scale}</span>
         {built.forecastNative != null && (
           <>
-            <span className="text-slate-400"> · Dự báo năm tới ≈ </span>
+            <span className="text-text-secondary"> · Dự báo năm tới ≈ </span>
             <span className="tabular font-bold">{fmt(built.forecastNative)}</span>
-            {estimate && <span className="text-slate-400"> ± {fmt(estimate.sigma * ((group.scale || 30) / 30))}</span>}
+            {estimate && <span className="text-text-secondary"> ± {fmt(estimate.sigma * ((group.scale || 30) / 30))}</span>}
           </>
         )}
       </p>
 
       {estimate ? (
-        <div
-          className="rounded-xl px-3 py-2.5 border space-y-1"
-          style={{ borderColor: bandStyle.border, background: bandStyle.bg }}
-        >
+        <div className={`rounded-xl px-3 py-2.5 border space-y-1 ${bandStyle.boxClass}`}>
           <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className={`font-arena-display font-bold text-base ${estimate.band === 'far' ? 'text-red-400' : ''}`}
-              style={bandStyle.color ? { color: bandStyle.color } : undefined}
-            >
+            <span className={`font-display font-bold text-base ${bandStyle.textClass}`}>
               {estimate.bandLabel}
             </span>
             {estimate.showPercent ? (
-              <span className="tabular text-sm font-bold">
+              <span className="tabular text-sm font-bold text-foreground">
                 {estimate.probabilityRounded}% khả năng
-                <span className="text-slate-400 font-medium">
+                <span className="text-text-secondary font-medium">
                   {' '}(khoảng {Math.round(estimate.pLow * 100)}–{Math.round(estimate.pHigh * 100)}%)
                 </span>
               </span>
             ) : (
-              <span className="text-xs text-slate-300">Độ tin cậy thấp — chỉ hiện mức đánh giá, chưa hiện %</span>
+              <span className="text-xs text-text-secondary">Độ tin cậy thấp — chỉ hiện mức đánh giá, chưa hiện %</span>
             )}
           </div>
-          <p className="text-xs text-slate-300">
+          <p className="text-xs text-text-secondary">
             Điểm của bạn {built.viaMethod !== group.method ? `(quy đổi từ ${getExam(built.viaMethod).label}) ` : ''}
             {built.marginNative >= 0 ? 'cao hơn' : 'thấp hơn'} dự báo{' '}
-            <span className="tabular font-bold">{fmt(Math.abs(built.marginNative))} điểm</span>
+            <span className="tabular font-bold text-foreground">{fmt(Math.abs(built.marginNative))} điểm</span>
             {' '}· Độ tin cậy ước tính: {estimate.confidenceLabel.toLowerCase()}
           </p>
         </div>
       ) : (
-        <div className="rounded-xl px-3 py-2.5 border border-white/10 bg-white/5">
-          <p className="text-xs text-slate-300 flex items-start gap-2">
-            <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">info</span>
+        <div className="rounded-xl px-3 py-2.5 border border-border bg-surface-alt">
+          <p className="text-xs text-text-secondary flex items-start gap-2">
+            <span className="material-symbols-outlined text-base text-accent no-shrink" aria-hidden="true">info</span>
             <span>{built.reason || 'Chưa đủ dữ liệu để ước tính cho ngành này.'}</span>
           </p>
         </div>
       )}
 
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <p className="text-[11px] text-slate-500">
+        <p className="text-[11px] text-muted">
           Căn cứ: điểm chuẩn {group.history.map((h) => h.year).join(', ')}
           {latestSource?.url && (
             <>
               {' '}· Nguồn:{' '}
-              <a href={latestSource.url} target="_blank" rel="noreferrer" className="underline text-slate-400">
+              <a href={latestSource.url} target="_blank" rel="noreferrer" className="underline text-text-secondary hover:text-primary">
                 {(() => { try { return new URL(latestSource.url).hostname; } catch { return 'nguồn dữ liệu'; } })()}
               </a>
             </>
@@ -703,30 +696,27 @@ export default function SchoolFinder() {
   const hasAnyScore = myScoreEntries.length > 0;
 
   return (
-    <div className="min-h-dvh font-arena text-slate-100 relative" style={{ background: 'var(--arena-ink)' }}>
+    <div className="min-h-dvh font-sans text-foreground bg-background relative">
       {/* Header */}
-      <header
-        className="sticky top-0 z-20 backdrop-blur-md border-b border-white/10"
-        style={{ background: 'rgba(25,14,18,0.85)' }}
-      >
+      <header className="sticky top-0 z-20 backdrop-blur-md bg-surface/95 border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
           <button
             onClick={() => navigate(-1)}
             aria-label="Quay lại"
-            className="w-11 h-11 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
+            className="w-11 h-11 no-shrink rounded-full bg-surface-alt border border-border flex items-center justify-center hover:bg-surface-hover text-foreground transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined" aria-hidden="true">arrow_back_ios_new</span>
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="font-arena-display font-bold text-xl leading-tight">Tìm trường phù hợp</h1>
-            <p className="text-xs text-slate-400">
+            <h1 className="font-display font-bold text-xl leading-tight text-foreground">Tìm trường phù hợp</h1>
+            <p className="text-xs text-text-secondary">
               Ước tính khả năng theo điểm chuẩn {data?.meta?.base_year || 'các năm gần nhất'} và các năm trước
             </p>
           </div>
           <button
             onClick={() => setShowWishlist((s) => !s)}
             aria-expanded={showWishlist}
-            className="btn-arena btn-arena-sm btn-arena-ghost cursor-pointer shrink-0"
+            className="btn-arena btn-arena-sm btn-arena-ghost cursor-pointer no-shrink"
           >
             <span className="material-symbols-outlined text-base" aria-hidden="true">bookmark</span>
             Nguyện vọng ({wishlist.length})
@@ -736,18 +726,18 @@ export default function SchoolFinder() {
 
       <main className="max-w-4xl mx-auto px-4 py-5 space-y-4 relative z-10">
         {/* Disclaimer bắt buộc (ALGORITHM §5.3) */}
-        <div className="arena-card p-4 flex gap-3">
-          <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">info</span>
-          <p className="text-xs leading-relaxed text-slate-300">{DISCLAIMER}</p>
+        <div className="arena-card p-4 flex gap-3 border-accent/35 bg-accent/5">
+          <span className="material-symbols-outlined no-shrink text-accent" aria-hidden="true">info</span>
+          <p className="text-xs leading-relaxed text-text-secondary">{DISCLAIMER}</p>
         </div>
 
         {/* Điểm HSA/V-ACT cũ không tin cậy */}
         {legacyKeys.length > 0 && (
-          <div className="arena-card p-4 flex gap-3" style={{ borderColor: 'rgba(242,193,89,0.5)' }}>
-            <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">warning</span>
+          <div className="arena-card p-4 flex gap-3 border-accent/45 bg-accent/5">
+            <span className="material-symbols-outlined no-shrink text-accent" aria-hidden="true">warning</span>
             <div className="flex-1 space-y-2">
-              <p className="text-sm font-semibold">Điểm HSA / V-ACT đã lưu trước đây cần nhập lại</p>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-sm font-semibold text-foreground">Điểm HSA / V-ACT đã lưu trước đây cần nhập lại</p>
+              <p className="text-xs text-text-secondary leading-relaxed">
                 Bản cũ của trang Tính điểm từng ghi sai thang điểm hai kỳ thi này, nên điểm cũ đang được
                 cách ly và <b>không</b> dùng để ước tính. Hãy nhập lại điểm đúng kỳ thi để kết quả đáng tin.
               </p>
@@ -762,9 +752,9 @@ export default function SchoolFinder() {
         {/* Hồ sơ điểm của tôi */}
         {hasAnyScore ? (
           <div className="arena-card p-4 flex gap-3">
-            <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-jade)' }} aria-hidden="true">verified</span>
+            <span className="material-symbols-outlined no-shrink text-secondary" aria-hidden="true">verified</span>
             <div className="flex-1">
-              <p className="text-sm font-semibold">Điểm của bạn đang dùng để ước tính</p>
+              <p className="text-sm font-semibold text-foreground">Điểm của bạn đang dùng để ước tính</p>
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {myScoreEntries.map(([code, v]) => {
                   const exam = EXAMS[code];
@@ -775,7 +765,7 @@ export default function SchoolFinder() {
                       : 'theo tổ hợp';
                   return (
                     <span key={code} className="arena-chip">
-                      {label}: <span className="tabular">{shown}</span>
+                      {label}: <span className="tabular font-bold text-primary">{shown}</span>
                       {v.status === 'mock' ? ' (thi thử)' : v.status === 'target' ? ' (mục tiêu)' : ''}
                     </span>
                   );
@@ -789,10 +779,10 @@ export default function SchoolFinder() {
           </div>
         ) : (
           <div className="arena-card p-4 flex gap-3">
-            <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">info</span>
+            <span className="material-symbols-outlined no-shrink text-accent" aria-hidden="true">info</span>
             <div className="flex-1 space-y-2">
-              <p className="text-sm font-semibold">Bạn chưa nhập điểm</p>
-              <p className="text-xs text-slate-300">
+              <p className="text-sm font-semibold text-foreground">Bạn chưa nhập điểm</p>
+              <p className="text-xs text-text-secondary">
                 Nhập điểm THPT, HSA, V-ACT, TSA... để xem ước tính khả năng cho từng ngành dưới đây.
                 Chưa nhập điểm, trang chỉ hiện điểm chuẩn các năm để tham khảo.
               </p>
@@ -807,19 +797,19 @@ export default function SchoolFinder() {
         {/* Panel nguyện vọng */}
         {showWishlist && (
           <section className="arena-card p-4 space-y-3" aria-label="Danh sách nguyện vọng đã lưu">
-            <h2 className="font-arena-display font-bold text-lg">Nguyện vọng của tôi ({wishlist.length})</h2>
+            <h2 className="font-display font-bold text-lg text-foreground">Nguyện vọng của tôi ({wishlist.length})</h2>
             {wishHealth && wishHealth.warnings.length > 0 && (
               <div className="space-y-2">
                 {wishHealth.warnings.map((w) => (
                   <p
                     key={w.code}
-                    className="text-xs leading-relaxed rounded-xl px-3 py-2 border flex gap-2"
-                    style={{
-                      borderColor: w.level === 'red' ? 'rgba(248,113,113,0.5)' : 'rgba(242,193,89,0.5)',
-                      background: w.level === 'red' ? 'rgba(248,113,113,0.08)' : 'rgba(242,193,89,0.08)',
-                    }}
+                    className={`text-xs leading-relaxed rounded-xl px-3 py-2 border flex gap-2 ${
+                      w.level === 'red'
+                        ? 'border-danger/35 bg-danger/8 text-danger'
+                        : 'border-accent/35 bg-accent/8 text-foreground'
+                    }`}
                   >
-                    <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+                    <span className="material-symbols-outlined text-base no-shrink" aria-hidden="true">
                       {w.level === 'red' ? 'error' : 'warning'}
                     </span>
                     <span>{w.text}</span>
@@ -828,37 +818,37 @@ export default function SchoolFinder() {
               </div>
             )}
             {wishHealth && (
-              <p className="text-xs text-slate-400">
-                Điểm sức khoẻ danh sách: <span className="tabular font-bold text-slate-200">{wishHealth.score}/100</span>
+              <p className="text-xs text-text-secondary">
+                Điểm sức khoẻ danh sách: <span className="tabular font-bold text-foreground">{wishHealth.score}/100</span>
                 {' '}— phân bổ an toàn / cân nhắc / mạo hiểm hợp lý và có nguyện vọng sàn an toàn sẽ cho điểm cao.
               </p>
             )}
             {wishlist.length === 0 ? (
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-text-secondary">
                 Chưa có nguyện vọng nào. Bấm “Lưu nguyện vọng” ở thẻ ngành bên dưới để thêm vào danh sách này.
               </p>
             ) : (
               <ol className="space-y-2">
                 {wishlist.map((w, idx) => (
-                  <li key={w.key} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                    <span className="font-arena-display font-bold text-sm shrink-0" style={{ color: 'var(--arena-gold)' }}>
+                  <li key={w.key} className="flex items-center gap-2 rounded-xl border border-border bg-surface-alt px-3 py-2">
+                    <span className="font-display font-bold text-sm text-accent no-shrink">
                       NV{idx + 1}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold leading-snug">{w.majorName}</p>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-sm font-semibold leading-snug text-foreground">{w.majorName}</p>
+                      <p className="text-[11px] text-text-secondary">
                         {w.schoolName} · {getExam(w.method).label}
                         {w.estimateSnapshot
                           ? ` · Lúc lưu: ${w.estimateSnapshot.bandLabel}${w.estimateSnapshot.probability != null ? ` (${Math.round(w.estimateSnapshot.probability * 20) * 5}%)` : ''}`
                           : ' · Chưa có ước tính lúc lưu'}
                       </p>
                     </div>
-                    <div className="flex shrink-0">
+                    <div className="flex no-shrink">
                       <button
                         onClick={() => moveWish(idx, -1)}
                         disabled={idx === 0}
                         aria-label="Đưa nguyện vọng lên trên"
-                        className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-white/10 disabled:opacity-30 cursor-pointer"
+                        className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-surface-hover text-text-secondary hover:text-foreground disabled:opacity-30 cursor-pointer"
                       >
                         <span className="material-symbols-outlined" aria-hidden="true">arrow_upward</span>
                       </button>
@@ -866,14 +856,14 @@ export default function SchoolFinder() {
                         onClick={() => moveWish(idx, 1)}
                         disabled={idx === wishlist.length - 1}
                         aria-label="Đưa nguyện vọng xuống dưới"
-                        className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-white/10 disabled:opacity-30 cursor-pointer"
+                        className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-surface-hover text-text-secondary hover:text-foreground disabled:opacity-30 cursor-pointer"
                       >
                         <span className="material-symbols-outlined" aria-hidden="true">arrow_downward</span>
                       </button>
                       <button
                         onClick={() => persistWishlist(wishlist.filter((x) => x.key !== w.key))}
                         aria-label="Xoá nguyện vọng"
-                        className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-white/10 cursor-pointer"
+                        className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-danger/10 text-text-secondary hover:text-danger cursor-pointer"
                       >
                         <span className="material-symbols-outlined" aria-hidden="true">delete</span>
                       </button>
@@ -882,7 +872,7 @@ export default function SchoolFinder() {
                 ))}
               </ol>
             )}
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-muted">
               Danh sách này để chuẩn bị và cân đối nguyện vọng — không thay thế đăng ký nguyện vọng chính thức trên cổng của Bộ GD&ĐT.
             </p>
           </section>
@@ -891,14 +881,13 @@ export default function SchoolFinder() {
         {/* Bộ lọc */}
         <section className="arena-card p-4 space-y-3" aria-label="Bộ lọc tìm trường">
           <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-base" aria-hidden="true">search</span>
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-base" aria-hidden="true">search</span>
             <input
               value={query}
               onChange={(e) => { setQuery(e.target.value); setDisplayLimit(20); }}
               placeholder="Nhập tên trường, ngành học, mã ngành..."
               aria-label="Tìm kiếm trường hoặc ngành"
-              className="w-full pl-10 pr-4 min-h-[44px] bg-white/5 border border-white/10 rounded-xl text-sm outline-none focus:ring-2 placeholder:text-slate-500"
-              style={{ '--tw-ring-color': 'var(--arena-ember)' }}
+              className="w-full pl-10 pr-4 min-h-[44px] bg-surface-alt border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary placeholder:text-muted"
             />
           </div>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Lọc theo phương thức">
@@ -924,8 +913,7 @@ export default function SchoolFinder() {
               value={bandFilter}
               onChange={(e) => { setBandFilter(e.target.value); setDisplayLimit(20); }}
               aria-label="Lọc theo mức đánh giá"
-              className="min-h-[44px] text-sm bg-white/5 border border-white/10 text-slate-200 rounded-xl px-3 outline-none cursor-pointer"
-              style={{ backgroundColor: 'var(--arena-surface)' }}
+              className="min-h-[44px] text-sm bg-surface-alt border border-border text-foreground rounded-xl px-3 outline-none focus:border-primary cursor-pointer"
             >
               <option value="all">Mọi mức đánh giá</option>
               <option value="good">Khả quan (từ 70%)</option>
@@ -939,9 +927,9 @@ export default function SchoolFinder() {
         {/* Trạng thái tải / lỗi / kết quả */}
         {loadError ? (
           <div className="arena-card p-6 text-center space-y-3">
-            <span className="material-symbols-outlined text-4xl text-red-400" aria-hidden="true">cloud_off</span>
-            <p className="font-semibold">Không tải được dữ liệu điểm chuẩn</p>
-            <p className="text-sm text-slate-400">{loadError}</p>
+            <span className="material-symbols-outlined text-4xl text-danger" aria-hidden="true">cloud_off</span>
+            <p className="font-semibold text-foreground">Không tải được dữ liệu điểm chuẩn</p>
+            <p className="text-sm text-text-secondary">{loadError}</p>
             <button onClick={handleRetry} className="btn-arena btn-arena-primary cursor-pointer">
               <span className="material-symbols-outlined text-base" aria-hidden="true">refresh</span>
               Thử lại
@@ -949,19 +937,19 @@ export default function SchoolFinder() {
           </div>
         ) : !data ? (
           <div className="flex justify-center items-center py-12" role="status" aria-label="Đang tải dữ liệu">
-            <span className="material-symbols-outlined text-4xl animate-spin" style={{ color: 'var(--arena-ember)' }} aria-hidden="true">sync</span>
+            <span className="material-symbols-outlined text-4xl animate-spin text-primary" aria-hidden="true">sync</span>
           </div>
         ) : (
           <>
-            <p className="text-xs text-slate-400 px-1">
-              <span className="tabular font-bold text-slate-100">{filtered.length}</span> ngành có dữ liệu điểm chuẩn
+            <p className="text-xs text-text-secondary px-1">
+              <span className="tabular font-bold text-foreground">{filtered.length}</span> ngành có dữ liệu điểm chuẩn
               {hasAnyScore && ' · ngành có khả năng cao hơn được xếp trước'}
             </p>
             {filtered.length === 0 ? (
               <div className="arena-card p-8 text-center space-y-2">
-                <span className="material-symbols-outlined text-4xl text-slate-500" aria-hidden="true">search_off</span>
-                <p className="text-sm font-semibold">Không tìm thấy ngành phù hợp với bộ lọc</p>
-                <p className="text-xs text-slate-400">Thử đổi từ khoá hoặc bỏ bớt điều kiện lọc.</p>
+                <span className="material-symbols-outlined text-4xl text-muted" aria-hidden="true">search_off</span>
+                <p className="text-sm font-semibold text-foreground">Không tìm thấy ngành phù hợp với bộ lọc</p>
+                <p className="text-xs text-text-secondary">Thử đổi từ khoá hoặc bỏ bớt điều kiện lọc.</p>
               </div>
             ) : (
               <div className="space-y-3 pb-4">
@@ -977,12 +965,12 @@ export default function SchoolFinder() {
                 ))}
                 {displayLimit < filtered.length && (
                   <p className="text-center py-3">
-                    <span className="material-symbols-outlined text-slate-500 animate-bounce" aria-hidden="true">expand_more</span>
+                    <span className="material-symbols-outlined text-muted animate-bounce" aria-hidden="true">expand_more</span>
                   </p>
                 )}
               </div>
             )}
-            <p className="text-[11px] text-slate-500 text-center pb-6">{DISCLAIMER}</p>
+            <p className="text-[11px] text-muted text-center pb-6">{DISCLAIMER}</p>
           </>
         )}
       </main>
@@ -995,12 +983,11 @@ function FilterChip({ active, onClick, children }) {
     <button
       onClick={onClick}
       aria-pressed={active}
-      className="arena-chip cursor-pointer min-h-[44px] px-4 transition-all active:scale-[0.98]"
-      style={
+      className={`arena-chip cursor-pointer min-h-[44px] px-4 transition-all active:scale-[0.98] ${
         active
-          ? { borderColor: 'var(--arena-ember)', background: 'rgba(227,100,136,0.16)', color: 'white' }
-          : undefined
-      }
+          ? 'bg-primary text-white border-primary font-semibold'
+          : 'hover:bg-surface-hover'
+      }`}
     >
       {children}
     </button>

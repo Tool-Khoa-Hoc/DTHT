@@ -8,6 +8,7 @@ import { priorityApplied } from '../lib/admission/predict';
 import { SUBJECTS, canonicalSubjects } from '../lib/admission/subjects';
 import { COMBOS as COMBO_DEFS, comboRawScore } from '../lib/admission/combos';
 import { bcaCombinedScore, integrated100Score, hcmutCombinedScore } from '../lib/admission/formulas';
+import ProgressBar from '../components/ui/ProgressBar';
 
 // Tổ hợp dùng chung từ lib/admission/combos.js (đầy đủ — không còn bản 8 tổ
 // hợp tự khai trong trang). Dạng rút gọn { mã: [môn...] } cho các vòng lặp cũ.
@@ -459,24 +460,21 @@ export default function AdmissionCalculator() {
   const exam = EXAMS[selectedExam];
 
   return (
-    <div className="min-h-dvh font-arena text-slate-100 relative" style={{ background: 'var(--arena-ink)' }}>
-      <header
-        className="sticky top-0 z-20 backdrop-blur-md border-b border-white/10"
-        style={{ background: 'rgba(25,14,18,0.85)' }}
-      >
+    <div className="min-h-dvh font-sans text-foreground bg-background relative">
+      <header className="sticky top-0 z-20 backdrop-blur-md bg-surface/95 border-b border-border">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
           <button
             onClick={() => navigate(-1)}
             aria-label="Quay lại"
-            className="w-11 h-11 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
+            className="w-11 h-11 no-shrink rounded-full bg-surface-alt border border-border flex items-center justify-center hover:bg-surface-hover text-foreground transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined" aria-hidden="true">arrow_back_ios_new</span>
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="font-arena-display font-bold text-xl leading-tight">Nhập điểm xét tuyển</h1>
-            <p className="text-xs text-slate-400">Một hồ sơ điểm duy nhất cho mọi kỳ thi — dùng ở trang Tìm trường</p>
+            <h1 className="font-display font-bold text-xl leading-tight text-foreground">Nhập điểm xét tuyển</h1>
+            <p className="text-xs text-text-secondary">Một hồ sơ điểm duy nhất cho mọi kỳ thi — dùng ở trang Tìm trường</p>
           </div>
-          <button onClick={() => navigate('/tim-truong')} className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer shrink-0">
+          <button onClick={() => navigate('/tim-truong')} className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer no-shrink">
             <span className="material-symbols-outlined text-base" aria-hidden="true">school</span>
             Tìm trường
           </button>
@@ -485,9 +483,9 @@ export default function AdmissionCalculator() {
 
       <main className="max-w-3xl mx-auto px-4 py-5 space-y-4">
         {!user && (
-          <div className="arena-card p-4 flex gap-3">
-            <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">info</span>
-            <p className="text-xs leading-relaxed text-slate-300">
+          <div className="arena-card p-4 flex gap-3 border-accent/35 bg-accent/5">
+            <span className="material-symbols-outlined no-shrink text-accent" aria-hidden="true">info</span>
+            <p className="text-xs leading-relaxed text-text-secondary">
               Bạn chưa đăng nhập — điểm sẽ lưu nháp trên thiết bị này. Đăng nhập để điểm đồng bộ vào hồ sơ
               và dùng được trên mọi thiết bị.
             </p>
@@ -495,9 +493,9 @@ export default function AdmissionCalculator() {
         )}
 
         {legacyKeys.length > 0 && (
-          <div className="arena-card p-4 flex gap-3" style={{ borderColor: 'rgba(242,193,89,0.5)' }}>
-            <span className="material-symbols-outlined shrink-0" style={{ color: 'var(--arena-gold)' }} aria-hidden="true">warning</span>
-            <p className="text-xs leading-relaxed text-slate-300">
+          <div className="arena-card p-4 flex gap-3 border-accent/45 bg-accent/5">
+            <span className="material-symbols-outlined no-shrink text-accent" aria-hidden="true">warning</span>
+            <p className="text-xs leading-relaxed text-text-secondary">
               Điểm HSA / V-ACT bạn lưu ở bản cũ đang bị cách ly vì bản cũ ghi sai thang điểm hai kỳ thi này
               (HSA đúng là thang 150 của ĐHQG Hà Nội, V-ACT đúng là thang 1200 của ĐHQG TP.HCM).
               Hãy nhập lại điểm ở hai mục HSA và V-ACT bên dưới — điểm cũ không được tự gán lại để tránh sai lệch.
@@ -508,15 +506,15 @@ export default function AdmissionCalculator() {
         {/* Điểm đã lưu */}
         {savedEntries.length > 0 && (
           <section className="arena-card p-4">
-            <h2 className="font-arena-display font-bold">Điểm đã lưu trong hồ sơ</h2>
+            <h2 className="font-display font-bold text-foreground">Điểm đã lưu trong hồ sơ</h2>
             <div className="flex flex-wrap gap-1.5 mt-2">
               {savedEntries.map(([code, v]) => (
                 <span key={code} className="arena-chip">
                   {EXAMS[code]?.label || code.toUpperCase()}:
-                  <span className="tabular">
+                  <span className="tabular font-bold text-primary">
                     {v.total != null ? `${fmt(parseFloat(v.total), code === 'vact' || code === 'vsat' ? 0 : 2)} / ${v.scale ?? EXAMS[code]?.scale ?? ''}` : 'theo tổ hợp'}
                   </span>
-                  <span>({STATUS_LABEL[v.status] || 'Điểm thật'})</span>
+                  <span className="text-text-secondary">({STATUS_LABEL[v.status] || 'Điểm thật'})</span>
                 </span>
               ))}
             </div>
@@ -525,16 +523,15 @@ export default function AdmissionCalculator() {
 
         {/* Ưu tiên khu vực / đối tượng */}
         <section className="arena-card p-4 space-y-3">
-          <h2 className="font-arena-display font-bold">Khu vực & đối tượng ưu tiên</h2>
+          <h2 className="font-display font-bold text-foreground">Khu vực & đối tượng ưu tiên</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="region-select" className="block text-xs font-semibold mb-1.5 text-slate-300">Khu vực ưu tiên</label>
+              <label htmlFor="region-select" className="block text-xs font-semibold mb-1.5 text-text-secondary">Khu vực ưu tiên</label>
               <select
                 id="region-select"
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
-                className="w-full min-h-[44px] bg-white/5 border border-white/10 rounded-xl px-3 text-sm outline-none cursor-pointer"
-                style={{ backgroundColor: 'var(--arena-surface)' }}
+                className="w-full min-h-[44px] bg-surface-alt border border-border rounded-xl px-3 text-sm text-foreground outline-none focus:border-primary cursor-pointer"
               >
                 {Object.entries(REGION_PRIORITY).map(([k, v]) => (
                   <option key={k} value={k}>{k} (+{fmt(v)} điểm danh nghĩa)</option>
@@ -542,27 +539,30 @@ export default function AdmissionCalculator() {
               </select>
             </div>
             <div>
-              <label htmlFor="category-select" className="block text-xs font-semibold mb-1.5 text-slate-300">Nhóm đối tượng ưu tiên</label>
+              <label htmlFor="category-select" className="block text-xs font-semibold mb-1.5 text-text-secondary">Nhóm đối tượng ưu tiên</label>
               <select
                 id="category-select"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full min-h-[44px] bg-white/5 border border-white/10 rounded-xl px-3 text-sm outline-none cursor-pointer"
-                style={{ backgroundColor: 'var(--arena-surface)' }}
+                className="w-full min-h-[44px] bg-surface-alt border border-border rounded-xl px-3 text-sm text-foreground outline-none focus:border-primary cursor-pointer"
               >
-                <option value="NONE">Không thuộc nhóm ưu tiên (+0)</option>
-                <option value="UT1">Nhóm UT1 (+2,0 điểm danh nghĩa)</option>
-                <option value="UT2">Nhóm UT2 (+1,0 điểm danh nghĩa)</option>
+                {Object.keys(CATEGORY_PRIORITY).length > 0 && (
+                  <>
+                    <option value="NONE">Không thuộc nhóm ưu tiên (+0)</option>
+                    <option value="UT1">Nhóm UT1 (+2,0 điểm danh nghĩa)</option>
+                    <option value="UT2">Nhóm UT2 (+1,0 điểm danh nghĩa)</option>
+                  </>
+                )}
               </select>
             </div>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-text-secondary leading-relaxed">
             Theo quy chế của Bộ GD&ĐT, từ mốc tổng điểm 22,5 trở lên điểm ưu tiên thực tế giảm dần:
             ưu tiên thực = (30 − tổng điểm) / 7,5 × ưu tiên danh nghĩa.
             {priorityPreview != null && bestThptRaw != null && (
               <>
-                {' '}Với tổ hợp THPT cao nhất hiện tại (<span className="tabular">{fmt(bestThptRaw)}</span>),
-                ưu tiên thực của bạn là <span className="tabular font-bold text-slate-200">+{fmt(priorityPreview)}</span> — không phải cộng thẳng điểm danh nghĩa.
+                {' '}Với tổ hợp THPT cao nhất hiện tại (<span className="tabular font-semibold">{fmt(bestThptRaw)}</span>),
+                ưu tiên thực của bạn là <span className="tabular font-bold text-secondary">+{fmt(priorityPreview)}</span> — không phải cộng thẳng điểm danh nghĩa.
               </>
             )}
           </p>
@@ -584,14 +584,15 @@ export default function AdmissionCalculator() {
                   key={code}
                   onClick={() => { setSelectedExam(code); setMessage({ type: '', text: '' }); }}
                   aria-pressed={active}
-                  className="arena-card arena-card-interactive p-3 text-left cursor-pointer"
-                  style={active ? { borderColor: 'var(--arena-ember)', background: 'rgba(227,100,136,0.10)' } : undefined}
+                  className={`arena-card arena-card-interactive p-3 text-left cursor-pointer ${
+                    active ? 'border-primary bg-primary/8' : ''
+                  }`}
                 >
-                  <span className="font-arena-display font-bold block" style={active ? { color: 'var(--arena-ember)' } : undefined}>
+                  <span className={`font-display font-bold block ${active ? 'text-primary' : 'text-foreground'}`}>
                     {e.label}
                   </span>
-                  <span className="text-[11px] text-slate-400 block leading-snug mt-0.5">{e.org}</span>
-                  <span className="text-[11px] text-slate-500 block mt-0.5">
+                  <span className="text-[11px] text-text-secondary block leading-snug mt-0.5">{e.org}</span>
+                  <span className="text-[11px] text-muted block mt-0.5">
                     Thang {code === 'spt' || code === 'hsca' ? '10/môn' : e.scale}
                     {has ? ' · Đã lưu' : ''}
                   </span>
@@ -604,8 +605,8 @@ export default function AdmissionCalculator() {
         {/* Form nhập điểm của kỳ thi đang chọn */}
         <section className="arena-card p-4 sm:p-5 space-y-5">
           <div>
-            <h2 className="font-arena-display font-bold text-lg">{exam.full}</h2>
-            <p className="text-xs text-slate-400 mt-1">
+            <h2 className="font-display font-bold text-lg text-foreground">{exam.full}</h2>
+            <p className="text-xs text-text-secondary mt-1">
               Đơn vị tổ chức: {exam.org} · Thang điểm:{' '}
               {selectedExam === 'spt' || selectedExam === 'hsca'
                 ? '10 điểm/môn — tổng tổ hợp 30 để so với điểm chuẩn của trường'
@@ -614,20 +615,19 @@ export default function AdmissionCalculator() {
           </div>
 
           <div>
-            <label htmlFor="status-select" className="block text-xs font-semibold mb-1.5 text-slate-300">Loại điểm</label>
+            <label htmlFor="status-select" className="block text-xs font-semibold mb-1.5 text-text-secondary">Loại điểm</label>
             <select
               id="status-select"
               value={statusOf(selectedExam)}
               onChange={(e) => setStatus(selectedExam, e.target.value)}
-              className="w-full sm:w-64 min-h-[44px] bg-white/5 border border-white/10 rounded-xl px-3 text-sm outline-none cursor-pointer"
-              style={{ backgroundColor: 'var(--arena-surface)' }}
+              className="w-full sm:w-64 min-h-[44px] bg-surface-alt border border-border rounded-xl px-3 text-sm text-foreground outline-none focus:border-primary cursor-pointer"
             >
               {STATUS_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
             </select>
             {statusOf(selectedExam) !== 'actual' && (
-              <p className="text-[11px] text-slate-500 mt-1.5">
+              <p className="text-[11px] text-muted mt-1.5">
                 Đang ở chế độ điểm {statusOf(selectedExam) === 'mock' ? 'thi thử' : 'mục tiêu'} — ước tính ở trang Tìm trường là kịch bản giả định, không phải điểm thật.
               </p>
             )}
@@ -654,10 +654,10 @@ export default function AdmissionCalculator() {
                   />
                 ))}
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span className="flex-1 border-t border-white/10" />
+              <div className="flex items-center gap-2 text-xs text-muted">
+                <span className="flex-1 border-t border-border" />
                 hoặc nhập thẳng tổng điểm nếu bạn chỉ nhớ tổng
-                <span className="flex-1 border-t border-white/10" />
+                <span className="flex-1 border-t border-border" />
               </div>
               <NumberField
                 label={`Tổng điểm ${exam.label} (0–${exam.scale})`}
@@ -666,7 +666,7 @@ export default function AdmissionCalculator() {
                 max={exam.scale}
               />
               {selectedExam === 'bca' && (
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-text-secondary leading-relaxed">
                   Lưu ý: điểm xét tuyển khối Công an (phương thức 3) = điểm tổ hợp THPT × 2/5 + điểm bài thi
                   BCA × 3/5 + điểm cộng. Hãy nhập thêm điểm THPT ở mục THPT để trang Tìm trường ước tính đúng.
                 </p>
@@ -681,7 +681,7 @@ export default function AdmissionCalculator() {
 
           {TRIO_EXAMS.includes(selectedExam) && (
             <div className="space-y-4">
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-text-secondary leading-relaxed">
                 Nhập điểm 3 môn bạn đã thi trong kỳ thi chuyên biệt (mỗi môn thang 10). Hệ thống cộng thành
                 tổng tổ hợp thang 30 — đúng thang các trường dùng khi công bố điểm chuẩn quy tổ hợp.
               </p>
@@ -706,7 +706,7 @@ export default function AdmissionCalculator() {
 
           {selectedExam === 'vsat' && (
             <div className="space-y-4">
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-text-secondary leading-relaxed">
                 Nhập điểm V-SAT theo từng môn (mỗi môn thang 150) — hệ thống tự tính tổng cho từng tổ hợp
                 khi trường chọn tổ hợp khác nhau. Nhập đúng 3 môn thì tổng tổ hợp được lưu kèm.
               </p>
@@ -722,10 +722,10 @@ export default function AdmissionCalculator() {
                   />
                 ))}
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span className="flex-1 border-t border-white/10" />
+              <div className="flex items-center gap-2 text-xs text-muted">
+                <span className="flex-1 border-t border-border" />
                 hoặc nhập thẳng tổng điểm tổ hợp nếu bạn chỉ nhớ tổng
-                <span className="flex-1 border-t border-white/10" />
+                <span className="flex-1 border-t border-border" />
               </div>
               <NumberField
                 label="Tổng điểm tổ hợp V-SAT (0–450, 3 môn × 150)"
@@ -749,7 +749,7 @@ export default function AdmissionCalculator() {
               {isSaving ? 'Đang lưu...' : message.type === 'success' ? 'Đã lưu điểm!' : `Lưu điểm ${exam.label}`}
             </button>
             {message.text && (
-              <p className={`text-center text-xs font-medium ${message.type === 'error' ? 'text-red-400' : ''}`} style={message.type === 'success' ? { color: 'var(--arena-jade)' } : undefined} role="status">
+              <p className={`text-center text-xs font-medium ${message.type === 'error' ? 'text-danger' : 'text-secondary'}`} role="status">
                 {message.text}
               </p>
             )}
@@ -759,44 +759,44 @@ export default function AdmissionCalculator() {
         {/* Máy tính kết hợp: BCA + tổng hợp thang 100 (formulas.js) */}
         <section className="arena-card p-4 sm:p-5 space-y-4">
           <div>
-            <h2 className="font-arena-display font-bold text-lg">Máy tính điểm kết hợp & tổng hợp</h2>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+            <h2 className="font-display font-bold text-lg text-foreground">Máy tính điểm kết hợp & tổng hợp</h2>
+            <p className="text-xs text-text-secondary mt-1 leading-relaxed">
               Dùng ngay điểm bạn đã nhập ở trên — không phải nhập lại. Công thức nằm ở thư viện dùng chung,
               kết quả được lưu vào hồ sơ để trang Tìm trường ước tính đúng thang điểm.
             </p>
           </div>
 
-          <div className="rounded-xl border border-white/10 p-3 space-y-2">
-            <h3 className="font-arena-display font-bold text-sm">Khối Công an (BCA) — phương thức 3</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
+          <div className="rounded-xl border border-border bg-surface-alt/50 p-3 space-y-2">
+            <h3 className="font-display font-bold text-sm text-foreground">Khối Công an (BCA) — phương thức 3</h3>
+            <p className="text-xs text-text-secondary leading-relaxed">
               Điểm xét tuyển thang 30 = điểm tổ hợp THPT × 2/5 + (điểm bài thi BCA quy thang 30) × 3/5 + điểm cộng/ưu tiên.
             </p>
             {bcaPreview ? (
-              <p className="text-sm">
-                Điểm kết hợp của bạn: <span className="tabular font-bold" style={{ color: 'var(--arena-jade)' }}>{fmt(bcaPreview.value)} / 30</span>
-                <span className="block text-xs text-slate-400 mt-1">
+              <p className="text-sm text-foreground">
+                Điểm kết hợp của bạn: <span className="tabular font-bold text-secondary">{fmt(bcaPreview.value)} / 30</span>
+                <span className="block text-xs text-text-secondary mt-1">
                   THPT đóng góp {fmt(bcaPreview.breakdown.thptPhan)} · BCA đóng góp {fmt(bcaPreview.breakdown.bcaPhan)} · Ưu tiên +{fmt(bcaPreview.breakdown.uuTien)}
                 </span>
               </p>
             ) : (
-              <p className="text-xs text-slate-500">Nhập điểm tổ hợp THPT (mục THPT) và tổng điểm bài thi BCA (mục BCA) để xem điểm kết hợp.</p>
+              <p className="text-xs text-muted">Nhập điểm tổ hợp THPT (mục THPT) và tổng điểm bài thi BCA (mục BCA) để xem điểm kết hợp.</p>
             )}
           </div>
 
-          <div className="rounded-xl border border-white/10 p-3 space-y-2">
-            <h3 className="font-arena-display font-bold text-sm">ĐH Bách khoa TP.HCM (HCMUT) — tổng hợp thang 100</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
+          <div className="rounded-xl border border-border bg-surface-alt/50 p-3 space-y-2">
+            <h3 className="font-display font-bold text-sm text-foreground">ĐH Bách khoa TP.HCM (HCMUT) — tổng hợp thang 100</h3>
+            <p className="text-xs text-text-secondary leading-relaxed">
               Điểm học lực = Điểm năng lực × 70% + TNTHPT quy đổi × 20% + Học bạ quy đổi × 10%.
               Khi tổ hợp không nhân đôi Toán, điểm năng lực chia cho 12 (không phải 15) — lỗi mẫu số ở bản cũ đã được sửa.
             </p>
             <NumberField label="Điểm cộng (chứng chỉ / giải thưởng, 0–10)" value={bonus100} onChange={setBonus100} max={10} />
             {hcmutPreview ? (
-              <div className="text-sm space-y-1">
+              <div className="text-sm space-y-1 text-foreground">
                 <p>
-                  Điểm tổng hợp của bạn: <span className="tabular font-bold" style={{ color: 'var(--arena-jade)' }}>{fmt(hcmutPreview.value)} / 100</span>
-                  <span className="text-xs text-slate-400"> ({hcmutPreview.breakdown.doiTuong})</span>
+                  Điểm tổng hợp của bạn: <span className="tabular font-bold text-secondary">{fmt(hcmutPreview.value)} / 100</span>
+                  <span className="text-xs text-text-secondary"> ({hcmutPreview.breakdown.doiTuong})</span>
                 </p>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-text-secondary">
                   Điểm năng lực {fmt(hcmutPreview.breakdown.diemNL)} · TNTHPT quy đổi {fmt(hcmutPreview.breakdown.tnthptQD)} ·
                   Học bạ quy đổi {fmt(hcmutPreview.breakdown.hbQD)} · Ưu tiên +{fmt(hcmutPreview.breakdown.uuTien)}
                 </p>
@@ -806,19 +806,19 @@ export default function AdmissionCalculator() {
                 </button>
               </div>
             ) : (
-              <p className="text-xs text-slate-500">Nhập đủ điểm THPT từng môn (mục THPT) và điểm học bạ từng môn (mục Học bạ) để tính điểm tổng hợp. Có điểm V-ACT thì nhập thêm ở mục V-ACT (đối tượng ĐT 2.1).</p>
+              <p className="text-xs text-muted">Nhập đủ điểm THPT từng môn (mục THPT) và điểm học bạ từng môn (mục Học bạ) để tính điểm tổng hợp. Có điểm V-ACT thì nhập thêm ở mục V-ACT (đối tượng ĐT 2.1).</p>
             )}
           </div>
 
-          <div className="rounded-xl border border-white/10 p-3 space-y-1">
-            <h3 className="font-arena-display font-bold text-sm">Đại học Kinh tế TP.HCM (UEH) — tổng hợp thang 100</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
+          <div className="rounded-xl border border-border bg-surface-alt/50 p-3 space-y-1">
+            <h3 className="font-display font-bold text-sm text-foreground">Đại học Kinh tế TP.HCM (UEH) — tổng hợp thang 100</h3>
+            <p className="text-xs text-text-secondary leading-relaxed">
               {uehCheck.explain[0]} Bạn vẫn tra được điểm chuẩn tích hợp của UEH ở trang Tìm trường.
             </p>
           </div>
         </section>
 
-        <p className="text-[11px] text-slate-500 text-center leading-relaxed pb-4">
+        <p className="text-[11px] text-muted text-center leading-relaxed pb-4">
           Điểm bạn nhập được dùng để ước tính khả năng ở trang Tìm trường. Ước tính dựa trên điểm chuẩn
           các năm trước — không phải cam kết trúng tuyển. Điểm 0 là giá trị hợp lệ và được lưu như các điểm khác.
         </p>
@@ -857,7 +857,7 @@ function SubjectForm({ subjectsState, onChange, transcript }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-slate-400 leading-relaxed">
+      <p className="text-xs text-text-secondary leading-relaxed">
         {transcript
           ? 'Nhập điểm trung bình môn dùng cho xét học bạ (theo cách tính của bạn / của trường). Tổng tổ hợp được tính tự động cho các tổ hợp đủ 3 môn.'
           : 'Nhập điểm từng môn thi tốt nghiệp THPT. Tổng các tổ hợp đủ 3 môn được tính tự động — trang Tìm trường sẽ dùng tổ hợp khớp với từng ngành.'}
@@ -875,12 +875,12 @@ function SubjectForm({ subjectsState, onChange, transcript }) {
         ))}
       </div>
       {Object.keys(byGroup).length > 0 && (
-        <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
-          <p className="text-xs text-slate-400 mb-1.5">Tổng theo tổ hợp (chưa gồm điểm ưu tiên):</p>
+        <div className="rounded-xl border border-border bg-surface-alt px-3 py-2.5">
+          <p className="text-xs text-text-secondary mb-1.5">Tổng theo tổ hợp (chưa gồm điểm ưu tiên):</p>
           <div className="flex flex-wrap gap-1.5">
             {Object.entries(byGroup).map(([combo, sum]) => (
               <span key={combo} className="arena-chip">
-                {combo}: <span className="tabular">{fmt(sum)}</span>
+                {combo}: <span className="tabular font-bold text-primary">{fmt(sum)}</span>
               </span>
             ))}
           </div>
@@ -893,7 +893,7 @@ function SubjectForm({ subjectsState, onChange, transcript }) {
 function NumberField({ label, value, onChange, max, step = '0.1' }) {
   return (
     <div>
-      <label className="block text-xs font-semibold mb-1.5 text-slate-300">{label}</label>
+      <label className="block text-xs font-semibold mb-1.5 text-text-secondary">{label}</label>
       <input
         type="number"
         min="0"
@@ -902,8 +902,7 @@ function NumberField({ label, value, onChange, max, step = '0.1' }) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="0"
-        className="w-full min-h-[44px] bg-white/5 border border-white/10 rounded-xl px-3 text-sm tabular outline-none focus:ring-2"
-        style={{ '--tw-ring-color': 'var(--arena-ember)' }}
+        className="w-full min-h-[44px] bg-surface-alt border border-border rounded-xl px-3 text-sm text-foreground tabular outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary"
       />
     </div>
   );
@@ -912,26 +911,16 @@ function NumberField({ label, value, onChange, max, step = '0.1' }) {
 function TotalPreview({ label, value, scale, digits = 2 }) {
   const pct = value != null && scale ? Math.min((value / scale) * 100, 100) : 0;
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 flex items-center justify-between gap-3">
+    <div className="rounded-xl border border-border bg-surface-alt px-4 py-3 flex items-center justify-between gap-3">
       <div>
-        <p className="text-xs text-slate-400">{label}</p>
-        <p className="font-arena-display font-bold text-2xl leading-tight">
+        <p className="text-xs text-text-secondary">{label}</p>
+        <p className="font-display font-bold text-2xl leading-tight text-foreground">
           <span className="tabular">{value != null ? fmt(value, digits) : '—'}</span>
-          <span className="text-sm text-slate-500 font-medium"> / {scale}</span>
+          <span className="text-sm text-muted font-medium"> / {scale}</span>
         </p>
       </div>
-      <div
-        className="w-24 h-2.5 rounded-full bg-white/10 overflow-hidden shrink-0"
-        role="progressbar"
-        aria-valuenow={Math.round(pct)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={label}
-      >
-        <div
-          className="h-full rounded-full transition-all"
-          style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--arena-jade), var(--arena-jade-strong))' }}
-        />
+      <div className="w-24 no-shrink">
+        <ProgressBar value={pct} max={100} variant="jade" size="md" ariaLabel={label} />
       </div>
     </div>
   );

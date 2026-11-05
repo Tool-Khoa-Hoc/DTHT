@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="vi" class="dark">
+<html lang="vi">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#201216" />
+  <meta name="theme-color" content="#FAF7F0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
   <!-- ═══════════ SEO ═══════════ -->
   <meta name="description" content="Đấu Trường Học Tập - Nền tảng ôn thi THPTQG, tính điểm xét tuyển đại học, và luyện thi trắc nghiệm dành cho học sinh Việt Nam" />
@@ -28,32 +28,12 @@
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/logo.png" />
 
-  <!--
-    ═══════════ TASK 1: PRECONNECT — Khai báo sớm các domain quan trọng ═══════════
-    Giúp browser mở TCP+TLS handshake NGAY KHI HTML được parse,
-    tiết kiệm 100-300ms khi fetch tài nguyên sau này.
-
-    Thứ tự quan trọng:
-    1. Supabase (API, Auth, Storage) — critical path cho app
-    2. Google Fonts — render-blocking nếu không preconnect
-  -->
-
-  <!-- Supabase Auth endpoint (khác domain với API) -->
+  <!-- Supabase Auth & API endpoint -->
   <link rel="dns-prefetch" href="https://szvzwnbdjixcvgbgpavf.supabase.co" />
 
-  <!-- Google Fonts — phải preconnect CẢ HAI domain -->
+  <!-- Google Fonts preconnect cho Material Symbols icon subset -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <!--
-    ═══════════ TASK 1: PRELOAD — Ưu tiên tài nguyên LCP ═══════════
-    `rel="preload"` báo browser tải ngay với priority cao nhất,
-    KHÔNG block parser, KHÔNG thực thi — chỉ cache trước.
-
-    Ưu tiên theo thứ tự:
-    1. Logo (LCP element — visible above-the-fold ngay khi load)
-    2. Font primary weight 700 (heading text — render LCP text)
-  -->
 
   <!-- LCP Image: Logo hiển thị ngay trong header mobile + desktop sidebar -->
   <link
@@ -64,85 +44,40 @@
     fetchpriority="high"
   />
 
-  <!--
-    Font preload: tải woff2 của Plus Jakarta Sans 700
-    trực tiếp từ gstatic — bypass qua Google Fonts redirect.
-    Lưu ý: URL này ổn định và không thay đổi giữa các version Google Fonts.
-  -->
-  <!--
-    ═══════════ Fonts — NON-BLOCKING (media swap trick) ═══════════
-    media="print" → browser không block render để tải
-    onload="this.media='all'" → sau khi tải xong thì áp dụng CSS
-  -->
+  <!-- Preload duy nhất font heading 700 (Baloo 2 Vietnamese subset, self-hosted woff2) -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap"
+    rel="preload"
+    as="font"
+    type="font/woff2"
+    href="/node_modules/@fontsource/baloo-2/files/baloo-2-vietnamese-700-normal.woff2"
+    crossorigin
+  />
+
+  <!-- Material Symbols — Icon font subset, non-blocking -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=account_balance,add,add_chart,add_circle,add_task,admin_panel_settings,all_inclusive,alternate_email,apartment,architecture,arrow_back,arrow_back_ios_new,arrow_downward,arrow_forward,arrow_forward_ios,arrow_outward,arrow_upward,article,assignment_late,auto_awesome,auto_stories,autorenew,backpack,biotech,bolt,bookmark,bookmark_added,calculate,calendar_month,campaign,cancel,cast_for_education,category,celebration,check,check_circle,chevron_right,close,cloud_off,cloud_upload,code,computer,content_copy,database_off,delete,description,diamond,done,done_all,draft,edit,edit_document,edit_note,edit_square,emoji_events,engineering,error,event_busy,expand_less,expand_more,experiment,flag,folder,folder_off,folder_open,format_list_bulleted,functions,gavel,gpp_good,grade,grid_view,group,group_add,group_off,groups,help_outline,history_edu,home,hotel_class,hourglass_empty,how_to_reg,hub,inbox,info,key,language,library_books,link,link_off,local_activity,local_fire_department,local_library,lock,login,logout,mail,manage_accounts,map,menu,menu_book,military_tech,model_training,note_alt,notifications,notifications_off,open_in_new,pending_actions,person,person_add,person_off,person_search,picture_as_pdf,play_circle,progress_activity,psychology,public,public_off,quiz,radio_button_unchecked,receipt_long,refresh,restart_alt,rocket_launch,route,save,schedule,school,science,search,search_off,send,settings,shield,splitscreen,star,support_agent,swords,sync,timeline,topic,track_changes,translate,trending_up,trophy,tune,upload_file,user_attributes,verified,visibility,visibility_off,warning,workspace_premium&display=block"
     rel="stylesheet"
     media="print"
     onload="this.media='all'"
   />
   <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=account_balance,add,add_chart,add_circle,add_task,admin_panel_settings,all_inclusive,alternate_email,apartment,architecture,arrow_back,arrow_back_ios_new,arrow_downward,arrow_forward,arrow_forward_ios,arrow_outward,arrow_upward,article,assignment_late,auto_awesome,auto_stories,autorenew,backpack,biotech,bolt,bookmark,bookmark_added,calculate,calendar_month,campaign,cancel,cast_for_education,category,celebration,check,check_circle,chevron_right,close,cloud_off,cloud_upload,code,computer,content_copy,database_off,delete,description,diamond,done,done_all,draft,edit,edit_document,edit_note,edit_square,emoji_events,engineering,error,event_busy,expand_less,expand_more,experiment,flag,folder,folder_off,folder_open,format_list_bulleted,functions,gavel,gpp_good,grade,grid_view,group,group_add,group_off,groups,help_outline,history_edu,home,hotel_class,hourglass_empty,how_to_reg,hub,inbox,info,key,language,library_books,link,link_off,local_activity,local_fire_department,local_library,lock,login,logout,mail,manage_accounts,map,menu,menu_book,military_tech,model_training,note_alt,notifications,notifications_off,open_in_new,pending_actions,person,person_add,person_off,person_search,picture_as_pdf,play_circle,progress_activity,psychology,public,public_off,quiz,radio_button_unchecked,receipt_long,refresh,restart_alt,rocket_launch,route,save,schedule,school,science,search,search_off,send,settings,shield,splitscreen,star,support_agent,swords,sync,timeline,topic,track_changes,translate,trending_up,trophy,tune,upload_file,user_attributes,verified,visibility,visibility_off,warning,workspace_premium&display=block" rel="stylesheet" />
   </noscript>
 
   <!--
-    ═══════════ Display face — Be Vietnam Pro ═══════════
-    Typeface Việt hoá gốc: hỗ trợ dấu tiếng Việt tuyệt đối, các weight nặng
-    (700/800) đủ lực cho tiêu đề kiểu "đấu trường". Dùng riêng cho heading —
-    body vẫn là Plus Jakarta Sans. Tải non-blocking như các font khác.
-    (Đợt Arena Bento: bổ sung 400/500 cho body/UI của component mới.)
-  -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-    media="print"
-    onload="this.media='all'"
-  />
-  <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  </noscript>
-
-  <!--
-    ═══════════ Arena display face — Baloo 2 ═══════════
-    Font display của design system "Arena Bento" (hero, tiêu đề lớn, số EXP):
-    rounded, nặng, đúng chất gamification và CÓ subset vietnamese nên không
-    gãy dấu tiếng Việt. Dùng qua class .font-arena-display / --arena-font-display.
-    Tải non-blocking + display=swap như các font khác; preconnect ở trên đã có.
-  -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap"
-    rel="stylesheet"
-    media="print"
-    onload="this.media='all'"
-  />
-  <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  </noscript>
-
-  <!-- Material Symbols — Icon font, không cần block render -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=account_balance,add,add_chart,add_circle,add_task,admin_panel_settings,all_inclusive,alternate_email,apartment,architecture,arrow_back,arrow_back_ios_new,arrow_downward,arrow_forward,arrow_forward_ios,arrow_outward,arrow_upward,article,assignment_late,auto_awesome,auto_stories,autorenew,backpack,biotech,bolt,calculate,calendar_month,campaign,cancel,cast_for_education,category,celebration,check,check_circle,chevron_right,close,cloud_upload,code,computer,content_copy,database_off,delete,description,done,done_all,draft,edit,edit_document,edit_note,edit_square,emoji_events,engineering,error,event_busy,expand_less,expand_more,experiment,flag,folder,folder_off,folder_open,format_list_bulleted,functions,gavel,gpp_good,grade,grid_view,group,group_add,group_off,groups,history_edu,home,hotel_class,hourglass_empty,how_to_reg,hub,inbox,info,key,language,library_books,link,link_off,local_activity,local_fire_department,local_library,lock,login,mail,manage_accounts,menu,menu_book,military_tech,model_training,note_alt,notifications,notifications_off,open_in_new,pending_actions,person,person_add,person_off,person_search,picture_as_pdf,play_circle,progress_activity,psychology,public,public_off,quiz,radio_button_unchecked,receipt_long,refresh,restart_alt,rocket_launch,route,save,schedule,school,science,search,search_off,send,settings,shield,splitscreen,star,support_agent,swords,sync,timeline,topic,trending_up,trophy,tune,upload_file,user_attributes,verified,visibility,visibility_off,warning,workspace_premium&display=block"
-    rel="stylesheet"
-    media="print"
-    onload="this.media='all'"
-  />
-  <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=account_balance,add,add_chart,add_circle,add_task,admin_panel_settings,all_inclusive,alternate_email,apartment,architecture,arrow_back,arrow_back_ios_new,arrow_downward,arrow_forward,arrow_forward_ios,arrow_outward,arrow_upward,article,assignment_late,auto_awesome,auto_stories,autorenew,backpack,biotech,bolt,calculate,calendar_month,campaign,cancel,cast_for_education,category,celebration,check,check_circle,chevron_right,close,cloud_upload,code,computer,content_copy,database_off,delete,description,done,done_all,draft,edit,edit_document,edit_note,edit_square,emoji_events,engineering,error,event_busy,expand_less,expand_more,experiment,flag,folder,folder_off,folder_open,format_list_bulleted,functions,gavel,gpp_good,grade,grid_view,group,group_add,group_off,groups,history_edu,home,hotel_class,hourglass_empty,how_to_reg,hub,inbox,info,key,language,library_books,link,link_off,local_activity,local_fire_department,local_library,lock,login,mail,manage_accounts,menu,menu_book,military_tech,model_training,note_alt,notifications,notifications_off,open_in_new,pending_actions,person,person_add,person_off,person_search,picture_as_pdf,play_circle,progress_activity,psychology,public,public_off,quiz,radio_button_unchecked,receipt_long,refresh,restart_alt,rocket_launch,route,save,schedule,school,science,search,search_off,send,settings,shield,splitscreen,star,support_agent,swords,sync,timeline,topic,trending_up,trophy,tune,upload_file,user_attributes,verified,visibility,visibility_off,warning,workspace_premium&display=block" rel="stylesheet" />
-  </noscript>
-  <!--
-    ═══════════ CRITICAL CSS INLINE — chống FOUC cho app shell ═══════════
-    Chỉ inlining các style tối thiểu cho trạng thái loading ban đầu.
-    Không cần đợi CSS bundle → FCP nhanh hơn.
+    ═══════════ CRITICAL CSS INLINE — Trung Hoa Sáng (Rice Paper Light) ═══════════
+    Chống FOUC cho app shell trên nền giấy gạo #FAF7F0.
   -->
   <style>
-    /* App shell background — khớp với TailwindCSS dark mode var */
     html, body, #root {
       margin: 0;
       padding: 0;
-      background-color: #0f0a0c;
+      background-color: #FAF7F0;
+      color: #1C1917;
       min-height: 100dvh;
     }
     body {
-      font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     #boot-shell {
       position: fixed;
@@ -151,9 +86,9 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: linear-gradient(135deg, #201216 0%, #2d1b2e 48%, #1a1025 100%);
-      color: #f8fafc;
-      transition: opacity 80ms linear, visibility 80ms linear;
+      background: radial-gradient(circle at 50% 24%, #FDFBF6 0%, #FAF7F0 65%, #F3EDE2 100%);
+      color: #1C1917;
+      transition: opacity 100ms ease-out, visibility 100ms ease-out;
       z-index: 9999;
     }
     #boot-shell[data-ready="true"] {
@@ -161,73 +96,60 @@
       visibility: hidden;
       pointer-events: none;
     }
-    .boot-orb {
-      display: none;
-    }
-    .boot-orb.top {
-      top: -8%;
-      right: -14%;
-      width: 260px;
-      height: 260px;
-      background: rgba(227, 100, 136, 0.22);
-    }
-    .boot-orb.bottom {
-      bottom: 2%;
-      left: -12%;
-      width: 220px;
-      height: 220px;
-      background: rgba(99, 102, 241, 0.16);
-    }
     .boot-card {
       position: relative;
       width: min(360px, calc(100vw - 32px));
-      padding: 24px 20px;
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(18, 12, 20, 0.92);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+      padding: 28px 24px;
+      border-radius: 16px;
+      border: 1px solid #E7E0D2;
+      background: #FFFFFF;
+      box-shadow: 0 12px 28px -8px rgba(28, 25, 23, 0.08), 0 0 0 1px rgba(201, 162, 39, 0.14);
       text-align: center;
     }
     .boot-mark {
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 18px;
-      border-radius: 22px;
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      border-radius: 12px;
       display: grid;
       place-items: center;
+      font-family: "Baloo 2", "Be Vietnam Pro", sans-serif;
       font-size: 22px;
       font-weight: 800;
-      letter-spacing: 0.08em;
-      background: linear-gradient(135deg, rgba(227, 100, 136, 0.24), rgba(147, 51, 234, 0.22));
-      box-shadow: 0 10px 28px rgba(227, 100, 136, 0.14);
+      letter-spacing: 0.06em;
+      color: #FFFFFF;
+      background: #B91C1C;
+      border: 2px solid #C9A227;
+      box-shadow: 0 6px 16px rgba(185, 28, 28, 0.22);
     }
     .boot-title {
-      margin: 0 0 10px;
-      font-size: 28px;
-      line-height: 1.1;
+      margin: 0 0 8px;
+      font-family: "Baloo 2", "Be Vietnam Pro", sans-serif;
+      font-size: 24px;
+      line-height: 1.2;
       font-weight: 800;
-      letter-spacing: -0.04em;
+      color: #1C1917;
     }
     .boot-copy {
       margin: 0 0 18px;
-      color: rgba(226, 232, 240, 0.74);
+      color: #57534E;
       font-size: 14px;
       line-height: 1.6;
     }
     .boot-track {
       width: 100%;
-      height: 10px;
+      height: 8px;
       border-radius: 999px;
       overflow: hidden;
-      background: rgba(255, 255, 255, 0.08);
+      background: #F3EDE2;
+      border: 1px solid #E7E0D2;
     }
     .boot-bar {
-      width: 58%;
+      width: 62%;
       height: 100%;
       border-radius: inherit;
-      background: linear-gradient(90deg, #e36488, #9333ea);
+      background: linear-gradient(90deg, #B91C1C, #C9A227);
     }
-    /* Prevent CLS: giữ không gian cho icon font khi chưa load */
     .material-symbols-outlined {
       font-family: 'Material Symbols Outlined', sans-serif;
       font-size: 24px;
@@ -253,12 +175,10 @@
 
 <body>
   <div id="boot-shell" aria-hidden="true">
-    <div class="boot-orb top"></div>
-    <div class="boot-orb bottom"></div>
     <div class="boot-card">
       <div class="boot-mark">DT</div>
-      <h1 class="boot-title">Đang tải giao diện học tập</h1>
-      <p class="boot-copy">Đang khởi động nhanh để bạn vào web sớm hơn trên mạng di động.</p>
+      <h1 class="boot-title">Đấu Trường Học Tập</h1>
+      <p class="boot-copy">Đang mở thư phòng ôn luyện mùa thi 2027...</p>
       <div class="boot-track">
         <div class="boot-bar"></div>
       </div>

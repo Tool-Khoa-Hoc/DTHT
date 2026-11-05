@@ -1,119 +1,176 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import Button from './ui/Button';
+
+const WELCOME_MODAL_DISMISSED_KEY = 'dtht_hide_welcome_modal';
 
 export default function WelcomeModal() {
-    const [isOpen, setIsOpen] = useState(() => {
-        return !localStorage.getItem('hasSeenWelcomeNotice_v1');
-    });
-    const modalRef = useRef(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [dontShowAgain, setDontShowAgain] = useState(true);
+  const [isOpen, setIsOpen] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
 
-    const handleClose = useCallback(() => {
-        setIsOpen(false);
-        localStorage.setItem('hasSeenWelcomeNotice_v1', 'true');
-    }, []);
+    try {
+      return window.localStorage.getItem(WELCOME_MODAL_DISMISSED_KEY) !== 'true';
+    } catch {
+      return true;
+    }
+  });
 
-    useEffect(() => {
-        if (!isOpen) {
-            return undefined;
-        }
+  const handleClose = () => {
+    if (dontShowAgain) {
+      try {
+        window.localStorage.setItem(WELCOME_MODAL_DISMISSED_KEY, 'true');
+      } catch {
+        // Ignore storage write failure in private browsing modes.
+      }
+    }
+    setIsOpen(false);
+  };
 
-        const previouslyFocused = document.activeElement;
-        const previousOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-        modalRef.current?.focus();
+  const handleJoinNow = () => {
+    handleClose();
+    if (!user) {
+      navigate('/auth');
+    } else {
+      navigate('/library');
+    }
+  };
 
-        const handleKeyDown = (event) => {
-            if (event.key === 'Escape') {
-                handleClose();
-                return;
-            }
+  if (!isOpen) return null;
 
-            if (event.key !== 'Tab' || !modalRef.current) {
-                return;
-            }
-
-            const focusableElements = modalRef.current.querySelectorAll(
-                'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
-            );
-
-            if (!focusableElements.length) {
-                return;
-            }
-
-            const firstElement = focusableElements[0];
-            const lastElement = focusableElements[focusableElements.length - 1];
-
-            if (event.shiftKey && document.activeElement === firstElement) {
-                event.preventDefault();
-                lastElement.focus();
-            } else if (!event.shiftKey && document.activeElement === lastElement) {
-                event.preventDefault();
-                firstElement.focus();
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = previousOverflow;
-            previouslyFocused?.focus?.();
-        };
-    }, [handleClose, isOpen]);
-
-    if (!isOpen) return null;
-
-    return (
-        <div
-            className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-            onMouseDown={(event) => {
-                if (event.target === event.currentTarget) {
-                    handleClose();
-                }
-            }}
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-foreground/45 backdrop-blur-xs">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="welcome-modal-title"
+        className="relative w-full max-w-lg imperial-frame overflow-hidden p-6 sm:p-8"
+      >
+        <span
+          aria-hidden="true"
+          className="hanzi-watermark absolute top-3 right-5 text-6xl font-bold text-accent/10"
         >
-            <div
-                ref={modalRef}
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="welcome-modal-title"
-                tabIndex={-1}
-                className="bg-white dark:bg-[#1a0f12] w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-white/10 animate-dialog-in focus:outline-none"
-            >
-                {/* Header Decoration */}
-                <div className="h-24 bg-gradient-to-r from-[#fe5f36] via-[#e36488] to-[#7f13ec] relative">
-                    <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-white dark:bg-[#1a0f12] rounded-full flex items-center justify-center p-1.5 shadow-lg">
-                        <div className="w-full h-full bg-amber-500/10 rounded-full flex items-center justify-center border border-amber-500/20">
-                            <span className="material-symbols-outlined text-4xl text-amber-500">campaign</span>
-                        </div>
-                    </div>
-                </div>
+          學堂
+        </span>
 
-                <div className="pt-12 pb-6 px-6 text-center">
-                    <h3 id="welcome-modal-title" className="text-xl font-black text-slate-800 dark:text-white mb-2">
-                        Thông báo hệ thống
-                    </h3>
-                    
-                    <div className="space-y-3 text-sm font-medium text-slate-600 dark:text-slate-400 mb-8 bg-slate-50 dark:bg-white/5 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
-                        <p>
-                            Chào mừng bạn đến với <strong className="text-[#fe5f36] font-black">Đấu Trường Học Tập!</strong>
-                        </p>
-                        <p>
-                            Hiện tại, hệ thống trang web đang trong quá trình nâng cấp và hoàn thiện. Các khu vực tài liệu, công cụ tính điểm và lộ trình học đang được cập nhật để mang lại trải nghiệm ổn định hơn.
-                        </p>
-                        <p className="italic text-xs mt-2 text-slate-500">
-                            Nếu xảy ra lỗi trong quá trình sử dụng, kính mong quý khách thông cảm!
-                        </p>
-                    </div>
+        <button
+          type="button"
+          onClick={handleClose}
+          aria-label="Đóng cửa sổ chào mừng"
+          className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-surface-alt hover:bg-muted text-secondary-text hover:text-foreground border border-border transition-colors cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-xl" aria-hidden="true">
+            close
+          </span>
+        </button>
 
-                    <button 
-                        onClick={handleClose}
-                        className="w-full bg-gradient-to-r from-[#fe5f36] to-pink-600 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-[#fe5f36]/30 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2"
-                    >
-                        <span className="material-symbols-outlined">check_circle</span>
-                        Tôi đã hiểu
-                    </button>
-                </div>
+        <div className="relative z-10 flex flex-col items-center text-center">
+          <div className="w-16 h-16 mb-5 rounded-2xl bg-primary-soft border border-primary/30 flex items-center justify-center shadow-xs">
+            <img
+              src="/logo.webp"
+              alt="Logo Đấu Trường Học Tập"
+              width={48}
+              height={48}
+              loading="lazy"
+              decoding="async"
+              className="w-11 h-11 object-contain"
+            />
+          </div>
+
+          <span className="seal-stamp px-3 py-1 text-[11px] uppercase tracking-wider mb-3">
+            Thư Viện &amp; Khoa Trường 2027
+          </span>
+
+          <h2
+            id="welcome-modal-title"
+            className="text-2xl sm:text-3xl font-display font-extrabold text-foreground mb-2 tracking-tight"
+          >
+            Đấu Trường Học Tập
+          </h2>
+
+          <p className="text-secondary-text text-sm sm:text-base mb-6 max-w-md leading-relaxed">
+            Chào mừng sĩ tử đến với thư phòng ôn luyện! Khám phá kho tài liệu chọn lọc, công cụ tính điểm chuẩn xác và thi đua bảng vàng mỗi ngày.
+          </p>
+
+          <div className="w-full space-y-2.5 mb-6 text-left">
+            <div className="flex items-center gap-3.5 p-3 rounded-xl bg-paper border border-border">
+              <div className="p-2 rounded-lg bg-primary-soft text-primary border border-primary/25">
+                <span className="material-symbols-outlined text-xl" aria-hidden="true">
+                  library_books
+                </span>
+              </div>
+              <div>
+                <h3 className="text-foreground font-bold text-sm">Kho Tài Liệu Chọn Lọc</h3>
+                <p className="text-secondary-text text-xs">
+                  Đề thi thử, chuyên đề và giáo trình từ các trường chuyên toàn quốc
+                </p>
+              </div>
             </div>
+
+            <div className="flex items-center gap-3.5 p-3 rounded-xl bg-paper border border-border">
+              <div className="p-2 rounded-lg bg-jade-soft text-jade border border-jade-border">
+                <span className="material-symbols-outlined text-xl" aria-hidden="true">
+                  calculate
+                </span>
+              </div>
+              <div>
+                <h3 className="text-foreground font-bold text-sm">Tính Điểm &amp; Chọn Trường</h3>
+                <p className="text-secondary-text text-xs">
+                  Phân tích GPA, điểm xét tuyển đại học và danh sách nguyện vọng
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3.5 p-3 rounded-xl bg-paper border border-border">
+              <div className="p-2 rounded-lg bg-gold-soft text-accent border border-gold">
+                <span className="material-symbols-outlined text-xl" aria-hidden="true">
+                  local_fire_department
+                </span>
+              </div>
+              <div>
+                <h3 className="text-foreground font-bold text-sm">Đấu Trường Bảng Vàng</h3>
+                <p className="text-secondary-text text-xs">
+                  Tích lũy giờ học, thăng bậc quân hàm từ Tân Binh đến Thống Soái
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Button
+            variant="primary"
+            icon="rocket_launch"
+            onClick={handleJoinNow}
+            className="w-full mb-4"
+          >
+            {user ? 'Khám Phá Kho Tài Liệu Ngay' : 'Đăng Nhập / Tham Gia Ngay'}
+          </Button>
+
+          <div className="w-full flex items-center justify-between pt-4 border-t border-border text-xs text-secondary-text">
+            <label className="flex items-center gap-2 cursor-pointer hover:text-foreground transition-colors select-none">
+              <input
+                type="checkbox"
+                checked={dontShowAgain}
+                onChange={(e) => setDontShowAgain(e.target.checked)}
+                className="rounded border-border-strong text-primary focus:ring-primary w-4 h-4 cursor-pointer accent-primary"
+              />
+              <span>Không hiển thị lại lần sau</span>
+            </label>
+
+            <button
+              type="button"
+              onClick={handleClose}
+              className="hover:text-foreground underline decoration-border-strong underline-offset-4 transition-colors cursor-pointer font-semibold"
+            >
+              Đóng
+            </button>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

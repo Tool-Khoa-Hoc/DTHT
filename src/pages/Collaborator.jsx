@@ -1,370 +1,626 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Navigate } from 'react-router-dom';
-import { assertSafeExternalUrl } from '../utils/urlSecurity';
-import { DOCUMENT_FIELDS, formatViDateTime, getDocumentUploadDate } from '../lib/documents';
-
-const CATEGORIES = [
-    { label: 'Toán', value: 'toan', icon: 'calculate', color: 'from-blue-500 to-indigo-600' },
-    { label: 'Vật Lý', value: 'ly', icon: 'experiment', color: 'from-amber-500 to-orange-600' },
-    { label: 'Hóa Học', value: 'hoa', icon: 'science', color: 'from-green-500 to-emerald-600' },
-    { label: 'Sinh Học', value: 'sinh', icon: 'biotech', color: 'from-teal-500 to-cyan-600' },
-    { label: 'Ngữ Văn', value: 'van', icon: 'menu_book', color: 'from-rose-500 to-pink-600' },
-    { label: 'Tiếng Anh', value: 'anh', icon: 'language', color: 'from-sky-500 to-blue-600' },
-    { label: 'Lịch Sử', value: 'su', icon: 'history_edu', color: 'from-yellow-600 to-amber-700' },
-    { label: 'Địa Lý', value: 'dia', icon: 'public', color: 'from-lime-500 to-green-600' },
-    { label: 'GDCD', value: 'gdcd', icon: 'gavel', color: 'from-purple-500 to-violet-600' },
-    { label: 'Tin Học', value: 'tin', icon: 'computer', color: 'from-cyan-500 to-sky-600' },
-    { label: 'Giải Tích', value: 'giai_tich', icon: 'functions', color: 'from-indigo-500 to-purple-600' },
-    { label: 'Lập Trình', value: 'lap_trinh', icon: 'code', color: 'from-slate-500 to-gray-600' },
-    { label: 'Kiến Trúc', value: 'kien_truc', icon: 'architecture', color: 'from-orange-500 to-red-500' },
-    { label: 'Kinh Tế', value: 'kinh_te', icon: 'trending_up', color: 'from-emerald-500 to-teal-600' },
-    { label: 'Khác', value: 'khac', icon: 'folder', color: 'from-gray-400 to-slate-500' },
-];
+import { DOCUMENT_SELECT_FIELDS } from '../lib/documents';
+import { Link } from 'react-router-dom';
+import RankSeal from '../components/ui/RankSeal';
 
 export default function Collaborator() {
-    const { user, profile } = useAuth();
-    const canManageDocuments = profile?.role === 'collaborator' || profile?.role === 'admin';
+  const { user, profile, isCollaborator } = useAuth();
+  const [activeTab, setActiveTab] = useState('library');
 
-    // Library Form State
-    const [docId, setDocId] = useState(null); // null means adding new
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [publishDate, setPublishDate] = useState('');
-    const [fileUrl, setFileUrl] = useState('');
-    const [authorName, setAuthorName] = useState('');
-    const [major, setMajor] = useState('');
-    const [category, setCategory] = useState('khac');
-    const [customCategory, setCustomCategory] = useState('');
-    const [educationLevel, setEducationLevel] = useState('thpt'); // 'thpt' | 'university'
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
+  const [documents, setDocuments] = useState([]);
+  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [docTitle, setDocTitle] = useState('');
+  const [docGrade, setDocGrade] = useState('Lớp 12');
+  const [docSubject, setDocSubject] = useState('Toán');
+  const [docCategory, setDocCategory] = useState('Đề thi thử');
+  const [uploadMode, setUploadMode] = useState('file');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [externalUrl, setExternalUrl] = useState('');
+  const [resourceLabel, setResourceLabel] = useState('Sheet / Link');
+  const [isUploading, setIsUploading] = useState(false);
 
-    // List State
-    const [documents, setDocuments] = useState([]);
-    const [loadingDocs, setLoadingDocs] = useState(true);
+  const [roadmaps, setRoadmaps] = useState([]);
+  const [selectedBlock, setSelectedBlock] = useState('Khối A00');
+  const [loadingRoadmap, setLoadingRoadmap] = useState(false);
+  const [newTaskInputs, setNewTaskInputs] = useState({});
 
-    const fetchMyDocuments = useCallback(async () => {
-        setLoadingDocs(true);
-        try {
-            if (!user) return;
-            // Only fetch documents uploaded by this user
-            const { data, error } = await supabase
-                .from('documents')
-                .select(DOCUMENT_FIELDS)
-                .eq('uploaded_by', user.id)
-                .order('uploaded_at', { ascending: false, nullsFirst: false })
-                .order('created_at', { ascending: false });
-            if (error) throw error;
-            setDocuments(data || []);
-        } catch (error) {
-            console.error('Error fetching documents', error);
-        } finally {
-            setLoadingDocs(false);
-        }
-    }, [user]);
+  useEffect(() => {
+    if (!isCollaborator) return;
+    if (activeTab === 'library') fetchDocuments();
+    if (activeTab === 'roadmap') fetchRoadmaps();
+  }, [activeTab, isCollaborator]);
 
-    useEffect(() => {
-        if (!canManageDocuments) return;
-        fetchMyDocuments();
-    }, [canManageDocuments, fetchMyDocuments]);
+  const fetchDocuments = async () => {
+    setLoadingDocs(true);
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .select(DOCUMENT_SELECT_FIELDS)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      if (data) setDocuments(data);
+    } catch (error) {
+      console.error('Lỗi tải tài liệu:', error.message);
+    } finally {
+      setLoadingDocs(false);
+    }
+  };
 
-    // Security Check: Kick out non-collaborators AND non-admins
-    if (!canManageDocuments) {
-        return <Navigate to="/home" />;
+  const handleUploadDocument = async (e) => {
+    e.preventDefault();
+    if (!docTitle.trim()) {
+      alert('Vui lòng nhập tên tài liệu!');
+      return;
     }
 
-    const handleLibrarySubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setMessage({ type: '', text: '' });
+    if (uploadMode === 'file' && !selectedFile) {
+      alert('Vui lòng chọn file PDF!');
+      return;
+    }
 
-        const finalCategory = category === 'khac' && customCategory.trim() !== '' ? customCategory.trim() : category;
+    if (uploadMode === 'link' && !externalUrl.trim()) {
+      alert('Vui lòng nhập link Google Sheet / Google Drive / tài liệu!');
+      return;
+    }
 
-        try {
-            const safeFileUrl = assertSafeExternalUrl(fileUrl);
+    setIsUploading(true);
+    try {
+      let finalUrl = '';
+      let finalFileName = '';
+      let finalFileSize = '';
 
-            if (docId) {
-                // Update existing document (RLS ensures they can only update their own)
-                const { error } = await supabase
-                    .from('documents')
-                    .update({
-                        title,
-                        description,
-                        file_url: safeFileUrl,
-                        author_name: authorName || profile?.display_name || 'Khuyết danh',
-                        category: educationLevel === 'university' ? (category || 'Chuyên ngành') : finalCategory,
-                        major: educationLevel === 'university' ? major : null,
-                        education_level: educationLevel,
-                        publish_date: publishDate || null
-                    })
-                    .eq('id', docId); // Note: uploaded_by = uid() is enforced by RLS
+      if (uploadMode === 'file') {
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+        const filePath = `${docGrade}/${docSubject}/${fileName}`;
 
-                if (error) throw error;
-                setMessage({ type: 'success', text: 'Tài liệu đã được cập nhật thành công!' });
-            } else {
-                // Insert new document
-                const { error } = await supabase
-                    .from('documents')
-                    .insert([
-                        {
-                            title,
-                            description,
-                            file_url: safeFileUrl,
-                            author_name: authorName || profile?.display_name || 'Khuyết danh',
-                            uploaded_by: user.id,
-                            is_public: true,
-                            category: educationLevel === 'university' ? (category || 'Chuyên ngành') : finalCategory,
-                            major: educationLevel === 'university' ? major : null,
-                            education_level: educationLevel,
-                            publish_date: publishDate || null
-                        }
-                    ]);
+        const { error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(filePath, selectedFile);
 
-                if (error) throw error;
-                setMessage({ type: 'success', text: 'Tài liệu đã được đăng tải thành công!' });
-            }
+        if (uploadError) throw uploadError;
 
-            // Reset form & refresh list
-            resetForm();
-            fetchMyDocuments();
-        } catch (error) {
-            console.error('Error saving document:', error);
-            setMessage({ type: 'error', text: 'Có lỗi xảy ra: ' + error.message });
-        } finally {
-            setLoading(false);
-            setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from('documents').getPublicUrl(filePath);
+
+        finalUrl = publicUrl;
+        finalFileName = selectedFile.name;
+        finalFileSize = (selectedFile.size / (1024 * 1024)).toFixed(2) + ' MB';
+      } else {
+        const normalizedUrl = externalUrl.trim();
+        if (!/^https?:\/\//i.test(normalizedUrl)) {
+          throw new Error('Link phải bắt đầu bằng http:// hoặc https://');
         }
-    };
+        finalUrl = normalizedUrl;
+        finalFileName = normalizedUrl;
+        finalFileSize = resourceLabel.trim() || 'Link ngoài';
+      }
 
-    const resetForm = () => {
-        setDocId(null);
-        setTitle('');
-        setDescription('');
-        setFileUrl('');
-        setAuthorName('');
-        setMajor('');
-        setCategory('khac');
-        setCustomCategory('');
-        setEducationLevel('thpt');
-        setPublishDate('');
-    };
+      const { error: dbError } = await supabase.from('documents').insert([
+        {
+          title: docTitle.trim(),
+          grade: docGrade,
+          subject: docSubject,
+          category: docCategory,
+          file_name: finalFileName,
+          file_size: finalFileSize,
+          file_url: finalUrl,
+          uploaded_by: user.id,
+        },
+      ]);
 
-    const handleEdit = (doc) => {
-        setDocId(doc.id);
-        setTitle(doc.title);
-        setDescription(doc.description || '');
-        setFileUrl(doc.file_url);
-        setAuthorName(doc.author_name || '');
-        
-        const isPredefined = CATEGORIES.some(c => c.value === doc.category);
-        if (!isPredefined && doc.category) {
-            setCategory('khac');
-            setCustomCategory(doc.category);
-        } else {
-            setCategory(doc.category || 'khac');
-            setCustomCategory('');
-        }
-        setMajor(doc.major || '');
-        setEducationLevel(doc.education_level || 'thpt');
-        setPublishDate(doc.publish_date || '');
+      if (dbError) throw dbError;
 
-        // Scroll to form automatically
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+      alert('Đã đăng tài liệu thành công!');
+      setDocTitle('');
+      setSelectedFile(null);
+      setExternalUrl('');
+      if (document.getElementById('collab-file-upload')) {
+        document.getElementById('collab-file-upload').value = '';
+      }
+      fetchDocuments();
+    } catch (error) {
+      alert('Lỗi khi đăng tài liệu: ' + error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Bạn có chắc chắn muốn xóa tài liệu này suy nghĩ kỹ nhé?")) return;
+  const handleDeleteDocument = async (id) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa tài liệu này?')) return;
+    try {
+      const { error } = await supabase.from('documents').delete().eq('id', id);
+      if (error) throw error;
+      setDocuments(documents.filter((doc) => doc.id !== id));
+    } catch (error) {
+      alert('Lỗi khi xóa: ' + error.message);
+    }
+  };
 
-        try {
-            const { error } = await supabase.from('documents').delete().eq('id', id);
-            if (error) throw error;
-            setDocuments(documents.filter(d => d.id !== id));
-            if (docId === id) resetForm(); // If deleting what is currently being edited
-        } catch (error) {
-            alert("Lỗi khi xóa tài liệu: " + error.message);
-        }
-    };
+  const fetchRoadmaps = async () => {
+    setLoadingRoadmap(true);
+    try {
+      const { data, error } = await supabase
+        .from('roadmaps')
+        .select(`
+          id, block_name, title, description,
+          roadmap_steps (
+            id, step_number, phase_title, timeframe, description,
+            roadmap_tasks ( id, task_title, is_custom )
+          )
+        `)
+        .order('block_name', { ascending: true });
 
+      if (error) throw error;
+      if (data) {
+        data.forEach((r) => {
+          if (r.roadmap_steps) {
+            r.roadmap_steps.sort((a, b) => a.step_number - b.step_number);
+          }
+        });
+        setRoadmaps(data);
+      }
+    } catch (error) {
+      console.error('Lỗi tải lộ trình:', error.message);
+    } finally {
+      setLoadingRoadmap(false);
+    }
+  };
+
+  const handleAddOfficialTask = async (stepId) => {
+    const taskTitle = newTaskInputs[stepId];
+    if (!taskTitle || !taskTitle.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('roadmap_tasks')
+        .insert([{ step_id: stepId, task_title: taskTitle.trim(), is_custom: false }]);
+
+      if (error) throw error;
+      setNewTaskInputs({ ...newTaskInputs, [stepId]: '' });
+      fetchRoadmaps();
+    } catch (error) {
+      alert('Lỗi thêm nhiệm vụ: ' + error.message);
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    if (!window.confirm('Xóa nhiệm vụ này khỏi lộ trình chuẩn?')) return;
+    try {
+      const { error } = await supabase.from('roadmap_tasks').delete().eq('id', taskId);
+      if (error) throw error;
+      fetchRoadmaps();
+    } catch (error) {
+      alert('Lỗi xóa nhiệm vụ: ' + error.message);
+    }
+  };
+
+  if (!isCollaborator) {
     return (
-        <div className="bg-[#f8f6f6] dark:bg-[#1a0f12] font-display text-slate-900 dark:text-white min-h-screen pb-24">
-            {/* Header */}
-            <header className="relative z-30 px-6 py-4 bg-white/50 dark:bg-[#201216]/80 backdrop-blur-md border-b border-[#10b981]/10 flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#10b981]/20 flex items-center justify-center text-[#10b981] shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-                        <span className="material-symbols-outlined">menu_book</span>
+      <div className="min-h-full flex flex-col items-center justify-center p-6 text-center bg-background">
+        <span className="material-symbols-outlined text-6xl text-primary mb-4" aria-hidden="true">
+          gpp_bad
+        </span>
+        <h1 className="text-2xl font-display font-bold text-foreground mb-2">
+          Khu Vực Dành Cho Cộng Tác Viên
+        </h1>
+        <p className="text-secondary-text max-w-md mb-6 text-sm">
+          Tài khoản của bạn chưa được cấp quyền Cộng tác viên hoặc Quản trị viên.
+        </p>
+        <Link to="/home" className="btn-arena btn-arena-primary btn-arena-sm">
+          Quay về Trang chủ
+        </Link>
+      </div>
+    );
+  }
+
+  const currentRoadmap = roadmaps.find((r) => r.block_name === selectedBlock);
+
+  return (
+    <div className="bg-background font-sans text-foreground min-h-full pb-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        {/* Header */}
+        <header className="imperial-frame p-5 sm:p-6 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-xl bg-jade-soft border border-jade-border flex items-center justify-center text-jade no-shrink">
+              <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+                group_add
+              </span>
+            </div>
+            <div>
+              <div className="mb-1">
+                <RankSeal size="sm" icon="verified_user" label="Ban Biên Tập Học Liệu" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-display font-extrabold tracking-tight text-foreground">
+                 Bàn Làm Việc Cộng Tác Viên
+              </h1>
+              <p className="text-xs text-secondary-text">
+                Xin chào {profile?.full_name || user?.email} • Đóng góp tài liệu &amp; lộ trình học tập
+              </p>
+            </div>
+          </div>
+
+          <Link to="/profile" className="btn-arena btn-arena-secondary btn-arena-sm">
+            <span className="material-symbols-outlined text-sm" aria-hidden="true">
+              person
+            </span>
+            Hồ sơ của tôi
+          </Link>
+        </header>
+
+        {/* Navigation Tabs */}
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-6 border-b border-border">
+          <button
+            type="button"
+            onClick={() => setActiveTab('library')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-display font-bold text-sm transition-all whitespace-nowrap cursor-pointer ${
+              activeTab === 'library'
+                ? 'bg-primary text-on-primary shadow-xs'
+                : 'text-secondary-text hover:bg-surface-alt hover:text-foreground'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+              folder_open
+            </span>
+            Đăng &amp; Quản lý Tài liệu Free
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('roadmap')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-display font-bold text-sm transition-all whitespace-nowrap cursor-pointer ${
+              activeTab === 'roadmap'
+                ? 'bg-primary text-on-primary shadow-xs'
+                : 'text-secondary-text hover:bg-surface-alt hover:text-foreground'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+              timeline
+            </span>
+            Cập nhật Lộ trình Học
+          </button>
+        </div>
+
+        <main>
+          {activeTab === 'library' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Cột trái: Form Upload */}
+              <div className="lg:col-span-1">
+                <form
+                  onSubmit={handleUploadDocument}
+                  className="paper-card p-5 space-y-4 sticky top-6"
+                >
+                  <h2 className="font-display font-bold text-base text-foreground flex items-center gap-2 border-b border-border pb-3">
+                    <span className="material-symbols-outlined text-primary" aria-hidden="true">
+                      cloud_upload
+                    </span>
+                    Đăng tài liệu mới
+                  </h2>
+
+                  <div className="grid grid-cols-2 gap-1.5 p-1 bg-surface-alt rounded-xl border border-border">
+                    <button
+                      type="button"
+                      onClick={() => setUploadMode('file')}
+                      className={`py-2 rounded-lg text-xs font-display font-bold transition-all cursor-pointer ${
+                        uploadMode === 'file'
+                          ? 'bg-primary text-white'
+                          : 'text-secondary-text hover:text-foreground'
+                      }`}
+                    >
+                      Tải file PDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUploadMode('link')}
+                      className={`py-2 rounded-lg text-xs font-display font-bold transition-all cursor-pointer ${
+                        uploadMode === 'link'
+                          ? 'bg-primary text-white'
+                          : 'text-secondary-text hover:text-foreground'
+                      }`}
+                    >
+                      Dán link Sheet / Drive
+                    </button>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1">
+                      Tên tài liệu / Đề thi
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="VD: Tổng hợp đề thi thử Toán 2027..."
+                      value={docTitle}
+                      onChange={(e) => setDocTitle(e.target.value)}
+                      className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-foreground mb-1">
+                        Khối lớp
+                      </label>
+                      <select
+                        value={docGrade}
+                        onChange={(e) => setDocGrade(e.target.value)}
+                        className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                      >
+                        <option value="Lớp 10">Lớp 10</option>
+                        <option value="Lớp 11">Lớp 11</option>
+                        <option value="Lớp 12">Lớp 12</option>
+                      </select>
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-[#10b981]">Truyền Đạo Sư</h1>
-                        <p className="text-xs text-slate-500 font-medium">Khu vực đăng tải tài liệu bí kíp</p>
+                      <label className="block text-xs font-bold text-foreground mb-1">
+                        Môn học
+                      </label>
+                      <select
+                        value={docSubject}
+                        onChange={(e) => setDocSubject(e.target.value)}
+                        className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                      >
+                        <option value="Toán">Toán</option>
+                        <option value="Vật Lý">Vật Lý</option>
+                        <option value="Hóa Học">Hóa Học</option>
+                        <option value="Sinh Học">Sinh Học</option>
+                        <option value="Tiếng Anh">Tiếng Anh</option>
+                        <option value="Ngữ Văn">Ngữ Văn</option>
+                      </select>
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1">
+                      Thể loại
+                    </label>
+                    <select
+                      value={docCategory}
+                      onChange={(e) => setDocCategory(e.target.value)}
+                      className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                    >
+                      <option value="Đề thi thử">Đề thi thử</option>
+                      <option value="Tóm tắt lý thuyết">Tóm tắt lý thuyết</option>
+                      <option value="Sơ đồ tư duy">Sơ đồ tư duy</option>
+                      <option value="Chuyên đề nâng cao">Chuyên đề nâng cao</option>
+                      <option value="Kho khóa học / Sheet">Kho khóa học / Sheet</option>
+                    </select>
+                  </div>
+
+                  {uploadMode === 'file' ? (
+                    <div>
+                      <label className="block text-xs font-bold text-foreground mb-1">
+                        Chọn File (PDF, Word...)
+                      </label>
+                      <input
+                        id="collab-file-upload"
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        onChange={(e) => setSelectedFile(e.target.files[0])}
+                        className="w-full text-xs text-secondary-text file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary-soft file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <div>
+                        <label className="block text-xs font-bold text-foreground mb-1">
+                          Link Google Sheet / Google Drive / Facebook
+                        </label>
+                        <input
+                          type="url"
+                          required
+                          placeholder="https://docs.google.com/spreadsheets/..."
+                          value={externalUrl}
+                          onChange={(e) => setExternalUrl(e.target.value)}
+                          className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-foreground mb-1">
+                          Nhãn hiển thị nguồn
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="VD: Google Sheet / Folder Drive / Tổng hợp"
+                          value={resourceLabel}
+                          onChange={(e) => setResourceLabel(e.target.value)}
+                          className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isUploading}
+                    className="btn-arena btn-arena-primary w-full"
+                  >
+                    <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                      {isUploading ? 'hourglass_empty' : 'upload_file'}
+                    </span>
+                    {isUploading ? 'Đang tải lên...' : 'Đăng lên Thư viện'}
+                  </button>
+                </form>
+              </div>
+
+              {/* Cột phải: Danh sách tài liệu */}
+              <div className="lg:col-span-2 paper-card p-5">
+                <h2 className="font-display font-bold text-base text-foreground mb-4">
+                  Danh sách tài liệu trong kho ({documents.length})
+                </h2>
+
+                {loadingDocs ? (
+                  <div className="flex justify-center py-12">
+                    <span
+                      className="material-symbols-outlined animate-spin text-3xl text-primary"
+                      aria-hidden="true"
+                    >
+                      sync
+                    </span>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
+                    {documents.map((doc) => (
+                      <div
+                        key={doc.id}
+                        className="flex items-center justify-between p-3 rounded-xl bg-paper border border-border hover:border-border-strong transition-all"
+                      >
+                        <div className="min-w-0 flex-1 pr-4">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-primary-soft text-primary border border-primary/30">
+                              {doc.grade}
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-surface-alt text-secondary-text border border-border">
+                              {doc.subject}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {doc.file_size}
+                            </span>
+                          </div>
+                          <a
+                            href={doc.file_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-sm font-bold text-foreground hover:text-primary truncate block"
+                          >
+                            {doc.title}
+                          </a>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteDocument(doc.id)}
+                          aria-label="Xóa tài liệu"
+                          className="p-2 text-muted-foreground hover:text-primary hover:bg-primary-soft rounded-lg transition-colors no-shrink cursor-pointer"
+                          title="Xóa tài liệu"
+                        >
+                          <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                            delete
+                          </span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'roadmap' && (
+            <div className="space-y-6">
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {['Khối A00', 'Khối A01', 'Khối B00', 'Khối C00', 'Khối D01', 'Đánh giá năng lực'].map(
+                  (block) => (
+                    <button
+                      key={block}
+                      type="button"
+                      onClick={() => setSelectedBlock(block)}
+                      className={`px-4 py-2 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all border cursor-pointer ${
+                        selectedBlock === block
+                          ? 'bg-primary text-white border-primary'
+                          : 'bg-surface border-border text-secondary-text hover:text-foreground'
+                      }`}
+                    >
+                      {block}
+                    </button>
+                  ),
+                )}
+              </div>
+
+              {loadingRoadmap ? (
+                <div className="flex justify-center py-12">
+                  <span
+                    className="material-symbols-outlined animate-spin text-3xl text-primary"
+                    aria-hidden="true"
+                  >
+                    sync
+                  </span>
                 </div>
-            </header>
-
-            <main className="w-full max-w-3xl mx-auto px-4 pt-8">
-                <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-xl border-t-4 border-t-[#10b981]">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-bold flex items-center gap-2 text-[#10b981]">
-                            <span className="material-symbols-outlined">{docId ? 'edit_document' : 'upload_file'}</span>
-                            {docId ? 'Cập nhật tài liệu' : 'Chia sẻ tài liệu mới'}
-                        </h2>
-                        {docId && (
-                            <button onClick={resetForm} className="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
-                                <span className="material-symbols-outlined text-[14px]">close</span> Hủy sửa
-                            </button>
-                        )}
-                    </div>
-
-                    {message.text && (
-                        <div className={`p-4 rounded-xl mb-6 text-sm font-medium ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'}`}>
-                            {message.text}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleLibrarySubmit} className="space-y-5">
-                        <div>
-                            <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Tiêu đề tài liệu / Khóa học <span className="text-red-500">*</span></label>
-                            <input required value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" placeholder="VD: Khóa học Lập trình Web Cơ bản" />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Mô tả ngắn</label>
-                            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows="3" className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white resize-none" placeholder="Nhập nội dung mô tả..."></textarea>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Tên tác giả</label>
-                            <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" placeholder={`Mặc định hiển thị: ${profile?.display_name || 'Khuyết danh'}`} />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Ngày - tháng - năm <span className="text-slate-400 font-normal">(Tùy chọn)</span></label>
-                            <input type="date" value={publishDate} onChange={(e) => setPublishDate(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white dark:[color-scheme:dark]" />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">Phân loại cấp học <span className="text-red-500">*</span></label>
-                            <div className="flex gap-4">
-                                <label className="flex-1 cursor-pointer">
-                                    <input type="radio" name="collabEduLevel" value="thpt" checked={educationLevel === 'thpt'} onChange={(e) => setEducationLevel(e.target.value)} className="hidden peer" />
-                                    <div className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all font-semibold peer-checked:border-[#10b981] peer-checked:bg-[#10b981]/10 peer-checked:text-[#10b981] border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:border-[#10b981]/50">
-                                        <span className="material-symbols-outlined text-[20px]">menu_book</span> THPT Quốc Gia
-                                    </div>
-                                </label>
-                                <label className="flex-1 cursor-pointer">
-                                    <input type="radio" name="collabEduLevel" value="university" checked={educationLevel === 'university'} onChange={(e) => setEducationLevel(e.target.value)} className="hidden peer" />
-                                    <div className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all font-semibold peer-checked:border-[#10b981] peer-checked:bg-[#10b981]/10 peer-checked:text-[#10b981] border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:border-[#10b981]/50">
-                                        <span className="material-symbols-outlined text-[20px]">school</span> Đại Học
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        {educationLevel === 'university' && (
-                            <div>
-                                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Trường / Ngành học <span className="text-red-500">*</span></label>
-                                <input required value={major} onChange={(e) => setMajor(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" placeholder="VD: ĐH Bách Khoa, CNTT, Y Dược..." />
-                            </div>
-                        )}
-
-                        <div>
-                            <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">{educationLevel === 'university' ? 'Tên Môn học / Học phần ' : 'Danh mục / Môn học '}<span className="text-red-500">*</span></label>
-                            {educationLevel === 'university' ? (
-                                <input required value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" placeholder="VD: Giải tích 1, Toán cao cấp..." />
-                            ) : (
-                                <>
-                                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                                        {CATEGORIES.map(cat => (
-                                            <button key={cat.value} type="button" onClick={() => setCategory(cat.value)} className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all text-xs font-semibold ${category === cat.value ? 'border-[#10b981] bg-[#10b981]/10 text-[#10b981]' : 'border-slate-200 dark:border-white/8 bg-slate-50 dark:bg-white/3 text-slate-500 dark:text-slate-400 hover:border-[#10b981]/40 hover:text-[#10b981]'}`}>
-                                                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center`}><span className="material-symbols-outlined text-white text-base">{cat.icon}</span></div>
-                                                {cat.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                    {category === 'khac' && (
-                                        <div className="mt-3">
-                                            <input 
-                                                value={customCategory} 
-                                                onChange={(e) => setCustomCategory(e.target.value)} 
-                                                className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-[#10b981]/50 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" 
-                                                placeholder="Nhập tên môn học / danh mục khác..." 
-                                            />
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Link Google Drive / Video / Tài liệu <span className="text-red-500">*</span></label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none"><span className="material-symbols-outlined text-slate-400">link</span></div>
-                                <input required type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all text-slate-900 dark:text-white" placeholder="https://drive.google.com/..." />
-                            </div>
-                        </div>
-
-                        <div className="pt-4">
-                            <button type="submit" disabled={loading} className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:scale-100 flex items-center justify-center gap-2">
-                                {loading ? <span className="material-symbols-outlined animate-spin">sync</span> : <span className="material-symbols-outlined">{docId ? 'save' : 'cloud_upload'}</span>}
-                                {loading ? 'Đang xử lý...' : (docId ? 'Cập nhật tài liệu' : 'Đăng tải tài liệu')}
-                            </button>
-                        </div>
-                    </form>
-
-                    {/* List of My Documents */}
-                    <div className="mt-12">
-                        <h3 className="text-md font-bold mb-4 flex items-center gap-2 border-t border-slate-200 dark:border-white/10 pt-8">
-                            <span className="material-symbols-outlined text-emerald-500">inventory_2</span>
-                            Tài liệu của tôi
+              ) : currentRoadmap ? (
+                <div className="space-y-6">
+                  {currentRoadmap.roadmap_steps?.map((step) => (
+                    <div key={step.id} className="paper-card p-5 space-y-4">
+                      <div className="border-b border-border pb-3">
+                        <span className="text-[10px] font-bold text-gold-dark uppercase tracking-wider bg-gold-soft border border-gold px-2 py-0.5 rounded">
+                          {step.timeframe}
+                        </span>
+                        <h3 className="text-lg font-display font-bold text-foreground mt-1">
+                          {step.phase_title}
                         </h3>
+                        <p className="text-xs text-secondary-text">{step.description}</p>
+                      </div>
 
-                        {loadingDocs ? (
-                            <div className="flex justify-center py-8"><span className="material-symbols-outlined animate-spin text-[#10b981]">sync</span></div>
-                        ) : documents.length === 0 ? (
-                            <p className="text-center text-sm text-slate-500 italic py-8 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl bg-slate-50/50 dark:bg-white/5">Bạn chưa đăng tải bí kíp nào.</p>
-                        ) : (
-                            <div className="space-y-3">
-                                {documents.map(doc => {
-                                    const catInfo = CATEGORIES.find(c => c.value === doc.category) || CATEGORIES[CATEGORIES.length - 1];
-                                    return (
-                                        <div key={doc.id} className="flex flex-col sm:flex-row gap-4 p-4 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 hover:border-[#10b981]/30 transition-all group">
-                                            <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${doc.is_featured ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
-                                                        {doc.is_featured ? 'Nổi bật' : (catInfo?.label || doc.category)}
-                                                    </span>
-                                                    <h4 className="font-bold text-sm truncate text-emerald-600 dark:text-emerald-400" title={doc.title}>{doc.title}</h4>
-                                                </div>
-                                                <p className="text-xs text-slate-500 truncate">{doc.description || 'Không có mô tả'}</p>
-                                                <p className="mt-1 text-[11px] text-slate-400">
-                                                    Up lúc: {formatViDateTime(getDocumentUploadDate(doc)) || 'Chưa rõ'}
-                                                </p>
-                                            </div>
-                                            <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 border-slate-200 dark:border-white/10 pt-3 sm:pt-0">
-                                                <button
-                                                    onClick={() => handleEdit(doc)}
-                                                    title="Sửa"
-                                                    className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#10b981]/10 hover:text-[#10b981] flex items-center justify-center transition-colors"
-                                                >
-                                                    <span className="material-symbols-outlined text-[18px]">edit</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(doc.id)}
-                                                    title="Xóa"
-                                                    className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-red-500/10 hover:text-red-500 flex items-center justify-center transition-colors"
-                                                >
-                                                    <span className="material-symbols-outlined text-[18px]">delete</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                      <div className="space-y-2">
+                        {step.roadmap_tasks?.map((task) => (
+                          <div
+                            key={task.id}
+                            className="flex items-center justify-between p-2.5 rounded-xl bg-paper border border-border"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="material-symbols-outlined text-jade text-sm"
+                                aria-hidden="true"
+                              >
+                                check_circle
+                              </span>
+                              <span className="text-sm text-foreground">{task.task_title}</span>
+                              {task.is_custom && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-gold-soft text-gold-dark border border-gold">
+                                  Bổ sung
+                                </span>
+                              )}
                             </div>
-                        )}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteTask(task.id)}
+                              aria-label="Xoá nhiệm vụ"
+                              className="text-muted-foreground hover:text-primary p-1 cursor-pointer"
+                            >
+                              <span className="material-symbols-outlined text-base" aria-hidden="true">
+                                close
+                              </span>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-2 pt-2">
+                        <input
+                          type="text"
+                          placeholder="Thêm nhiệm vụ chuẩn mới vào giai đoạn này..."
+                          value={newTaskInputs[step.id] || ''}
+                          onChange={(e) =>
+                            setNewTaskInputs({ ...newTaskInputs, [step.id]: e.target.value })
+                          }
+                          onKeyDown={(e) =>
+                            e.key === 'Enter' && handleAddOfficialTask(step.id)
+                          }
+                          className="flex-1 px-3.5 py-2 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleAddOfficialTask(step.id)}
+                          className="btn-arena btn-arena-primary btn-arena-sm"
+                        >
+                          <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                            add
+                          </span>
+                          Thêm
+                        </button>
+                      </div>
                     </div>
+                  ))}
                 </div>
-            </main>
-        </div>
-    );
+              ) : (
+                <div className="p-8 text-center text-secondary-text paper-card">
+                  Chưa có dữ liệu lộ trình cho khối này.
+                </div>
+              )}
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
 }

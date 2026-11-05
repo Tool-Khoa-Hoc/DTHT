@@ -1,50 +1,66 @@
 import React from 'react';
 
 class ErrorBoundary extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { hasError: false, error: null };
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    this.setState({
+      error,
+      errorInfo,
+    });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-dvh bg-background text-foreground p-6 flex flex-col items-center justify-center font-sans">
+          <div className="max-w-2xl w-full imperial-frame p-6 sm:p-8">
+            <div className="flex items-center gap-3 text-primary mb-4">
+              <span className="material-symbols-outlined text-4xl" aria-hidden="true">
+                error
+              </span>
+              <h1 className="text-2xl font-display font-bold text-foreground">
+                Đã xảy ra lỗi hiển thị giao diện
+              </h1>
+            </div>
+            <p className="text-secondary-text mb-4 text-sm leading-relaxed">
+              Vui lòng tải lại trang hoặc báo lại thông tin bên dưới cho ban quản trị:
+            </p>
+            <div className="bg-surface-alt p-4 rounded-xl overflow-auto max-h-96 border border-border mb-6">
+              <p className="text-primary font-mono text-sm font-bold mb-2">
+                {this.state.error && this.state.error.toString()}
+              </p>
+              <pre className="text-secondary-text font-mono text-xs whitespace-pre-wrap">
+                {this.state.errorInfo && this.state.errorInfo.componentStack}
+              </pre>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = '/home';
+              }}
+              className="btn-arena btn-arena-primary"
+            >
+              <span className="material-symbols-outlined text-base" aria-hidden="true">
+                refresh
+              </span>
+              Tải lại trang chủ
+            </button>
+          </div>
+        </div>
+      );
     }
 
-    static getDerivedStateFromError(error) {
-        return { hasError: true, error };
-    }
-
-    componentDidCatch(error, errorInfo) {
-        console.error("UI Error Caught by Boundary:", error, errorInfo);
-    }
-
-    render() {
-        if (this.state.hasError) {
-            return (
-                <div className="min-h-screen font-display bg-[#0a0c14] text-white flex items-center justify-center p-6">
-                    <div className="max-w-md w-full text-center space-y-6">
-                        <div className="w-24 h-24 bg-red-500/10 text-red-400 rounded-3xl flex items-center justify-center mx-auto border border-red-500/20 shadow-xl">
-                            <span className="material-symbols-outlined text-5xl">warning</span>
-                        </div>
-                        <h1 className="text-3xl font-black">Ôi hỏng rồi!</h1>
-                        <p className="text-slate-400 text-sm leading-relaxed">
-                            Có vẻ như trang web vừa gặp một sự cố không lường trước được. Mong cậu thông cảm nhé! Nhấn nút tải lại để làm mới giao diện.
-                        </p>
-                        <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-left overflow-hidden">
-                            <p className="font-mono text-xs text-red-300 break-words opacity-80" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                                {this.state.error?.toString() || 'Unknown React render error'}
-                            </p>
-                        </div>
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="bg-[#3b82f6] text-white py-3 px-8 rounded-xl font-bold hover:bg-[#2563eb] transition-colors shadow-lg shadow-[#3b82f6]/30 flex items-center justify-center gap-2 mx-auto"
-                        >
-                            <span className="material-symbols-outlined text-[20px]">refresh</span>
-                            Thử tải lại trang
-                        </button>
-                    </div>
-                </div>
-            );
-        }
-
-        return this.props.children;
-    }
+    return this.props.children;
+  }
 }
 
 export default ErrorBoundary;

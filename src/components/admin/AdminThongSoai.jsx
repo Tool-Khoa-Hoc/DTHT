@@ -1,112 +1,149 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../lib/supabase';
+﻿import React from 'react';
+import Avatar from '../Avatar';
 
-const ADMIN_USER_DIRECTORY_SELECT_LIMIT = 200;
-
-export default function AdminThongSoai({ isActive }) {
-  const [candidates, setCandidates] = useState([]);
-  const [loadingCandidates, setLoadingCandidates] = useState(false);
-
-  const adminUserDirectory = useCallback(async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
-    const { data, error } = await supabase.rpc('admin_user_directory', {
-      p_search: search, p_role: role, p_ids: ids, p_limit: limit,
-    });
-    if (error) throw error;
-    return Array.isArray(data) ? data : [];
-  }, []);
-
-  const fetchCandidates = useCallback(async () => {
-    setLoadingCandidates(true);
-    try {
-      const { data: camps } = await supabase.from('campaigns').select('user_id').eq('is_completed', true);
-      if (camps) {
-        const counts = {};
-        camps.forEach(c => Object.assign(counts, { [c.user_id]: (counts[c.user_id] || 0) + 1 }));
-
-        const eligibleIds = Object.keys(counts).filter(id => counts[id] >= 50);
-
-        if (eligibleIds.length > 0) {
-          const profiles = await adminUserDirectory({
-            ids: eligibleIds,
-            limit: Math.min(eligibleIds.length, ADMIN_USER_DIRECTORY_SELECT_LIMIT),
-          });
-
-          if (profiles.length > 0) {
-            setCandidates(
-              profiles
-                .map(candidate => ({ ...candidate, completedCount: counts[candidate.id] || 0 }))
-                .sort((a, b) => b.completedCount - a.completedCount)
-            );
-          }
-        } else {
-          setCandidates([]);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingCandidates(false);
-    }
-  }, [adminUserDirectory]);
-
-  useEffect(() => {
-    if (isActive) {
-      fetchCandidates();
-    }
-  }, [isActive, fetchCandidates]);
-
-  const approveBangChu = async (userId, currentStatus) => {
-    try {
-      const { error } = await supabase.from('profiles').update({ is_approved_bang_chu: !currentStatus }).eq('id', userId);
-      if (error) throw error;
-      setCandidates(candidates.map(c => c.id === userId ? { ...c, is_approved_bang_chu: !currentStatus } : c));
-    } catch (err) {
-      alert('Lỗi: ' + err.message);
-    }
-  };
-
-  if (!isActive) return null;
+export default function AdminThongSoai({
+  usersList,
+  thongSoaiEmail,
+  setThongSoaiEmail,
+  isGrantingThongSoai,
+  onGrantByEmail,
+  onToggleThongSoai,
+}) {
+  const thongSoaiUsers = usersList.filter(
+    (u) => u.is_thong_soai || (u.total_study_minutes || 0) >= 4500,
+  );
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-xl">
-        <h2 className="text-base font-black text-rose-500 mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px]">verified</span> Danh sách Ứng Cử Viên (≥ 50 khóa)
-        </h2>
-        {loadingCandidates ? (
-          <div className="flex justify-center p-8"><span className="material-symbols-outlined animate-spin text-rose-500">sync</span></div>
-        ) : candidates.length === 0 ? (
-          <div className="text-center p-8 border border-dashed border-slate-200 dark:border-white/10 rounded-xl">
-            <span className="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600 mb-2">inbox</span>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Chưa có user nào đạt điều kiện đủ 50 khóa học.</p>
+      <div className="paper-card p-6 relative overflow-hidden">
+        <span
+          aria-hidden="true"
+          className="hanzi-watermark absolute top-2 right-5 text-7xl font-bold text-primary/8"
+        >
+          統帥
+        </span>
+
+        <div className="relative z-10 flex items-center gap-3.5 mb-3">
+          <div className="w-12 h-12 rounded-2xl bg-primary-soft border border-primary/35 flex items-center justify-center text-primary no-shrink">
+            <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+              emoji_events
+            </span>
           </div>
-        ) : (
-          <div className="grid gap-3 max-h-[500px] overflow-y-auto">
-            {candidates.map(c => (
-              <div key={c.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
-                <div className="min-w-0">
-                  <p className="font-bold text-slate-900 dark:text-white truncate">{c.display_name || c.full_name || c.email || c.id}</p>
-                  <div className="flex items-center gap-4 mt-2">
-                    <span className="text-xs bg-rose-500/10 text-rose-600 dark:text-rose-400 px-2.5 py-1 rounded-full font-bold border border-rose-500/20">
-                      {c.completedCount} khóa
+          <div>
+            <h2 className="font-display font-bold text-lg text-foreground">
+              Sắc Phong Danh Hiệu &ldquo;Thống Soái&rdquo; Đặc Cách
+            </h2>
+            <p className="text-xs text-secondary-text">
+              Cấp trực tiếp danh hiệu cao quý nhất Đấu Trường cho tài khoản mà không cần đủ 4.500 phút học.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={onGrantByEmail} className="relative z-10 flex flex-col sm:flex-row gap-3 mt-4">
+          <div className="relative flex-1">
+            <span
+              className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"
+              aria-hidden="true"
+            >
+              mail
+            </span>
+            <input
+              type="email"
+              required
+              placeholder="Nhập email tài khoản muốn phong hàm Thống Soái..."
+              value={thongSoaiEmail}
+              onChange={(e) => setThongSoaiEmail(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isGrantingThongSoai}
+            className="btn-arena btn-arena-primary btn-arena-sm no-shrink"
+          >
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">
+              military_tech
+            </span>
+            {isGrantingThongSoai ? 'Đang sắc phong...' : 'Phong Hàm Thống Soái'}
+          </button>
+        </form>
+      </div>
+
+      {/* Danh sách các Thống Soái hiện tại */}
+      <div className="paper-card overflow-hidden">
+        <div className="p-5 border-b border-border flex items-center justify-between bg-paper">
+          <div>
+            <h3 className="font-display font-bold text-base text-foreground flex items-center gap-2">
+              <span className="material-symbols-outlined text-accent" aria-hidden="true">
+                workspace_premium
+              </span>
+              Danh sách các Thống Soái hiện tại ({thongSoaiUsers.length})
+            </h3>
+            <p className="text-xs text-secondary-text mt-0.5">
+              Bao gồm cả chiến binh được Admin đặc cách và chiến binh tự cày đủ 4.500 phút
+            </p>
+          </div>
+        </div>
+
+        <div className="divide-y divide-border">
+          {thongSoaiUsers.map((u) => (
+            <div
+              key={u.id}
+              className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-alt transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar
+                  src={u.avatar_url}
+                  name={u.full_name || u.email}
+                  className="w-11 h-11 border border-gold"
+                  textSize="text-base"
+                />
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-display font-bold text-foreground text-sm">
+                      {u.full_name || 'Chưa đặt tên'}
+                    </p>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-soft text-primary border border-primary/35">
+                      <span className="material-symbols-outlined text-[12px]" aria-hidden="true">
+                        emoji_events
+                      </span>
+                      Thống Soái
                     </span>
-                    <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${c.is_approved_bang_chu ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20' : 'bg-slate-500/10 text-slate-500 dark:text-slate-400 border-slate-500/20'}`}>
-                      {c.is_approved_bang_chu ? 'Đã duyệt Bảng Chủ' : 'Chưa duyệt'}
-                    </span>
+                    {u.is_thong_soai && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gold-soft text-gold-dark border border-gold">
+                        Đặc cách Admin
+                      </span>
+                    )}
                   </div>
-                </div>
-                <div className="shrink-0 flex items-center gap-2">
-                  <button
-                    onClick={() => approveBangChu(c.id, c.is_approved_bang_chu)}
-                    className={`px-4 py-2 text-xs font-black rounded-xl transition-all ${c.is_approved_bang_chu ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500/20' : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30 hover:scale-[1.02]'}`}
-                  >
-                    {c.is_approved_bang_chu ? 'Hủy Duyệt' : 'Duyệt Bảng Chủ'}
-                  </button>
+                  <p className="text-xs text-secondary-text mt-0.5 tabular">
+                    {u.email || 'Chưa đồng bộ email'} • Tích lũy: {u.total_study_minutes || 0} phút
+                  </p>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+
+              <button
+                type="button"
+                onClick={() => onToggleThongSoai(u.id, u.is_thong_soai, u.full_name || u.email)}
+                className={`self-start sm:self-auto px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 cursor-pointer ${
+                  u.is_thong_soai
+                    ? 'bg-primary-soft text-primary border-primary/30 hover:bg-primary hover:text-white'
+                    : 'bg-gold-soft text-gold-dark border-gold hover:bg-gold/30'
+                }`}
+              >
+                <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                  {u.is_thong_soai ? 'remove_moderator' : 'add_moderator'}
+                </span>
+                {u.is_thong_soai ? 'Gỡ đặc cách' : 'Bật đặc cách cố định'}
+              </button>
+            </div>
+          ))}
+
+          {thongSoaiUsers.length === 0 && (
+            <div className="p-8 text-center text-secondary-text text-sm">
+              Chưa có chiến binh nào đạt cấp Thống Soái.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

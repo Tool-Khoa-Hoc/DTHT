@@ -21,15 +21,15 @@ export function minExpForLevel(level) {
   return 50 * l * (l - 1);
 }
 
+/** Alias kept for compatibility */
+export function getExpRequiredForNext(level) {
+  const l = Math.max(1, Math.floor(level));
+  return minExpForLevel(l + 1) - minExpForLevel(l);
+}
+
 /**
  * Resolve a lifetime EXP total into rich level info for the UI.
  * @param {number} exp lifetime EXP
- * @returns {{
- *   level:number, exp:number,
- *   currentLevelMinExp:number, nextLevelMinExp:number,
- *   expForThisLevel:number, expIntoLevel:number, expToNext:number,
- *   progressPct:number
- * }}
  */
 export function getLevelFromExp(exp) {
   const safeExp = Math.max(0, Math.floor(Number(exp) || 0));
@@ -40,33 +40,69 @@ export function getLevelFromExp(exp) {
   const expForThisLevel = nextLevelMinExp - currentLevelMinExp; // == 100 * level
   const expIntoLevel = safeExp - currentLevelMinExp;
   const expToNext = Math.max(0, nextLevelMinExp - safeExp);
-  const progressPct = expForThisLevel > 0
-    ? Math.min(100, Math.max(0, Math.round((expIntoLevel / expForThisLevel) * 100)))
-    : 0;
+  const progressPct =
+    expForThisLevel > 0
+      ? Math.min(100, Math.max(0, Math.round((expIntoLevel / expForThisLevel) * 100)))
+      : 0;
 
   return {
     level,
     exp: safeExp,
+    totalExp: safeExp,
     currentLevelMinExp,
     nextLevelMinExp,
     expForThisLevel,
+    expForNext: expForThisLevel,
     expIntoLevel,
+    expInLevel: expIntoLevel,
     expToNext,
     progressPct,
   };
 }
 
 /**
- * Visual accent for a level, intensifying as the number climbs. Uses only
- * the arena design tokens (jade → gold → ember → violet).
+ * Visual accent for a level in Trung Hoa Sáng light tokens.
  */
 export function getLevelAccent(level) {
   const l = Math.floor(level) || 1;
-  if (l >= 50) return { text: 'text-violet-400', ring: 'ring-violet-500/45', bar: 'from-violet-500 to-ember-500', glow: '139,92,246' };
-  if (l >= 30) return { text: 'text-ember-400', ring: 'ring-ember-500/45', bar: 'from-ember-500 to-gold-400', glow: '227,100,136' };
-  if (l >= 15) return { text: 'text-gold-300', ring: 'ring-gold-400/45', bar: 'from-gold-400 to-ember-400', glow: '242,193,89' };
-  if (l >= 5) return { text: 'text-jade-300', ring: 'ring-jade-400/45', bar: 'from-jade-400 to-gold-400', glow: '95,207,166' };
-  return { text: 'text-slate-200', ring: 'ring-slate-400/35', bar: 'from-slate-400 to-jade-400', glow: '148,163,184' };
+  if (l >= 50) {
+    return {
+      text: 'text-primary',
+      ring: 'ring-primary/40',
+      badge: 'bg-primary-soft text-primary border-primary/35',
+      bar: 'from-primary to-accent',
+    };
+  }
+  if (l >= 30) {
+    return {
+      text: 'text-accent',
+      ring: 'ring-accent/45',
+      badge: 'bg-gold-soft text-gold-dark border-gold/45',
+      bar: 'from-accent to-gold',
+    };
+  }
+  if (l >= 15) {
+    return {
+      text: 'text-jade',
+      ring: 'ring-jade/40',
+      badge: 'bg-jade-soft text-jade border-jade/35',
+      bar: 'from-jade to-completed',
+    };
+  }
+  if (l >= 5) {
+    return {
+      text: 'text-sky-700',
+      ring: 'ring-sky-300',
+      badge: 'bg-sky-50 text-sky-800 border-sky-300',
+      bar: 'from-sky-600 to-jade',
+    };
+  }
+  return {
+    text: 'text-secondary-text',
+    ring: 'ring-border-strong',
+    badge: 'bg-surface-alt text-secondary-text border-border',
+    bar: 'from-secondary-text to-foreground',
+  };
 }
 
 /** Humanise a study-time total in seconds → e.g. "12 giờ 30 phút". */

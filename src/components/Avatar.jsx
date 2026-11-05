@@ -1,75 +1,57 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
-const COLORS = [
-  'bg-blue-500', 
-  'bg-purple-500', 
-  'bg-emerald-500', 
-  'bg-rose-500', 
-  'bg-amber-500', 
-  'bg-indigo-500', 
-  'bg-cyan-500', 
-  'bg-pink-500'
+const AVATAR_TONES = [
+  'bg-primary text-white border-gold',
+  'bg-jade text-white border-jade-border',
+  'bg-accent text-white border-gold',
+  'bg-sky-700 text-white border-sky-300',
+  'bg-indigo-700 text-white border-indigo-300',
+  'bg-emerald-700 text-white border-emerald-300',
 ];
 
-/**
- * Deterministically pick a color based on a string (ID or name)
- */
-const getDeterministicColor = (str = '') => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % COLORS.length;
-  return COLORS[index];
-};
+export default function Avatar({ src, name, className = 'w-10 h-10', textSize = 'text-base' }) {
+  const [failedSrc, setFailedSrc] = useState(null);
+  const imgError = Boolean(src) && failedSrc === src;
 
-/**
- * Get the first letter of a name for initials
- */
-const getInitial = (name = '') => {
-  if (!name) return '?';
-  return name.trim().charAt(0).toUpperCase();
-};
+  const getInitial = (fullName) => {
+    if (!fullName) return 'U';
+    const parts = fullName.trim().split(' ');
+    const lastPart = parts[parts.length - 1];
+    return lastPart.charAt(0).toUpperCase();
+  };
 
-export default function Avatar({ src, name, id, size = 'w-12 h-12', rounded = 'rounded-xl', className = '' }) {
-  const [error, setError] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [prevSrc, setPrevSrc] = useState(src);
+  const getToneClass = (str) => {
+    if (!str) return AVATAR_TONES[0];
+    let hash = 0;
+    for (let i = 0; i < str.length; i += 1) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return AVATAR_TONES[Math.abs(hash) % AVATAR_TONES.length];
+  };
 
-  // Reset error when src changes (adjust state during render, no effect needed)
-  if (prevSrc !== src) {
-    setPrevSrc(src);
-    setError(false);
-  }
+  const initial = getInitial(name);
+  const toneClass = getToneClass(name || 'User');
 
-  const initials = getInitial(name);
-  const bgColor = getDeterministicColor(id || name || 'default');
-
-  // If no source or an error occurred, show the initials
-  // Cũng coi chuỗi rỗng "" là không có ảnh (để fallback sang Google avatar)
-  if (!src?.trim() || error) {
+  if (src && !imgError) {
     return (
-      <div 
-        className={`${size} ${rounded} ${bgColor} flex items-center justify-center text-white font-black text-lg select-none shadow-sm ${className}`}
-        title={name}
-      >
-        {initials}
-      </div>
+      <img
+        src={src}
+        alt={name || 'Avatar'}
+        width={64}
+        height={64}
+        loading="lazy"
+        decoding="async"
+        onError={() => setFailedSrc(src)}
+        className={`rounded-full object-cover no-shrink border border-border-strong ${className}`}
+      />
     );
   }
 
   return (
-    <div className={`relative ${size} ${className}`}>
-      {!isVisible && (
-        <div className={`absolute inset-0 ${size} ${rounded} animate-pulse bg-slate-200 dark:bg-slate-700`} />
-      )}
-      <img
-        src={src}
-        alt={name || 'Avatar'}
-        onLoad={() => setIsVisible(true)}
-        onError={() => setError(true)}
-        className={`${size} ${rounded} object-cover border border-slate-200 dark:border-white/10 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-      />
+    <div
+      className={`rounded-full flex items-center justify-center font-display font-bold select-none no-shrink border shadow-xs ${toneClass} ${className} ${textSize}`}
+    >
+      {initial}
     </div>
   );
 }

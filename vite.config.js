@@ -16,7 +16,11 @@ const CHUNK_RULES = [
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
     tailwindcss(),
     // Gzip compression for text assets (JS/CSS/HTML) → giảm ~70% kích thước transfer
     compression({

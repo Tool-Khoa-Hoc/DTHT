@@ -1,292 +1,533 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabase';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
+import RankSeal from '../components/ui/RankSeal';
 
-const TITLE_MAX_LENGTH = 200;
-const CONTENT_MAX_LENGTH = 10000;
-const AUTOSAVE_DEBOUNCE_MS = 1500;
+const CATEGORIES = [
+  {
+    id: 'Tất cả',
+    label: 'Tất cả',
+    icon: 'grid_view',
+    color: 'text-secondary-text',
+    bg: 'bg-surface-alt',
+    border: 'border-border-strong',
+  },
+  {
+    id: 'Công thức',
+    label: 'Công thức',
+    icon: 'functions',
+    color: 'text-sky-800',
+    bg: 'bg-sky-50',
+    border: 'border-sky-300',
+  },
+  {
+    id: 'Từ vựng',
+    label: 'Từ vựng',
+    icon: 'translate',
+    color: 'text-jade',
+    bg: 'bg-jade-soft',
+    border: 'border-jade-border',
+  },
+  {
+    id: 'Lịch sử / Văn',
+    label: 'Lịch sử / Văn',
+    icon: 'history_edu',
+    color: 'text-gold-dark',
+    bg: 'bg-gold-soft',
+    border: 'border-gold',
+  },
+  {
+    id: 'Nhắc nhở',
+    label: 'Nhắc nhở',
+    icon: 'notifications_active',
+    color: 'text-primary',
+    bg: 'bg-primary-soft',
+    border: 'border-primary/35',
+  },
+  {
+    id: 'Khác',
+    label: 'Khác',
+    icon: 'push_pin',
+    color: 'text-indigo-800',
+    bg: 'bg-indigo-50',
+    border: 'border-indigo-200',
+  },
+];
 
 export default function Notes() {
-    const { user } = useAuth();
-    const [notes, setNotes] = useState([]);
-    const [activeNoteId, setActiveNoteId] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
+  const { user } = useAuth();
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('Tất cả');
 
-    const activeNote = notes.find(n => n.id === activeNoteId);
-    const debounceTimerRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingNote, setEditingNote] = useState(null);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [category, setCategory] = useState('Công thức');
+  const [isPinned, setIsPinned] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-    useEffect(() => {
-        if (!user) return;
-        fetchNotes();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
+  const fetchNotes = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('user_notes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('is_pinned', { ascending: false })
+        .order('updated_at', { ascending: false });
 
-    const fetchNotes = async () => {
-        setIsLoading(true);
-        try {
-            const { data, error } = await supabase
-                .from('user_notes')
-                .select('*')
-                .eq('user_id', user.id)
-                .order('updated_at', { ascending: false });
+      if (error) throw error;
+      if (data) setNotes(data);
+    } catch (error) {
+      console.error('Lỗi tải ghi chú:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
-            if (error) throw error;
-            setNotes(data || []);
-            if (data?.length > 0 && !activeNoteId) {
-                setActiveNoteId(data[0].id);
-            }
-        } catch (err) {
-            console.error('Error fetching notes:', err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]);
 
-    const handleCreateNote = async () => {
-        setIsSaving(true);
-        try {
-            const newNote = {
-                user_id: user.id,
-                title: 'Ghi chú mới',
-                content: ''
-            };
-            const { data, error } = await supabase
-                .from('user_notes')
-                .insert([newNote])
-                .select()
-                .single();
+  const openModal = (note = null) => {
+    if (note) {
+      setEditingNote(note);
+      setTitle(note.title);
+      setContent(note.content);
+      setCategory(note.category);
+      setIsPinned(note.is_pinned);
+    } else {
+      setEditingNote(null);
+      setTitle('');
+      setContent('');
+      setCategory(selectedCategory === 'Tất cả' ? 'Công thức' : selectedCategory);
+      setIsPinned(false);
+    }
+    setIsModalOpen(true);
+  };
 
-            if (error) throw error;
-            
-            setNotes(prev => [data, ...prev]);
-            setActiveNoteId(data.id);
-        } catch (err) {
-            console.error('Error creating note:', err);
-            alert('Lỗi tạo ghi chú. Vui lòng thử lại!');
-        } finally {
-            setIsSaving(false);
-        }
-    };
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingNote(null);
+  };
 
-    const handleDeleteNote = async (id, e) => {
-        if (e) {
-            e.stopPropagation();
-        }
-        if (!window.confirm('Bạn có chắc chắn muốn xóa ghi chú này?')) return;
-        
-        setIsSaving(true);
-        try {
-            const { error } = await supabase
-                .from('user_notes')
-                .delete()
-                .eq('id', id)
-                .eq('user_id', user.id);
-
-            if (error) throw error;
-            
-            setNotes(prev => prev.filter(n => n.id !== id));
-            if (activeNoteId === id) {
-                setActiveNoteId(null);
-            }
-        } catch (err) {
-            console.error('Error deleting note:', err);
-            alert('Lỗi xóa ghi chú. Vui lòng thử lại!');
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const persistNoteChanges = async (id, updates) => {
-        setIsSaving(true);
-        try {
-            const { error } = await supabase
-                .from('user_notes')
-                .update({ ...updates, updated_at: new Date().toISOString() })
-                .eq('id', id)
-                .eq('user_id', user.id);
-                
-            if (error) throw error;
-        } catch (err) {
-            console.error('Error saving note:', err);
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleUpdateNote = (id, field, value) => {
-        let finalValue = value;
-        // Kiểm soát ký tự nhập vào để tránh spam payload
-        if (field === 'title' && value.length > TITLE_MAX_LENGTH) {
-            finalValue = value.substring(0, TITLE_MAX_LENGTH);
-            alert(`Tiêu đề tối đa ${TITLE_MAX_LENGTH} ký tự.`);
-        }
-        if (field === 'content' && value.length > CONTENT_MAX_LENGTH) {
-            finalValue = value.substring(0, CONTENT_MAX_LENGTH);
-            alert(`Nội dung tối đa ${CONTENT_MAX_LENGTH} ký tự.`);
-        }
-
-        // Cập nhật state ngay lập tức
-        setNotes(prev => prev.map(n => 
-            n.id === id ? { ...n, [field]: finalValue, updated_at: new Date().toISOString() } : n
-        ).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))); // Sort lên đầu ngay
-
-        // Debounce gọi API cập nhật Database để tối ưu
-        if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = setTimeout(() => {
-            persistNoteChanges(id, { [field]: finalValue });
-        }, AUTOSAVE_DEBOUNCE_MS);
-    };
-
-    const filteredNotes = notes.filter(n => 
-        n.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        n.content?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const formatDate = (isoString) => {
-        if (!isoString) return '';
-        const d = new Date(isoString);
-        return d.toLocaleDateString('vi-VN') + ' ' + d.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
-    };
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-[#0f080a] flex items-center justify-center p-6">
-                <div className="flex flex-col items-center gap-3">
-                    <span className="material-symbols-outlined animate-spin text-4xl text-[#fe5f36]">sync</span>
-                    <p className="text-slate-400 font-medium">Đang tải ghi chú...</p>
-                </div>
-            </div>
-        );
+  const handleSaveNote = async (e) => {
+    e.preventDefault();
+    if (!title.trim() && !content.trim()) {
+      alert('Vui lòng nhập tiêu đề hoặc nội dung ghi chú!');
+      return;
     }
 
-    return (
-        <div className="min-h-screen bg-[#0f080a] text-slate-200 font-display flex flex-col md:flex-row relative">
-            {/* Background elements */}
-            <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#fe5f36]/5 blur-[120px] rounded-full pointer-events-none" />
+    setIsSaving(true);
+    try {
+      const noteData = {
+        user_id: user.id,
+        title: title.trim() || 'Ghi chú không tiêu đề',
+        content: content.trim(),
+        category,
+        is_pinned: isPinned,
+        updated_at: new Date(),
+      };
 
-            {/* Cột trái: Danh sách Ghi chú */}
-            <aside className="w-full md:w-[320px] lg:w-[380px] shrink-0 border-r border-white/10 bg-white/5 backdrop-blur-md flex flex-col h-[40vh] md:h-screen z-10">
-                <div className="p-5 border-b border-white/10 flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#fe5f36]/20 to-pink-500/20 flex items-center justify-center border border-white/10">
-                                <span className="material-symbols-outlined text-transparent bg-clip-text bg-gradient-to-r from-[#fe5f36] to-pink-500 text-sm">
-                                    edit_note
-                                </span>
-                            </div>
-                            <h2 className="text-xl font-black text-white tracking-tight">Ghi Chú Cá Nhân</h2>
-                        </div>
-                        <button 
-                            onClick={handleCreateNote}
-                            disabled={isSaving}
-                            className="w-8 h-8 rounded-full bg-[#fe5f36]/10 text-[#fe5f36] hover:bg-[#fe5f36] hover:text-white transition-colors flex items-center justify-center disabled:opacity-50"
-                            title="Tạo ghi chú mới"
+      if (editingNote) {
+        const { error } = await supabase
+          .from('user_notes')
+          .update(noteData)
+          .eq('id', editingNote.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('user_notes').insert([noteData]);
+        if (error) throw error;
+      }
+
+      closeModal();
+      fetchNotes();
+    } catch (error) {
+      alert('Lỗi khi lưu ghi chú: ' + error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleTogglePin = async (note, e) => {
+    e.stopPropagation();
+    try {
+      const newPinStatus = !note.is_pinned;
+      setNotes(
+        notes
+          .map((n) => (n.id === note.id ? { ...n, is_pinned: newPinStatus } : n))
+          .sort((a, b) => Number(b.is_pinned) - Number(a.is_pinned)),
+      );
+
+      const { error } = await supabase
+        .from('user_notes')
+        .update({ is_pinned: newPinStatus, updated_at: new Date() })
+        .eq('id', note.id);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Lỗi ghim ghi chú:', error.message);
+      fetchNotes();
+    }
+  };
+
+  const handleDeleteNote = async (id, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm('Bạn có chắc chắn muốn xóa ghi chú này?')) return;
+
+    try {
+      setNotes(notes.filter((n) => n.id !== id));
+      if (editingNote?.id === id) closeModal();
+
+      const { error } = await supabase.from('user_notes').delete().eq('id', id);
+      if (error) throw error;
+    } catch (error) {
+      alert('Lỗi khi xóa: ' + error.message);
+      fetchNotes();
+    }
+  };
+
+  const filteredNotes = notes.filter((note) => {
+    const matchCategory = selectedCategory === 'Tất cả' || note.category === selectedCategory;
+    const matchSearch =
+      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (note.content && note.content.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchCategory && matchSearch;
+  });
+
+  const getCategoryStyle = (catName) => {
+    return CATEGORIES.find((c) => c.id === catName) || CATEGORIES[5];
+  };
+
+  return (
+    <div className="bg-background font-sans text-foreground min-h-full pb-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        {/* Header */}
+        <header className="imperial-frame p-5 sm:p-7 mb-6 relative overflow-hidden">
+          <span
+            aria-hidden="true"
+            className="hanzi-watermark absolute top-2 right-5 text-8xl font-bold text-accent/8"
+          >
+            筆記
+          </span>
+
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+            <div>
+              <div className="mb-2">
+                <RankSeal size="sm" icon="edit_note" label="Thư Phòng Bút Ký" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-display font-extrabold tracking-tight text-foreground">
+                Sổ Tay Kiến Thức
+              </h1>
+              <p className="text-xs sm:text-sm text-secondary-text mt-1">
+                Lưu trữ công thức, từ vựng và những lưu ý quan trọng cho kỳ thi
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => openModal()}
+              className="btn-arena btn-arena-primary"
+            >
+              <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                add
+              </span>
+              <span>Tạo ghi chú mới</span>
+            </button>
+          </div>
+
+          {/* Search & Filter */}
+          <div className="relative z-10 flex flex-col md:flex-row gap-3">
+            <div className="relative flex-1">
+              <span
+                className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              >
+                search
+              </span>
+              <input
+                type="text"
+                placeholder="Tìm kiếm trong ghi chú của bạn..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-10 py-3 bg-surface border border-border-strong rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-sm text-foreground placeholder:text-muted-foreground transition-all"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Xoá tìm kiếm"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                    close
+                  </span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
+                    selectedCategory === cat.id
+                      ? `${cat.bg} ${cat.color} ${cat.border} shadow-2xs`
+                      : 'bg-surface border-border text-secondary-text hover:text-foreground hover:border-border-strong'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
+                    {cat.icon}
+                  </span>
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main>
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <span
+                className="material-symbols-outlined animate-spin text-4xl text-primary"
+                aria-hidden="true"
+              >
+                sync
+              </span>
+            </div>
+          ) : filteredNotes.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredNotes.map((note) => {
+                const catStyle = getCategoryStyle(note.category);
+                return (
+                  <div
+                    key={note.id}
+                    onClick={() => openModal(note)}
+                    className={`group relative paper-card paper-card-interactive p-5 flex flex-col justify-between cursor-pointer h-64 ${
+                      note.is_pinned ? 'border-gold ring-1 ring-gold/40 bg-paper' : ''
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <span
+                          className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-md ${catStyle.bg} ${catStyle.color} border ${catStyle.border}`}
                         >
-                            <span className="material-symbols-outlined text-xl">add</span>
-                        </button>
-                    </div>
-
-                    <div className="relative group">
-                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg group-focus-within:text-[#fe5f36] transition-colors">
-                            search
+                          <span className="material-symbols-outlined text-[12px]" aria-hidden="true">
+                            {catStyle.icon}
+                          </span>
+                          {note.category}
                         </span>
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm nội dung..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-black/20 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#fe5f36]/50 transition-colors placeholder:text-slate-600"
-                        />
-                    </div>
-                </div>
 
-                <div className="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
-                    {filteredNotes.length === 0 ? (
-                        <div className="text-center py-10 text-slate-500 text-sm">
-                            {searchTerm ? 'Không tìm thấy ghi chú phù hợp' : 'Chưa có ghi chú nào. Hãy tạo mới nhé!'}
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={(e) => handleTogglePin(note, e)}
+                            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                              note.is_pinned
+                                ? 'text-primary bg-primary-soft'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-surface-alt sm:opacity-0 sm:group-hover:opacity-100'
+                            }`}
+                            title={note.is_pinned ? 'Bỏ ghim' : 'Ghim lên đầu'}
+                          >
+                            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                              push_pin
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDeleteNote(note.id, e)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary-soft transition-colors sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer"
+                            title="Xóa ghi chú"
+                          >
+                            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                              delete
+                            </span>
+                          </button>
                         </div>
-                    ) : (
-                        filteredNotes.map(note => (
-                            <div 
-                                key={note.id}
-                                onClick={() => setActiveNoteId(note.id)}
-                                className={`p-4 rounded-2xl cursor-pointer transition-all border ${activeNoteId === note.id ? 'bg-[#fe5f36]/10 border-[#fe5f36]/30 shadow-lg' : 'bg-transparent border-transparent hover:bg-white/5 hover:border-white/10'}`}
-                            >
-                                <div className="flex justify-between items-start gap-2 mb-1">
-                                    <h3 className={`font-bold truncate text-sm flex-1 ${activeNoteId === note.id ? 'text-[#fe5f36]' : 'text-slate-200'}`}>
-                                        {note.title || 'Ghi chú không tên'}
-                                    </h3>
-                                    <button 
-                                        onClick={(e) => handleDeleteNote(note.id, e)}
-                                        className="text-slate-500 hover:text-red-400 transition-colors"
-                                        title="Xóa ghi chú"
-                                    >
-                                        <span className="material-symbols-outlined text-[16px]">delete</span>
-                                    </button>
-                                </div>
-                                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-2">
-                                    {note.content || '...'}
-                                </p>
-                                <div className="text-[10px] text-slate-600 font-medium">
-                                    {formatDate(note.updated_at)}
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
-            </aside>
+                      </div>
 
-            {/* Cột phải: Khung Editor */}
-            <main className="flex-1 flex flex-col h-[60vh] md:h-screen relative z-10">
-                {activeNote ? (
-                    <div className="flex flex-col h-full bg-gradient-to-b from-white/[0.02] to-transparent m-2 md:m-4 md:ml-0 rounded-3xl border border-white/5 shadow-2xl flex-1 backdrop-blur-xl transition-all overflow-hidden">
-                        <header className="px-6 py-4 flex items-center justify-between border-b border-white/5 shrink-0">
-                            <input 
-                                type="text"
-                                value={activeNote.title}
-                                onChange={(e) => handleUpdateNote(activeNote.id, 'title', e.target.value)}
-                                placeholder="Nhập tiêu đề..."
-                                className="bg-transparent border-none text-xl md:text-2xl font-black text-white focus:outline-none focus:ring-0 w-full placeholder:text-slate-600 truncate"
-                            />
-                            {isSaving && (
-                                <div className="flex items-center gap-1.5 text-xs text-slate-500 shrink-0 bg-white/5 px-2.5 py-1 rounded-full border border-white/5">
-                                    <span className="material-symbols-outlined text-[14px] animate-spin">sync</span>
-                                    Đang lưu...
-                                </div>
-                            )}
-                        </header>
-                        
-                        <div className="flex-1 p-6 relative">
-                            <textarea
-                                value={activeNote.content}
-                                onChange={(e) => handleUpdateNote(activeNote.id, 'content', e.target.value)}
-                                placeholder="Viết những gì bạn cần nhớ vào đây nhé..."
-                                className="w-full h-full bg-transparent border-none text-slate-300 text-[15px] leading-relaxed resize-none focus:outline-none focus:ring-0 placeholder:text-slate-600 selection:bg-[#fe5f36]/30 custom-scrollbar"
-                            />
-                            <div className="absolute bottom-4 right-6 text-[10px] text-slate-600 font-medium pointer-events-none">
-                                {activeNote.content?.length || 0} / {CONTENT_MAX_LENGTH} ký tự
-                            </div>
-                        </div>
+                      <h3 className="font-display font-bold text-base text-foreground mb-2 line-clamp-1 group-hover:text-primary transition-colors">
+                        {note.title}
+                      </h3>
+                      <p className="text-xs text-secondary-text whitespace-pre-line line-clamp-5 leading-relaxed">
+                        {note.content || (
+                          <span className="italic text-muted-foreground">Không có nội dung...</span>
+                        )}
+                      </p>
                     </div>
+
+                    <div className="pt-3 mt-2 border-t border-border flex items-center justify-between text-[10px] text-muted-foreground">
+                      <span>
+                        Cập nhật: {new Date(note.updated_at).toLocaleDateString('vi-VN')}
+                      </span>
+                      <span className="text-primary font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                        Mở xem{' '}
+                        <span className="material-symbols-outlined text-[12px]" aria-hidden="true">
+                          arrow_forward
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-16 paper-card border-dashed max-w-lg mx-auto my-8 p-6">
+              <div className="w-16 h-16 rounded-full bg-primary-soft border border-primary/30 text-primary flex items-center justify-center mx-auto mb-4">
+                <span className="material-symbols-outlined text-3xl" aria-hidden="true">
+                  edit_note
+                </span>
+              </div>
+              <h3 className="font-display font-bold text-lg text-foreground mb-1">
+                Chưa có ghi chú nào
+              </h3>
+              <p className="text-xs text-secondary-text mb-6 max-w-xs mx-auto leading-relaxed">
+                Hãy ghi lại những công thức khó nhớ, từ vựng mới hoặc mục tiêu học tập của bạn ngay hôm nay!
+              </p>
+              <button
+                type="button"
+                onClick={() => openModal()}
+                className="btn-arena btn-arena-primary btn-arena-sm"
+              >
+                <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                  add
+                </span>
+                Viết ghi chú đầu tiên
+              </button>
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Modal Thêm / Sửa Ghi chú */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-[100] bg-foreground/45 backdrop-blur-xs flex items-center justify-center p-4"
+          onClick={closeModal}
+        >
+          <div
+            className="imperial-frame w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-paper">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                {CATEGORIES.filter((c) => c.id !== 'Tất cả').map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setCategory(cat.id)}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                      category === cat.id
+                        ? `${cat.bg} ${cat.color} ${cat.border}`
+                        : 'bg-surface border-border text-secondary-text hover:text-foreground'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
+                      {cat.icon}
+                    </span>
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-1 no-shrink ml-2">
+                <button
+                  type="button"
+                  onClick={() => setIsPinned(!isPinned)}
+                  className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                    isPinned
+                      ? 'bg-primary-soft text-primary'
+                      : 'text-muted-foreground hover:bg-surface-alt hover:text-foreground'
+                  }`}
+                  title={isPinned ? 'Đã ghim' : 'Ghim ghi chú'}
+                >
+                  <span className="material-symbols-outlined text-xl" aria-hidden="true">
+                    push_pin
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  aria-label="Đóng"
+                  className="p-2 rounded-xl text-muted-foreground hover:bg-surface-alt hover:text-foreground transition-colors cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-xl" aria-hidden="true">
+                    close
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <form
+              onSubmit={handleSaveNote}
+              className="flex-1 flex flex-col p-6 overflow-y-auto space-y-4 bg-surface"
+            >
+              <input
+                type="text"
+                placeholder="Tiêu đề ghi chú..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full bg-transparent text-xl font-display font-bold text-foreground placeholder:text-muted-foreground focus:outline-none border-b border-border pb-2"
+              />
+
+              <textarea
+                placeholder="Nhập nội dung kiến thức, công thức, từ vựng cần nhớ vào đây..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={12}
+                className="w-full flex-1 bg-paper border border-border rounded-xl p-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary leading-relaxed resize-none"
+              />
+
+              {/* Modal Footer */}
+              <div className="pt-4 border-t border-border flex items-center justify-between">
+                {editingNote ? (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteNote(editingNote.id)}
+                    className="flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary-soft px-3 py-2 rounded-xl transition-colors cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-base" aria-hidden="true">
+                      delete
+                    </span>
+                    Xóa ghi chú
+                  </button>
                 ) : (
-                    <div className="flex flex-col items-center justify-center flex-1 m-4 text-slate-500">
-                        <span className="material-symbols-outlined text-6xl text-slate-700 mb-4 opacity-50">note_alt</span>
-                        <p className="font-medium text-sm">Chọn một ghi chú bên trái để xem hoặc tạo mới</p>
-                    </div>
+                  <div />
                 )}
-            </main>
-            
-            <style>{`
-                .no-scrollbar::-webkit-scrollbar { display: none; }
-                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-                
-                .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
-            `}</style>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="btn-arena btn-arena-secondary btn-arena-sm"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="btn-arena btn-arena-primary btn-arena-sm"
+                  >
+                    <span className="material-symbols-outlined text-base" aria-hidden="true">
+                      {isSaving ? 'sync' : 'check'}
+                    </span>
+                    {isSaving ? 'Đang lưu...' : 'Lưu ghi chú'}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
 }

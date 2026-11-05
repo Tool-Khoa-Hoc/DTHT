@@ -1,747 +1,1058 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Navigate } from 'react-router-dom';
-import { assertSafeExternalUrl } from '../utils/urlSecurity';
+import { DOCUMENT_SELECT_FIELDS } from '../lib/documents';
+import { Link } from 'react-router-dom';
+import { getUserRank } from '../utils/rankHelper';
+import { getLevelFromExp, getLevelAccent } from '../utils/levelHelper';
 import Avatar from '../components/Avatar';
-import { ADMIN_DOCUMENT_FIELDS, formatViDateTime, getDocumentUploadDate } from '../lib/documents';
-
-const CATEGORIES = [
-  { label: 'Toán', value: 'toan', icon: 'calculate', color: 'from-blue-500 to-indigo-600' },
-  { label: 'Vật Lý', value: 'ly', icon: 'experiment', color: 'from-amber-500 to-orange-600' },
-  { label: 'Hóa Học', value: 'hoa', icon: 'science', color: 'from-green-500 to-emerald-600' },
-  { label: 'Sinh Học', value: 'sinh', icon: 'biotech', color: 'from-teal-500 to-cyan-600' },
-  { label: 'Ngữ Văn', value: 'van', icon: 'menu_book', color: 'from-rose-500 to-pink-600' },
-  { label: 'Tiếng Anh', value: 'anh', icon: 'language', color: 'from-sky-500 to-blue-600' },
-  { label: 'Lịch Sử', value: 'su', icon: 'history_edu', color: 'from-yellow-600 to-amber-700' },
-  { label: 'Địa Lý', value: 'dia', icon: 'public', color: 'from-lime-500 to-green-600' },
-  { label: 'GDCD', value: 'gdcd', icon: 'gavel', color: 'from-purple-500 to-violet-600' },
-  { label: 'Tin Học', value: 'tin', icon: 'computer', color: 'from-cyan-500 to-sky-600' },
-  { label: 'Giải Tích', value: 'giai_tich', icon: 'functions', color: 'from-indigo-500 to-purple-600' },
-  { label: 'Lập Trình', value: 'lap_trinh', icon: 'code', color: 'from-slate-500 to-gray-600' },
-  { label: 'Kiến Trúc', value: 'kien_truc', icon: 'architecture', color: 'from-orange-500 to-red-500' },
-  { label: 'Kinh Tế', value: 'kinh_te', icon: 'trending_up', color: 'from-emerald-500 to-teal-600' },
-  { label: 'Khác', value: 'khac', icon: 'folder', color: 'from-gray-400 to-slate-500' },
-];
-
-const ADMIN_USER_DIRECTORY_SELECT_LIMIT = 200;
-const ADMIN_USER_DIRECTORY_FALLBACK_SELECT = 'id, display_name, avatar_url, role, is_vip, vip_expired_at, is_approved_bang_chu';
-const ADMIN_USER_DIRECTORY_FALLBACK_WARNING = 'Dang dung duong doc du phong tu bang profiles. Danh sach van tai duoc, nhung tim theo email chi hoat dong khi RPC admin_user_directory hoat dong lai.';
-const toTrimmedString = (value) => (typeof value === 'string' ? value.trim() : '');
-
-const normalizeAdminDirectoryRow = (row) => ({
-  id: row?.id ?? null,
-  email: row?.email ?? null,
-  display_name: row?.display_name ?? null,
-  full_name: row?.full_name ?? null,
-  avatar_url: row?.avatar_url ?? null,
-  role: row?.role ?? 'user',
-  is_vip: Boolean(row?.is_vip),
-  vip_expired_at: row?.vip_expired_at ?? null,
-  is_approved_bang_chu: Boolean(row?.is_approved_bang_chu),
-});
+import AdminCollaborator from '../components/admin/AdminCollaborator';
+import AdminThongSoai from '../components/admin/AdminThongSoai';
+import AdminLibrary from '../components/admin/AdminLibrary';
+import RankSeal from '../components/ui/RankSeal';
 
 export default function Admin() {
-  const { user, profile } = useAuth();
-  const isAdmin = profile?.role === 'admin';
+  const { user, isAdmin } = useAuth();
+  const [activeTab, setActiveTab] = useState('users');
 
-  const [mainTab, setMainTab] = useState('library'); // 'library' | 'thongsoai' | 'collaborators'
+  const [usersList, setUsersList] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
-  // Library Form State
-  const [docId, setDocId] = useState(null); // null means adding new
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [publishDate, setPublishDate] = useState('');
-  const [fileUrl, setFileUrl] = useState('');
-  const [authorName, setAuthorName] = useState('');
-  const [major, setMajor] = useState('');
-  const [category, setCategory] = useState('khac');
-  const [isFeatured, setIsFeatured] = useState(false);
-  const [educationLevel, setEducationLevel] = useState('thpt'); // 'thpt' | 'university'
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
+  const [collabEmailInput, setCollabEmailInput] = useState('');
+  const [isUpdatingCollab, setIsUpdatingCollab] = useState(false);
 
-  // List State
+  const [thongSoaiEmail, setThongSoaiEmail] = useState('');
+  const [isGrantingThongSoai, setIsGrantingThongSoai] = useState(false);
+
   const [documents, setDocuments] = useState([]);
-  const [loadingDocs, setLoadingDocs] = useState(true);
+  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [docTitle, setDocTitle] = useState('');
+  const [docGrade, setDocGrade] = useState('Lớp 12');
+  const [docSubject, setDocSubject] = useState('Toán');
+  const [docCategory, setDocCategory] = useState('Đề thi thử');
+  const [uploadMode, setUploadMode] = useState('file');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [externalUrl, setExternalUrl] = useState('');
+  const [resourceLabel, setResourceLabel] = useState('Sheet / Link');
+  const [isUploading, setIsUploading] = useState(false);
 
-  // Thống Soái State
-  const [candidates, setCandidates] = useState([]);
-  const [loadingCandidates, setLoadingCandidates] = useState(false);
+  const [roadmaps, setRoadmaps] = useState([]);
+  const [selectedBlock, setSelectedBlock] = useState('Khối A00');
+  const [loadingRoadmap, setLoadingRoadmap] = useState(false);
+  const [newTaskInputs, setNewTaskInputs] = useState({});
 
-  // Collaborator State
-  const [collabSearchTerm, setCollabSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [collaborators, setCollaborators] = useState([]);
-  const [loadingCollabs, setLoadingCollabs] = useState(false);
-  const [directoryWarning, setDirectoryWarning] = useState('');
+  const [vipOrders, setVipOrders] = useState([]);
+  const [loadingVipOrders, setLoadingVipOrders] = useState(false);
+  const [vipFilterStatus, setVipFilterStatus] = useState('all');
+  const [reviewingOrderId, setReviewingOrderId] = useState(null);
 
-  const adminUserDirectoryFallback = async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
-    const normalizedSearch = toTrimmedString(search);
-    let query = supabase
-      .from('profiles')
-      .select(ADMIN_USER_DIRECTORY_FALLBACK_SELECT);
-
-    if (role !== null) {
-      query = query.eq('role', role);
-    }
-
-    if (Array.isArray(ids)) {
-      if (ids.length === 0) {
-        return [];
-      }
-      query = query.in('id', ids);
-    }
-
-    if (normalizedSearch) {
-      query = query.ilike('display_name', `%${normalizedSearch}%`);
-    }
-
-    const { data, error } = await query
-      .order('is_vip', { ascending: false })
-      .order('display_name', { ascending: true })
-      .limit(limit);
-
-    if (error) throw error;
-    return Array.isArray(data) ? data.map(normalizeAdminDirectoryRow) : [];
-  };
-
-  const adminUserDirectory = async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
-    const params = { p_limit: limit };
-    if (search !== null) params.p_search = search;
-    if (role !== null) params.p_role = role;
-    if (ids !== null) params.p_ids = ids;
-
+  const fetchVipOrders = useCallback(async () => {
+    setLoadingVipOrders(true);
     try {
-      const { data, error } = await supabase.rpc('admin_user_directory', params);
+      const { data, error } = await supabase
+        .from('vip_course_orders')
+        .select('*')
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
+      if (data) setVipOrders(data);
+    } catch (error) {
+      console.error('Lỗi tải danh sách đơn VIP:', error.message);
+    } finally {
+      setLoadingVipOrders(false);
+    }
+  }, []);
 
-      setDirectoryWarning('');
-      return {
-        rows: Array.isArray(data) ? data.map(normalizeAdminDirectoryRow) : [],
-        source: 'rpc',
-      };
-    } catch (rpcError) {
-      console.error('admin_user_directory rpc failed, using profiles fallback:', rpcError);
-      const rows = await adminUserDirectoryFallback({ search, role, ids, limit });
-      setDirectoryWarning(ADMIN_USER_DIRECTORY_FALLBACK_WARNING);
-      return { rows, source: 'fallback' };
+  const handleReviewVipOrder = async (orderId, decision) => {
+    const label = decision === 'approved' ? 'DUYỆT & MỞ KHÓA HỌC' : 'TỪ CHỐI';
+    const note = window.prompt(
+      `Nhập ghi chú phản hồi cho học viên (${label}) — có thể bỏ trống:`,
+      decision === 'approved'
+        ? 'Đã nhận đủ 50.000đ. Chúc bạn ôn thi hiệu quả!'
+        : 'Chưa tìm thấy giao dịch khớp nội dung chuyển khoản.',
+    );
+    if (note === null) return;
+
+    setReviewingOrderId(orderId);
+    try {
+      const { error } = await supabase.rpc('admin_review_vip_order', {
+        p_order_id: orderId,
+        p_decision: decision,
+        p_admin_note: note,
+      });
+
+      if (error) throw error;
+      await fetchVipOrders();
+    } catch (error) {
+      alert('Lỗi cập nhật đơn: ' + error.message);
+    } finally {
+      setReviewingOrderId(null);
     }
   };
 
-  const fetchDocuments = async () => {
+  const fetchUsers = useCallback(async () => {
+    setLoadingUsers(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      if (data) setUsersList(data);
+    } catch (error) {
+      console.error('Lỗi tải danh sách user:', error.message);
+    } finally {
+      setLoadingUsers(false);
+    }
+  }, []);
+
+  const fetchDocuments = useCallback(async () => {
     setLoadingDocs(true);
     try {
       const { data, error } = await supabase
         .from('documents')
-        .select(ADMIN_DOCUMENT_FIELDS)
-        .order('uploaded_at', { ascending: false, nullsFirst: false })
+        .select(DOCUMENT_SELECT_FIELDS)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      setDocuments(data || []);
+      if (data) setDocuments(data);
     } catch (error) {
-      console.error('Error fetching documents', error);
+      console.error('Lỗi tải tài liệu:', error.message);
     } finally {
       setLoadingDocs(false);
     }
-  };
+  }, []);
 
-  const fetchCandidates = async () => {
-    setLoadingCandidates(true);
+  const fetchRoadmaps = useCallback(async () => {
+    setLoadingRoadmap(true);
     try {
-      const { data, error } = await supabase.rpc('admin_get_thongsoai_candidates', { p_min_completed: 50 });
+      const { data, error } = await supabase
+        .from('roadmaps')
+        .select(`
+          id, block_name, title, description,
+          roadmap_steps (
+            id, step_number, phase_title, timeframe, description,
+            roadmap_tasks ( id, task_title, is_custom )
+          )
+        `)
+        .order('block_name', { ascending: true });
+
       if (error) throw error;
-      setCandidates(
-        (data || []).map(row => ({
-          ...row,
-          completedCount: Number(row.completed_count) || 0,
-        }))
-      );
-    } catch (err) {
-      console.error('fetchCandidates error:', err);
-      setCandidates([]);
+      if (data) {
+        data.forEach((r) => {
+          if (r.roadmap_steps) {
+            r.roadmap_steps.sort((a, b) => a.step_number - b.step_number);
+          }
+        });
+        setRoadmaps(data);
+      }
+    } catch (error) {
+      console.error('Lỗi tải lộ trình:', error.message);
     } finally {
-      setLoadingCandidates(false);
+      setLoadingRoadmap(false);
     }
-  };
+  }, []);
 
-  const approveBangChu = async (userId, currentStatus) => {
-    try {
-      const { error } = await supabase.from('profiles').update({ is_approved_bang_chu: !currentStatus }).eq('id', userId);
-      if (error) throw error;
-      setCandidates(candidates.map(c => c.id === userId ? { ...c, is_approved_bang_chu: !currentStatus } : c));
-    } catch (err) {
-      alert('Lỗi: ' + err.message);
+  useEffect(() => {
+    if (!isAdmin) return;
+    if (
+      activeTab === 'users' ||
+      activeTab === 'collaborator' ||
+      activeTab === 'thong_soai'
+    ) {
+      fetchUsers();
     }
-  };
+    if (activeTab === 'library') fetchDocuments();
+    if (activeTab === 'roadmap') fetchRoadmaps();
+    if (activeTab === 'vip_orders') fetchVipOrders();
+  }, [activeTab, fetchDocuments, fetchRoadmaps, fetchUsers, fetchVipOrders, isAdmin]);
 
-  const fetchCollaborators = async () => {
-    setLoadingCollabs(true);
-    try {
-      const { rows: data } = await adminUserDirectory({
-        role: 'collaborator',
-        limit: ADMIN_USER_DIRECTORY_SELECT_LIMIT,
-      });
-      setCollaborators(data);
-    } catch (err) {
-      console.error(err);
-      setCollaborators([]);
-      setMessage({ type: 'error', text: 'Khong the tai danh sach Truyen Dao Su tu Supabase.' });
-    } finally {
-      setLoadingCollabs(false);
+  const handleSetUserRole = async (targetUserId, newRole, userName) => {
+    if (targetUserId === user.id) {
+      alert('Bạn không thể tự thay đổi quyền của chính mình!');
+      return;
     }
-  };
 
-  const searchUsers = async (e) => {
-    e.preventDefault();
-    if (!collabSearchTerm.trim()) return;
-    setLoadingCollabs(true);
-    try {
-      const { rows: data } = await adminUserDirectory({ search: collabSearchTerm.trim(), limit: 10 });
-      setSearchResults(data.filter(candidate => candidate.role !== 'admin'));
-    } catch (err) {
-      console.error(err);
-      setSearchResults([]);
-      setMessage({ type: 'error', text: 'Khong the tim user tu Supabase.' });
-    } finally {
-      setLoadingCollabs(false);
-    }
-  };
+    const roleLabel =
+      newRole === 'admin'
+        ? 'Quản trị viên (Admin)'
+        : newRole === 'collaborator'
+          ? 'Cộng tác viên'
+          : 'Học sinh';
 
-  const setCollaboratorRole = async (userId, makeCollaborator) => {
+    if (
+      !window.confirm(
+        `Bạn có chắc muốn đổi quyền của "${userName || 'Học viên này'}" thành [${roleLabel}]?`,
+      )
+    )
+      return;
+
     try {
-      const newRole = makeCollaborator ? 'collaborator' : 'user';
       const { error } = await supabase
         .from('profiles')
         .update({ role: newRole })
-        .eq('id', userId);
+        .eq('id', targetUserId);
+
+      if (error) throw error;
+      setUsersList(
+        usersList.map((u) => (u.id === targetUserId ? { ...u, role: newRole } : u)),
+      );
+    } catch (error) {
+      alert('Lỗi cập nhật quyền: ' + error.message);
+    }
+  };
+
+  const handleGrantCollaboratorByEmail = async (e) => {
+    e.preventDefault();
+    const targetEmail = collabEmailInput.trim().toLowerCase();
+    if (!targetEmail) return;
+
+    setIsUpdatingCollab(true);
+    try {
+      const foundUser = usersList.find(
+        (u) => (u.email || '').toLowerCase() === targetEmail,
+      );
+
+      if (!foundUser) {
+        alert(
+          'Không tìm thấy tài khoản nào có email: ' +
+            targetEmail +
+            '. Hãy bảo bạn ấy đăng ký tài khoản trước nhé!',
+        );
+        return;
+      }
+
+      if (foundUser.role === 'admin') {
+        alert('Tài khoản này đang là Admin (đã có toàn quyền).');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: 'collaborator' })
+        .eq('id', foundUser.id);
 
       if (error) throw error;
 
-      // Update local state
-      if (makeCollaborator) {
-        toast('Đã thăng cấp thành Truyền Đạo Sư');
-      } else {
-        toast('Đã giáng cấp thành người dùng thường');
-      }
-
-      // Refresh list
-      fetchCollaborators();
-      if (collabSearchTerm) {
-        // Trigger search again to update results UI
-        setSearchResults(searchResults.map(u => u.id === userId ? { ...u, role: newRole } : u));
-      }
-    } catch (err) {
-      alert('Lỗi: ' + err.message);
+      setUsersList(
+        usersList.map((u) =>
+          u.id === foundUser.id ? { ...u, role: 'collaborator' } : u,
+        ),
+      );
+      setCollabEmailInput('');
+      alert(
+        `Đã cấp quyền Cộng tác viên cho ${foundUser.full_name || targetEmail} thành công!`,
+      );
+    } catch (error) {
+      alert('Lỗi khi cấp quyền CTV: ' + error.message);
+    } finally {
+      setIsUpdatingCollab(false);
     }
   };
 
-  const toast = (msg) => {
-    setMessage({ type: 'success', text: msg });
-    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-  };
+  const handleToggleThongSoai = async (targetUserId, currentStatus, userName) => {
+    const newStatus = !currentStatus;
+    const actionText = newStatus
+      ? 'SẮC PHONG danh hiệu Thống Soái đặc cách'
+      : 'THU HỒI danh hiệu Thống Soái đặc cách';
 
-  const handleLibrarySubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage({ type: '', text: '' });
+    if (!window.confirm(`Bạn muốn ${actionText} cho "${userName || 'chiến binh này'}"?`))
+      return;
 
     try {
-      const safeFileUrl = assertSafeExternalUrl(fileUrl);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_thong_soai: newStatus })
+        .eq('id', targetUserId);
 
-      if (docId) {
-        // Update existing document
-        const { error } = await supabase
-          .from('documents')
-          .update({
-            title,
-            description,
-            file_url: safeFileUrl,
-            author_name: authorName || 'Khuyết danh',
-            category: educationLevel === 'university' ? (category || 'Chuyên ngành') : category,
-            major: educationLevel === 'university' ? major : null,
-            is_featured: isFeatured,
-            education_level: educationLevel,
-            publish_date: publishDate || null
-          })
-          .eq('id', docId);
-
-        if (error) throw error;
-        setMessage({ type: 'success', text: 'Tài liệu đã được cập nhật thành công!' });
-      } else {
-        // Insert new document
-        const { error } = await supabase
-          .from('documents')
-          .insert([
-            {
-              title,
-              description,
-              file_url: safeFileUrl,
-              author_name: authorName || 'Khuyết danh',
-              uploaded_by: user.id,
-              is_public: true,
-              category: educationLevel === 'university' ? (category || 'Chuyên ngành') : category,
-              major: educationLevel === 'university' ? major : null,
-              is_featured: isFeatured,
-              education_level: educationLevel,
-              publish_date: publishDate || null
-            }
-          ]);
-
-        if (error) throw error;
-        setMessage({ type: 'success', text: 'Tài liệu đã được đăng tải thành công!' });
-      }
-
-      // Reset form & refresh list
-      resetForm();
-      fetchDocuments();
+      if (error) throw error;
+      setUsersList(
+        usersList.map((u) =>
+          u.id === targetUserId ? { ...u, is_thong_soai: newStatus } : u,
+        ),
+      );
     } catch (error) {
-      console.error('Error saving document:', error);
-      setMessage({ type: 'error', text: 'Có lỗi xảy ra: ' + error.message });
-    } finally {
-      setLoading(false);
-      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      alert('Lỗi cập nhật danh hiệu Thống Soái: ' + error.message);
     }
   };
 
-  const resetForm = () => {
-    setDocId(null);
-    setTitle('');
-    setDescription('');
-    setFileUrl('');
-    setAuthorName('');
-    setMajor('');
-    setCategory('khac');
-    setIsFeatured(false);
-    setEducationLevel('thpt');
-    setPublishDate('');
+  const handleAdjustUserExp = async (targetUser) => {
+    const currentExp = Number(targetUser.exp) || 0;
+    const currentLv = getLevelFromExp(currentExp).level;
+    const raw = window.prompt(
+      `Điều chỉnh EXP cho "${targetUser.full_name || targetUser.email || 'học viên'}"\n` +
+        `Hiện tại: ${currentExp} EXP (Lv.${currentLv}).\n` +
+        `Nhập số dương để cộng (vd: 120) hoặc số âm để trừ (vd: -60):`,
+      '60',
+    );
+    if (raw === null) return;
+    const delta = parseInt(raw.trim(), 10);
+    if (!Number.isFinite(delta) || delta === 0) {
+      alert('Vui lòng nhập một số nguyên khác 0.');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.rpc('admin_adjust_user_exp', {
+        p_target_user: targetUser.id,
+        p_delta: delta,
+        p_reason: 'admin_panel',
+      });
+      if (error) throw error;
+
+      const nextExp = data?.exp ?? Math.max(0, currentExp + delta);
+      setUsersList(
+        usersList.map((u) => (u.id === targetUser.id ? { ...u, exp: nextExp } : u)),
+      );
+    } catch (error) {
+      alert(
+        'Không thể điều chỉnh EXP (hãy chắc chắn đã chạy migration 20261022000000_exp_system_v2.sql): ' +
+          error.message,
+      );
+    }
   };
 
-  const handleEdit = (doc) => {
-    setDocId(doc.id);
-    setTitle(doc.title);
-    setDescription(doc.description || '');
-    setFileUrl(doc.file_url);
-    setAuthorName(doc.author_name || '');
-    setMajor(doc.major || '');
-    setCategory(doc.category || 'khac');
-    setIsFeatured(doc.is_featured || false);
-    setEducationLevel(doc.education_level || 'thpt');
-    setPublishDate(doc.publish_date || '');
+  const handleGrantThongSoaiByEmail = async (e) => {
+    e.preventDefault();
+    const targetEmail = thongSoaiEmail.trim().toLowerCase();
+    if (!targetEmail) return;
 
-    // Scroll to form automatically
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsGrantingThongSoai(true);
+    try {
+      const foundUser = usersList.find(
+        (u) => (u.email || '').toLowerCase() === targetEmail,
+      );
+
+      if (!foundUser) {
+        alert('Không tìm thấy chiến binh nào có email: ' + targetEmail);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_thong_soai: true })
+        .eq('id', foundUser.id);
+
+      if (error) throw error;
+
+      setUsersList(
+        usersList.map((u) =>
+          u.id === foundUser.id ? { ...u, is_thong_soai: true } : u,
+        ),
+      );
+      setThongSoaiEmail('');
+      alert(
+        `Đã sắc phong Thống Soái cho ${foundUser.full_name || targetEmail} thành công!`,
+      );
+    } catch (error) {
+      alert('Lỗi khi phong hàm Thống Soái: ' + error.message);
+    } finally {
+      setIsGrantingThongSoai(false);
+    }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa tài liệu này vĩnh viễn?")) return;
+  const handleUploadDocument = async (e) => {
+    e.preventDefault();
+    if (!docTitle.trim()) {
+      alert('Vui lòng nhập tên tài liệu!');
+      return;
+    }
+    if (uploadMode === 'file' && !selectedFile) {
+      alert('Vui lòng chọn file PDF!');
+      return;
+    }
+    if (uploadMode === 'link' && !externalUrl.trim()) {
+      alert('Vui lòng nhập link Google Sheet / Google Drive!');
+      return;
+    }
 
+    setIsUploading(true);
+    try {
+      let finalUrl = '';
+      let finalFileName = '';
+      let finalFileSize = '';
+
+      if (uploadMode === 'file') {
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+        const filePath = `${docGrade}/${docSubject}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(filePath, selectedFile);
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from('documents').getPublicUrl(filePath);
+
+        finalUrl = publicUrl;
+        finalFileName = selectedFile.name;
+        finalFileSize = (selectedFile.size / (1024 * 1024)).toFixed(2) + ' MB';
+      } else {
+        const normalizedUrl = externalUrl.trim();
+        if (!/^https?:\/\//i.test(normalizedUrl)) {
+          throw new Error('Link phải bắt đầu bằng http:// hoặc https://');
+        }
+        finalUrl = normalizedUrl;
+        finalFileName = normalizedUrl;
+        finalFileSize = resourceLabel.trim() || 'Link ngoài';
+      }
+
+      const { error: dbError } = await supabase.from('documents').insert([
+        {
+          title: docTitle.trim(),
+          grade: docGrade,
+          subject: docSubject,
+          category: docCategory,
+          file_name: finalFileName,
+          file_size: finalFileSize,
+          file_url: finalUrl,
+          uploaded_by: user.id,
+        },
+      ]);
+
+      if (dbError) throw dbError;
+
+      alert('Tải tài liệu lên thành công!');
+      setDocTitle('');
+      setSelectedFile(null);
+      setExternalUrl('');
+      if (document.getElementById('file-upload')) {
+        document.getElementById('file-upload').value = '';
+      }
+      fetchDocuments();
+    } catch (error) {
+      alert('Lỗi khi tải tài liệu: ' + error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeleteDocument = async (id) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa tài liệu này?')) return;
     try {
       const { error } = await supabase.from('documents').delete().eq('id', id);
       if (error) throw error;
-      setDocuments(documents.filter(d => d.id !== id));
-      if (docId === id) resetForm(); // If deleting what is currently being edited
+      setDocuments(documents.filter((doc) => doc.id !== id));
     } catch (error) {
-      alert("Lỗi khi xóa tài liệu: " + error.message);
+      alert('Lỗi khi xóa: ' + error.message);
     }
   };
 
-  const toggleFeatured = async (id, currentStatus) => {
+  const handleAddOfficialTask = async (stepId) => {
+    const taskTitle = newTaskInputs[stepId];
+    if (!taskTitle || !taskTitle.trim()) return;
+
     try {
       const { error } = await supabase
-        .from('documents')
-        .update({ is_featured: !currentStatus })
-        .eq('id', id);
+        .from('roadmap_tasks')
+        .insert([{ step_id: stepId, task_title: taskTitle.trim(), is_custom: false }]);
+
       if (error) throw error;
-      setDocuments(documents.map(d => d.id === id ? { ...d, is_featured: !currentStatus } : d));
-      if (docId === id) setIsFeatured(!currentStatus);
+      setNewTaskInputs({ ...newTaskInputs, [stepId]: '' });
+      fetchRoadmaps();
     } catch (error) {
-      alert("Lỗi khi cập nhật trạng thái: " + error.message);
+      alert('Lỗi thêm nhiệm vụ: ' + error.message);
     }
   };
 
-
-  // Data fetch: placed AFTER all const function definitions so closures work correctly
-  useEffect(() => {
-    if (!isAdmin) return;
-    if (mainTab === 'library') {
-      fetchDocuments();
-    } else if (mainTab === 'thongsoai') {
-      fetchCandidates();
-    } else if (mainTab === 'collaborators') {
-      fetchCollaborators();
+  const handleDeleteTask = async (taskId) => {
+    if (!window.confirm('Xóa nhiệm vụ này khỏi lộ trình chuẩn?')) return;
+    try {
+      const { error } = await supabase.from('roadmap_tasks').delete().eq('id', taskId);
+      if (error) throw error;
+      fetchRoadmaps();
+    } catch (error) {
+      alert('Lỗi xóa nhiệm vụ: ' + error.message);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin, mainTab]);
+  };
 
-  // Security Check: Kick out non-admins
   if (!isAdmin) {
-    return <Navigate to="/home" />;
+    return (
+      <div className="min-h-full flex flex-col items-center justify-center p-6 text-center bg-background">
+        <span className="material-symbols-outlined text-6xl text-primary mb-4" aria-hidden="true">
+          gpp_bad
+        </span>
+        <h1 className="text-2xl font-display font-bold text-foreground mb-2">
+          Truy Cập Bị Từ Chối!
+        </h1>
+        <p className="text-secondary-text max-w-md mb-6 text-sm">
+          Khu vực này chỉ dành riêng cho Ban Quản Trị (Admin) của Đấu Trường Học Tập.
+        </p>
+        <Link to="/home" className="btn-arena btn-arena-primary btn-arena-sm">
+          Quay về Trang chủ
+        </Link>
+      </div>
+    );
   }
 
+  const currentRoadmap = roadmaps.find((r) => r.block_name === selectedBlock);
+
+  const ADMIN_TABS = [
+    { id: 'users', label: 'Học viên', icon: 'group' },
+    { id: 'collaborator', label: 'Cộng tác viên', icon: 'group_add' },
+    { id: 'thong_soai', label: 'Phong Thống Soái', icon: 'emoji_events' },
+    { id: 'vip_orders', label: 'Đơn Khóa Học 50K', icon: 'workspace_premium' },
+    { id: 'library', label: 'Kho Tài liệu', icon: 'folder_open' },
+    { id: 'roadmap', label: 'Lộ trình Chuẩn', icon: 'timeline' },
+  ];
+
   return (
-    <div className="bg-[#f8f6f6] dark:bg-[#1a0f12] font-display text-slate-900 dark:text-white min-h-screen pb-24">
-      {/* Header */}
-      <header className="relative z-30 px-6 py-4 bg-white/50 dark:bg-[#201216]/80 backdrop-blur-md border-b border-[#7f13ec]/10 flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#7f13ec]/20 flex items-center justify-center text-[#7f13ec] shadow-[0_0_15px_rgba(127,19,236,0.3)]">
-            <span className="material-symbols-outlined">admin_panel_settings</span>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">Quản trị viên hệ thống</h1>
-            <p className="text-xs text-slate-500 font-medium">Bảng điều khiển admin quyền lực</p>
-          </div>
-        </div>
+    <div className="bg-background font-sans text-foreground min-h-full pb-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        {/* Admin Header */}
+        <header className="imperial-frame p-5 sm:p-6 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+          <span
+            aria-hidden="true"
+            className="hanzi-watermark absolute top-2 right-5 text-7xl font-bold text-primary/8"
+          >
+            中樞
+          </span>
 
-        {/* Main Tabs Segmented Control */}
-        <div className="flex bg-slate-200 dark:bg-[#1a0f12] p-1 rounded-xl w-full overflow-x-auto scrollbar-hide">
-          <button onClick={() => setMainTab('library')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'library' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-[#7f13ec]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
-            <span className="material-symbols-outlined text-[18px]">library_books</span> Quản lý Tài Liệu Học Free
-          </button>
-          <button onClick={() => setMainTab('collaborators')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'collaborators' ? 'bg-white dark:bg-[#2a1a1f] shadow-sm text-[#10b981]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
-            <span className="material-symbols-outlined text-[18px]">group_add</span> Truyền Đạo Sư
-          </button>
-          <button onClick={() => setMainTab('thongsoai')} className={`whitespace-nowrap flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mainTab === 'thongsoai' ? 'bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/40 dark:to-orange-900/20 border-red-200 dark:border-red-900/50 shadow-sm text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
-            <span className="material-symbols-outlined text-[18px]">local_fire_department</span> Sắc phong Bang Chủ
-          </button>
-        </div>
-      </header>
-
-      <main className="w-full mx-auto px-4 pt-8 max-w-3xl">
-
-
-        {mainTab === 'library' && (
-          <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold flex items-center gap-2 text-[#7f13ec]">
-                <span className="material-symbols-outlined">{docId ? 'edit_document' : 'upload_file'}</span>
-                {docId ? 'Cập nhật tài liệu' : 'Thêm tài liệu mới'}
-              </h2>
-              {docId && (
-                <button onClick={resetForm} className="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">close</span> Hủy sửa
-                </button>
-              )}
+          <div className="relative z-10 flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-xl bg-primary-soft border border-primary/35 flex items-center justify-center text-primary no-shrink">
+              <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+                admin_panel_settings
+              </span>
             </div>
-
-            {message.text && (
-              <div className={`p-4 rounded-xl mb-6 text-sm font-medium ${message.type === 'success' ? 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'}`}>
-                {message.text}
+            <div>
+              <div className="mb-1">
+                <RankSeal size="sm" icon="gavel" label="Soái Phủ · Trung Tâm Quản Trị" />
               </div>
-            )}
+              <h1 className="text-xl sm:text-2xl font-display font-extrabold tracking-tight text-foreground">
+                Trung Tâm Quản Trị (Admin Panel)
+              </h1>
+              <p className="text-xs text-secondary-text">
+                Quản lý học viên, Cộng tác viên, sắc phong Thống Soái và kho học liệu
+              </p>
+            </div>
+          </div>
+        </header>
 
-            <form onSubmit={handleLibrarySubmit} className="space-y-5">
-              {/* Form fields... (reusing existing UI) */}
-              <div>
-                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Tiêu đề tài liệu <span className="text-red-500">*</span></label>
-                <input required value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="VD: Giáo trình Giải tích 1 HK231" />
-              </div>
+        {/* Navigation Tabs */}
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-6 border-b border-border no-scrollbar">
+          {ADMIN_TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setActiveTab(t.id)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-display font-bold text-sm transition-all whitespace-nowrap cursor-pointer ${
+                activeTab === t.id
+                  ? 'bg-primary text-on-primary shadow-xs'
+                  : 'text-secondary-text hover:bg-surface-alt hover:text-foreground'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                {t.icon}
+              </span>
+              {t.label}
+            </button>
+          ))}
+        </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Mô tả ngắn</label>
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows="3" className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white resize-none" placeholder="Nhập nội dung mô tả..."></textarea>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Tác giả / Nguồn tài liệu</label>
-                <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="VD: Nguyễn Văn A hoặc PĐT Bách Khoa" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Ngày - tháng - năm <span className="text-slate-400 font-normal">(Tùy chọn)</span></label>
-                <input type="date" value={publishDate} onChange={(e) => setPublishDate(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white dark:[color-scheme:dark]" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">Phân loại cấp học <span className="text-red-500">*</span></label>
-                <div className="flex gap-4">
-                  <label className="flex-1 cursor-pointer">
-                    <input type="radio" name="educationLevel" value="thpt" checked={educationLevel === 'thpt'} onChange={(e) => setEducationLevel(e.target.value)} className="hidden peer" />
-                    <div className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all font-semibold peer-checked:border-[#306ee8] peer-checked:bg-[#306ee8]/10 peer-checked:text-[#306ee8] border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:border-[#306ee8]/50">
-                      <span className="material-symbols-outlined text-[20px]">menu_book</span> THPT Quốc Gia
-                    </div>
-                  </label>
-                  <label className="flex-1 cursor-pointer">
-                    <input type="radio" name="educationLevel" value="university" checked={educationLevel === 'university'} onChange={(e) => setEducationLevel(e.target.value)} className="hidden peer" />
-                    <div className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all font-semibold peer-checked:border-[#7f13ec] peer-checked:bg-[#7f13ec]/10 peer-checked:text-[#7f13ec] border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:border-[#7f13ec]/50">
-                      <span className="material-symbols-outlined text-[20px]">school</span> Đại Học
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {educationLevel === 'university' && (
-                <div>
-                  <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Trường / Ngành học <span className="text-red-500">*</span></label>
-                  <input required value={major} onChange={(e) => setMajor(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="VD: ĐH Bách Khoa, CNTT, Y Dược..." />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">{educationLevel === 'university' ? 'Tên Môn học / Học phần ' : 'Danh mục / Môn học '}<span className="text-red-500">*</span></label>
-                {educationLevel === 'university' ? (
-                  <input required value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="VD: Giải tích 1, Toán cao cấp..." />
-                ) : (
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                    {CATEGORIES.map(cat => (
-                      <button key={cat.value} type="button" onClick={() => setCategory(cat.value)} className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all text-xs font-semibold ${category === cat.value ? 'border-[#7f13ec] bg-[#7f13ec]/10 text-[#7f13ec]' : 'border-slate-200 dark:border-white/8 bg-slate-50 dark:bg-white/3 text-slate-500 dark:text-slate-400 hover:border-[#7f13ec]/40 hover:text-[#7f13ec]'}`}>
-                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center`}><span className="material-symbols-outlined text-white text-base">{cat.icon}</span></div>
-                        {cat.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Link Google Drive / Tải về <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none"><span className="material-symbols-outlined text-slate-400">link</span></div>
-                  <input required type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} className="w-full bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-[#7f13ec]/50 focus:border-[#7f13ec] transition-all text-slate-900 dark:text-white" placeholder="https://drive.google.com/..." />
-                </div>
-              </div>
-
-              <div onClick={() => setIsFeatured(!isFeatured)} className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${isFeatured ? 'border-amber-500 bg-amber-500/10' : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/3 hover:border-amber-400/50'}`}>
-                <div className="flex items-center gap-3">
-                  <span className={`material-symbols-outlined text-2xl ${isFeatured ? 'text-amber-400' : 'text-slate-400'}`}>star</span>
-                  <div>
-                    <p className={`font-semibold text-sm ${isFeatured ? 'text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>Ghim làm Tài liệu nổi bật</p>
-                    <p className="text-xs text-slate-500">Hiển thị ở đầu trang Tài Liệu Học Free</p>
-                  </div>
-                </div>
-                <div className={`w-12 h-6 rounded-full transition-all relative ${isFeatured ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-600'}`}>
-                  <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${isFeatured ? 'left-6' : 'left-0.5'}`} />
-                </div>
-              </div>
-
-              <div className="pt-4">
-                <button type="submit" disabled={loading} className="w-full py-4 bg-[#7f13ec] text-white rounded-xl font-bold text-lg shadow-lg shadow-[#7f13ec]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:scale-100 flex items-center justify-center gap-2">
-                  {loading ? <span className="material-symbols-outlined animate-spin">sync</span> : <span className="material-symbols-outlined">{docId ? 'save' : 'cloud_upload'}</span>}
-                  {loading ? 'Đang xử lý...' : (docId ? 'Cập nhật tài liệu' : 'Đăng tải tài liệu')}
+        {/* TAB CONTENT */}
+        <main>
+          {activeTab === 'users' && (
+            <div className="paper-card overflow-hidden">
+              <div className="p-4 sm:p-5 border-b border-border flex justify-between items-center bg-paper">
+                <h2 className="font-display font-bold text-base text-foreground">
+                  Tổng số thành viên ({usersList.length})
+                </h2>
+                <button
+                  type="button"
+                  onClick={fetchUsers}
+                  className="text-xs text-primary hover:underline flex items-center gap-1 font-bold cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                    refresh
+                  </span>
+                  Làm mới
                 </button>
               </div>
-            </form>
 
-            {/* List of Documents */}
-            <div className="mt-12">
-              <h3 className="text-md font-bold mb-4 flex items-center gap-2 border-t border-slate-200 dark:border-white/10 pt-8">
-                <span className="material-symbols-outlined text-slate-400">format_list_bulleted</span>
-                Danh sách tài liệu hệ thống
-              </h3>
-
-              {loadingDocs ? (
-                <div className="flex justify-center py-8"><span className="material-symbols-outlined animate-spin text-[#7f13ec]">sync</span></div>
-              ) : documents.length === 0 ? (
-                <p className="text-center text-sm text-slate-500 italic py-6">Chưa có tài liệu nào.</p>
+              {loadingUsers ? (
+                <div className="p-12 flex justify-center">
+                  <span
+                    className="material-symbols-outlined animate-spin text-3xl text-primary"
+                    aria-hidden="true"
+                  >
+                    sync
+                  </span>
+                </div>
               ) : (
-                <div className="space-y-3">
-                  {documents.map(doc => {
-                    const catInfo = CATEGORIES.find(c => c.value === doc.category) || CATEGORIES[CATEGORIES.length - 1];
-                    return (
-                      <div key={doc.id} className="flex flex-col sm:flex-row gap-4 p-4 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 hover:border-[#7f13ec]/30 transition-all group">
-                        <div className="flex-1 min-w-0 flex flex-col justify-center">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${doc.is_featured ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
-                              {doc.is_featured ? 'Nổi bật' : catInfo.label}
-                            </span>
-                            <h4 className="font-bold text-sm truncate" title={doc.title}>{doc.title}</h4>
-                          </div>
-                          <p className="text-xs text-slate-500 truncate">{doc.description || 'Không có mô tả'}</p>
-                          <p className="mt-1 text-[11px] text-slate-400">
-                            Up lúc: {formatViDateTime(getDocumentUploadDate(doc)) || 'Chưa rõ'}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 border-slate-200 dark:border-white/10 pt-3 sm:pt-0">
-                          <button
-                            onClick={() => toggleFeatured(doc.id, doc.is_featured)}
-                            title={doc.is_featured ? "Bỏ ghim" : "Ghim nổi bật"}
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${doc.is_featured ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20' : 'bg-slate-200 dark:bg-slate-800 text-slate-400 hover:text-amber-500'}`}
-                          >
-                            <span className="material-symbols-outlined text-[18px]">star</span>
-                          </button>
-                          <button
-                            onClick={() => handleEdit(doc)}
-                            title="Sửa"
-                            className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#7f13ec]/10 hover:text-[#7f13ec] flex items-center justify-center transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-[18px]">edit</span>
-                          </button>
-                          <button
-                            onClick={() => handleDelete(doc.id)}
-                            title="Xóa"
-                            className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-red-500/10 hover:text-red-500 flex items-center justify-center transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-[18px]">delete</span>
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-surface-alt text-secondary-text text-xs uppercase tracking-wider border-b border-border">
+                        <th className="p-4 font-bold">Học viên</th>
+                        <th className="p-4 font-bold">Trường / Khối</th>
+                        <th className="p-4 font-bold">Cấp bậc &amp; Giờ học</th>
+                        <th className="p-4 font-bold">Level &amp; EXP</th>
+                        <th className="p-4 font-bold">Vai trò</th>
+                        <th className="p-4 font-bold text-right">Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border text-sm">
+                      {usersList.map((u) => {
+                        const rInfo = getUserRank(u.total_study_minutes || 0, u.is_thong_soai);
+                        const lvInfo = getLevelFromExp(u.exp || 0);
+                        const lvAccent = getLevelAccent(lvInfo.level);
+                        return (
+                          <tr key={u.id} className="hover:bg-surface-alt/70 transition-colors">
+                            <td className="p-4">
+                              <div className="flex items-center gap-3">
+                                <Avatar
+                                  src={u.avatar_url}
+                                  name={u.full_name || u.email}
+                                  className="w-9 h-9"
+                                  textSize="text-xs"
+                                />
+                                <div>
+                                  <p className="font-bold text-foreground">
+                                    {u.full_name || 'Chưa đặt tên'}
+                                  </p>
+                                  <p className="text-xs text-secondary-text">{u.email}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <p className="text-foreground">{u.school_name || '—'}</p>
+                              <p className="text-xs text-secondary-text">{u.grade || 'Lớp 12'}</p>
+                            </td>
+                            <td className="p-4">
+                              <div className="flex items-center gap-1.5">
+                                <span
+                                  className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${rInfo.bg} ${rInfo.color} ${rInfo.border}`}
+                                >
+                                  <span
+                                    className="material-symbols-outlined text-[12px]"
+                                    aria-hidden="true"
+                                  >
+                                    {rInfo.icon}
+                                  </span>
+                                  {rInfo.name}
+                                </span>
+                                <span className="text-xs text-secondary-text tabular">
+                                  ({u.total_study_minutes || 0}p)
+                                </span>
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`tabular inline-flex items-center text-[11px] font-extrabold px-2 py-0.5 rounded border ${lvAccent.badge}`}
+                                >
+                                  Lv.{lvInfo.level}
+                                </span>
+                                <span className="tabular text-xs text-foreground font-semibold">
+                                  {lvInfo.totalExp} EXP
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleAdjustUserExp(u)}
+                                  title="Cộng / trừ EXP"
+                                  className="px-2 py-0.5 rounded text-[11px] font-bold bg-gold-soft text-gold-dark border border-gold hover:bg-gold/30 transition-colors cursor-pointer"
+                                >
+                                  ±EXP
+                                </button>
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <span
+                                className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
+                                  u.role === 'admin'
+                                    ? 'bg-primary-soft text-primary border-primary/35'
+                                    : u.role === 'collaborator'
+                                      ? 'bg-jade-soft text-jade border-jade-border'
+                                      : 'bg-surface-alt text-secondary-text border-border'
+                                }`}
+                              >
+                                {u.role === 'admin'
+                                  ? 'Admin'
+                                  : u.role === 'collaborator'
+                                    ? 'Cộng tác viên'
+                                    : 'Học sinh'}
+                              </span>
+                            </td>
+                            <td className="p-4 text-right">
+                              <select
+                                aria-label={`Đổi vai trò của ${u.full_name || u.email}`}
+                                value={u.role || 'student'}
+                                onChange={(e) =>
+                                  handleSetUserRole(
+                                    u.id,
+                                    e.target.value,
+                                    u.full_name || u.email,
+                                  )
+                                }
+                                disabled={u.id === user.id}
+                                className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-paper border border-border-strong text-foreground focus:outline-none focus:border-primary disabled:opacity-40"
+                              >
+                                <option value="student">Học sinh</option>
+                                <option value="collaborator">Cộng tác viên</option>
+                                <option value="admin">Admin</option>
+                              </select>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Thong Soai Tab */}
-        {mainTab === 'thongsoai' && (
-          <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-xl space-y-6">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-black text-red-600 dark:text-red-400 flex items-center justify-center gap-2">
-                <span className="material-symbols-outlined text-3xl">local_fire_department</span>
-                Sắc phong Bang Chủ
-              </h2>
-              <p className="text-sm font-medium text-slate-500 mt-2">Duyệt những Phó Bang Chủ rèn luyện xuất sắc (50+ chiến dịch) thăng cấp thành Bang Chủ.</p>
-            </div>
+          {activeTab === 'collaborator' && (
+            <AdminCollaborator
+              usersList={usersList}
+              collabEmailInput={collabEmailInput}
+              setCollabEmailInput={setCollabEmailInput}
+              isUpdatingCollab={isUpdatingCollab}
+              onGrantByEmail={handleGrantCollaboratorByEmail}
+              onSetUserRole={handleSetUserRole}
+            />
+          )}
 
-            {loadingCandidates ? (
-              <div className="flex justify-center py-8"><span className="material-symbols-outlined animate-spin text-red-500 text-3xl">sync</span></div>
-            ) : candidates.length === 0 ? (
-              <div className="text-center bg-slate-50 dark:bg-[#1a0f12] p-8 rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner">
-                <span className="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-700 mb-3">group_off</span>
-                <p className="font-bold text-slate-500">Chưa có ai đủ điều kiện (&gt;= 50 chiến dịch).</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {candidates.map(candidate => (
-                  <div key={candidate.id} className="flex flex-col sm:flex-row items-center gap-4 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1a0f12] hover:shadow-md transition-shadow">
-                    <Avatar 
-                      src={candidate.avatar_url} 
-                      name={candidate.display_name || candidate.full_name || 'Ẩn danh'} 
-                      id={candidate.id}
-                      size="w-16 h-16"
-                      className="border-2 border-amber-400 shadow-sm"
-                    />
-                    <div className="flex-1 text-center sm:text-left">
-                      <h3 className="font-bold text-xl text-slate-800 dark:text-white mb-1">{candidate.display_name || candidate.full_name || 'Ẩn danh'}</h3>
-                      <p className="text-sm font-bold text-amber-600 dark:text-amber-500 bg-amber-100 dark:bg-amber-900/30 inline-block px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/50">
-                        ⚡ Đã cày {candidate.completedCount} chiến dịch
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => approveBangChu(candidate.id, candidate.is_approved_bang_chu)}
-                      className={`px-5 py-3 rounded-2xl font-black flex items-center gap-2 transition-all shadow-md shrink-0 ${candidate.is_approved_bang_chu ? 'bg-slate-200 text-slate-600 dark:bg-white/10 dark:text-slate-300 hover:bg-red-100 hover:text-red-600 border border-slate-300 dark:border-white/20' : 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-amber-500/30 hover:scale-105 active:scale-95 border border-amber-500'}`}
+          {activeTab === 'thong_soai' && (
+            <AdminThongSoai
+              usersList={usersList}
+              thongSoaiEmail={thongSoaiEmail}
+              setThongSoaiEmail={setThongSoaiEmail}
+              isGrantingThongSoai={isGrantingThongSoai}
+              onGrantByEmail={handleGrantThongSoaiByEmail}
+              onToggleThongSoai={handleToggleThongSoai}
+            />
+          )}
+
+          {activeTab === 'vip_orders' && (
+            <div className="paper-card overflow-hidden">
+              <div className="p-4 sm:p-5 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-paper">
+                <div>
+                  <h2 className="font-display font-bold text-base text-foreground flex items-center gap-2">
+                    <span
+                      className="material-symbols-outlined text-primary"
+                      aria-hidden="true"
                     >
-                      <span className="material-symbols-outlined text-[20px]">{candidate.is_approved_bang_chu ? 'cancel' : 'workspace_premium'}</span>
-                      {candidate.is_approved_bang_chu ? 'Thu hồi sắc phong' : 'Sắc phong Bang Chủ'}
+                      workspace_premium
+                    </span>
+                    Đơn đăng ký COMBO ĐTHT – HS12 (2K9) · 50.000đ ({vipOrders.length})
+                  </h2>
+                  <p className="text-xs text-secondary-text mt-0.5">
+                    Hệ thống tự động đối soát qua API MB Bank khi học viên bấm kiểm tra; Admin cũng có thể duyệt thủ công tại đây.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  {[
+                    { id: 'all', label: 'Tất cả' },
+                    { id: 'submitted', label: 'Chờ duyệt' },
+                    { id: 'approved', label: 'Đã duyệt' },
+                    { id: 'pending', label: 'Mới tạo mã' },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setVipFilterStatus(f.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors border cursor-pointer ${
+                        vipFilterStatus === f.id
+                          ? 'bg-primary text-white border-primary'
+                          : 'bg-surface text-secondary-text border-border hover:text-foreground'
+                      }`}
+                    >
+                      {f.label}
                     </button>
-                  </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={fetchVipOrders}
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-surface hover:bg-surface-alt border border-border-strong text-primary flex items-center gap-1 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                      refresh
+                    </span>
+                    Làm mới
+                  </button>
+                </div>
+              </div>
+
+              {loadingVipOrders ? (
+                <div className="p-12 flex justify-center">
+                  <span
+                    className="material-symbols-outlined animate-spin text-3xl text-primary"
+                    aria-hidden="true"
+                  >
+                    sync
+                  </span>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-surface-alt text-secondary-text text-xs uppercase tracking-wider border-b border-border">
+                        <th className="p-4 font-bold">Mã CK</th>
+                        <th className="p-4 font-bold">Học viên</th>
+                        <th className="p-4 font-bold">Số tiền</th>
+                        <th className="p-4 font-bold">Ghi chú giao dịch</th>
+                        <th className="p-4 font-bold">Trạng thái</th>
+                        <th className="p-4 font-bold text-right">Duyệt đơn</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border text-sm">
+                      {vipOrders
+                        .filter((o) =>
+                          vipFilterStatus === 'all' ? true : o.status === vipFilterStatus,
+                        )
+                        .map((order) => (
+                          <tr key={order.id} className="hover:bg-surface-alt/70">
+                            <td className="p-4">
+                              <span className="font-mono font-extrabold text-primary bg-primary-soft border border-primary/30 px-2.5 py-1 rounded-lg text-xs">
+                                {order.transfer_code}
+                              </span>
+                              <p className="text-[11px] text-muted-foreground mt-1">
+                                {new Date(order.created_at).toLocaleString('vi-VN')}
+                              </p>
+                            </td>
+                            <td className="p-4">
+                              <p className="font-bold text-foreground">
+                                {order.user_full_name || 'Học viên'}
+                              </p>
+                              <p className="text-xs text-secondary-text">{order.user_email}</p>
+                            </td>
+                            <td className="p-4 font-display font-extrabold text-completed tabular">
+                              {(order.amount || 50000).toLocaleString('vi-VN')}đ
+                            </td>
+                            <td className="p-4 max-w-xs">
+                              <p className="text-xs text-foreground break-words">
+                                {order.user_note || (
+                                  <span className="text-muted-foreground italic">
+                                    Chưa gửi ghi chú
+                                  </span>
+                                )}
+                              </p>
+                              {order.admin_note && (
+                                <p className="text-[11px] text-accent mt-1">
+                                  Admin: {order.admin_note}
+                                </p>
+                              )}
+                            </td>
+                            <td className="p-4">
+                              <span
+                                className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
+                                  order.status === 'approved'
+                                    ? 'bg-completed-soft text-completed border-completed-border'
+                                    : order.status === 'submitted'
+                                      ? 'bg-gold-soft text-gold-dark border-gold'
+                                      : order.status === 'rejected'
+                                        ? 'bg-primary-soft text-primary border-primary/35'
+                                        : 'bg-surface-alt text-secondary-text border-border'
+                                }`}
+                              >
+                                {order.status === 'approved'
+                                  ? 'Đã kích hoạt'
+                                  : order.status === 'submitted'
+                                    ? 'Đã báo CK · Chờ duyệt'
+                                    : order.status === 'rejected'
+                                      ? 'Từ chối'
+                                      : 'Mới tạo mã'}
+                              </span>
+                              {order.auto_matched && (
+                                <span className="ml-1.5 inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-jade-soft text-jade border border-jade-border">
+                                  <span
+                                    className="material-symbols-outlined text-[12px]"
+                                    aria-hidden="true"
+                                  >
+                                    bolt
+                                  </span>
+                                  Tự động
+                                </span>
+                              )}
+                              {order.bank_transaction_id && (
+                                <p className="text-[10px] text-muted-foreground font-mono mt-1">
+                                  Mã GD: #{order.bank_transaction_id}
+                                </p>
+                              )}
+                            </td>
+                            <td className="p-4 text-right">
+                              <div className="inline-flex items-center gap-1.5">
+                                {order.status !== 'approved' && (
+                                  <button
+                                    type="button"
+                                    disabled={reviewingOrderId === order.id}
+                                    onClick={() => handleReviewVipOrder(order.id, 'approved')}
+                                    className="px-3 py-1.5 rounded-lg bg-completed hover:bg-completed/90 text-white text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer"
+                                  >
+                                    Duyệt mở khóa
+                                  </button>
+                                )}
+                                {order.status !== 'rejected' && (
+                                  <button
+                                    type="button"
+                                    disabled={reviewingOrderId === order.id}
+                                    onClick={() => handleReviewVipOrder(order.id, 'rejected')}
+                                    className="px-2.5 py-1.5 rounded-lg bg-primary-soft hover:bg-primary hover:text-white text-primary border border-primary/30 text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer"
+                                  >
+                                    Từ chối
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                  {vipOrders.length === 0 && (
+                    <div className="p-8 text-center text-secondary-text text-sm">
+                      Chưa có đơn đăng ký khóa học nào.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'library' && (
+            <AdminLibrary
+              documents={documents}
+              loadingDocs={loadingDocs}
+              docTitle={docTitle}
+              setDocTitle={setDocTitle}
+              docGrade={docGrade}
+              setDocGrade={setDocGrade}
+              docSubject={docSubject}
+              setDocSubject={setDocSubject}
+              docCategory={docCategory}
+              setDocCategory={setDocCategory}
+              uploadMode={uploadMode}
+              setUploadMode={setUploadMode}
+              setSelectedFile={setSelectedFile}
+              externalUrl={externalUrl}
+              setExternalUrl={setExternalUrl}
+              resourceLabel={resourceLabel}
+              setResourceLabel={setResourceLabel}
+              isUploading={isUploading}
+              onUploadDocument={handleUploadDocument}
+              onDeleteDocument={handleDeleteDocument}
+            />
+          )}
+
+          {activeTab === 'roadmap' && (
+            <div className="space-y-6">
+              <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                {[
+                  'Khối A00',
+                  'Khối A01',
+                  'Khối B00',
+                  'Khối C00',
+                  'Khối D01',
+                  'Đánh giá năng lực',
+                ].map((block) => (
+                  <button
+                    key={block}
+                    type="button"
+                    onClick={() => setSelectedBlock(block)}
+                    className={`px-4 py-2 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all border cursor-pointer ${
+                      selectedBlock === block
+                        ? 'bg-primary text-white border-primary'
+                        : 'bg-surface border-border text-secondary-text hover:text-foreground'
+                    }`}
+                  >
+                    {block}
+                  </button>
                 ))}
               </div>
-            )}
-          </div>
-        )}
 
-        {/* Collaborators Tab */}
-        {mainTab === 'collaborators' && (
-          <div className="space-y-6">
-            <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-xl">
-              <h2 className="text-xl font-bold flex items-center gap-2 text-[#10b981] mb-2">
-                <span className="material-symbols-outlined">person_search</span>
-                Tìm kiếm User để cấp quyền
-              </h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Tìm kiếm qua Tên, Email hoặc Nickname để thêm/xóa quyền Truyền Đạo Sư (Cộng tác viên).</p>
-
-              {message.text && (
-                <div className={`p-4 rounded-xl mb-6 text-sm font-medium ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'}`}>
-                  {message.text}
+              {loadingRoadmap ? (
+                <div className="flex justify-center py-12">
+                  <span
+                    className="material-symbols-outlined animate-spin text-3xl text-primary"
+                    aria-hidden="true"
+                  >
+                    sync
+                  </span>
                 </div>
-              )}
+              ) : currentRoadmap ? (
+                <div className="space-y-6">
+                  {currentRoadmap.roadmap_steps?.map((step) => (
+                    <div key={step.id} className="paper-card p-5 space-y-4">
+                      <div className="border-b border-border pb-3">
+                        <span className="text-[10px] font-bold text-gold-dark uppercase tracking-wider bg-gold-soft border border-gold px-2 py-0.5 rounded">
+                          {step.timeframe}
+                        </span>
+                        <h3 className="text-lg font-display font-bold text-foreground mt-1">
+                          {step.phase_title}
+                        </h3>
+                        <p className="text-xs text-secondary-text">{step.description}</p>
+                      </div>
 
-              {directoryWarning && (
-                <div className="p-4 rounded-xl mb-6 text-sm font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
-                  {directoryWarning}
-                </div>
-              )}
-
-              <form onSubmit={searchUsers} className="flex gap-2">
-                <input
-                  required
-                  value={collabSearchTerm}
-                  onChange={e => setCollabSearchTerm(e.target.value)}
-                  className="flex-1 bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] transition-all"
-                  placeholder="Nhập email, tên..."
-                />
-                <button type="submit" className="bg-[#10b981] hover:bg-[#059669] text-white px-6 rounded-xl font-bold transition-colors flex items-center gap-2">
-                  {loadingCollabs ? <span className="material-symbols-outlined animate-spin text-[20px]">sync</span> : <span className="material-symbols-outlined text-[20px]">search</span>}
-                  Tìm kiếm
-                </button>
-              </form>
-
-              {searchResults.length > 0 && (
-                <div className="mt-6 space-y-3">
-                  <h3 className="font-bold text-sm text-slate-500">Kết quả tìm kiếm:</h3>
-                  {searchResults.map(user => (
-                    <div key={user.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1a0f12]">
-                      <div className="flex items-center gap-4">
-                        <Avatar 
-                          src={user.avatar_url} 
-                          name={user.display_name || user.full_name || 'Khuyết danh'} 
-                          id={user.id}
-                        />
-                        <div>
-                          <div className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                            {user.display_name || user.full_name || 'Khuyết danh'}
-                            {user.role === 'collaborator' && <span className="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded border border-emerald-200 uppercase font-black">TĐ. Sư</span>}
+                      <div className="space-y-2">
+                        {step.roadmap_tasks?.map((task) => (
+                          <div
+                            key={task.id}
+                            className="flex items-center justify-between p-2.5 rounded-xl bg-paper border border-border"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="material-symbols-outlined text-jade text-sm"
+                                aria-hidden="true"
+                              >
+                                check_circle
+                              </span>
+                              <span className="text-sm text-foreground">{task.task_title}</span>
+                              {task.is_custom && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-gold-soft text-gold-dark border border-gold">
+                                  User tự thêm
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteTask(task.id)}
+                              aria-label="Xoá nhiệm vụ"
+                              className="text-muted-foreground hover:text-primary p-1 cursor-pointer"
+                            >
+                              <span className="material-symbols-outlined text-base" aria-hidden="true">
+                                close
+                              </span>
+                            </button>
                           </div>
-                          <div className="text-xs text-slate-500">{user.email}</div>
-                        </div>
+                        ))}
                       </div>
 
-                      <button
-                        onClick={() => setCollaboratorRole(user.id, user.role !== 'collaborator')}
-                        className={`px-4 py-2 font-bold text-sm flex items-center gap-2 rounded-lg transition-colors border ${user.role === 'collaborator' ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-900/50' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-900/50'}`}
-                      >
-                        {user.role === 'collaborator' ? 'Hủy sách phong' : 'Sắc phong Truyền Đạo Sư'}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-xl">
-              <h2 className="text-xl font-bold flex items-center gap-2 text-[#10b981] mb-6">
-                <span className="material-symbols-outlined">groups</span>
-                Danh sách Truyền Đạo Sư hiện tại
-              </h2>
-
-              {loadingCollabs && searchResults.length === 0 ? (
-                <div className="flex justify-center py-4"><span className="material-symbols-outlined animate-spin text-[#10b981]">sync</span></div>
-              ) : collaborators.length === 0 ? (
-                <p className="text-center text-slate-500 py-6 italic border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-white/5">Hệ thống chưa có Truyền Đạo Sư nào.</p>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {collaborators.map(user => (
-                    <div key={user.id} className="flex flex-col p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-900/10">
-                      <div className="flex items-center gap-4 mb-4">
-                        <Avatar 
-                          src={user.avatar_url} 
-                          name={user.display_name || user.full_name || 'Khuyết danh'} 
-                          id={user.id}
-                          className="border border-emerald-200"
+                      <div className="flex gap-2 pt-2">
+                        <input
+                          type="text"
+                          placeholder="Nhập nhiệm vụ chuẩn mới cho giai đoạn này..."
+                          value={newTaskInputs[step.id] || ''}
+                          onChange={(e) =>
+                            setNewTaskInputs({ ...newTaskInputs, [step.id]: e.target.value })
+                          }
+                          onKeyDown={(e) =>
+                            e.key === 'Enter' && handleAddOfficialTask(step.id)
+                          }
+                          className="flex-1 px-3.5 py-2 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
                         />
-                        <div>
-                          <div className="font-bold text-slate-800 dark:text-white">{user.display_name || user.full_name || 'Khuyết danh'}</div>
-                          <div className="text-xs text-slate-500">{user.email}</div>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleAddOfficialTask(step.id)}
+                          className="btn-arena btn-arena-primary btn-arena-sm"
+                        >
+                          <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                            add
+                          </span>
+                          Thêm
+                        </button>
                       </div>
-                      <button
-                        onClick={() => setCollaboratorRole(user.id, false)}
-                        className="w-full py-2 bg-white dark:bg-[#1a0f12] text-red-500 border border-slate-200 dark:border-white/10 rounded-lg text-sm font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                      >
-                        Hủy quyền
-                      </button>
                     </div>
                   ))}
                 </div>
-              )}
+              ) : null}
             </div>
-          </div>
-        )}
-      </main>
-
+          )}
+        </main>
+      </div>
     </div>
   );
 }

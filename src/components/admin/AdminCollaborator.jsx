@@ -1,182 +1,132 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../lib/supabase';
+﻿import React from 'react';
 import Avatar from '../Avatar';
 
-const ADMIN_USER_DIRECTORY_SELECT_LIMIT = 200;
-
-export default function AdminCollaborator({ isActive }) {
-  const [collabSearchTerm, setCollabSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [collaborators, setCollaborators] = useState([]);
-  const [loadingCollabs, setLoadingCollabs] = useState(false);
-
-  const adminUserDirectory = useCallback(async ({ search = null, role = null, ids = null, limit = 10 } = {}) => {
-    const { data, error } = await supabase.rpc('admin_user_directory', {
-      p_search: search, p_role: role, p_ids: ids, p_limit: limit,
-    });
-    if (error) throw error;
-    return Array.isArray(data) ? data : [];
-  }, []);
-
-  const fetchCollaborators = useCallback(async () => {
-    setLoadingCollabs(true);
-    try {
-      const data = await adminUserDirectory({
-        role: 'collaborator',
-        limit: ADMIN_USER_DIRECTORY_SELECT_LIMIT,
-      });
-      setCollaborators(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingCollabs(false);
-    }
-  }, [adminUserDirectory]);
-
-  useEffect(() => {
-    if (isActive) {
-      fetchCollaborators();
-    }
-  }, [isActive, fetchCollaborators]);
-
-  const searchUsers = async (e) => {
-    e.preventDefault();
-    if (!collabSearchTerm.trim()) return;
-    setLoadingCollabs(true);
-    try {
-      const data = await adminUserDirectory({ search: collabSearchTerm.trim(), limit: 10 });
-      setSearchResults(data.filter(candidate => candidate.role !== 'admin'));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingCollabs(false);
-    }
-  };
-
-  const setCollaboratorRole = async (userId, makeCollaborator) => {
-    try {
-      const newRole = makeCollaborator ? 'collaborator' : 'user';
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: newRole })
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      if (makeCollaborator) {
-        alert('Đã thăng cấp thành Truyền Đạo Sư');
-      } else {
-        alert('Đã giáng cấp thành người dùng thường');
-      }
-
-      fetchCollaborators();
-      if (collabSearchTerm) {
-        searchUsers({ preventDefault: () => {} });
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Lỗi: ' + err.message);
-    }
-  };
-
-  if (!isActive) return null;
+export default function AdminCollaborator({
+  usersList,
+  collabEmailInput,
+  setCollabEmailInput,
+  isUpdatingCollab,
+  onGrantByEmail,
+  onSetUserRole,
+}) {
+  const collaborators = usersList.filter((u) => u.role === 'collaborator' || u.role === 'admin');
 
   return (
-    <div className="space-y-8">
-      {/* Search & Add New Collaborators */}
-      <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-xl">
-        <h2 className="text-base font-black text-indigo-500 mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px]">person_add</span> Thêm Truyền Đạo Sư Mới
-        </h2>
-        <form onSubmit={searchUsers} className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Nhập email hoặc tên..."
-            value={collabSearchTerm}
-            onChange={(e) => setCollabSearchTerm(e.target.value)}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#1a0f12] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm placeholder:text-slate-400 focus:outline-none focus:border-indigo-500/50"
-          />
+    <div className="space-y-6">
+      {/* Form cấp quyền nhanh bằng Email */}
+      <div className="paper-card p-6">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-xl bg-jade-soft border border-jade-border flex items-center justify-center text-jade">
+            <span className="material-symbols-outlined" aria-hidden="true">
+              person_add
+            </span>
+          </div>
+          <div>
+            <h2 className="font-display font-bold text-base text-foreground">
+              Thêm Cộng Tác Viên bằng Email
+            </h2>
+            <p className="text-xs text-secondary-text">
+              Cộng tác viên có quyền đăng tài liệu vào Thư viện Free và cập nhật nhiệm vụ trong Lộ trình học.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={onGrantByEmail} className="flex flex-col sm:flex-row gap-3 mt-4">
+          <div className="relative flex-1">
+            <span
+              className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"
+              aria-hidden="true"
+            >
+              mail
+            </span>
+            <input
+              type="email"
+              required
+              placeholder="Nhập chính xác email tài khoản cần cấp quyền CTV..."
+              value={collabEmailInput}
+              onChange={(e) => setCollabEmailInput(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+            />
+          </div>
           <button
             type="submit"
-            disabled={loadingCollabs || !collabSearchTerm.trim()}
-            className="px-5 py-2.5 rounded-xl bg-indigo-500 text-white text-sm font-bold hover:bg-indigo-600 transition-colors flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            disabled={isUpdatingCollab}
+            className="btn-arena btn-arena-jade btn-arena-sm no-shrink"
           >
-            {loadingCollabs ? <span className="material-symbols-outlined animate-spin text-[16px]">sync</span> : <span className="material-symbols-outlined text-[16px]">search</span>}
-            Tìm user
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">
+              verified_user
+            </span>
+            {isUpdatingCollab ? 'Đang xử lý...' : 'Cấp quyền Cộng tác viên'}
           </button>
         </form>
-
-        {searchResults.length > 0 && (
-          <div className="mt-6 space-y-3">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1 mb-2">Kết quả tìm kiếm</p>
-            {searchResults.map((user) => (
-              <div key={`search-${user.id}`} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-slate-200 dark:border-indigo-500/10 bg-indigo-50/50 dark:bg-indigo-500/5">
-                <div className="flex items-center gap-4">
-                  <Avatar user={user} size="md" />
-                  <div className="min-w-0">
-                    <p className="font-bold text-slate-900 dark:text-white truncate">{user.display_name || user.full_name || 'Người dùng vô danh'}</p>
-                    <p className="text-xs text-slate-500 truncate">{user.email || 'N/A'}</p>
-                    {user.role === 'collaborator' && (
-                      <span className="inline-block mt-1 text-[10px] bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-md font-bold">Đang là TDS</span>
-                    )}
-                  </div>
-                </div>
-                <div className="shrink-0 flex items-center gap-2">
-                  <button
-                    onClick={() => setCollaboratorRole(user.id, user.role !== 'collaborator')}
-                    disabled={user.role === 'admin'}
-                    className={`px-4 py-2 text-xs font-black rounded-lg transition-all ${
-                      user.role === 'collaborator'
-                        ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500/20'
-                        : 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 hover:scale-[1.02]'
-                    } disabled:opacity-50`}
-                  >
-                    {user.role === 'collaborator' ? 'Giáng cấp' : 'Thăng cấp'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* List Collaborators */}
-      <div className="bg-white dark:bg-[#201216] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-xl">
-        <h2 className="text-base font-black text-indigo-500 mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px]">group</span> Danh Sách Truyền Đạo Sư ({collaborators.length})
-        </h2>
-        
-        {loadingCollabs && collaborators.length === 0 ? (
-           <div className="flex justify-center p-8"><span className="material-symbols-outlined animate-spin text-indigo-500">sync</span></div>
-        ) : collaborators.length === 0 ? (
-          <div className="text-center p-8 border border-dashed border-slate-200 dark:border-white/10 rounded-xl">
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Chưa có Truyền Đạo Sư nào.</p>
+      {/* Danh sách đội ngũ hiện tại */}
+      <div className="paper-card overflow-hidden">
+        <div className="p-5 border-b border-border flex items-center justify-between bg-paper">
+          <div>
+            <h3 className="font-display font-bold text-base text-foreground">
+              Đội ngũ Quản trị &amp; Cộng tác viên ({collaborators.length})
+            </h3>
+            <p className="text-xs text-secondary-text mt-0.5">
+              Danh sách các tài khoản có quyền biên tập nội dung trên hệ thống
+            </p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {collaborators.map((collab) => (
-              <div key={`collab-${collab.id}`} className="group relative flex flex-col p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:border-indigo-500/30 dark:hover:border-indigo-500/30 transition-colors">
-                <div className="flex items-center gap-3 mb-3">
-                  <Avatar user={collab} size="sm" />
-                  <div className="min-w-0">
-                    <p className="font-bold text-slate-900 dark:text-white text-sm truncate">{collab.display_name || collab.full_name}</p>
-                    <p className="text-[11px] text-slate-500 truncate">{collab.email}</p>
+        </div>
+
+        <div className="divide-y divide-border">
+          {collaborators.map((u) => (
+            <div
+              key={u.id}
+              className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-alt transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar
+                  src={u.avatar_url}
+                  name={u.full_name || u.email}
+                  className="w-10 h-10"
+                  textSize="text-sm"
+                />
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-display font-bold text-foreground text-sm">
+                      {u.full_name || 'Chưa đặt tên'}
+                    </p>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                        u.role === 'admin'
+                          ? 'bg-primary-soft text-primary border-primary/35'
+                          : 'bg-jade-soft text-jade border-jade-border'
+                      }`}
+                    >
+                      {u.role === 'admin' ? 'Admin' : 'Cộng tác viên'}
+                    </span>
                   </div>
+                  <p className="text-xs text-secondary-text">{u.email || 'Chưa đồng bộ email'}</p>
                 </div>
-                <button
-                  onClick={() => {
-                    if (window.confirm(`Bạn có chắc muốn giáng cấp ${collab.display_name || collab.email} trở thành người dùng bình thường?`)) {
-                      setCollaboratorRole(collab.id, false);
-                    }
-                  }}
-                  className="mt-auto px-3 py-1.5 text-[11px] font-bold rounded-lg bg-slate-200/50 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 dark:hover:bg-red-500/10 transition-colors"
-                >
-                  GỠ QUYỀN TRUYỀN ĐẠO SƯ
-                </button>
               </div>
-            ))}
-          </div>
-        )}
+
+              {u.role === 'collaborator' && (
+                <button
+                  type="button"
+                  onClick={() => onSetUserRole(u.id, 'student', u.full_name || u.email)}
+                  className="self-start sm:self-auto px-3 py-1.5 rounded-lg text-xs font-bold bg-primary-soft text-primary border border-primary/30 hover:bg-primary hover:text-white transition-all flex items-center gap-1 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                    person_remove
+                  </span>
+                  Thu hồi quyền CTV
+                </button>
+              )}
+            </div>
+          ))}
+
+          {collaborators.length === 0 && (
+            <div className="p-8 text-center text-secondary-text text-sm">
+              Chưa có Cộng tác viên nào. Hãy nhập email ở ô phía trên để thêm!
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

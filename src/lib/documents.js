@@ -1,118 +1,58 @@
-export const DOCUMENT_FIELDS = 'id, title, description, file_url, category, education_level, uploaded_by, author_name, created_at, uploaded_at, is_featured, publish_date, major';
+export const DOCUMENT_SELECT_FIELDS =
+  'id, title, grade, subject, category, file_name, file_size, file_url, created_at';
 
-export const ADMIN_DOCUMENT_FIELDS = `${DOCUMENT_FIELDS}, document_reports(id, reason, created_at, document_id, reported_by, documents(id, title, author_name))`;
+export function getDocumentKindMeta(fileName, fileUrl) {
+  const source = `${fileName || ''} ${fileUrl || ''}`.toLowerCase();
 
-export const LIBRARY_THPT_CATEGORIES = [
-  { label: 'Tất cả', value: '' },
-  { label: 'Toán', value: 'toan' },
-  { label: 'Vật Lý', value: 'ly' },
-  { label: 'Hóa Học', value: 'hoa' },
-  { label: 'Sinh Học', value: 'sinh' },
-  { label: 'Ngữ Văn', value: 'van' },
-  { label: 'Tiếng Anh', value: 'anh' },
-  { label: 'Lịch Sử', value: 'su' },
-  { label: 'Địa Lý', value: 'dia' },
-  { label: 'Tin Học', value: 'tin' },
-  { label: 'GD KT&PL', value: 'gdktpl' },
-];
-
-export function normalizeSearchText(value) {
-  return (value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-}
-
-export function getDocumentUploadDate(document) {
-  return document?.uploaded_at || document?.created_at || null;
-}
-
-export function formatViDate(value, options) {
-  if (!value) {
-    return null;
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  return new Intl.DateTimeFormat(
-    'vi-VN',
-    options ?? {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    },
-  ).format(date);
-}
-
-export function formatViDateTime(value) {
-  return formatViDate(value, {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-export function getDocumentKindMeta(fileUrl) {
-  const lowerUrl = (fileUrl || '').toLowerCase();
-
-  if (!lowerUrl) {
+  if (source.includes('docs.google.com/spreadsheets')) {
     return {
-      icon: 'draft',
-      label: 'Chưa gắn link',
-      accent: 'text-slate-400',
-      chipClass: 'bg-slate-500/10 text-slate-300 border border-slate-500/20',
+      label: 'Sheet',
+      icon: 'grid_view',
+      badgeClass: 'bg-jade-soft text-jade border border-jade/30',
+      actionLabel: 'Mở sheet',
     };
   }
 
-  if (
-    lowerUrl.includes('youtube.com')
-    || lowerUrl.includes('youtu.be')
-    || lowerUrl.includes('vimeo.com')
-  ) {
+  if (source.includes('drive.google.com/drive/folders')) {
     return {
-      icon: 'play_circle',
-      label: 'Video',
-      accent: 'text-rose-300',
-      chipClass: 'bg-rose-500/10 text-rose-200 border border-rose-500/20',
+      label: 'Folder Drive',
+      icon: 'folder_open',
+      badgeClass: 'bg-gold-soft text-gold-dark border border-gold/40',
+      actionLabel: 'Mở thư mục',
     };
   }
 
-  if (
-    lowerUrl.includes('.doc')
-    || lowerUrl.includes('.docx')
-    || lowerUrl.includes('docs.google.com')
-  ) {
+  if (source.includes('drive.google.com')) {
     return {
-      icon: 'article',
-      label: 'Docs',
-      accent: 'text-sky-300',
-      chipClass: 'bg-sky-500/10 text-sky-200 border border-sky-500/20',
+      label: 'Google Drive',
+      icon: 'cloud_upload',
+      badgeClass: 'bg-sky-50 text-sky-800 border border-sky-200',
+      actionLabel: 'Mở Drive',
     };
   }
 
-  if (lowerUrl.includes('.pdf') || lowerUrl.includes('drive.google.com')) {
+  if (source.includes('facebook.com')) {
     return {
+      label: 'Nhóm / Bài viết',
+      icon: 'groups',
+      badgeClass: 'bg-indigo-50 text-indigo-800 border border-indigo-200',
+      actionLabel: 'Mở liên kết',
+    };
+  }
+
+  if (source.endsWith('.pdf') || source.includes('.pdf')) {
+    return {
+      label: 'PDF',
       icon: 'picture_as_pdf',
-      label: 'PDF / Drive',
-      accent: 'text-amber-300',
-      chipClass: 'bg-amber-500/10 text-amber-200 border border-amber-500/20',
+      badgeClass: 'bg-primary-soft text-primary border border-primary/30',
+      actionLabel: 'Xem / Tải PDF',
     };
   }
 
   return {
-    icon: 'link',
-    label: 'Liên kết',
-    accent: 'text-emerald-300',
-    chipClass: 'bg-emerald-500/10 text-emerald-200 border border-emerald-500/20',
+    label: 'Tài liệu',
+    icon: 'description',
+    badgeClass: 'bg-surface-alt text-secondary-text border border-border',
+    actionLabel: 'Mở tài liệu',
   };
-}
-
-export function getEducationLevelLabel(level) {
-  return level === 'university' ? 'Đại học' : 'THPT';
 }
