@@ -41,6 +41,7 @@ rpc_output.txt
 .DS_Store
 Thumbs.db
 desktop.ini
+Microsoft/
 
 # Cache
 .cache/

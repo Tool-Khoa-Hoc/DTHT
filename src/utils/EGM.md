@@ -20,10 +20,12 @@ React components and plain modules alike.
   - `getLevelAccent(level)` → `{ text, ring, bar, glow }` Tailwind token bundle.
   - `formatStudyTime(totalSeconds)` → e.g. `"12 giờ 30 phút"`.
 - `rankHelper.js`
-  - `RANK_TIERS` — ordered `{ name, min, color, bg, border, icon, requiresApproval? }`
-    (`Tân Binh` 0 → `Bang Chủ` 50, approval-gated).
-  - `getUserRank(completedCount, role, isApprovedBangChu)` → current rank plus
-    `nextRank`, `isMax`, and a `progress` block.
+  - `SOLE_BANG_CHU_ID` — UUID of the sole account allowed to hold the `Bang Chủ` rank.
+  - `isSoleBangChuAccount(role, userId)` — returns `true` only for the sole Bang Chủ account.
+  - `RANK_TIERS` — ordered `{ name, min, color, bg, border, icon, requiresApproval?, exclusiveBangChu? }`
+    (`Tân Binh` 0 EXP → `Phó Bang Chủ` 12,000 EXP, plus exclusive `Bang Chủ`).
+  - `getUserRank(exp, role, _isApprovedBangChu, userId)` → current rank plus
+    `nextRank`, `isMax`, `isBangChu`, and an EXP-based `progress` block.
 - `urlSecurity.js` — `sanitizeExternalUrl(input)` → normalised `http(s)` URL or
   `null`; `assertSafeExternalUrl(input, fallbackMessage)` → URL or throws.
 - `mediaPath.js` — `resolveMediaPath(input, basePath)`; leaves absolute URLs and
@@ -43,11 +45,12 @@ React components and plain modules alike.
   Changing one side without the other desynchronises client and server.
 - `getLevelFromExp` clamps input to a non-negative integer and always returns
   `progressPct` in `0..100`; `minExpForLevel` floors and clamps level to ≥ 1.
-- `RANK_TIERS` is ordered by ascending `min`. `getUserRank` short-circuits first
-  for `admin` (`Thống Soái`) and `collaborator`/`editor` (`Truyền Đạo Sư`), then
-  walks the ladder. `Bang Chủ` (min 50) is only granted when
-  `isApprovedBangChu` is true — otherwise the user stays at `Phó Bang Chủ` and
-  `progress.pendingApproval` is set.
+- `RANK_TIERS` is ordered by ascending `min` EXP. `getUserRank` grants `Bang Chủ`
+  exclusively to the single account matching `isSoleBangChuAccount(role, userId)`
+  (`SOLE_BANG_CHU_ID`). All other accounts advance through the EXP-earnable tiers
+  (`Tân Binh` → `Thiếu Hiệp` → `Đại Hiệp` → `Trưởng Lão` → `Chưởng Môn` →
+  `Phó Bang Chủ`) strictly by accumulated `exp` (higher EXP = higher rank) and
+  are never allowed to become `Bang Chủ`.
 - `getUserRank` percentage maths is guarded so `nextRank.min` is never 0 for a
   tier that has one.
 - `sanitizeExternalUrl` accepts only absolute `http:`/`https:` URLs; it returns

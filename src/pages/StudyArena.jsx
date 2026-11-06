@@ -82,26 +82,68 @@ export default function StudyArena() {
   const [loadingPublicCampaigns, setLoadingPublicCampaigns] = useState(false);
   const [communitySearch, setCommunitySearch] = useState('');
 
-  const fetchCompletedCounts = useCallback(async () => {
+  const fetchCompletedCounts = useCallback(async (targetUserIds = []) => {
+    const uniqueIds = [...new Set((targetUserIds || []).filter(Boolean))];
+    if (uniqueIds.length === 0) return {};
+
     try {
+      const counts = {};
+      for (const uid of uniqueIds) {
+        counts[uid] = 0;
+      }
+
+      // 1. Prefer server-side Index-Only Scan aggregation RPC (10k CCU safe)
+      const rpcRes = await supabase.rpc('get_completed_campaign_counts', {
+        p_user_ids: uniqueIds,
+      });
+
+      if (!rpcRes.error && Array.isArray(rpcRes.data)) {
+        for (const row of rpcRes.data) {
+          if (row.user_id) {
+            counts[row.user_id] = Number(row.completed_count) || 0;
+          }
+        }
+        setCompletedCountsMap((prev) => ({ ...prev, ...counts }));
+        return counts;
+      }
+
+      // 2. Fallback: scoped .in('user_id', uniqueIds) query (never scan whole table)
       const { data, error } = await supabase
         .from('campaigns')
         .select('user_id')
-        .eq('is_completed', true);
+        .eq('is_completed', true)
+        .in('user_id', uniqueIds);
 
-      if (error || !data) return {};
-      const counts = {};
+      if (error || !data) return counts;
       for (const row of data) {
         if (row.user_id) {
           counts[row.user_id] = (counts[row.user_id] || 0) + 1;
         }
       }
-      setCompletedCountsMap(counts);
+      setCompletedCountsMap((prev) => ({ ...prev, ...counts }));
       return counts;
     } catch {
       return {};
     }
   }, []);
+
+  const adjustMyCompletedCount = useCallback(
+    (delta) => {
+      if (!user?.id || !delta) return;
+      setCompletedCountsMap((prev) => {
+        const nextVal = Math.max(0, (prev[user.id] || 0) + delta);
+        return { ...prev, [user.id]: nextVal };
+      });
+      setLeaderboard((prev) =>
+        prev.map((item) =>
+          item.id === user.id
+            ? { ...item, completedCampaigns: Math.max(0, (item.completedCampaigns || 0) + delta) }
+            : item,
+        ),
+      );
+    },
+    [user],
+  );
 
   const fetchPublicProfilesByIds = useCallback(async (ids) => {
     const uniqueIds = [...new Set((ids || []).filter(Boolean))];
@@ -132,8 +174,6 @@ export default function StudyArena() {
       const targetMode = modeOverride || leaderboardMode;
       setLoadingLeaderboard(true);
       try {
-        const [counts] = await Promise.all([fetchCompletedCounts()]);
-
         let rawRows = null;
 
         if (targetMode === 'daily') {
@@ -177,6 +217,11 @@ export default function StudyArena() {
           if (res.error) throw res.error;
           rawRows = res.data || [];
         }
+
+        const counts = await fetchCompletedCounts([
+          ...rawRows.map((u) => u.id),
+          user?.id,
+        ]);
 
         const rows = rawRows.map((u) => {
           const todaySec = Number(u.today_seconds) || 0;
@@ -253,7 +298,8 @@ export default function StudyArena() {
           'id, user_id, title, description, target, targets, start_date, end_date, is_completed, is_public, created_at',
         )
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(100);
 
       if (error) throw error;
       setMyCampaigns(data || []);
@@ -268,21 +314,23 @@ export default function StudyArena() {
   const fetchPublicCampaigns = useCallback(async () => {
     setLoadingPublicCampaigns(true);
     try {
-      const [, campRes] = await Promise.all([
-        fetchCompletedCounts(),
-        supabase
-          .from('campaigns')
-          .select(
-            'id, user_id, title, description, target, targets, start_date, end_date, is_completed, is_public, created_at',
-          )
-          .eq('is_public', true)
-          .order('created_at', { ascending: false })
-          .limit(60),
-      ]);
+      const campRes = await supabase
+        .from('campaigns')
+        .select(
+          'id, user_id, title, description, target, targets, start_date, end_date, is_completed, is_public, created_at',
+        )
+        .eq('is_public', true)
+        .order('created_at', { ascending: false })
+        .limit(60);
 
       if (campRes.error) throw campRes.error;
       const list = campRes.data || [];
-      const profilesMap = await fetchPublicProfilesByIds(list.map((c) => c.user_id));
+      const authorIds = list.map((c) => c.user_id);
+
+      const [profilesMap] = await Promise.all([
+        fetchPublicProfilesByIds(authorIds),
+        fetchCompletedCounts(authorIds),
+      ]);
 
       setPublicCampaigns(
         list.map((c) => ({
@@ -425,7 +473,9 @@ export default function StudyArena() {
     if (allDone && !campaign.is_completed) {
       showToast(`Chúc mừng! Bạn đã hoàn thành chiến dịch "${campaign.title}"!`, 'success');
     }
-    fetchCompletedCounts();
+    if (allDone !== Boolean(campaign.is_completed)) {
+      adjustMyCompletedCount(allDone ? 1 : -1);
+    }
   };
 
   const handleToggleCampaignComplete = async (campaign) => {
@@ -454,7 +504,7 @@ export default function StudyArena() {
         : 'Đã mở lại chiến dịch để tiếp tục rèn luyện.',
       nextCompleted ? 'success' : 'info',
     );
-    fetchCompletedCounts();
+    adjustMyCompletedCount(nextCompleted ? 1 : -1);
   };
 
   const handleToggleCampaignPublic = async (campaign) => {
@@ -486,6 +536,7 @@ export default function StudyArena() {
   const handleDeleteCampaign = async (campaignId) => {
     if (!user) return;
     const backup = myCampaigns;
+    const deletedTarget = myCampaigns.find((c) => c.id === campaignId);
     setMyCampaigns((prev) => prev.filter((c) => c.id !== campaignId));
     setConfirmDeleteId(null);
 
@@ -502,7 +553,9 @@ export default function StudyArena() {
     }
 
     showToast('Đã xoá chiến dịch.', 'info');
-    fetchCompletedCounts();
+    if (deletedTarget?.is_completed) {
+      adjustMyCompletedCount(-1);
+    }
   };
 
   // Derived personal stats
@@ -512,12 +565,13 @@ export default function StudyArena() {
       : completedCountsMap[user.id] || 0
     : 0;
 
+  const myExp = Number(profile?.exp) || 0;
   const myRankInfo = getUserRank(
-    myCompletedCount,
+    myExp,
     profile?.role,
     profile?.is_approved_bang_chu,
+    user?.id,
   );
-  const myExp = Number(profile?.exp) || 0;
   const myStudySeconds = Number(profile?.study_seconds) || 0;
   const myStreak = Number(profile?.study_streak) || 0;
   const myLevel = getLevelFromExp(myExp);
@@ -765,13 +819,8 @@ export default function StudyArena() {
                       max={100}
                       tone="primary"
                       label={`Quân hàm → ${myRankInfo.nextRank.name}`}
-                      sublabel={`${myCompletedCount}/${myRankInfo.progress.target} chiến dịch`}
+                      sublabel={`${myExp.toLocaleString('vi-VN')}/${myRankInfo.progress.target.toLocaleString('vi-VN')} EXP`}
                     />
-                    {myRankInfo.progress.pendingApproval && (
-                      <p className="text-[10px] text-accent font-semibold mt-1">
-                        Đã đủ 50 chiến dịch — đang chờ Thống Soái sắc phong Bang Chủ!
-                      </p>
-                    )}
                   </div>
                 ) : (
                   <p className="text-[11px] font-display font-bold text-primary flex items-center justify-between pt-1 border-t border-border">
@@ -779,10 +828,12 @@ export default function StudyArena() {
                       <span className="material-symbols-outlined text-sm" aria-hidden="true">
                         auto_awesome
                       </span>
-                      Quân hàm tối cao: {myRankInfo.name}
+                      {myRankInfo.isBangChu
+                        ? 'Ngôi vị độc tôn: Bang Chủ'
+                        : `Hạng tối đa: ${myRankInfo.name}`}
                     </span>
                     <span className="tabular text-secondary-text">
-                      {myCompletedCount} chiến dịch
+                      {myExp.toLocaleString('vi-VN')} EXP · {myCompletedCount} CD
                     </span>
                   </p>
                 )}
@@ -984,9 +1035,10 @@ export default function StudyArena() {
                       {restOfList.map((scholar) => {
                         const isMe = Boolean(user && scholar.id === user.id);
                         const sRank = getUserRank(
-                          scholar.completedCampaigns,
+                          scholar.exp,
                           scholar.role,
                           scholar.is_approved_bang_chu,
+                          scholar.id,
                         );
                         const sLv = getLevelFromExp(scholar.exp);
                         const sLvAccent = getLevelAccent(sLv.level);
@@ -1133,7 +1185,7 @@ export default function StudyArena() {
                 </h3>
                 <p className="text-sm text-secondary-text max-w-md mx-auto">
                   Chia nhỏ mục tiêu ôn thi thành từng chặng rõ ràng, theo dõi tiến độ mỗi ngày và
-                  thăng cấp Quân Hàm từ Tân Binh lên Bang Chủ!
+                  kết hợp tích lũy EXP học tập để thăng cấp Quân Hàm!
                 </p>
                 <button
                   type="button"
@@ -1704,11 +1756,11 @@ export default function StudyArena() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {visiblePublicCampaigns.map((camp) => {
                   const author = camp.author;
-                  const authorCompleted = completedCountsMap[camp.user_id] || 0;
                   const authorRank = getUserRank(
-                    authorCompleted,
+                    author?.exp || 0,
                     author?.role,
                     author?.is_approved_bang_chu,
+                    camp.user_id,
                   );
                   const authorLv = getLevelFromExp(author?.exp || 0);
                   const authorLvAccent = getLevelAccent(authorLv.level);
@@ -1825,7 +1877,7 @@ export default function StudyArena() {
                   military_tech
                 </span>
                 <h3 className="font-display font-bold text-base text-foreground">
-                  Hệ Thống Công Lực &amp; Quân Hàm Chiến Dịch
+                  Hệ Thống Công Lực &amp; Quân Hàm (EXP)
                 </h3>
               </div>
               <button
@@ -1846,8 +1898,8 @@ export default function StudyArena() {
                 <strong>Học Online</strong> (+10 EXP/phút, tối đa 5 giờ/ngày + thưởng chuỗi ngày học liên tiếp).
               </div>
               <div className="p-3.5 rounded-xl bg-gold-soft/50 border border-gold text-xs text-foreground leading-relaxed">
-                <strong>2. Danh Hiệu Quân Hàm:</strong> Thăng tiến dựa trên tổng số{' '}
-                <strong>Chiến Dịch Học Tập đã hoàn thành</strong> dưới đây:
+                <strong>2. Mức Hạng Quân Hàm:</strong> EXP tích luỹ càng cao thì mức hạng càng cao.
+                Riêng ngôi vị <strong>Bang Chủ</strong> chỉ có duy nhất 1 tài khoản tối cao nắm giữ (không ai khác được phép là Bang Chủ):
               </div>
 
               {RANK_TIERS.map((tier) => {
@@ -1881,16 +1933,18 @@ export default function StudyArena() {
                           )}
                         </div>
                         <p className="text-xs text-secondary-text mt-0.5 tabular">
-                          {tier.min === 0
-                            ? 'Khởi điểm khi gia nhập Đấu Trường'
-                            : tier.requiresApproval
-                              ? `Hoàn thành ≥ ${tier.min} chiến dịch + Thống Soái sắc phong`
-                              : `Hoàn thành từ ${tier.min} chiến dịch`}
+                          {tier.exclusiveBangChu
+                            ? 'Ngôi vị độc tôn — Chỉ duy nhất 1 tài khoản được phép là Bang Chủ'
+                            : tier.min === 0
+                              ? 'Khởi điểm khi gia nhập Đấu Trường (0 EXP)'
+                              : `Tích lũy đạt từ ${tier.min.toLocaleString('vi-VN')} EXP`}
                         </p>
                       </div>
                     </div>
                     <span className="text-xs font-display font-extrabold text-secondary-text tabular">
-                      {tier.min} CD
+                      {tier.exclusiveBangChu
+                        ? 'Độc tôn'
+                        : `${tier.min.toLocaleString('vi-VN')} EXP`}
                     </span>
                   </div>
                 );
@@ -1905,9 +1959,10 @@ export default function StudyArena() {
 
 function PodiumCard({ scholar, place, mode = 'daily', isCurrentUser }) {
   const rank = getUserRank(
-    scholar.completedCampaigns,
+    scholar.exp || 0,
     scholar.role,
     scholar.is_approved_bang_chu,
+    scholar.id,
   );
   const lv = getLevelFromExp(scholar.exp || 0);
   const lvAccent = getLevelAccent(lv.level);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Avatar from '../Avatar';
+import { isSoleBangChuAccount } from '../../utils/rankHelper';
 
 export default function AdminThongSoai({
   candidates = [],
@@ -18,7 +19,7 @@ export default function AdminThongSoai({
 
   return (
     <div className="space-y-6">
-      {/* Banner Sắc phong Bang Chủ */}
+      {/* Banner Ngôi vị Bang Chủ Độc Tôn */}
       <div className="paper-card p-6 relative overflow-hidden">
         <span
           aria-hidden="true"
@@ -35,16 +36,16 @@ export default function AdminThongSoai({
           </div>
           <div>
             <h2 className="font-display font-bold text-lg text-foreground">
-              Sắc Phong Bang Chủ &amp; Vinh Danh Thống Soái
+              Ngôi Vị Bang Chủ Độc Tôn
             </h2>
             <p className="text-xs text-secondary-text">
-              Duyệt các chiến binh xuất sắc (hoàn thành trên 50 nhiệm vụ / tích lũy thời gian rèn luyện cao) lên vị trí Bang Chủ bang hội.
+              Trên toàn Đấu Trường Học Tập chỉ có duy nhất 1 tài khoản tối cao giữ ngôi vị Bang Chủ. Các sĩ tử khác thăng hạng theo tổng EXP tích lũy (tối đa đến Phó Bang Chủ).
             </p>
           </div>
         </div>
       </div>
 
-      {/* Danh sách Bang Chủ đã được sắc phong */}
+      {/* Tài khoản Bang Chủ duy nhất */}
       <div className="paper-card overflow-hidden">
         <div className="p-5 border-b border-border flex items-center justify-between bg-paper">
           <div>
@@ -52,10 +53,10 @@ export default function AdminThongSoai({
               <span className="material-symbols-outlined text-accent" aria-hidden="true">
                 military_tech
               </span>
-              <span>Danh sách Bang Chủ chính thức ({approvedBangChuList.length})</span>
+              <span>Bang Chủ Tối Cao Duy Nhất</span>
             </h3>
             <p className="text-xs text-secondary-text mt-0.5">
-              Những thủ lĩnh đã được Admin phê chuẩn con dấu Bang Chủ trên toàn cõi Đấu Trường
+              Không có bất kỳ tài khoản nào khác được phép sắc phong làm Bang Chủ
             </p>
           </div>
         </div>
@@ -63,6 +64,7 @@ export default function AdminThongSoai({
         <div className="divide-y divide-border">
           {approvedBangChuList.map((u) => {
             const displayName = u.display_name || u.full_name || u.email || 'Khuyết danh';
+            const isSoleOwner = isSoleBangChuAccount(u.role, u.id);
             return (
               <div
                 key={u.id}
@@ -81,12 +83,18 @@ export default function AdminThongSoai({
                       <p className="font-display font-bold text-foreground text-sm">
                         {displayName}
                       </p>
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-gold-soft text-gold-dark border border-gold">
-                        <span className="material-symbols-outlined text-[12px] icon-fill" aria-hidden="true">
-                          verified
+                      {isSoleOwner ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-gold-soft text-gold-dark border border-gold">
+                          <span className="material-symbols-outlined text-[12px] icon-fill" aria-hidden="true">
+                            verified
+                          </span>
+                          Bang Chủ Độc Tôn
                         </span>
-                        Bang Chủ Phê Chuẩn
-                      </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-soft text-primary border border-primary/30">
+                          Cần thu hồi cờ cũ
+                        </span>
+                      )}
                       {u.is_vip && (
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-soft text-primary border border-primary/30">
                           VIP
@@ -94,40 +102,49 @@ export default function AdminThongSoai({
                       )}
                     </div>
                     <p className="text-xs text-secondary-text mt-0.5">
-                      {u.email || 'Chưa đồng bộ email'} • {u.university || 'Sĩ tử THPT'}
+                      {u.email || 'Chưa đồng bộ email'} • {u.university || 'Ban Quản Trị'}
                     </p>
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    setToggleConfirmTarget({
-                      userId: u.id,
-                      currentStatus: true,
-                      name: displayName,
-                    })
-                  }
-                  className="self-start sm:self-auto px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 cursor-pointer bg-primary-soft text-primary border-primary/30 hover:bg-primary hover:text-white"
-                >
-                  <span className="material-symbols-outlined text-sm" aria-hidden="true">
-                    remove_moderator
+                {isSoleOwner ? (
+                  <span className="self-start sm:self-auto px-3 py-1.5 rounded-lg text-xs font-bold border bg-gold-soft text-gold-dark border-gold flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm icon-fill" aria-hidden="true">
+                      lock
+                    </span>
+                    <span>Ngôi vị cố định</span>
                   </span>
-                  <span>Bỏ chức Bang Chủ</span>
-                </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setToggleConfirmTarget({
+                        userId: u.id,
+                        currentStatus: true,
+                        name: displayName,
+                      })
+                    }
+                    className="self-start sm:self-auto px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 cursor-pointer bg-primary-soft text-primary border-primary/30 hover:bg-primary hover:text-white"
+                  >
+                    <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                      remove_moderator
+                    </span>
+                    <span>Thu hồi cờ Bang Chủ</span>
+                  </button>
+                )}
               </div>
             );
           })}
 
           {approvedBangChuList.length === 0 && (
             <div className="p-8 text-center text-secondary-text text-sm">
-              Chưa có Bang Chủ nào được phê chuẩn. Hãy duyệt các ứng viên tiềm năng ở danh sách dưới!
+              Đang tải thông tin tài khoản Bang Chủ tối cao...
             </div>
           )}
         </div>
       </div>
 
-      {/* Danh sách Ứng viên Thống Soái tiềm năng (RPC) */}
+      {/* Danh sách Sĩ tử xuất sắc (Chỉ vinh danh Phó Bang Chủ / Cao thủ, không sắc phong Bang Chủ) */}
       <div className="paper-card overflow-hidden">
         <div className="p-5 border-b border-border flex items-center justify-between bg-paper">
           <div>
@@ -135,10 +152,10 @@ export default function AdminThongSoai({
               <span className="material-symbols-outlined text-primary" aria-hidden="true">
                 leaderboard
               </span>
-              <span>Ứng viên Thống Soái tiềm năng ({candidates.length})</span>
+              <span>Bảng Cao Thủ Chiến Dịch ({candidates.length})</span>
             </h3>
             <p className="text-xs text-secondary-text mt-0.5">
-              Thống kê từ RPC `admin_get_thongsoai_candidates` (đạt từ 50 mốc học tập trở lên)
+              Các sĩ tử hoàn thành nhiều chiến dịch (chỉ theo dõi thành tích, quyền Bang Chủ đã khoá độc quyền cho 1 tài khoản duy nhất)
             </p>
           </div>
         </div>
@@ -153,7 +170,7 @@ export default function AdminThongSoai({
           ) : candidates.length > 0 ? (
             candidates.map((cand) => {
               const displayName = cand.display_name || cand.full_name || cand.email || 'Khuyết danh';
-              const isApproved = Boolean(cand.is_approved_bang_chu);
+              const isSoleOwner = isSoleBangChuAccount(cand.role, cand.id);
 
               return (
                 <div
@@ -176,9 +193,9 @@ export default function AdminThongSoai({
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-jade-soft text-jade border border-jade-border tabular">
                           {cand.completedCount || cand.completed_count || 0} nhiệm vụ
                         </span>
-                        {isApproved && (
+                        {isSoleOwner && (
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gold-soft text-gold-dark border border-gold">
-                            Đã phê chuẩn
+                            Bang Chủ Độc Tôn
                           </span>
                         )}
                       </div>
@@ -186,32 +203,15 @@ export default function AdminThongSoai({
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setToggleConfirmTarget({
-                        userId: cand.id,
-                        currentStatus: isApproved,
-                        name: displayName,
-                      })
-                    }
-                    className={`self-start sm:self-auto px-3.5 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 cursor-pointer ${
-                      isApproved
-                        ? 'bg-primary-soft text-primary border-primary/30 hover:bg-primary hover:text-white'
-                        : 'bg-gold-soft text-gold-dark border-gold hover:bg-gold hover:text-white'
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-sm" aria-hidden="true">
-                      {isApproved ? 'close' : 'check'}
-                    </span>
-                    <span>{isApproved ? 'Hủy sắc phong' : 'Sắc phong Bang Chủ'}</span>
-                  </button>
+                  <span className="self-start sm:self-auto px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-alt text-secondary-text border border-border">
+                    {isSoleOwner ? 'Bang Chủ Duy Nhất' : 'Thăng hạng theo EXP (Tối đa Phó Bang Chủ)'}
+                  </span>
                 </div>
               );
             })
           ) : (
             <div className="p-8 text-center text-secondary-text text-sm">
-              Chưa có ứng viên nào đạt điều kiện mốc hoàn thành.
+              Chưa có sĩ tử nào vượt mốc 50 chiến dịch.
             </div>
           )}
         </div>

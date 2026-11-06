@@ -1,6 +1,6 @@
 /*
- * Level / EXP ("Cấp độ" & "Công Lực") — a time-based progression that runs
- * alongside the campaign-based Danh Hiệu ladder in rankHelper.js.
+ * Level / EXP ("Cấp độ" & "Công Lực") — a time-based progression that drives
+ * both Cấp Độ (Level) and the EXP-based Quân Hàm / Danh Hiệu ladder in rankHelper.js.
  *
  * Economy (MUST stay in sync with the award_study_exp() SQL migration):
  *   - 10 EXP per verified minute of study.

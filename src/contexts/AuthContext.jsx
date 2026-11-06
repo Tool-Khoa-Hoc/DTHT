@@ -17,7 +17,7 @@ const PROFILE_COLUMNS = `
   university, major, starting_year, user_mode,
   target_gpa, target_thpt, target_dgnl, current_gpa,
   admission_scores, is_approved_bang_chu,
-  is_vip, vip_expired_at, roadmap_data,
+  is_vip, vip_expired_at, roadmap_data, created_at,
   exp, study_seconds, study_streak, last_study_date
 `;
 
@@ -26,7 +26,7 @@ const PROFILE_COLUMNS_FALLBACK = `
   university, major, starting_year, user_mode,
   target_gpa, target_thpt, target_dgnl, current_gpa,
   admission_scores, is_approved_bang_chu,
-  is_vip, vip_expired_at, roadmap_data
+  is_vip, vip_expired_at, roadmap_data, created_at
 `;
 
 // eslint-disable-next-line react-refresh/only-export-components

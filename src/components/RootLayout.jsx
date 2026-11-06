@@ -111,9 +111,14 @@ export default function RootLayout() {
     }
   };
 
-  const userRank = getUserRank(0, profile?.role, profile?.is_approved_bang_chu);
   const lv = getLevelFromExp(profile?.exp || 0);
   const lvAccent = getLevelAccent(lv.level);
+  const userRank = getUserRank(
+    lv.totalExp,
+    profile?.role,
+    profile?.is_approved_bang_chu,
+    user?.id,
+  );
 
   const displayAvatar =
     profile?.avatar_url ||

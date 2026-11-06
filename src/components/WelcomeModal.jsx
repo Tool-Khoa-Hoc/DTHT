@@ -136,7 +136,7 @@ export default function WelcomeModal() {
               <div>
                 <h3 className="text-foreground font-bold text-sm">Đấu Trường Bảng Vàng</h3>
                 <p className="text-secondary-text text-xs">
-                  Tích lũy giờ học, thăng bậc quân hàm từ Tân Binh đến Thống Soái
+                  Tích lũy EXP từ giờ học thực tế, EXP càng cao mức hạng quân hàm càng cao
                 </p>
               </div>
             </div>

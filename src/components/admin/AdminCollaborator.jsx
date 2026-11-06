@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Avatar from '../Avatar';
+import { isSoleBangChuAccount } from '../../utils/rankHelper';
 
 export default function AdminCollaborator({
   collaborators = [],
@@ -117,7 +118,7 @@ export default function AdminCollaborator({
                               Truyền Đạo Sư
                             </span>
                           )}
-                          {usr.is_approved_bang_chu && (
+                          {isSoleBangChuAccount(usr.role, usr.id) && (
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gold-soft text-gold-dark border border-gold uppercase">
                               Bang Chủ
                             </span>

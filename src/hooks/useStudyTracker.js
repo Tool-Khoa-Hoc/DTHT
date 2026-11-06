@@ -29,7 +29,8 @@ import { getLevelFromExp } from '../utils/levelHelper';
  *     (gracefully falling back to the 2-arg RPC if the DB migration is pending).
  */
 
-const HEARTBEAT_MS = 50000;                  // 50s heartbeat cadence
+const HEARTBEAT_MS = 50000;                  // 50s base heartbeat cadence
+const HEARTBEAT_JITTER_MS = 10000;           // ±5s randomized jitter to prevent 10k-CCU thundering herd
 const TICK_MS = 1000;                        // 1s UI clock & anti-AFK watcher
 const SESSION_LS_KEY = 'dtht.session.v1';
 const SESSION_RESUME_MS = 5 * 60 * 1000;     // resume open session within 5 min
@@ -293,6 +294,7 @@ export function useStudyTracker({
         applyAward(data.award, checkinBonus);
       } else if (data?.exp != null) {
         setExp(Number(data.exp) || 0);
+        if (data.study_seconds != null) setStudySeconds(Number(data.study_seconds) || 0);
         if (data.streak != null) setStreak(Number(data.streak) || 0);
         if (checkinBonus > 0) {
           flashIdRef.current += 1;
@@ -791,7 +793,9 @@ export function useStudyTracker({
     setCheckinPrompt(null);
 
     cycle();
-    const intervalId = window.setInterval(cycle, HEARTBEAT_MS);
+    const jitteredIntervalMs =
+      HEARTBEAT_MS + Math.floor(Math.random() * HEARTBEAT_JITTER_MS) - 4000;
+    const intervalId = window.setInterval(cycle, jitteredIntervalMs);
 
     const onPageHide = () => {
       if (modeRef.current === 'session' && sessionIdRef.current) {

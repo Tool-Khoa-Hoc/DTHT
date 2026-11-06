@@ -7,7 +7,7 @@ import RankSeal from '../components/ui/RankSeal';
 import { ListItemSkeleton } from '../components/ui/Skeleton';
 import { useToast } from '../components/ui/ToastProvider';
 import { toGpa4, gpaSemester, gpaCumulative, getGpaScale } from '../lib/admission/gpa';
-import { SUBJECTS, SUBJECT_LABEL, canonicalSubjects } from '../lib/admission/subjects';
+import { SUBJECTS, SUBJECT_LABEL, canonicalSubjectKey, canonicalSubjects } from '../lib/admission/subjects';
 import { COMBOS, allComboScores } from '../lib/admission/combos';
 import { migrateLegacyScores, saveScoreEntry } from '../lib/admission/scores';
 
@@ -26,6 +26,31 @@ const DEFAULT_THPT_SUBJECTS = [
   { id: 'tmp-s4', name: 'Vật lí', credits: 1, score: '8.2' },
   { id: 'tmp-s5', name: 'Hoá học', credits: 1, score: '8.0' },
 ];
+
+const THPT_SUBJECT_ICONS = {
+  toan: 'calculate',
+  van: 'auto_stories',
+  anh: 'translate',
+  ly: 'bolt',
+  hoa: 'science',
+  sinh: 'biotech',
+  su: 'history_edu',
+  dia: 'map',
+  gdkp: 'gavel',
+  tin: 'computer',
+  congnghe: 'engineering',
+  phap: 'translate',
+  trung: 'translate',
+  duc: 'translate',
+  nhat: 'translate',
+  han: 'translate',
+  nga: 'translate',
+};
+
+function getThptSubjectIcon(name) {
+  const key = canonicalSubjectKey(name);
+  return (key && THPT_SUBJECT_ICONS[key]) || 'book';
+}
 
 function normalizeCalcMode(raw) {
   if (raw === 'student' || raw === 'thpt') return 'student';
@@ -1400,7 +1425,7 @@ export default function GPACalculator() {
                         >
                           <div className="col-span-12 sm:col-span-5 flex items-center gap-2">
                             <span
-                              className="material-symbols-outlined text-accent text-lg pl-1 shrink-0"
+                              className="material-symbols-outlined text-accent text-lg ml-1 shrink-0"
                               aria-hidden="true"
                             >
                               menu_book
@@ -1751,10 +1776,10 @@ export default function GPACalculator() {
                       >
                         <div className="col-span-6 flex items-center gap-2">
                           <span
-                            className="material-symbols-outlined text-accent text-lg pl-1 shrink-0"
+                            className="material-symbols-outlined text-accent text-lg ml-1 shrink-0"
                             aria-hidden="true"
                           >
-                            book
+                            {getThptSubjectIcon(subj.name)}
                           </span>
                           <input
                             list="thpt-subjects"

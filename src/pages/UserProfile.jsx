@@ -251,9 +251,10 @@ export default function UserProfile() {
   const studyStreak = Number(scholar.study_streak) || 0;
 
   const rankInfo = getUserRank(
-    completedCampaignsCount,
+    expTotal,
     scholar.role,
     scholar.is_approved_bang_chu,
+    scholar.id,
   );
   const levelInfo = getLevelFromExp(expTotal);
   const levelAccent = getLevelAccent(levelInfo.level);
@@ -399,12 +400,12 @@ export default function UserProfile() {
               </span>
             </div>
             <div>
-              <p className="text-xs text-secondary-text">Quân hàm Chiến dịch</p>
+              <p className="text-xs text-secondary-text">Quân hàm Công Lực</p>
               <p className={`text-lg font-display font-extrabold ${rankInfo.color}`}>
                 {rankInfo.name}
               </p>
               <p className="text-[11px] text-secondary-text tabular">
-                {completedCampaignsCount} chiến dịch hoàn thành
+                {expTotal.toLocaleString('vi-VN')} EXP · {completedCampaignsCount} chiến dịch
               </p>
             </div>
           </div>

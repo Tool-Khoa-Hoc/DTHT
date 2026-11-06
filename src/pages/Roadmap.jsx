@@ -538,28 +538,36 @@ export default function Roadmap() {
 
     setReorderingId(itemA.id);
     try {
-      // 3-step swap avoids collision on UNIQUE (user_id, mode, sort_order)
-      const tempOrder = -1000 - (Date.now() % 900000);
-      const { error: err1 } = await supabase
-        .from('roadmap_milestones')
-        .update({ sort_order: tempOrder })
-        .eq('id', itemA.id)
-        .eq('user_id', user.id);
-      if (err1) throw err1;
+      // 1. Prefer single-round-trip atomic RPC (10k CCU optimization)
+      const rpcRes = await supabase.rpc('swap_roadmap_milestones', {
+        p_first_id: itemA.id,
+        p_second_id: itemB.id,
+      });
 
-      const { error: err2 } = await supabase
-        .from('roadmap_milestones')
-        .update({ sort_order: finalOrderB })
-        .eq('id', itemB.id)
-        .eq('user_id', user.id);
-      if (err2) throw err2;
+      if (rpcRes.error) {
+        // 2. Fallback: 3-step swap if RPC migration is not yet deployed
+        const tempOrder = -1000 - (Date.now() % 900000);
+        const { error: err1 } = await supabase
+          .from('roadmap_milestones')
+          .update({ sort_order: tempOrder })
+          .eq('id', itemA.id)
+          .eq('user_id', user.id);
+        if (err1) throw err1;
 
-      const { error: err3 } = await supabase
-        .from('roadmap_milestones')
-        .update({ sort_order: finalOrderA })
-        .eq('id', itemA.id)
-        .eq('user_id', user.id);
-      if (err3) throw err3;
+        const { error: err2 } = await supabase
+          .from('roadmap_milestones')
+          .update({ sort_order: finalOrderB })
+          .eq('id', itemB.id)
+          .eq('user_id', user.id);
+        if (err2) throw err2;
+
+        const { error: err3 } = await supabase
+          .from('roadmap_milestones')
+          .update({ sort_order: finalOrderA })
+          .eq('id', itemA.id)
+          .eq('user_id', user.id);
+        if (err3) throw err3;
+      }
     } catch (err) {
       setMilestones(prevMilestones);
       showToast(`Không thể đổi thứ tự cột mốc: ${err.message}`, 'error');

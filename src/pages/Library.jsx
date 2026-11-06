@@ -89,12 +89,10 @@ export default function Library() {
       }
 
       if (selectedCategory) {
-        query = query.or(
-          `category.eq.${selectedCategory},category_id.eq.${selectedCategory}`,
-        );
+        query = query.eq('category', selectedCategory);
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query.limit(200);
       if (error) throw error;
       setDocuments(data || []);
     } catch (err) {
@@ -187,7 +185,8 @@ export default function Library() {
         .from('document_reviews')
         .select('id, document_id, user_id, rating, review_text, created_at')
         .eq('document_id', docId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(50);
 
       if (!error && data) {
         setReviews(data);

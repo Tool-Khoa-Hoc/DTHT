@@ -51,6 +51,8 @@ export default function Profile() {
   const { showToast } = useToast();
 
   const fileInputRef = useRef(null);
+  const profileRef = useRef(profile);
+  profileRef.current = profile;
 
   // Live extra data from tram_sv
   const [extraProfile, setExtraProfile] = useState({
@@ -103,11 +105,13 @@ export default function Profile() {
         docsCountRes,
         dailyRes,
       ] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('major, starting_year, full_name, is_vip, vip_expired_at, created_at')
-          .eq('id', user.id)
-          .maybeSingle(),
+        profileRef.current?.id === user.id
+          ? Promise.resolve({ data: profileRef.current, error: null })
+          : supabase
+              .from('profiles')
+              .select('major, starting_year, full_name, is_vip, vip_expired_at, created_at')
+              .eq('id', user.id)
+              .maybeSingle(),
         supabase
           .from('campaigns')
           .select('*', { count: 'exact', head: true })
@@ -390,9 +394,10 @@ export default function Profile() {
   const studyStreak = Number(profile?.study_streak) || 0;
 
   const rankInfo = getUserRank(
-    completedCampaignsCount,
+    expTotal,
     profile?.role,
     profile?.is_approved_bang_chu,
+    user?.id,
   );
   const levelInfo = getLevelFromExp(expTotal);
   const levelAccent = getLevelAccent(levelInfo.level);
@@ -893,7 +898,7 @@ export default function Profile() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-secondary-text uppercase tracking-wider">
-                        Quân hàm Chiến dịch
+                        Quân hàm Công Lực
                       </span>
                       <button
                         type="button"
@@ -934,7 +939,7 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Campaign Rank Progress */}
+              {/* EXP Rank Progress */}
               {rankInfo.nextRank && rankInfo.progress ? (
                 <div className="bg-paper p-4 rounded-xl border border-border">
                   <ProgressBar
@@ -942,20 +947,15 @@ export default function Profile() {
                     max={100}
                     tone="primary"
                     label={`Tiến trình thăng Quân hàm → ${rankInfo.nextRank.name}`}
-                    sublabel={`${completedCampaignsCount}/${rankInfo.progress.target} chiến dịch`}
+                    sublabel={`${expTotal.toLocaleString('vi-VN')} / ${rankInfo.progress.target.toLocaleString('vi-VN')} EXP`}
                   />
                   <p className="text-xs text-secondary-text mt-2 tabular">
-                    {rankInfo.progress.pendingApproval ? (
-                      <span className="text-accent font-semibold">
-                        Bạn đã vượt mốc 50 chiến dịch — đang chờ sắc phong danh hiệu Bang Chủ!
-                      </span>
-                    ) : (
-                      <>
-                        Hoàn thành thêm{' '}
-                        <strong className="text-foreground">{rankInfo.progress.remaining}</strong>{' '}
-                        chiến dịch tại Đấu Trường Học Tập để thăng cấp.
-                      </>
-                    )}
+                    Tích lũy thêm{' '}
+                    <strong className="text-foreground">
+                      {rankInfo.progress.remaining.toLocaleString('vi-VN')} EXP
+                    </strong>{' '}
+                    qua thời gian tự học xác thực để thăng lên mức hạng{' '}
+                    <strong className="text-foreground">{rankInfo.nextRank.name}</strong>.
                   </p>
                 </div>
               ) : (
@@ -964,7 +964,9 @@ export default function Profile() {
                     <span className="material-symbols-outlined text-lg" aria-hidden="true">
                       workspace_premium
                     </span>
-                    Cảnh giới Quân hàm tối cao: {rankInfo.name}
+                    {rankInfo.isBangChu
+                      ? 'Ngôi vị Độc Tôn Duy Nhất: Bang Chủ tối cao'
+                      : `Đã đạt mức hạng tích lũy tối đa: ${rankInfo.name}`}
                   </p>
                 </div>
               )}
@@ -1218,7 +1220,7 @@ export default function Profile() {
                   military_tech
                 </span>
                 <h3 className="font-display font-bold text-base text-foreground">
-                  Hệ Thống Quân Hàm Chiến Dịch
+                  Hệ Thống Quân Hàm Công Lực (EXP)
                 </h3>
               </div>
               <button
@@ -1234,6 +1236,11 @@ export default function Profile() {
             </div>
 
             <div className="p-6 space-y-3 max-h-[75vh] overflow-y-auto bg-surface">
+              <div className="p-3.5 rounded-xl bg-gold-soft/50 border border-gold text-xs text-foreground leading-relaxed">
+                Tích lũy <strong>EXP càng cao thì mức hạng càng cao</strong>. Riêng ngôi vị{' '}
+                <strong>Bang Chủ</strong> chỉ dành duy nhất cho 1 tài khoản tối cao (không ai khác
+                được phép là Bang Chủ).
+              </div>
               {RANK_TIERS.map((tier) => {
                 const isCurrent = rankInfo.name === tier.name;
                 return (
@@ -1265,16 +1272,18 @@ export default function Profile() {
                           )}
                         </div>
                         <p className="text-xs text-secondary-text mt-0.5 tabular">
-                          {tier.min === 0
-                            ? 'Khởi điểm khi gia nhập'
-                            : tier.requiresApproval
-                              ? `≥ ${tier.min} chiến dịch hoàn thành + Sắc phong`
-                              : `Hoàn thành từ ${tier.min} chiến dịch`}
+                          {tier.exclusiveBangChu
+                            ? 'Ngôi vị độc tôn — Chỉ duy nhất 1 tài khoản được phép là Bang Chủ'
+                            : tier.min === 0
+                              ? 'Khởi điểm khi gia nhập (0 EXP)'
+                              : `Tích lũy đạt từ ${tier.min.toLocaleString('vi-VN')} EXP`}
                         </p>
                       </div>
                     </div>
                     <span className="text-xs font-display font-extrabold text-secondary-text tabular">
-                      {tier.min} CD
+                      {tier.exclusiveBangChu
+                        ? 'Độc tôn'
+                        : `${tier.min.toLocaleString('vi-VN')} EXP`}
                     </span>
                   </div>
                 );

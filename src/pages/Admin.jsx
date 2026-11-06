@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../components/ui/ToastProvider';
 import { assertSafeExternalUrl } from '../utils/urlSecurity';
+import { SOLE_BANG_CHU_ID, isSoleBangChuAccount } from '../utils/rankHelper';
 import RankSeal from '../components/ui/RankSeal';
 import AdminLibrary from '../components/admin/AdminLibrary';
 import AdminCollaborator from '../components/admin/AdminCollaborator';
@@ -330,17 +331,17 @@ export default function Admin() {
         console.warn('RPC admin_get_thongsoai_candidates error:', rpcErr);
       }
 
-      // 2. Fetch existing approved Bang Chu from profiles
+      // 2. Fetch sole Bang Chu account (and any legacy approved rows so they can be revoked if needed)
       const { data: bangChuData, error: bcError } = await supabase
         .from('profiles')
         .select(ADMIN_FALLBACK_SELECT)
-        .eq('is_approved_bang_chu', true);
+        .or(`id.eq.${SOLE_BANG_CHU_ID},is_approved_bang_chu.eq.true`);
 
       if (!bcError && bangChuData) {
         setApprovedBangChuList(bangChuData.map(normalizeDirectoryRow));
       }
     } catch (err) {
-      console.error('Lỗi tải dữ liệu Thống Soái:', err);
+      console.error('Lỗi tải dữ liệu Bang Chủ:', err);
     } finally {
       setLoadingCandidates(false);
     }
@@ -348,6 +349,13 @@ export default function Admin() {
 
   const handleToggleBangChu = async (userId, currentStatus, name) => {
     const nextStatus = !currentStatus;
+    if (nextStatus && !isSoleBangChuAccount(null, userId)) {
+      showToast(
+        'Ngôi vị Bang Chủ là độc tôn — không tài khoản nào khác được phép là Bang Chủ!',
+        'warning',
+      );
+      return;
+    }
     try {
       const { error } = await supabase
         .from('profiles')
@@ -358,14 +366,14 @@ export default function Admin() {
 
       showToast(
         nextStatus
-          ? `Đã sắc phong Bang Chủ cho ${name}!`
+          ? `Đã xác nhận ngôi vị Bang Chủ cho ${name}!`
           : `Đã thu hồi danh hiệu Bang Chủ của ${name}!`,
         'success',
       );
 
       fetchThongSoaiData();
     } catch (err) {
-      showToast('Lỗi sắc phong Bang Chủ: ' + err.message, 'error');
+      showToast('Lỗi cập nhật Bang Chủ: ' + err.message, 'error');
     }
   };
 

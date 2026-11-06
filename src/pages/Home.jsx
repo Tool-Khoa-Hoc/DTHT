@@ -54,7 +54,7 @@ const ARENA_GATES = [
     tag: 'BẢNG VÀNG · QUÂN HÀM',
     hanzi: '榜',
     title: 'Đấu trường',
-    desc: 'Tích luỹ phút học thực tế, leo bậc quân hàm từ Tân Binh đến Thống Soái cùng bạn bè.',
+    desc: 'Tích luỹ EXP từ thời gian học thực tế, leo bậc quân hàm mỗi ngày cùng bạn bè.',
     cta: 'Vào đấu trường',
     tone: 'primary',
   },
@@ -117,20 +117,22 @@ export default function Home() {
   const { user, profile, signInWithGoogle } = useAuth();
   const [isGoogleRedirecting, setIsGoogleRedirecting] = useState(false);
   const studyMinutes = profile?.total_study_minutes || 0;
-  const userRank = getUserRank(
-    0,
-    profile?.role,
-    profile?.is_approved_bang_chu || profile?.is_thong_soai,
-  );
-  const studyHours = (studyMinutes / 60).toFixed(1);
+  const studySeconds = Number(profile?.study_seconds) || studyMinutes * 60;
+  const studyHours = (studySeconds / 3600).toFixed(1);
 
   // Compute Level & EXP (ưu tiên lấy profile?.exp trực tiếp từ DB vì đã gồm điểm thưởng chuỗi ngày học)
   const totalExp =
     typeof profile?.exp === 'number'
       ? profile.exp
-      : Math.round(((profile?.study_seconds || studyMinutes * 60) / 60) * EXP_PER_MINUTE);
+      : Math.round((studySeconds / 60) * EXP_PER_MINUTE);
   const levelInfo = getLevelFromExp(totalExp);
   const levelAccent = getLevelAccent(levelInfo.level);
+  const userRank = getUserRank(
+    totalExp,
+    profile?.role,
+    profile?.is_approved_bang_chu || profile?.is_thong_soai,
+    user?.id,
+  );
 
   // Live Supabase highlights
   const [featuredDocs, setFeaturedDocs] = useState([]);
@@ -319,7 +321,7 @@ export default function Home() {
                     </span>
                   </Link>
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
                   {RANK_TIERS.map((tier) => {
                     const isCurrent = user && userRank.name === tier.name;
                     return (
@@ -343,6 +345,11 @@ export default function Home() {
                           }`}
                         >
                           {tier.name}
+                        </span>
+                        <span className="text-[9px] text-secondary-text tabular mt-0.5">
+                          {tier.exclusiveBangChu
+                            ? 'Độc tôn'
+                            : `${tier.min.toLocaleString('vi-VN')} EXP`}
                         </span>
                       </div>
                     );
@@ -491,8 +498,7 @@ export default function Home() {
                     </h2>
                     <p className="text-sm text-secondary-text leading-relaxed mb-6">
                       Tự động đếm thời gian ôn luyện khi bạn đọc đề, học online hoặc làm bài.
-                      Mỗi phút học đều giúp bạn tiến gần hơn tới danh hiệu{' '}
-                      <span className="text-primary font-bold">Thống Soái</span>.
+                      EXP tích lũy càng cao thì mức hạng Quân hàm càng cao!
                     </p>
 
                     <div className="space-y-2.5 mb-6">
@@ -714,6 +720,12 @@ export default function Home() {
                 const totalSec = Number(scholar.study_seconds) || 0;
                 const totalExpVal = Number(scholar.exp) || 0;
                 const sLv = getLevelFromExp(totalExpVal);
+                const sRank = getUserRank(
+                  totalExpVal,
+                  scholar.role,
+                  scholar.is_approved_bang_chu,
+                  scholar.id,
+                );
                 const hasTodayStudy = Boolean(scholar.is_today) || todayMin > 0;
 
                 return (
@@ -747,11 +759,11 @@ export default function Home() {
                           <span className="font-display font-bold text-xs sm:text-sm text-foreground truncate">
                             {scholar.display_name || 'Sĩ tử giấu tên'}
                           </span>
-                          {scholar.is_approved_bang_chu && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-gold-soft text-gold-dark border border-gold uppercase">
-                              Bang Chủ
-                            </span>
-                          )}
+                          <span
+                            className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${sRank.bg} ${sRank.color} ${sRank.border}`}
+                          >
+                            {sRank.name}
+                          </span>
                           {totalExpVal > 0 && (
                             <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-surface-alt text-secondary-text border border-border tabular">
                               Lv.{sLv.level}
