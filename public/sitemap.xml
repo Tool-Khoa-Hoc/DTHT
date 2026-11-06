@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.dautruonghoctap.io.vn/home</loc>
+    <loc>https://www.dautruonghoctap.dev/home</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.dautruonghoctap.io.vn/gpa</loc>
+    <loc>https://www.dautruonghoctap.dev/hoc-online</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.dautruonghoctap.dev/gpa</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.dautruonghoctap.io.vn/arena</loc>
+    <loc>https://www.dautruonghoctap.dev/arena</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.dautruonghoctap.io.vn/library</loc>
+    <loc>https://www.dautruonghoctap.dev/library</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.dautruonghoctap.io.vn/roadmap</loc>
+    <loc>https://www.dautruonghoctap.dev/roadmap</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.dautruonghoctap.io.vn/schools</loc>
+    <loc>https://www.dautruonghoctap.dev/schools</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

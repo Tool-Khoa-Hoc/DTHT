@@ -314,7 +314,13 @@ export default function AdmissionCalculator() {
         const sc = comboRawScore(subjects, code);
         if (sc != null) byGroup[code] = sc;
       }
-      const total = Object.keys(subjects).length === 3 ? Object.values(subjects).reduce((a, b) => a + b, 0) : null;
+      const groupScores = Object.values(byGroup);
+      const total =
+        groupScores.length > 0
+          ? Math.round(Math.max(...groupScores) * 100) / 100
+          : Object.keys(subjects).length === 3
+            ? Math.round(Object.values(subjects).reduce((a, b) => a + b, 0) * 100) / 100
+            : null;
       return { entry: { status: statusOf('vsat'), subjects, byGroup, total, scale: 450, scoreMode: 'per-subject-150', updatedAt: new Date().toISOString() } };
     }
     const check = validateScoreInput('vsat', totals.vsat);
@@ -395,10 +401,10 @@ export default function AdmissionCalculator() {
     return out;
   }, [subjectsHb]);
   const bcaPreview = useMemo(() => {
-    const bcaTotal = parseFloat(totals.bca);
-    if (!Number.isFinite(bcaTotal) || bestThptRaw == null) return null;
+    const bcaTotal = previewPartsTotal('bca', parts, totals);
+    if (bcaTotal == null || !Number.isFinite(bcaTotal) || bestThptRaw == null) return null;
     return bcaCombinedScore({ thptComboScore: bestThptRaw, bcaExamScore: bcaTotal, region, category });
-  }, [totals.bca, bestThptRaw, region, category]);
+  }, [parts, totals, bestThptRaw, region, category]);
   const hcmutPreview = useMemo(() => {
     const comboCodes = Object.keys(thptPreview);
     if (!comboCodes.length) return null;
@@ -407,17 +413,17 @@ export default function AdmissionCalculator() {
     const thptScores = keys.map((k) => thptNums[k]);
     const hocbaScores = keys.map((k) => hbNums[k]);
     if (thptScores.some((v) => v == null) || hocbaScores.some((v) => v == null)) return null;
-    const vactTotal = parseFloat(totals.vact);
+    const vactTotal = previewPartsTotal('vact', parts, totals);
     const vactToanPart = parseFloat(parts['vact.toan']);
     return hcmutCombinedScore({
-      vactTotal: Number.isFinite(vactTotal) ? vactTotal : null,
+      vactTotal: vactTotal != null && Number.isFinite(vactTotal) ? vactTotal : null,
       vactToan: Number.isFinite(vactToanPart) ? vactToanPart : null,
       doubleMath: keys.includes('toan'),
       thptScores, thptMathScore: thptNums.toan,
       hocbaScores, hocbaMathScore: hbNums.toan,
       bonus: parseFloat(bonus100) || 0, region, category,
     });
-  }, [thptPreview, thptNums, hbNums, totals.vact, parts, bonus100, region, category]);
+  }, [thptPreview, thptNums, hbNums, totals, parts, bonus100, region, category]);
   const uehCheck = useMemo(() => integrated100Score('UEH', {}), []);
   const handleSaveHcmut = async () => {
     if (!hcmutPreview) return;
@@ -733,7 +739,7 @@ export default function AdmissionCalculator() {
                 onChange={(v) => setTotals((p) => ({ ...p, vsat: v }))}
                 max={450}
               />
-              <TotalPreview label="Tổng điểm V-SAT" value={parseFloat(totals.vsat) || null} scale={450} digits={0} />
+              <TotalPreview label="Tổng điểm V-SAT" value={previewVsatTotal(vsatSubjects, totals)} scale={450} digits={0} />
             </div>
           )}
 
@@ -842,6 +848,31 @@ function previewTrioTotal(code, trios) {
   const vals = [0, 1, 2].map((i) => parseFloat(trios[`${code}.${i}`]));
   if (vals.some((v) => !Number.isFinite(v))) return null;
   return vals.reduce((s, v) => s + v, 0);
+}
+
+function previewVsatTotal(vsatSubjects, totals) {
+  const subjects = {};
+  for (const [k, v] of Object.entries(vsatSubjects || {})) {
+    if (v === '' || v == null) continue;
+    const n = parseFloat(v);
+    if (Number.isFinite(n) && n >= 0 && n <= 150) subjects[k] = n;
+  }
+  if (Object.keys(subjects).length >= 3) {
+    let best = null;
+    for (const code of Object.keys(COMBOS)) {
+      const sc = comboRawScore(subjects, code);
+      if (sc != null && (best == null || sc > best)) best = sc;
+    }
+    if (best != null) return best;
+    if (Object.keys(subjects).length === 3) {
+      return Object.values(subjects).reduce((a, b) => a + b, 0);
+    }
+  }
+  if (totals?.vsat !== '' && totals?.vsat != null) {
+    const t = parseFloat(totals.vsat);
+    if (Number.isFinite(t)) return t;
+  }
+  return null;
 }
 
 function SubjectForm({ subjectsState, onChange, transcript }) {

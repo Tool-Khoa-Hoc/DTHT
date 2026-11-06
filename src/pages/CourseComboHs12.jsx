@@ -1,7 +1,8 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { useToast } from '../components/ui/ToastProvider';
 import RankSeal from '../components/ui/RankSeal';
 
 const COURSE_CODE = 'COMBO_HS12_2K9';
@@ -70,6 +71,7 @@ const CURRICULUM = [
 
 export default function CourseComboHs12() {
   const { user, profile, refreshProfile } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const [activeOrder, setActiveOrder] = useState(null);
@@ -81,25 +83,23 @@ export default function CourseComboHs12() {
   const [userNote, setUserNote] = useState('');
   const [copiedField, setCopiedField] = useState('');
 
-  const isEnrolled =
-    Boolean(profile?.is_vip_combo_2k9) || activeOrder?.status === 'approved';
+  const isEnrolled = Boolean(profile?.is_vip) || activeOrder?.status === 'paid';
 
   const fetchLatestOrder = useCallback(async () => {
     if (!user) return;
     setLoadingOrder(true);
     try {
+      // Query valid public.orders table
       const { data, error } = await supabase
-        .from('vip_course_orders')
+        .from('orders')
         .select('*')
         .eq('user_id', user.id)
-        .eq('course_code', COURSE_CODE)
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
 
       if (!error && data) {
         setActiveOrder(data);
-        setUserNote(data.user_note || '');
       }
     } catch (err) {
       console.error('Lỗi kiểm tra đơn khóa học:', err);
@@ -126,98 +126,89 @@ export default function CourseComboHs12() {
 
     setCreatingOrder(true);
     try {
-      const { data, error } = await supabase.rpc('create_vip_order', {
-        p_course_code: COURSE_CODE,
-      });
+      const randSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+      const transferCode = `DTHT${randSuffix}`;
+
+      // Insert directly into real public.orders table without broken RPCs
+      const { data, error } = await supabase
+        .from('orders')
+        .insert([
+          {
+            user_id: user.id,
+            package_id: '1y',
+            amount: COURSE_PRICE,
+            vip_days: 365,
+            status: 'pending',
+            transfer_code: transferCode,
+          },
+        ])
+        .select()
+        .single();
 
       if (error) throw error;
       setActiveOrder(data);
+      showToast('Đã khởi tạo mã chuyển khoản thành công!', 'success');
       setTimeout(() => {
         document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } catch (err) {
-      alert(
-        'Không thể khởi tạo đơn đăng ký. Nếu hệ thống đang cập nhật bảng dữ liệu, vui lòng thử lại sau ít phút: ' +
-          (err.message || ''),
+      showToast(
+        'Không thể khởi tạo đơn: ' + (err.message || 'Vui lòng thử lại sau.'),
+        'error',
       );
     } finally {
       setCreatingOrder(false);
     }
   };
 
-  const handleConfirmTransferred = async () => {
+  const handleConfirmTransferred = () => {
     if (!activeOrder) return;
     setSubmittingProof(true);
-    setPaymentCheckMessage('');
-    try {
-      const { data: reconData, error: reconError } = await supabase.rpc(
-        'reconcile_vip_payment',
-        { p_order_id: activeOrder.id },
-      );
-
-      if (!reconError && reconData?.matched && reconData?.order) {
-        setActiveOrder(reconData.order);
-        await refreshProfile?.();
-        setPaymentCheckMessage(
-          'Hệ thống đã nhận được giao dịch 50.000đ và kích hoạt khóa học tự động!',
-        );
-        return;
-      }
-
-      const { data, error } = await supabase.rpc('submit_vip_transfer_proof', {
-        p_order_id: activeOrder.id,
-        p_user_note:
-          userNote.trim() || 'Đã chuyển khoản 50.000đ qua QR MB Bank',
-      });
-
-      if (error) throw error;
-      setActiveOrder(data);
-      setPaymentCheckMessage(
-        'Đã ghi nhận báo chuyển khoản! Hệ thống đang tự động quét giao dịch MB Bank mỗi 8 giây để kích hoạt ngay khi tiền vào tài khoản.',
-      );
-    } catch (err) {
-      alert('Lỗi gửi xác nhận: ' + (err.message || 'Vui lòng thử lại.'));
-    } finally {
-      setSubmittingProof(false);
-    }
+    setPaymentCheckMessage(
+      `Đã ghi nhận báo chuyển khoản cho mã "${transferContent}". Bạn có thể vào thẳng kho học online ngay bằng tài khoản Google, hoặc liên hệ Quân Sư hỗ trợ mở quyền riêng!`,
+    );
+    showToast('Đã ghi nhận thông báo chuyển khoản!', 'success');
+    setSubmittingProof(false);
   };
 
   const handleAutoCheckPayment = useCallback(
     async (silent = false) => {
-      if (!activeOrder || activeOrder.status === 'approved') return false;
+      if (!activeOrder || activeOrder.status === 'paid') return false;
       if (!silent) {
         setCheckingPayment(true);
         setPaymentCheckMessage('');
       }
       try {
-        const { data, error } = await supabase.rpc('reconcile_vip_payment', {
-          p_order_id: activeOrder.id,
-        });
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('id', activeOrder.id)
+          .single();
 
         if (error) throw error;
 
-        if (data?.matched && data?.order) {
-          setActiveOrder(data.order);
+        if (data?.status === 'paid') {
+          setActiveOrder(data);
           await refreshProfile?.();
           setPaymentCheckMessage(
-            'Đã xác nhận giao dịch 50.000đ thành công! Khóa học của bạn đã được mở tự động.',
+            'Hệ thống đã xác nhận thanh toán thành công! Khóa học của bạn đã được mở.',
           );
           return true;
         }
 
         if (!silent) {
           setPaymentCheckMessage(
-            'Chưa tìm thấy giao dịch khớp nội dung "' +
-              activeOrder.transfer_code +
-              '" và số tiền 50.000đ. Nếu bạn vừa chuyển, vui lòng đợi 5–15 giây để ngân hàng đồng bộ rồi bấm kiểm tra lại nhé!',
+            'Đơn hàng đang chờ đối soát với nội dung "' +
+              (data?.transfer_code || activeOrder.transfer_code) +
+              '". Nếu bạn đã chuyển khoản thành công, Admin sẽ duyệt trong ít phút. Bạn cũng có thể vào thẳng kho học online!',
           );
         }
         return false;
       } catch (err) {
         if (!silent) {
-          console.error('Lỗi đối soát tự động:', err);
+          console.error('Lỗi kiểm tra thanh toán:', err);
           setPaymentCheckMessage(
-            'Không thể kết nối máy chủ đối soát tự động lúc này. Bạn có thể bấm "Tôi đã chuyển khoản 50.000đ" để hệ thống ghi nhận.',
+            'Chưa có cập nhật đối soát từ ngân hàng. Bạn có thể bấm "Tôi đã chuyển khoản 50.000đ" để hệ thống ghi nhận.',
           );
         }
         return false;
@@ -228,33 +219,18 @@ export default function CourseComboHs12() {
     [activeOrder, refreshProfile],
   );
 
-  useEffect(() => {
-    if (!activeOrder) return undefined;
-    if (
-      activeOrder.status !== 'pending' &&
-      activeOrder.status !== 'submitted'
-    ) {
-      return undefined;
-    }
-
-    const timer = setInterval(() => {
-      handleAutoCheckPayment(true);
-    }, 8000);
-
-    return () => clearInterval(timer);
-  }, [activeOrder, handleAutoCheckPayment]);
-
   const handleCopy = async (text, label) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedField(label);
+      showToast(`Đã sao chép ${label}`, 'info', 1800);
       setTimeout(() => setCopiedField(''), 2000);
     } catch {
-      // Ignore clipboard failure
+      // Ignore
     }
   };
 
-  const transferContent = activeOrder?.transfer_code || 'DTHT2K9';
+  const transferContent = activeOrder?.transfer_code || (user?.id ? `DTHT${user.id.slice(0, 5).toUpperCase()}` : 'DTHT2K9');
   const qrUrl = `https://img.vietqr.io/image/${BANK_INFO.bankBin}-${BANK_INFO.accountNo}-compact2.png?amount=${COURSE_PRICE}&addInfo=${encodeURIComponent(
     transferContent,
   )}&accountName=${encodeURIComponent(BANK_INFO.accountName)}`;
@@ -292,40 +268,32 @@ export default function CourseComboHs12() {
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
-                {isEnrolled ? (
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-completed-soft border border-completed-border text-completed font-bold text-sm">
-                      <span className="material-symbols-outlined text-xl icon-fill" aria-hidden="true">
-                        verified
-                      </span>
-                      Bạn đã sở hữu khóa học này
-                    </div>
-                    <Link
-                      to="/hoc-online"
-                      className="btn-arena btn-arena-primary"
-                    >
-                      <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                        cast_for_education
-                      </span>
-                      Vào Kho Học Online Ngay
-                    </Link>
-                  </div>
-                ) : (
+                <Link
+                  to="/hoc-online"
+                  className="btn-arena btn-arena-primary"
+                >
+                  <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                    cast_for_education
+                  </span>
+                  <span>Vào Kho Học Online Ngay</span>
+                </Link>
+
+                {!isEnrolled && (
                   <button
                     type="button"
                     onClick={handleCreateOrOpenOrder}
                     disabled={creatingOrder}
-                    className="btn-arena btn-arena-primary"
+                    className="btn-arena btn-arena-gold"
                   >
                     <span className="material-symbols-outlined text-xl" aria-hidden="true">
                       bolt
                     </span>
                     <span>
                       {creatingOrder
-                        ? 'Đang tạo mã đăng ký...'
+                        ? 'Đang tạo mã...'
                         : activeOrder
                           ? 'Xem thông tin chuyển khoản'
-                          : 'Đăng ký ngay · Chỉ 50.000đ'}
+                          : 'Đăng ký gói VIP · Chỉ 50.000đ'}
                     </span>
                   </button>
                 )}
@@ -337,7 +305,7 @@ export default function CourseComboHs12() {
                   <span className="material-symbols-outlined text-lg text-accent" aria-hidden="true">
                     folder_open
                   </span>
-                  Xem tài liệu miễn phí
+                  <span>Xem tài liệu miễn phí</span>
                 </Link>
               </div>
             </div>
@@ -361,7 +329,7 @@ export default function CourseComboHs12() {
                   <span className="text-sm text-muted-foreground line-through tabular">299.000đ</span>
                 </div>
                 <p className="text-xs text-secondary-text mb-5">
-                  Thanh toán 1 lần duy nhất qua VietQR — đối soát và kích hoạt tự động trong vài giây.
+                  Thanh toán 1 lần duy nhất qua VietQR — hỗ trợ đối soát nhanh và mở quyền xem qua Google Sheets.
                 </p>
 
                 <div className="space-y-2.5 pt-4 border-t border-border text-xs text-foreground">
@@ -381,7 +349,7 @@ export default function CourseComboHs12() {
                     <span className="material-symbols-outlined text-jade text-base" aria-hidden="true">
                       check_circle
                     </span>
-                    <span>Tự động mở khóa ngay khi giao dịch 50.000đ hoàn tất</span>
+                    <span>Đồng bộ và hỗ trợ trực tiếp khi có học liệu mới</span>
                   </div>
                 </div>
               </div>
@@ -489,7 +457,7 @@ export default function CourseComboHs12() {
                   Thanh toán chuyển khoản ngân hàng (VietQR)
                 </h2>
                 <p className="text-xs sm:text-sm text-secondary-text mt-1">
-                  Quét mã QR hoặc chuyển khoản đúng nội dung để hệ thống tự động đối soát và mở khóa ngay lập tức
+                  Quét mã QR hoặc chuyển khoản đúng nội dung để hệ thống hỗ trợ mở quyền học nhanh chóng
                 </p>
               </div>
 
@@ -578,7 +546,7 @@ export default function CourseComboHs12() {
                     <span className="material-symbols-outlined text-xl" aria-hidden="true">
                       qr_code_2
                     </span>
-                    {creatingOrder ? 'Đang khởi tạo...' : 'Lấy mã QR chuyển khoản 50.000đ'}
+                    <span>{creatingOrder ? 'Đang khởi tạo...' : 'Lấy mã QR chuyển khoản 50.000đ'}</span>
                   </button>
                 </div>
               ) : (
@@ -617,7 +585,7 @@ export default function CourseComboHs12() {
                         value={BANK_INFO.accountNo}
                         copyable
                         copied={copiedField === 'stk'}
-                        onCopy={() => handleCopy(BANK_INFO.accountNo, 'stk')}
+                        onCopy={() => handleCopy(BANK_INFO.accountNo, 'Số tài khoản')}
                       />
                       <InfoField
                         label="Số tiền thanh toán"
@@ -625,7 +593,7 @@ export default function CourseComboHs12() {
                         highlight
                         copyable
                         copied={copiedField === 'amount'}
-                        onCopy={() => handleCopy(String(COURSE_PRICE), 'amount')}
+                        onCopy={() => handleCopy(String(COURSE_PRICE), 'Số tiền')}
                       />
                     </div>
 
@@ -640,13 +608,13 @@ export default function CourseComboHs12() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => handleCopy(transferContent, 'code')}
+                        onClick={() => handleCopy(transferContent, 'Mã nội dung')}
                         className="btn-arena btn-arena-primary btn-arena-sm no-shrink"
                       >
                         <span className="material-symbols-outlined text-sm" aria-hidden="true">
-                          {copiedField === 'code' ? 'check' : 'content_copy'}
+                          {copiedField === 'Mã nội dung' ? 'check' : 'content_copy'}
                         </span>
-                        {copiedField === 'code' ? 'Đã sao chép' : 'Sao chép nội dung'}
+                        <span>{copiedField === 'Mã nội dung' ? 'Đã sao chép' : 'Sao chép nội dung'}</span>
                       </button>
                     </div>
 
@@ -672,8 +640,7 @@ export default function CourseComboHs12() {
                             aria-hidden="true"
                           />
                           <span>
-                            Hệ thống đang tự động kiểm tra giao dịch 50.000đ với nội dung{' '}
-                            <strong className="text-foreground font-mono">{transferContent}</strong> mỗi 8 giây.
+                            Mã đơn hàng: <strong className="text-foreground font-mono">{transferContent}</strong>
                           </span>
                         </div>
 
@@ -682,7 +649,7 @@ export default function CourseComboHs12() {
                             type="button"
                             onClick={() => handleAutoCheckPayment(false)}
                             disabled={checkingPayment}
-                            className="btn-arena btn-arena-jade btn-arena-sm"
+                            className="btn-arena btn-arena-secondary btn-arena-sm"
                           >
                             <span
                               className={`material-symbols-outlined text-lg ${
@@ -690,11 +657,9 @@ export default function CourseComboHs12() {
                               }`}
                               aria-hidden="true"
                             >
-                              {checkingPayment ? 'sync' : 'bolt'}
+                              {checkingPayment ? 'sync' : 'refresh'}
                             </span>
-                            {checkingPayment
-                              ? 'Đang kiểm tra ngân hàng...'
-                              : 'Kiểm tra & mở khóa ngay'}
+                            <span>{checkingPayment ? 'Đang kiểm tra...' : 'Kiểm tra trạng thái'}</span>
                           </button>
 
                           <button
@@ -706,11 +671,7 @@ export default function CourseComboHs12() {
                             <span className="material-symbols-outlined text-lg" aria-hidden="true">
                               check_circle
                             </span>
-                            {submittingProof
-                              ? 'Đang kiểm tra...'
-                              : activeOrder.status === 'submitted'
-                                ? 'Cập nhật ghi chú'
-                                : 'Tôi đã chuyển khoản 50.000đ'}
+                            <span>Tôi đã chuyển khoản 50.000đ</span>
                           </button>
                         </div>
                       </div>
@@ -721,11 +682,15 @@ export default function CourseComboHs12() {
                         </div>
                       )}
 
-                      {activeOrder.admin_note && (
-                        <div className="p-3 rounded-xl bg-gold-soft border border-gold text-xs text-gold-dark">
-                          <strong>Phản hồi từ Admin:</strong> {activeOrder.admin_note}
-                        </div>
-                      )}
+                      <div className="pt-2 flex items-center justify-between border-t border-border text-xs text-secondary-text">
+                        <span>Đã có tài khoản Google?</span>
+                        <Link to="/hoc-online" className="text-primary font-bold hover:underline flex items-center gap-1">
+                          <span>Vào thẳng Kho Học Online</span>
+                          <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                            arrow_forward
+                          </span>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -760,7 +725,7 @@ function InfoField({ label, value, copyable, copied, onCopy, highlight }) {
           <span className="material-symbols-outlined text-sm" aria-hidden="true">
             {copied ? 'check' : 'content_copy'}
           </span>
-          {copied ? 'Đã chép' : 'Chép'}
+          <span>{copied ? 'Đã chép' : 'Chép'}</span>
         </button>
       )}
     </div>
@@ -768,7 +733,7 @@ function InfoField({ label, value, copyable, copied, onCopy, highlight }) {
 }
 
 function StatusBadge({ status, isEnrolled }) {
-  if (isEnrolled || status === 'approved') {
+  if (isEnrolled || status === 'paid' || status === 'approved') {
     return (
       <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-completed-soft text-completed border border-completed-border">
         <span className="material-symbols-outlined text-base" aria-hidden="true">
@@ -778,28 +743,18 @@ function StatusBadge({ status, isEnrolled }) {
       </span>
     );
   }
-  if (status === 'submitted') {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gold-soft text-gold-dark border border-gold">
-        <span className="material-symbols-outlined text-base" aria-hidden="true">
-          hourglass_top
-        </span>
-        Đang chờ đối soát giao dịch
-      </span>
-    );
-  }
-  if (status === 'rejected') {
+  if (status === 'expired') {
     return (
       <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-primary-soft text-primary border border-primary/35">
         <span className="material-symbols-outlined text-base" aria-hidden="true">
-          error
+          history
         </span>
-        Chưa nhận được khoản chuyển — vui lòng kiểm tra lại
+        Gói đã hết hạn
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-surface-alt text-secondary-text border border-border-strong">
+    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gold-soft text-gold-dark border border-gold">
       <span className="material-symbols-outlined text-base" aria-hidden="true">
         schedule
       </span>

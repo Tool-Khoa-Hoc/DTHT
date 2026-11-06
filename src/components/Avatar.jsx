@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 
 const AVATAR_TONES = [
   'bg-primary text-white border-gold',
@@ -9,9 +9,17 @@ const AVATAR_TONES = [
   'bg-emerald-700 text-white border-emerald-300',
 ];
 
-export default function Avatar({ src, name, className = 'w-10 h-10', textSize = 'text-base' }) {
+export default function Avatar({
+  src,
+  name,
+  size,
+  rounded = 'rounded-full',
+  className = 'w-10 h-10',
+  textSize = 'text-base',
+}) {
   const [failedSrc, setFailedSrc] = useState(null);
   const imgError = Boolean(src) && failedSrc === src;
+  const boxClass = size ? `${size} ${className === 'w-10 h-10' ? '' : className}`.trim() : className;
 
   const getInitial = (fullName) => {
     if (!fullName) return 'U';
@@ -41,15 +49,16 @@ export default function Avatar({ src, name, className = 'w-10 h-10', textSize = 
         height={64}
         loading="lazy"
         decoding="async"
+        referrerPolicy="no-referrer"
         onError={() => setFailedSrc(src)}
-        className={`rounded-full object-cover no-shrink border border-border-strong ${className}`}
+        className={`${rounded} object-cover no-shrink border border-border-strong ${boxClass}`}
       />
     );
   }
 
   return (
     <div
-      className={`rounded-full flex items-center justify-center font-display font-bold select-none no-shrink border shadow-xs ${toneClass} ${className} ${textSize}`}
+      className={`${rounded} flex items-center justify-center font-display font-bold select-none no-shrink border shadow-xs ${toneClass} ${boxClass} ${textSize}`}
     >
       {initial}
     </div>

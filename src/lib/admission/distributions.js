@@ -10,6 +10,8 @@
 // không suy ngược điểm thô.
 
 export const SCORE_DISTRIBUTIONS = [
+  { exam: 'thpt', year: 2025, session: 'chung', scale: 30, mean: 19.37, median: null, sd: null, max: 30, combos_mean: { A00: 19.37, A01: null, B00: 18.29, C00: 19.7, D01: null }, sourceUrl: 'https://tuoitre.vn/pho-diem-thi-tot-nghiep-thpt-2025-khong-co-diem-10-mon-van-513-diem-10-mon-toan-20250715115337607.htm', sourceDate: '2025-07-15', reliability: 'A' },
+  { exam: 'thpt', year: 2026, session: 'chung', scale: 30, mean: 19.41, median: null, sd: null, max: 30, combos_mean: { A00: 19.41, A01: 18.41, B00: 19.69, C00: 17.23, D01: 19.01 }, sourceUrl: 'https://tienphong.vn/bang-bach-phan-vi-cua-bo-gddt-to-hop-nao-co-loi-post1856298.tpo', sourceDate: '2026-07-01', reliability: 'A' },
   { exam: 'hsa', year: 2025, session: 'chung', scale: 150, mean: 78.8, median: 78, sd: 14.3, max: 130, sourceUrl: 'https://xaydungchinhsach.chinhphu.vn/print/pho-diem-ky-thi-danh-gia-nang-luc-hsa-nam-2025-cua-dai-hoc-quoc-gia-ha-noi-119250529223043086.htm', sourceDate: '2025-05-29', reliability: 'A' },
   { exam: 'hsa', year: 2026, session: 'chung', scale: 150, mean: 79.39, median: null, sd: 15.0, max: null, sourceUrl: null, sourceDate: null, reliability: 'B' },
   { exam: 'hsa', year: 2024, session: 'chung', scale: 150, mean: 76.5, median: null, sd: null, max: null, sourceUrl: null, sourceDate: null, reliability: 'B' },

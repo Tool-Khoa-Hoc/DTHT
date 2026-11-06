@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { getUserRank, RANK_TIERS } from '../utils/rankHelper';
+import { getLevelFromExp, EXP_PER_MINUTE, getLevelAccent, formatStudyTime } from '../utils/levelHelper';
 import { preloadRouteModule } from '../lib/routeModules';
+import { getDocumentKindMeta } from '../lib/documents';
+import { sanitizeExternalUrl } from '../utils/urlSecurity';
 import Avatar from '../components/Avatar';
 import WelcomeModal from '../components/WelcomeModal';
 import SectionHeading from '../components/ui/SectionHeading';
@@ -110,10 +114,110 @@ const GATE_TONE_CLASSES = {
 };
 
 export default function Home() {
-  const { user, profile } = useAuth();
+  const { user, profile, signInWithGoogle } = useAuth();
+  const [isGoogleRedirecting, setIsGoogleRedirecting] = useState(false);
   const studyMinutes = profile?.total_study_minutes || 0;
-  const userRank = getUserRank(studyMinutes, profile?.is_thong_soai);
+  const userRank = getUserRank(
+    0,
+    profile?.role,
+    profile?.is_approved_bang_chu || profile?.is_thong_soai,
+  );
   const studyHours = (studyMinutes / 60).toFixed(1);
+
+  // Compute Level & EXP (ưu tiên lấy profile?.exp trực tiếp từ DB vì đã gồm điểm thưởng chuỗi ngày học)
+  const totalExp =
+    typeof profile?.exp === 'number'
+      ? profile.exp
+      : Math.round(((profile?.study_seconds || studyMinutes * 60) / 60) * EXP_PER_MINUTE);
+  const levelInfo = getLevelFromExp(totalExp);
+  const levelAccent = getLevelAccent(levelInfo.level);
+
+  // Live Supabase highlights
+  const [featuredDocs, setFeaturedDocs] = useState([]);
+  const [topScholars, setTopScholars] = useState([]);
+  const [loadingHighlights, setLoadingHighlights] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadHighlights() {
+      setLoadingHighlights(true);
+      try {
+        // 1. Featured / Latest 4 documents
+        const { data: docData } = await supabase
+          .from('documents')
+          .select('id, title, category, description, file_url, is_featured, created_at, author_name, education_level')
+          .eq('is_public', true)
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(4);
+
+        if (isMounted && docData) {
+          setFeaturedDocs(docData);
+        }
+
+        // 2. Sĩ tử tiêu biểu hôm nay (Phương án A: ưu tiên số phút học trong ngày + tự động lấp đầy đầu ngày)
+        try {
+          const { data: dailyData, error: rpcErr } = await supabase.rpc(
+            'get_daily_top_scholars',
+            { p_limit: 5, p_fallback: true },
+          );
+
+          if (!rpcErr && Array.isArray(dailyData) && dailyData.length > 0) {
+            if (isMounted) setTopScholars(dailyData);
+          } else {
+            throw rpcErr || new Error('Empty daily RPC response');
+          }
+        } catch {
+          // Fallback 1: truy vấn public_profile_view (có today_seconds hoặc exp/study_seconds)
+          let viewRes = await supabase
+            .from('public_profile_view')
+            .select(
+              'id, display_name, avatar_url, role, university, user_mode, target_gpa, target_thpt, is_approved_bang_chu, exp, study_seconds, study_streak, today_seconds, today_minutes, today_exp',
+            )
+            .order('today_seconds', { ascending: false, nullsFirst: false })
+            .order('exp', { ascending: false, nullsFirst: false })
+            .limit(5);
+
+          if (viewRes.error) {
+            viewRes = await supabase
+              .from('public_profile_view')
+              .select(
+                'id, display_name, avatar_url, role, university, user_mode, target_gpa, target_thpt, is_approved_bang_chu, exp, study_seconds, study_streak',
+              )
+              .order('exp', { ascending: false, nullsFirst: false })
+              .order('study_seconds', { ascending: false, nullsFirst: false })
+              .limit(5);
+          }
+
+          if (viewRes.error) {
+            viewRes = await supabase
+              .from('public_profile_view')
+              .select(
+                'id, display_name, avatar_url, role, university, user_mode, target_gpa, target_thpt, is_approved_bang_chu',
+              )
+              .order('is_approved_bang_chu', { ascending: false })
+              .limit(5);
+          }
+
+          if (isMounted && viewRes.data) {
+            setTopScholars(viewRes.data);
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi tải highlights trang chủ:', err);
+      } finally {
+        if (isMounted) setLoadingHighlights(false);
+      }
+    }
+
+    loadHighlights();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const displayName = profile?.display_name || profile?.full_name || (user?.email ? user.email.split('@')[0] : 'Chiến binh');
 
   return (
     <div className="min-h-full bg-background text-foreground font-sans selection:bg-primary/15 selection:text-primary">
@@ -169,6 +273,18 @@ export default function Home() {
                   </Link>
 
                   <Link
+                    to="/hoc-online"
+                    onMouseEnter={() => preloadRouteModule('OnlineLearning')}
+                    onFocus={() => preloadRouteModule('OnlineLearning')}
+                    className="btn-arena btn-arena-gold"
+                  >
+                    <span className="material-symbols-outlined text-xl" aria-hidden="true">
+                      cast_for_education
+                    </span>
+                    <span>Kho Học Online</span>
+                  </Link>
+
+                  <Link
                     to="/roadmap"
                     onMouseEnter={() => preloadRouteModule('Roadmap')}
                     onFocus={() => preloadRouteModule('Roadmap')}
@@ -182,7 +298,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Rank ladder strip — Con đường thăng hạng */}
+              {/* Rank ladder strip */}
               <div className="paper-card p-4 bg-surface/90">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-secondary-text flex items-center gap-1.5">
@@ -269,7 +385,7 @@ export default function Home() {
                       <div className="relative">
                         <Avatar
                           src={profile?.avatar_url}
-                          name={profile?.full_name || user?.email}
+                          name={displayName}
                           className="w-16 h-16 ring-2 ring-gold/60"
                           textSize="text-xl"
                         />
@@ -286,33 +402,30 @@ export default function Home() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <h2 className="font-display text-lg font-extrabold text-foreground truncate">
-                          {profile?.full_name || 'Chiến binh DTHT'}
+                          Chào {displayName}!
                         </h2>
-                        <div className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-soft text-primary border border-primary/30">
-                          <span className="material-symbols-outlined text-sm icon-fill" aria-hidden="true">
-                            {userRank.icon}
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-soft text-primary border border-primary/30">
+                            <span className="material-symbols-outlined text-sm icon-fill" aria-hidden="true">
+                              {userRank.icon}
+                            </span>
+                            <span>{userRank.name}</span>
                           </span>
-                          <span>Hạng {userRank.name}</span>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold border ${levelAccent.badge}`}>
+                            Cấp {levelInfo.level} · {levelInfo.exp} EXP
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Progress to next rank */}
+                    {/* Progress to next level */}
                     <div className="p-4 rounded-xl bg-paper border border-border mb-4">
                       <ProgressBar
-                        value={userRank.progress}
+                        value={levelInfo.progressPct}
                         max={100}
                         tone="primary"
-                        label={
-                          userRank.nextRank
-                            ? `Tiến tới ${userRank.nextRank.name}`
-                            : 'Đã đạt đỉnh Thống Soái'
-                        }
-                        sublabel={
-                          userRank.nextRank
-                            ? `Còn ${Math.max(0, userRank.nextRank.min - studyMinutes)} phút`
-                            : 'Cấp tối đa'
-                        }
+                        label={`Công lực Cấp ${levelInfo.level} → Cấp ${levelInfo.level + 1}`}
+                        sublabel={`${levelInfo.expIntoLevel}/${levelInfo.expForThisLevel} EXP`}
                       />
                     </div>
 
@@ -408,17 +521,325 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <Link
-                    to="/auth"
-                    className="btn-arena btn-arena-primary w-full"
-                  >
-                    <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                      login
-                    </span>
-                    <span>Đăng nhập / Tạo tài khoản miễn phí</span>
-                  </Link>
+                  <div className="space-y-2.5">
+                    <button
+                      type="button"
+                      disabled={isGoogleRedirecting}
+                      onClick={async () => {
+                        setIsGoogleRedirecting(true);
+                        try {
+                          const { error } = await signInWithGoogle('/home');
+                          if (error) setIsGoogleRedirecting(false);
+                        } catch {
+                          setIsGoogleRedirecting(false);
+                        }
+                      }}
+                      className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-surface hover:bg-surface-alt border-2 border-border-strong hover:border-gold text-foreground font-bold text-sm flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-60 shadow-xs"
+                    >
+                      <svg className="h-4 w-4 no-shrink" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          fill="#4285F4"
+                        />
+                        <path
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          fill="#34A853"
+                        />
+                        <path
+                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                          fill="#FBBC05"
+                        />
+                        <path
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          fill="#EA4335"
+                        />
+                      </svg>
+                      <span>
+                        {isGoogleRedirecting
+                          ? 'Đang chuyển tới Google...'
+                          : 'Tiếp tục nhanh với Google'}
+                      </span>
+                    </button>
+
+                    <Link
+                      to="/auth"
+                      className="btn-arena btn-arena-primary w-full"
+                    >
+                      <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                        login
+                      </span>
+                      <span>Đăng nhập / Tạo tài khoản bằng Email</span>
+                    </Link>
+                  </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════ LIVE HIGHLIGHTS: TÀI LIỆU & BẢNG VÀNG SĨ TỬ ═══════════════ */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Featured Documents (7 cols) */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                  Tài nguyên tuyển chọn
+                </span>
+                <h2 className="font-display text-xl sm:text-2xl font-extrabold text-foreground">
+                  Học liệu nổi bật &amp; mới nhất
+                </h2>
+              </div>
+              <Link
+                to="/library"
+                className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+              >
+                <span>Xem tất cả</span>
+                <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                  arrow_forward
+                </span>
+              </Link>
+            </div>
+
+            {loadingHighlights ? (
+              <div className="py-12 flex justify-center">
+                <span className="material-symbols-outlined animate-spin text-2xl text-primary" aria-hidden="true">
+                  sync
+                </span>
+              </div>
+            ) : featuredDocs.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {featuredDocs.map((doc) => {
+                  const kind = getDocumentKindMeta(doc.title, doc.file_url);
+                  const safeUrl = sanitizeExternalUrl(doc.file_url);
+
+                  return (
+                    <div
+                      key={doc.id}
+                      className="paper-card paper-card-interactive p-4 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${kind.badgeClass}`}>
+                            {kind.label}
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-surface-alt text-secondary-text border border-border uppercase">
+                            {doc.education_level || 'THPT'}
+                          </span>
+                          {doc.is_featured && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gold-soft text-gold-dark border border-gold">
+                              Nổi bật
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="font-display font-bold text-sm text-foreground line-clamp-2 mb-1">
+                          {doc.title}
+                        </h3>
+                        <p className="text-xs text-secondary-text line-clamp-2">
+                          {doc.description || 'Chuyên đề và tài liệu trọng tâm cho kỳ thi.'}
+                        </p>
+                      </div>
+
+                      <div className="pt-3 mt-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground">
+                        <span className="truncate max-w-[120px]">{doc.author_name || 'Khuyết danh'}</span>
+                        {safeUrl ? (
+                          <a
+                            href={safeUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-bold text-primary hover:underline flex items-center gap-0.5"
+                          >
+                            <span>Mở học</span>
+                            <span className="material-symbols-outlined text-[12px]" aria-hidden="true">
+                              open_in_new
+                            </span>
+                          </a>
+                        ) : (
+                          <Link to="/library" className="font-bold text-primary hover:underline">
+                            Xem chi tiết
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-8 text-center text-xs text-secondary-text paper-card">
+                Chưa có tài liệu nổi bật nào được đăng tải.
+              </div>
+            )}
+          </div>
+
+          {/* Top Scholars / Daily Study Minutes Leaderboard (5 cols) */}
+          <div className="lg:col-span-5 space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
+                    Phong Thần Bảng
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gold-soft text-gold-dark border border-gold">
+                    <span
+                      className="material-symbols-outlined text-[12px] text-primary"
+                      aria-hidden="true"
+                    >
+                      local_fire_department
+                    </span>
+                    Top Phút Học Ngày
+                  </span>
+                </div>
+                <h2 className="font-display text-xl sm:text-2xl font-extrabold text-foreground">
+                  Sĩ tử tiêu biểu
+                </h2>
+              </div>
+              <Link
+                to="/arena"
+                className="text-xs font-bold text-primary hover:underline flex items-center gap-1 shrink-0"
+              >
+                <span>Bảng đấu trường</span>
+                <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                  arrow_forward
+                </span>
+              </Link>
+            </div>
+
+            <div className="paper-card divide-y divide-border overflow-hidden">
+              {topScholars.map((scholar, idx) => {
+                const todaySec = Number(scholar.today_seconds) || 0;
+                const todayMin =
+                  Number(scholar.today_minutes) || Math.floor(Math.max(0, todaySec) / 60);
+                const totalSec = Number(scholar.study_seconds) || 0;
+                const totalExpVal = Number(scholar.exp) || 0;
+                const sLv = getLevelFromExp(totalExpVal);
+                const hasTodayStudy = Boolean(scholar.is_today) || todayMin > 0;
+
+                return (
+                  <Link
+                    to={scholar.id ? `/profile/${scholar.id}` : '/arena'}
+                    key={scholar.id || idx}
+                    className="p-3.5 flex items-center justify-between gap-3 hover:bg-surface-alt transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span
+                        className={`w-6 text-center font-display font-extrabold text-sm shrink-0 tabular ${
+                          idx === 0
+                            ? 'text-primary'
+                            : idx === 1
+                              ? 'text-accent'
+                              : idx === 2
+                                ? 'text-gold-dark'
+                                : 'text-muted-foreground'
+                        }`}
+                      >
+                        #{idx + 1}
+                      </span>
+                      <Avatar
+                        src={scholar.avatar_url}
+                        name={scholar.display_name || 'Sĩ tử'}
+                        className="w-9 h-9 border border-border shrink-0"
+                        textSize="text-xs"
+                      />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-display font-bold text-xs sm:text-sm text-foreground truncate">
+                            {scholar.display_name || 'Sĩ tử giấu tên'}
+                          </span>
+                          {scholar.is_approved_bang_chu && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-gold-soft text-gold-dark border border-gold uppercase">
+                              Bang Chủ
+                            </span>
+                          )}
+                          {totalExpVal > 0 && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-surface-alt text-secondary-text border border-border tabular">
+                              Lv.{sLv.level}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {scholar.university || 'Sĩ tử THPTQG 2027'}
+                          {scholar.study_streak > 0 ? ` · 🔥${scholar.study_streak} ngày` : ''}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right no-shrink">
+                      {hasTodayStudy ? (
+                        <div>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-extrabold bg-jade-soft text-jade border border-jade-border tabular">
+                            <span
+                              className="material-symbols-outlined text-[13px]"
+                              aria-hidden="true"
+                            >
+                              schedule
+                            </span>
+                            {todayMin >= 60
+                              ? formatStudyTime(todaySec || todayMin * 60)
+                              : `${todayMin} phút`}
+                          </span>
+                          <p className="text-[10px] text-secondary-text font-semibold mt-0.5 tabular">
+                            Hôm nay
+                            {Number(scholar.today_exp) > 0
+                              ? ` · +${Number(scholar.today_exp).toLocaleString('vi-VN')} EXP`
+                              : ''}
+                          </p>
+                        </div>
+                      ) : totalSec >= 60 ? (
+                        <div>
+                          <span className="text-xs font-bold text-foreground tabular block">
+                            {formatStudyTime(totalSec)}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground tabular">
+                            Tích luỹ · {totalExpVal.toLocaleString('vi-VN')} EXP
+                          </span>
+                        </div>
+                      ) : totalExpVal > 0 ? (
+                        <div>
+                          <span className="text-xs font-bold text-accent tabular block">
+                            {totalExpVal.toLocaleString('vi-VN')} EXP
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">Công lực</span>
+                        </div>
+                      ) : scholar.target_thpt ? (
+                        <span className="text-xs font-bold text-accent tabular">
+                          {scholar.target_thpt}đ
+                        </span>
+                      ) : scholar.target_gpa ? (
+                        <span className="text-xs font-bold text-jade tabular">
+                          GPA {scholar.target_gpa}
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-muted-foreground">Tích cực</span>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+
+              {topScholars.length === 0 && (
+                <div className="p-6 text-center text-xs text-secondary-text">
+                  Đang cập nhật bảng danh sách sĩ tử...
+                </div>
+              )}
+
+              <Link
+                to="/hoc-online"
+                onMouseEnter={() => preloadRouteModule('OnlineLearning')}
+                onFocus={() => preloadRouteModule('OnlineLearning')}
+                className="px-4 py-2.5 bg-paper hover:bg-primary-soft/50 flex items-center justify-between text-[11px] font-bold text-primary transition-colors"
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                    bolt
+                  </span>
+                  Học tại Kho Học Online để ghi danh lên Bảng Vàng hôm nay
+                </span>
+                <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                  chevron_right
+                </span>
+              </Link>
             </div>
           </div>
         </div>
@@ -548,7 +969,7 @@ export default function Home() {
                   10k+ Học liệu
                 </div>
                 <p className="text-xs text-secondary-text mt-1 leading-relaxed">
-                  Đề thi thử, chuyên đề và đáp án chi tiết phân loại theo từng khối lớp 10 · 11 · 12.
+                  Đề thi thử, chuyên đề và đáp án chi tiết phân loại theo từng môn học và kỳ thi THPT &amp; ĐGNL.
                 </p>
               </div>
             </div>
@@ -564,7 +985,7 @@ export default function Home() {
                   Công cụ GPA · THPT
                 </div>
                 <p className="text-xs text-secondary-text mt-1 leading-relaxed">
-                  Tự động tính điểm học bạ, xét tuyển đại học và gợi ý ngành phù hợp năng lực.
+                  Tự động tính điểm học bạ, quy đổi điểm thi ĐGNL và sắp xếp nguyện vọng trường tối ưu.
                 </p>
               </div>
             </div>

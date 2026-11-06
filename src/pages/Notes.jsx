@@ -1,7 +1,40 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import RankSeal from '../components/ui/RankSeal';
+import { useToast } from '../components/ui/ToastProvider';
+
+const NOTES_META_KEY = 'dtht_notes_meta';
+
+function loadNotesMeta() {
+  try {
+    const raw = localStorage.getItem(NOTES_META_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveNoteMeta(id, meta) {
+  try {
+    const all = loadNotesMeta();
+    all[id] = { ...(all[id] || {}), ...meta };
+    localStorage.setItem(NOTES_META_KEY, JSON.stringify(all));
+  } catch {
+    // Ignore storage quota
+  }
+}
+
+function removeNoteMeta(id) {
+  try {
+    const all = loadNotesMeta();
+    delete all[id];
+    localStorage.setItem(NOTES_META_KEY, JSON.stringify(all));
+  } catch {
+    // Ignore
+  }
+}
 
 const CATEGORIES = [
   {
@@ -16,9 +49,9 @@ const CATEGORIES = [
     id: 'Công thức',
     label: 'Công thức',
     icon: 'functions',
-    color: 'text-sky-800',
-    bg: 'bg-sky-50',
-    border: 'border-sky-300',
+    color: 'text-sky-800 dark:text-sky-300',
+    bg: 'bg-sky-50 dark:bg-sky-950/40',
+    border: 'border-sky-300 dark:border-sky-800',
   },
   {
     id: 'Từ vựng',
@@ -32,7 +65,7 @@ const CATEGORIES = [
     id: 'Lịch sử / Văn',
     label: 'Lịch sử / Văn',
     icon: 'history_edu',
-    color: 'text-gold-dark',
+    color: 'text-gold-dark dark:text-accent',
     bg: 'bg-gold-soft',
     border: 'border-gold',
   },
@@ -48,14 +81,16 @@ const CATEGORIES = [
     id: 'Khác',
     label: 'Khác',
     icon: 'push_pin',
-    color: 'text-indigo-800',
-    bg: 'bg-indigo-50',
-    border: 'border-indigo-200',
+    color: 'text-indigo-800 dark:text-indigo-300',
+    bg: 'bg-indigo-50 dark:bg-indigo-950/40',
+    border: 'border-indigo-200 dark:border-indigo-800',
   },
 ];
 
 export default function Notes() {
   const { user } = useAuth();
+  const { showToast } = useToast();
+
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,26 +103,47 @@ export default function Notes() {
   const [category, setCategory] = useState('Công thức');
   const [isPinned, setIsPinned] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
   const fetchNotes = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
+      // ONLY valid columns in tram_sv: id, user_id, title, content, created_at, updated_at
       const { data, error } = await supabase
         .from('user_notes')
-        .select('*')
+        .select('id, user_id, title, content, created_at, updated_at')
         .eq('user_id', user.id)
-        .order('is_pinned', { ascending: false })
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
-      if (data) setNotes(data);
+
+      const meta = loadNotesMeta();
+      const enriched = (data || []).map((n) => ({
+        ...n,
+        category: meta[n.id]?.category || 'Khác',
+        is_pinned: Boolean(meta[n.id]?.is_pinned),
+      }));
+
+      // Sort pinned first, then updated_at descending
+      enriched.sort((a, b) => {
+        if (a.is_pinned !== b.is_pinned) {
+          return a.is_pinned ? -1 : 1;
+        }
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      });
+
+      setNotes(enriched);
     } catch (error) {
       console.error('Lỗi tải ghi chú:', error.message);
+      showToast('Không thể tải danh sách ghi chú: ' + error.message, 'error');
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, showToast]);
 
   useEffect(() => {
     fetchNotes();
@@ -96,10 +152,10 @@ export default function Notes() {
   const openModal = (note = null) => {
     if (note) {
       setEditingNote(note);
-      setTitle(note.title);
-      setContent(note.content);
-      setCategory(note.category);
-      setIsPinned(note.is_pinned);
+      setTitle(note.title || '');
+      setContent(note.content || '');
+      setCategory(note.category || 'Công thức');
+      setIsPinned(Boolean(note.is_pinned));
     } else {
       setEditingNote(null);
       setTitle('');
@@ -117,84 +173,130 @@ export default function Notes() {
 
   const handleSaveNote = async (e) => {
     e.preventDefault();
-    if (!title.trim() && !content.trim()) {
-      alert('Vui lòng nhập tiêu đề hoặc nội dung ghi chú!');
+    if (!user) {
+      showToast('Vui lòng đăng nhập để lưu ghi chú!', 'warning');
+      return;
+    }
+
+    const trimmedTitle = title.trim();
+    const trimmedContent = content.trim();
+
+    if (!trimmedTitle && !trimmedContent) {
+      showToast('Vui lòng nhập tiêu đề hoặc nội dung ghi chú!', 'warning');
+      return;
+    }
+
+    if (trimmedTitle.length > 200) {
+      showToast('Tiêu đề ghi chú không được vượt quá 200 ký tự!', 'warning');
+      return;
+    }
+
+    if (trimmedContent.length > 10000) {
+      showToast('Nội dung ghi chú không được vượt quá 10.000 ký tự!', 'warning');
       return;
     }
 
     setIsSaving(true);
     try {
-      const noteData = {
-        user_id: user.id,
-        title: title.trim() || 'Ghi chú không tiêu đề',
-        content: content.trim(),
-        category,
-        is_pinned: isPinned,
-        updated_at: new Date(),
-      };
+      const nowIso = new Date().toISOString();
 
       if (editingNote) {
+        // ONLY send valid columns: title, content, updated_at
         const { error } = await supabase
           .from('user_notes')
-          .update(noteData)
+          .update({
+            title: trimmedTitle || 'Ghi chú mới',
+            content: trimmedContent,
+            updated_at: nowIso,
+          })
           .eq('id', editingNote.id);
+
         if (error) throw error;
+
+        saveNoteMeta(editingNote.id, { category, is_pinned: isPinned });
+        showToast('Đã lưu thay đổi ghi chú thành công!', 'success');
       } else {
-        const { error } = await supabase.from('user_notes').insert([noteData]);
+        // ONLY send valid columns: user_id, title, content
+        const { data, error } = await supabase
+          .from('user_notes')
+          .insert([
+            {
+              user_id: user.id,
+              title: trimmedTitle || 'Ghi chú mới',
+              content: trimmedContent,
+            },
+          ])
+          .select()
+          .single();
+
         if (error) throw error;
+
+        if (data?.id) {
+          saveNoteMeta(data.id, { category, is_pinned: isPinned });
+        }
+        showToast('Đã tạo ghi chú mới thành công!', 'success');
       }
 
       closeModal();
       fetchNotes();
     } catch (error) {
-      alert('Lỗi khi lưu ghi chú: ' + error.message);
+      showToast('Lỗi khi lưu ghi chú: ' + (error.message || 'Thử lại sau.'), 'error');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleTogglePin = async (note, e) => {
+  const handleTogglePin = (note, e) => {
     e.stopPropagation();
-    try {
-      const newPinStatus = !note.is_pinned;
-      setNotes(
-        notes
-          .map((n) => (n.id === note.id ? { ...n, is_pinned: newPinStatus } : n))
-          .sort((a, b) => Number(b.is_pinned) - Number(a.is_pinned)),
+    const newPinStatus = !note.is_pinned;
+    saveNoteMeta(note.id, { is_pinned: newPinStatus });
+
+    setNotes((prev) => {
+      const updated = prev.map((n) =>
+        n.id === note.id ? { ...n, is_pinned: newPinStatus } : n,
       );
+      return updated.sort((a, b) => {
+        if (a.is_pinned !== b.is_pinned) return a.is_pinned ? -1 : 1;
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      });
+    });
 
-      const { error } = await supabase
-        .from('user_notes')
-        .update({ is_pinned: newPinStatus, updated_at: new Date() })
-        .eq('id', note.id);
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Lỗi ghim ghi chú:', error.message);
-      fetchNotes();
-    }
+    showToast(
+      newPinStatus ? 'Đã ghim ghi chú lên đầu' : 'Đã bỏ ghim ghi chú',
+      'info',
+      2000,
+    );
   };
 
-  const handleDeleteNote = async (id, e) => {
+  const handleRequestDelete = (id, e) => {
     if (e) e.stopPropagation();
-    if (!window.confirm('Bạn có chắc chắn muốn xóa ghi chú này?')) return;
+    setDeleteConfirmId(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmId) return;
+    const id = deleteConfirmId;
+    setDeleteConfirmId(null);
 
     try {
-      setNotes(notes.filter((n) => n.id !== id));
+      setNotes((prev) => prev.filter((n) => n.id !== id));
+      removeNoteMeta(id);
       if (editingNote?.id === id) closeModal();
 
       const { error } = await supabase.from('user_notes').delete().eq('id', id);
       if (error) throw error;
+      showToast('Đã xóa ghi chú', 'info', 2500);
     } catch (error) {
-      alert('Lỗi khi xóa: ' + error.message);
+      showToast('Lỗi khi xóa ghi chú: ' + error.message, 'error');
       fetchNotes();
     }
   };
 
   const filteredNotes = notes.filter((note) => {
-    const matchCategory = selectedCategory === 'Tất cả' || note.category === selectedCategory;
+    const matchCategory =
+      selectedCategory === 'Tất cả' || note.category === selectedCategory;
     const matchSearch =
-      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (note.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (note.content && note.content.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchCategory && matchSearch;
   });
@@ -224,19 +326,28 @@ export default function Notes() {
                 Sổ Tay Kiến Thức
               </h1>
               <p className="text-xs sm:text-sm text-secondary-text mt-1">
-                Lưu trữ công thức, từ vựng và những lưu ý quan trọng cho kỳ thi
+                Lưu trữ công thức, từ vựng và những lưu ý quan trọng cho kỳ thi THPT &amp; ĐGNL
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => openModal()}
-              className="btn-arena btn-arena-primary"
-            >
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                add
-              </span>
-              <span>Tạo ghi chú mới</span>
-            </button>
+            {user ? (
+              <button
+                type="button"
+                onClick={() => openModal()}
+                className="btn-arena btn-arena-primary"
+              >
+                <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                  add
+                </span>
+                <span>Tạo ghi chú mới</span>
+              </button>
+            ) : (
+              <Link to="/auth" className="btn-arena btn-arena-primary">
+                <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                  login
+                </span>
+                <span>Đăng nhập để ghi chép</span>
+              </Link>
+            )}
           </div>
 
           {/* Search & Filter */}
@@ -293,7 +404,27 @@ export default function Notes() {
 
         {/* Main Content */}
         <main>
-          {loading ? (
+          {!user ? (
+            <div className="text-center py-16 paper-card border-dashed max-w-lg mx-auto my-8 p-6">
+              <div className="w-16 h-16 rounded-2xl bg-primary-soft border border-primary/30 text-primary flex items-center justify-center mx-auto mb-4">
+                <span className="material-symbols-outlined text-3xl" aria-hidden="true">
+                  edit_note
+                </span>
+              </div>
+              <h3 className="font-display font-bold text-lg text-foreground mb-1">
+                Đăng nhập để sử dụng Sổ Tay Kiến Thức
+              </h3>
+              <p className="text-xs text-secondary-text mb-6 max-w-xs mx-auto leading-relaxed">
+                Ghi chú của bạn được đồng bộ an toàn trên hệ thống máy chủ để truy cập trên mọi thiết bị máy tính lẫn điện thoại.
+              </p>
+              <Link to="/auth" className="btn-arena btn-arena-primary btn-arena-sm">
+                <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                  login
+                </span>
+                Đăng nhập ngay
+              </Link>
+            </div>
+          ) : loading ? (
             <div className="flex justify-center py-20">
               <span
                 className="material-symbols-outlined animate-spin text-4xl text-primary"
@@ -328,6 +459,7 @@ export default function Notes() {
                         <div className="flex items-center gap-1">
                           <button
                             type="button"
+                            aria-label={note.is_pinned ? 'Bỏ ghim ghi chú' : 'Ghim ghi chú lên đầu'}
                             onClick={(e) => handleTogglePin(note, e)}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                               note.is_pinned
@@ -342,7 +474,8 @@ export default function Notes() {
                           </button>
                           <button
                             type="button"
-                            onClick={(e) => handleDeleteNote(note.id, e)}
+                            aria-label="Xóa ghi chú"
+                            onClick={(e) => handleRequestDelete(note.id, e)}
                             className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary-soft transition-colors sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer"
                             title="Xóa ghi chú"
                           >
@@ -441,6 +574,7 @@ export default function Notes() {
               <div className="flex items-center gap-1 no-shrink ml-2">
                 <button
                   type="button"
+                  aria-label={isPinned ? 'Bỏ ghim ghi chú' : 'Ghim ghi chú lên đầu'}
                   onClick={() => setIsPinned(!isPinned)}
                   className={`p-2 rounded-xl transition-colors cursor-pointer ${
                     isPinned
@@ -471,28 +605,40 @@ export default function Notes() {
               onSubmit={handleSaveNote}
               className="flex-1 flex flex-col p-6 overflow-y-auto space-y-4 bg-surface"
             >
-              <input
-                type="text"
-                placeholder="Tiêu đề ghi chú..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-transparent text-xl font-display font-bold text-foreground placeholder:text-muted-foreground focus:outline-none border-b border-border pb-2"
-              />
+              <div>
+                <input
+                  type="text"
+                  maxLength={200}
+                  placeholder="Tiêu đề ghi chú (tối đa 200 ký tự)..."
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full bg-transparent text-xl font-display font-bold text-foreground placeholder:text-muted-foreground focus:outline-none border-b border-border pb-2"
+                />
+                <div className="text-[10px] text-muted-foreground text-right mt-1 tabular">
+                  {title.length}/200
+                </div>
+              </div>
 
-              <textarea
-                placeholder="Nhập nội dung kiến thức, công thức, từ vựng cần nhớ vào đây..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={12}
-                className="w-full flex-1 bg-paper border border-border rounded-xl p-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary leading-relaxed resize-none"
-              />
+              <div className="flex-1 flex flex-col">
+                <textarea
+                  maxLength={10000}
+                  placeholder="Nhập nội dung kiến thức, công thức, từ vựng cần nhớ vào đây (tối đa 10.000 ký tự)..."
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  rows={12}
+                  className="w-full flex-1 bg-paper border border-border rounded-xl p-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary leading-relaxed resize-none"
+                />
+                <div className="text-[10px] text-muted-foreground text-right mt-1 tabular">
+                  {content.length}/10000
+                </div>
+              </div>
 
               {/* Modal Footer */}
               <div className="pt-4 border-t border-border flex items-center justify-between">
                 {editingNote ? (
                   <button
                     type="button"
-                    onClick={() => handleDeleteNote(editingNote.id)}
+                    onClick={(e) => handleRequestDelete(editingNote.id, e)}
                     className="flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary-soft px-3 py-2 rounded-xl transition-colors cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-base" aria-hidden="true">
@@ -525,6 +671,52 @@ export default function Notes() {
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal for Delete */}
+      {deleteConfirmId && (
+        <div
+          className="fixed inset-0 z-[110] bg-foreground/45 backdrop-blur-xs flex items-center justify-center p-4"
+          onClick={() => setDeleteConfirmId(null)}
+        >
+          <div
+            className="imperial-frame w-full max-w-sm p-6 bg-surface shadow-2xl space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center no-shrink">
+                <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+                  delete_forever
+                </span>
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-base text-foreground">
+                  Xác nhận xoá ghi chú
+                </h3>
+                <p className="text-xs text-secondary-text mt-0.5">
+                  Hành động này không thể hoàn tác.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmId(null)}
+                className="btn-arena btn-arena-secondary btn-arena-sm"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="btn-arena btn-arena-primary btn-arena-sm"
+              >
+                Xóa vĩnh viễn
+              </button>
+            </div>
           </div>
         </div>
       )}

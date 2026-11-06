@@ -5,14 +5,14 @@
 `src/` is the frontend application subsystem for the DTHT web platform (Trạm Học Sinh Sinh Viên), built with React 19, Vite, and Tailwind CSS v4. It implements a responsive Single Page Application (SPA) offering study tools, GPA calculation, university admissions analysis, document library browsing, and gamified study tracking.
 
 The subsystem is architected with a decoupled layer hierarchy:
-- **Bootstrap & Routing**: `main.jsx` and `App.jsx` initialise React 19, mount global context providers, and configure lazy routes with chunk-retry resilience.
-- **Visual Design System**: `index.css` configures Tailwind v4 and exports the "Môn phái học tập" design token palette (ink plum background, ember brand accents, gold badges, jade accents, arena typography).
+- **Bootstrap & Routing**: `main.jsx` and `App.jsx` initialise React 19, mount global context providers (`ThemeProvider`, `AuthProvider`, `ToastProvider`), and configure lazy routes with chunk-retry resilience.
+- **Visual Design System**: `index.css` configures Tailwind v4 and exports the "Môn phái học tập" / "Thư Phòng Sáng" design token palette (ink plum background, ember brand accents, gold badges, jade accents, arena typography, rice paper light mode).
 - **Core Subsystems**: Eight focused child packages partition concerns across UI components, domain configuration, auth state, custom hooks, shared infrastructure, route views, and pure utilities.
 
 ## Local Interface & Invariants
 
 ### `main.jsx`
-- Initializes the client runtime: mounts `<StrictMode><App /></StrictMode>` into `document.getElementById('root')`.
+- Initializes the client runtime: mounts `<StrictMode><ThemeProvider><App /></ThemeProvider></StrictMode>` into `document.getElementById('root')`.
 - Imports `index.css` for global style and token cascade.
 
 ### `App.jsx`
@@ -24,7 +24,7 @@ The subsystem is architected with a decoupled layer hierarchy:
 
 ### Routing Table
 Routes defined in `App.jsx`:
-- Public: `/` (AuthScreen), `/auth` (AuthScreen).
+- Public: `/` (AuthScreen), `/auth` (AuthScreen), `/auth/callback` (AuthCallback).
 - Nested in `RootLayout`:
   - `/home` (Home — public view supported)
   - `/gpa` (GPACalculator)
@@ -45,10 +45,10 @@ Routes defined in `App.jsx`:
 - **components**: [`./components/EGM.md`](./components/EGM.md) — Shell layout (`RootLayout`), global widgets (`Avatar`, `WelcomeModal`, `ErrorBoundary`), reusable UI primitives ([`./components/ui/EGM.md`](./components/ui/EGM.md)), and administrative tab extractions ([`./components/admin/EGM.md`](./components/admin/EGM.md)).
 - **config**: [`./config/EGM.md`](./config/EGM.md) — Static app configuration, teacher seed registries (`teachers.seed.json`), and metadata definitions.
 - **content**: [`./content/EGM.md`](./content/EGM.md) — Editorial course marketing models; exports `comboHs12Course` in `courseCatalog.js` for the `/courses/combo-dtht-hs12-2k9-chinh-phuc-dai-hoc` route.
-- **contexts**: [`./contexts/EGM.md`](./contexts/EGM.md) — React context providers: `AuthContext` managing authentication sessions, profile resolution, and login/logout state.
+- **contexts**: [`./contexts/EGM.md`](./contexts/EGM.md) — React context providers: `AuthContext` (auth session, profile SWR, next-path sanitation) and `ThemeContext` (dual theme state, localStorage sync, dark mode class toggling).
 - **hooks**: [`./hooks/EGM.md`](./hooks/EGM.md) — Single hook package holding `useStudyTracker.js`, the core EXP v2 accrual and heartbeat synchronization engine.
 - **lib**: [`./lib/EGM.md`](./lib/EGM.md) — Shared frontend utilities (singleton Supabase client, document query constants, route preloading) and admissions calculation engine ([`./lib/admission/EGM.md`](./lib/admission/EGM.md)).
-- **pages**: [`./pages/EGM.md`](./pages/EGM.md) — 15 top-level route views and page controllers.
+- **pages**: [`./pages/EGM.md`](./pages/EGM.md) — 16 top-level route views and page controllers (including OAuth/magic link handler `AuthCallback`).
 - **utils**: [`./utils/EGM.md`](./utils/EGM.md) — Pure computational helpers: Word document parsing (`docxParser.js`), EXP leveling and arena rank thresholds (`levelHelper.js`, `rankHelper.js`), URL sanitation (`urlSecurity.js`), asset paths (`mediaPath.js`), and duration formatting (`timeFormat.js`).
 
 ## Global Invariants
@@ -62,8 +62,8 @@ Routes defined in `App.jsx`:
 
 ## Global Side Effects
 
-- **DOM Mutation**: Mounts the React virtual DOM tree into `#root`, and removes `#boot-shell` from the document body upon initial mount.
-- **Storage Access**: Reads and writes `sessionStorage.getItem('vite-chunk-reload')` during dynamic route resolution.
+- **DOM Mutation**: Mounts the React virtual DOM tree into `#root`, manages theme class on document element, and removes `#boot-shell` from the document body upon initial mount.
+- **Storage Access**: Reads and writes `sessionStorage.getItem('vite-chunk-reload')` and `localStorage.getItem('dtht_theme')`.
 - **Timer & Frame Scheduling**: Dispatches `requestAnimationFrame` for shell cleanup and `requestIdleCallback` / `setTimeout` for deferred analytics.
 - **Network I/O**: Dispatches API requests via `@supabase/supabase-js`, pulls remote static assets (documents, images), and triggers lazy route module imports.
 

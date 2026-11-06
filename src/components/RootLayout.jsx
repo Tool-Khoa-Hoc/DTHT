@@ -1,11 +1,12 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
-import { Outlet, Link, useLocation, Navigate } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { preloadRouteModule } from '../lib/routeModules';
 import { getUserRank } from '../utils/rankHelper';
 import { getLevelFromExp, getLevelAccent } from '../utils/levelHelper';
 import Avatar from './Avatar';
 import { PageSkeleton } from './ui/Skeleton';
+import ThemeToggle from './ui/ThemeToggle';
 
 const WelcomeModal = lazy(() => import('./WelcomeModal'));
 
@@ -21,11 +22,51 @@ const scheduleIdleTask = (callback, timeout = 1800) => {
   return () => window.clearTimeout(timerId);
 };
 
+function GoogleLinkedBadge() {
+  return (
+    <span
+      className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface border border-border no-shrink shadow-2xs"
+      title="Đã đồng bộ tài khoản Google"
+      aria-label="Đã đồng bộ tài khoản Google"
+    >
+      <svg className="h-2.5 w-2.5" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+          fill="#4285F4"
+        />
+        <path
+          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+          fill="#34A853"
+        />
+        <path
+          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+          fill="#FBBC05"
+        />
+        <path
+          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+          fill="#EA4335"
+        />
+      </svg>
+    </span>
+  );
+}
+
 export default function RootLayout() {
   const location = useLocation();
-  const { user, profile, isAdmin, isCollaborator, loading } = useAuth();
+  const navigate = useNavigate();
+  const {
+    user,
+    profile,
+    isAdmin,
+    isCollaborator,
+    isGoogleLinked,
+    signOut,
+    loading,
+  } = useAuth();
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [shouldLoadWelcomeModal, setShouldLoadWelcomeModal] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const mainRef = useRef(null);
 
   useEffect(() => {
@@ -49,14 +90,42 @@ export default function RootLayout() {
   }
 
   const isPublicBrowseRoute = location.pathname === '/home';
+  const currentDestination = `${location.pathname}${location.search}`;
+  const authLinkWithNext = `/auth?next=${encodeURIComponent(currentDestination)}`;
 
   if (!loading && !user && !isPublicBrowseRoute) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to={authLinkWithNext} replace />;
   }
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+    try {
+      await signOut();
+      setIsMobileMenuOpen(false);
+      navigate('/auth', { replace: true });
+    } catch (err) {
+      console.error('[RootLayout] Sign out error:', err);
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
 
   const userRank = getUserRank(0, profile?.role, profile?.is_approved_bang_chu);
   const lv = getLevelFromExp(profile?.exp || 0);
   const lvAccent = getLevelAccent(lv.level);
+
+  const displayAvatar =
+    profile?.avatar_url ||
+    user?.user_metadata?.avatar_url ||
+    user?.user_metadata?.picture;
+  const displayName =
+    profile?.display_name ||
+    profile?.full_name ||
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split('@')[0] ||
+    'Sĩ tử';
 
   return (
     <div className="flex h-dvh w-full bg-background font-sans text-foreground overflow-hidden">
@@ -148,7 +217,7 @@ export default function RootLayout() {
             label="Ghi chú"
             currentPath={location.pathname}
           />
-          {(isAdmin || profile?.role === 'admin') && (
+          {isAdmin && (
             <SidebarLink
               to="/admin"
               preloadKey="Admin"
@@ -157,7 +226,7 @@ export default function RootLayout() {
               currentPath={location.pathname}
             />
           )}
-          {(isCollaborator || isAdmin || profile?.role === 'admin' || profile?.role === 'collaborator') && (
+          {isCollaborator && (
             <SidebarLink
               to="/collaborator"
               preloadKey="Collaborator"
@@ -168,50 +237,72 @@ export default function RootLayout() {
           )}
         </nav>
 
-        <div className="p-3 border-t border-border bg-surface/60">
+        <div className="p-3 border-t border-border bg-surface/60 space-y-2">
+          <ThemeToggle variant="desktop" />
           {user ? (
-            <Link
-              to="/profile"
-              onMouseEnter={() => preloadRouteModule('Profile')}
-              onFocus={() => preloadRouteModule('Profile')}
-              className={`flex items-center gap-3 p-2.5 rounded-xl transition-all border ${
-                location.pathname === '/profile'
-                  ? 'bg-primary-soft border-primary/40 shadow-xs'
-                  : 'bg-surface hover:bg-surface-alt border-border'
-              }`}
-            >
-              <Avatar
-                src={profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture}
-                name={profile?.display_name || profile?.full_name || user?.user_metadata?.full_name || user?.email}
-                id={user?.id}
-                size="w-10 h-10"
-                rounded="rounded-xl"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold truncate text-foreground">
-                  {profile?.display_name || profile?.full_name || user?.user_metadata?.full_name || 'Học viên'}
-                </p>
-                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                  <span
-                    className={`inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded border ${userRank.bg} ${userRank.color} ${userRank.border}`}
-                  >
-                    <span className="material-symbols-outlined text-[11px]" aria-hidden="true">
-                      {userRank.icon}
+            <div className="flex items-stretch gap-1.5">
+              <Link
+                to="/profile"
+                onMouseEnter={() => preloadRouteModule('Profile')}
+                onFocus={() => preloadRouteModule('Profile')}
+                className={`flex flex-1 min-w-0 items-center gap-2.5 p-2 rounded-xl transition-all border ${
+                  location.pathname === '/profile'
+                    ? 'bg-primary-soft border-primary/40 shadow-xs'
+                    : 'bg-surface hover:bg-surface-alt border-border'
+                }`}
+              >
+                <Avatar
+                  src={displayAvatar}
+                  name={displayName}
+                  id={user?.id}
+                  size="w-9 h-9"
+                  rounded="rounded-xl"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1 min-w-0">
+                    <p className="text-xs font-bold truncate text-foreground">
+                      {displayName}
+                    </p>
+                    {isGoogleLinked && <GoogleLinkedBadge />}
+                  </div>
+                  <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                    <span
+                      className={`inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded border ${userRank.bg} ${userRank.color} ${userRank.border}`}
+                    >
+                      <span className="material-symbols-outlined text-[11px]" aria-hidden="true">
+                        {userRank.icon}
+                      </span>
+                      {userRank.name}
                     </span>
-                    {userRank.name}
-                  </span>
-                  <span
-                    className={`tabular inline-flex items-center text-[10px] font-extrabold px-1.5 py-0.5 rounded border ${lvAccent.badge}`}
-                    title={`${lv.expInLevel}/${lv.expForNext} EXP tới cấp tiếp theo`}
-                  >
-                    Cấp {lv.level}
-                  </span>
+                    <span
+                      className={`tabular inline-flex items-center text-[10px] font-extrabold px-1.5 py-0.5 rounded border ${lvAccent.badge}`}
+                      title={`${lv.expInLevel}/${lv.expForNext} EXP tới cấp tiếp theo`}
+                    >
+                      Cấp {lv.level}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+
+              <button
+                type="button"
+                onClick={handleSignOut}
+                disabled={isSigningOut}
+                title="Đăng xuất tài khoản"
+                aria-label="Đăng xuất tài khoản"
+                className="flex w-10 items-center justify-center rounded-xl border border-border bg-surface text-secondary-text hover:bg-primary-soft hover:text-primary hover:border-primary/35 transition-colors cursor-pointer no-shrink disabled:opacity-50"
+              >
+                <span
+                  className={`material-symbols-outlined text-lg ${isSigningOut ? 'animate-spin' : ''}`}
+                  aria-hidden="true"
+                >
+                  {isSigningOut ? 'progress_activity' : 'logout'}
+                </span>
+              </button>
+            </div>
           ) : (
             <Link
-              to="/auth"
+              to={authLinkWithNext}
               className="btn-arena btn-arena-primary w-full text-sm"
             >
               <span className="material-symbols-outlined text-lg" aria-hidden="true">
@@ -250,7 +341,7 @@ export default function RootLayout() {
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-alt border border-border text-foreground active:bg-surface-hover cursor-pointer"
                 aria-label="Đóng menu"
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined" aria-hidden="true">close</span>
               </button>
             </div>
 
@@ -277,31 +368,70 @@ export default function RootLayout() {
               <SidebarLink to="/hoc-online" preloadKey="OnlineLearning" icon="computer" label="Học online" currentPath={location.pathname} />
               <SidebarLink to="/arena" preloadKey="StudyArena" icon="local_fire_department" label="Đấu trường" currentPath={location.pathname} />
               <SidebarLink to="/notes" preloadKey="Notes" icon="edit_note" label="Ghi chú" currentPath={location.pathname} />
-              {(isAdmin || profile?.role === 'admin') && (
+              {isAdmin && (
                 <SidebarLink to="/admin" preloadKey="Admin" icon="admin_panel_settings" label="Admin Panel" currentPath={location.pathname} />
               )}
-              {(isCollaborator || isAdmin || profile?.role === 'admin' || profile?.role === 'collaborator') && (
+              {isCollaborator && (
                 <SidebarLink to="/collaborator" preloadKey="Collaborator" icon="local_library" label="Truyền Đạo Sư" currentPath={location.pathname} />
               )}
             </nav>
 
-            <div className="px-3 pb-4 pt-2 border-t border-border bg-surface pb-safe">
-              <Link
-                to={user ? '/profile' : '/auth'}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 rounded-xl bg-surface-alt border border-border px-4 py-3 transition-colors active:bg-surface-hover"
-              >
-                <Avatar
-                  src={profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture}
-                  name={profile?.display_name || profile?.full_name || user?.user_metadata?.full_name || 'Cá nhân'}
-                  id={user?.id}
-                  size="w-8 h-8"
-                  rounded="rounded-full"
-                />
-                <span className="truncate text-sm font-bold text-foreground">
-                  {profile?.display_name || profile?.full_name || user?.user_metadata?.full_name || 'Cá nhân'}
-                </span>
-              </Link>
+            <div className="px-3 pb-4 pt-2 border-t border-border bg-surface pb-safe space-y-2">
+              <ThemeToggle variant="desktop" />
+              {user ? (
+                <div className="flex items-stretch gap-1.5">
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex flex-1 min-w-0 items-center gap-2.5 rounded-xl bg-surface-alt border border-border px-3 py-2.5 transition-colors active:bg-surface-hover"
+                  >
+                    <Avatar
+                      src={displayAvatar}
+                      name={displayName}
+                      id={user?.id}
+                      size="w-8 h-8"
+                      rounded="rounded-full"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1 min-w-0">
+                        <span className="truncate text-sm font-bold text-foreground">
+                          {displayName}
+                        </span>
+                        {isGoogleLinked && <GoogleLinkedBadge />}
+                      </div>
+                      <span className="text-[11px] text-secondary-text block truncate">
+                        {userRank.name} · Cấp {lv.level}
+                      </span>
+                    </div>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    disabled={isSigningOut}
+                    title="Đăng xuất tài khoản"
+                    aria-label="Đăng xuất tài khoản"
+                    className="flex min-w-[44px] items-center justify-center rounded-xl border border-border bg-surface-alt text-secondary-text hover:bg-primary-soft hover:text-primary hover:border-primary/35 transition-colors cursor-pointer no-shrink disabled:opacity-50"
+                  >
+                    <span
+                      className={`material-symbols-outlined text-lg ${isSigningOut ? 'animate-spin' : ''}`}
+                      aria-hidden="true"
+                    >
+                      {isSigningOut ? 'progress_activity' : 'logout'}
+                    </span>
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to={authLinkWithNext}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="btn-arena btn-arena-primary w-full text-sm"
+                >
+                  <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                    login
+                  </span>
+                  <span>Đăng nhập / Đăng ký</span>
+                </Link>
+              )}
             </div>
           </aside>
         </div>
@@ -331,16 +461,19 @@ export default function RootLayout() {
             </span>
           </Link>
 
-          <button
-            type="button"
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-alt border border-border text-foreground transition-colors active:bg-surface-hover cursor-pointer"
-            aria-label="Menu"
-            aria-controls="mobile-main-menu"
-            aria-expanded={isMobileMenuOpen}
-          >
-            <span className="material-symbols-outlined text-xl">menu</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle variant="compact" />
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-alt border border-border text-foreground transition-colors active:bg-surface-hover cursor-pointer"
+              aria-label="Menu"
+              aria-controls="mobile-main-menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <span className="material-symbols-outlined text-xl" aria-hidden="true">menu</span>
+            </button>
+          </div>
         </header>
 
         <main
@@ -383,10 +516,10 @@ export default function RootLayout() {
               currentPath={location.pathname}
             />
             <MobileNavLink
-              to={user ? '/profile' : '/auth'}
+              to={user ? '/profile' : authLinkWithNext}
               preloadKey={user ? 'Profile' : undefined}
               icon={user ? 'person' : 'login'}
-              label={user ? 'Cá nhân' : 'Cá nhân'}
+              label={user ? 'Cá nhân' : 'Đăng nhập'}
               currentPath={location.pathname}
             />
           </div>

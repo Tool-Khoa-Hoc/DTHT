@@ -1,5 +1,6 @@
 export const routeModuleLoaders = {
   RootLayout: () => import('../components/RootLayout'),
+  AuthCallback: () => import('../pages/AuthCallback'),
   Home: () => import('../pages/Home'),
   GPACalculator: () => import('../pages/GPACalculator'),
   Library: () => import('../pages/Library'),

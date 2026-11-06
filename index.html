@@ -12,14 +12,14 @@
   <meta name="description" content="Đấu Trường Học Tập - Nền tảng ôn thi THPTQG, tính điểm xét tuyển đại học, và luyện thi trắc nghiệm dành cho học sinh Việt Nam" />
   <meta name="keywords" content="ôn thi THPT, tính điểm xét tuyển, luyện thi trắc nghiệm, đề thi thử, Đấu Trường Học Tập" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://www.dautruonghoctap.io.vn/" />
+  <link rel="canonical" href="https://www.dautruonghoctap.dev/" />
 
   <!-- Open Graph -->
   <meta property="og:title" content="Đấu Trường Học Tập" />
   <meta property="og:description" content="Nền tảng ôn thi THPTQG và tính điểm xét tuyển đại học hàng đầu Việt Nam" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.dautruonghoctap.io.vn/" />
-  <meta property="og:image" content="https://www.dautruonghoctap.io.vn/logo.png" />
+  <meta property="og:url" content="https://www.dautruonghoctap.dev/" />
+  <meta property="og:image" content="https://www.dautruonghoctap.dev/logo.png" />
   <meta property="og:locale" content="vi_VN" />
 
   <title>Đấu Trường Học Tập - Ôn thi THPTQG &amp; Tính điểm xét tuyển</title>
@@ -44,14 +44,28 @@
     fetchpriority="high"
   />
 
-  <!-- Preload duy nhất font heading 700 (Baloo 2 Vietnamese subset, self-hosted woff2) -->
+  <!-- Preload font heading 700 (Spectral Vietnamese subset, self-hosted woff2) -->
   <link
     rel="preload"
     as="font"
     type="font/woff2"
-    href="/node_modules/@fontsource/baloo-2/files/baloo-2-vietnamese-700-normal.woff2"
+    href="/node_modules/@fontsource/spectral/files/spectral-vietnamese-700-normal.woff2"
     crossorigin
   />
+
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem('dtht_theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (theme === 'dark' || (!theme && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
 
   <!-- Material Symbols — Icon font subset, non-blocking -->
   <link
@@ -65,8 +79,8 @@
   </noscript>
 
   <!--
-    ═══════════ CRITICAL CSS INLINE — Trung Hoa Sáng (Rice Paper Light) ═══════════
-    Chống FOUC cho app shell trên nền giấy gạo #FAF7F0.
+    ═══════════ CRITICAL CSS INLINE — Trung Hoa Sáng & Mặc Dạ Tối ═══════════
+    Chống FOUC cho app shell trên nền giấy gạo #FAF7F0 hoặc nghiên mực #12100E.
   -->
   <style>
     html, body, #root {
@@ -75,6 +89,10 @@
       background-color: #FAF7F0;
       color: #1C1917;
       min-height: 100dvh;
+    }
+    html.dark, html.dark body, html.dark #root {
+      background-color: #12100E;
+      color: #F5EFE6;
     }
     body {
       font-family: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -91,6 +109,10 @@
       transition: opacity 100ms ease-out, visibility 100ms ease-out;
       z-index: 9999;
     }
+    html.dark #boot-shell {
+      background: radial-gradient(circle at 50% 24%, #1A1714 0%, #12100E 65%, #0B0A09 100%);
+      color: #F5EFE6;
+    }
     #boot-shell[data-ready="true"] {
       opacity: 0;
       visibility: hidden;
@@ -106,6 +128,11 @@
       box-shadow: 0 12px 28px -8px rgba(28, 25, 23, 0.08), 0 0 0 1px rgba(201, 162, 39, 0.14);
       text-align: center;
     }
+    html.dark .boot-card {
+      border: 1px solid #383027;
+      background: #1E1A17;
+      box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(229, 184, 66, 0.22);
+    }
     .boot-mark {
       width: 64px;
       height: 64px;
@@ -113,7 +140,7 @@
       border-radius: 12px;
       display: grid;
       place-items: center;
-      font-family: "Baloo 2", "Be Vietnam Pro", sans-serif;
+      font-family: "Spectral", "Be Vietnam Pro", serif;
       font-size: 22px;
       font-weight: 800;
       letter-spacing: 0.06em;
@@ -122,19 +149,30 @@
       border: 2px solid #C9A227;
       box-shadow: 0 6px 16px rgba(185, 28, 28, 0.22);
     }
+    html.dark .boot-mark {
+      background: #DC2626;
+      border-color: #E5B842;
+      box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35);
+    }
     .boot-title {
       margin: 0 0 8px;
-      font-family: "Baloo 2", "Be Vietnam Pro", sans-serif;
+      font-family: "Spectral", "Be Vietnam Pro", serif;
       font-size: 24px;
       line-height: 1.2;
       font-weight: 800;
       color: #1C1917;
+    }
+    html.dark .boot-title {
+      color: #F5EFE6;
     }
     .boot-copy {
       margin: 0 0 18px;
       color: #57534E;
       font-size: 14px;
       line-height: 1.6;
+    }
+    html.dark .boot-copy {
+      color: #BDB4A5;
     }
     .boot-track {
       width: 100%;
@@ -144,11 +182,18 @@
       background: #F3EDE2;
       border: 1px solid #E7E0D2;
     }
+    html.dark .boot-track {
+      background: #27221E;
+      border: 1px solid #383027;
+    }
     .boot-bar {
       width: 62%;
       height: 100%;
       border-radius: inherit;
       background: linear-gradient(90deg, #B91C1C, #C9A227);
+    }
+    html.dark .boot-bar {
+      background: linear-gradient(90deg, #DC2626, #E5B842);
     }
     .material-symbols-outlined {
       font-family: 'Material Symbols Outlined', sans-serif;

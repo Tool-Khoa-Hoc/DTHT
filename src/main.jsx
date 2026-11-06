@@ -8,17 +8,22 @@ import '@fontsource/be-vietnam-pro/latin-600.css';
 import '@fontsource/be-vietnam-pro/vietnamese-600.css';
 import '@fontsource/be-vietnam-pro/latin-700.css';
 import '@fontsource/be-vietnam-pro/vietnamese-700.css';
-import '@fontsource/baloo-2/latin-600.css';
-import '@fontsource/baloo-2/vietnamese-600.css';
-import '@fontsource/baloo-2/latin-700.css';
-import '@fontsource/baloo-2/vietnamese-700.css';
-import '@fontsource/baloo-2/latin-800.css';
-import '@fontsource/baloo-2/vietnamese-800.css';
+import '@fontsource/spectral/latin-500.css';
+import '@fontsource/spectral/vietnamese-500.css';
+import '@fontsource/spectral/latin-600.css';
+import '@fontsource/spectral/vietnamese-600.css';
+import '@fontsource/spectral/latin-700.css';
+import '@fontsource/spectral/vietnamese-700.css';
+import '@fontsource/spectral/latin-800.css';
+import '@fontsource/spectral/vietnamese-800.css';
 import './index.css';
 import App from './App.jsx';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </StrictMode>,
 );

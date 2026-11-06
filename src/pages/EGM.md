@@ -3,8 +3,8 @@
 ## Overview
 
 Route-level screens for the DTHT study platform. Every module here is a default
-exported React component mounted by `src/App.jsx`; all but `AuthScreen` render
-inside `RootLayout` (sidebar + bottom tabs + `Outlet`) and therefore assume an
+exported React component mounted by `src/App.jsx`; all but `AuthScreen` and `AuthCallback`
+render inside `RootLayout` (sidebar + bottom tabs + `Outlet`) and therefore assume an
 authenticated `useAuth()` context, because `RootLayout` redirects to `/auth`
 when there is no session. Pages own their data fetching and orchestrate the
 lower layers: `src/lib/admission` for maths, `src/hooks/useStudyTracker` for
@@ -15,6 +15,7 @@ EXP, and `src/components/**` for presentation.
 | Component | Route(s) | Responsibility |
 | --- | --- | --- |
 | `AuthScreen()` | `/`, `/auth` | Sign-in / sign-up via Supabase Auth with Vietnamese error mapping and post-login redirect. |
+| `AuthCallback()` | `/auth/callback` | OAuth and magic link callback handling: exchanges code/hash via Supabase Auth, handles fallback token parsing, error recovery, and redirect to post-auth destination. |
 | `Home()` | `/home` | Landing hub: four "arena gates", rank ladder from `RANK_TIERS`, idle route prefetch. |
 | `GPACalculator()` | `/gpa` | University GPA: semester + subject CRUD, GPA on the 4-point scale via `lib/admission/gpa`. |
 | `Library()` | `/library` | Document library: search/category/education-level filters, notifications, report submission, PDF/preview. |
@@ -38,6 +39,7 @@ EXP, and `src/components/**` for presentation.
   may be imported eagerly by another page.
 - `RootLayout` is the authentication gate: pages may assume `user` is non-null,
   but must still tolerate `profile` being `null` while SWR resolves.
+- `AuthCallback` executes outside `RootLayout` as an unauthenticated gateway handling OAuth/Magic Link callbacks, safely sanitizing target return paths via `sanitizeNextPath`.
 - Role-gated screens redirect rather than render: `Admin` requires
   `profile.role === 'admin'` and `Collaborator` requires
   `collaborator`/`admin`; both otherwise `<Navigate to="/home" />`.
@@ -75,7 +77,7 @@ EXP, and `src/components/**` for presentation.
   `admission_wishlists`.
 - Supabase RPCs: `admin_user_directory`, `admin_get_thongsoai_candidates`,
   plus the study-session RPCs driven through `useStudyTracker`.
-- Authentication: sign-in/sign-up/sign-out on `AuthScreen`; `refreshProfile()`
+- Authentication: sign-in/sign-up/sign-out on `AuthScreen`; callback code/token exchange on `AuthCallback`; `refreshProfile()`
   after profile edits; redirects via `useNavigate`.
 - Browser APIs: `window.confirm`/`alert` for destructive actions,
   `sessionStorage` chunk-reload guard in `App.jsx`, `localStorage` via the study

@@ -12,6 +12,7 @@
 
 import { normalizeMethodCode } from './exams.js';
 import { parseComboField } from './combos.js';
+import { SCORE_DISTRIBUTIONS } from './distributions.js';
 
 let cache = null;
 
@@ -52,11 +53,29 @@ export async function loadCutoffsFromSupabase(supabaseClient) {
         }
       }
     } catch { /* thiếu tên trường không được làm hỏng dữ liệu điểm chuẩn */ }
+    const baseYear =
+      rows.reduce((max, r) => (Number(r.year) > max ? Number(r.year) : max), 0) || 2026;
+    let distributions = SCORE_DISTRIBUTIONS;
+    try {
+      const { data: distRows, error: distErr } = await supabaseClient
+        .from('admission_score_distributions')
+        .select(
+          'exam, year, session, scale, mean, median, sd, max_score, combos_mean, reliability, source_url',
+        );
+      if (!distErr && Array.isArray(distRows) && distRows.length > 0) {
+        distributions = distRows;
+      }
+    } catch { /* fallback sang SCORE_DISTRIBUTIONS tĩnh */ }
     return {
-      meta: { source: 'supabase', table: 'admission_cutoffs', record_count: rows.length },
+      meta: {
+        source: 'supabase',
+        table: 'admission_cutoffs',
+        record_count: rows.length,
+        base_year: baseYear,
+      },
       records: rows,
       conversions: [],
-      score_distributions: [],
+      score_distributions: distributions,
     };
   } catch {
     return null;
@@ -144,13 +163,13 @@ export function groupHistories(records) {
       });
     }
     const g = map.get(key);
-    g.history.push({ year: r.year, cutoff: r.cutoff, quota: r.quota });
+    g.history.push({ year: r.year, cutoff: r.cutoff, quota: r.quota, reliability: r.reliability || null });
     g.sources.push({ year: r.year, url: r.sourceUrl, date: r.sourceDate, verified: r.verified });
-    // Reliability của nhóm = của bản ghi mới nhất.
-    if (r.year >= (g.history[0]?.year ?? 0)) g.reliability = r.reliability;
   }
   for (const g of map.values()) {
     g.history.sort((a, b) => b.year - a.year);
+    // Reliability của nhóm = của bản ghi năm mới nhất sau khi đã sắp xếp.
+    g.reliability = g.history[0]?.reliability ?? g.reliability;
   }
   return [...map.values()];
 }

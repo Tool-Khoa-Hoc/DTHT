@@ -69,11 +69,12 @@ ok('validate HSA 200 bị chặn', validateScoreInput('hsa', 200).ok === false);
 
 // 8) groupHistories: bỏ record cutoff null, sắp năm mới -> cũ
 const groups = groupHistories([
-  { school_code: 'HUST', school_name: 'BKHN', major_name: 'IT1', method: 'THPT_QG', scale: 30, cutoff: 28, year: 2025, verified: true, source_url: 'https://example.vn' },
-  { school_code: 'HUST', school_name: 'BKHN', major_name: 'IT1', method: 'THPT_QG', scale: 30, cutoff: 28.5, year: 2026, verified: true, source_url: 'https://example.vn' },
-  { school_code: 'HUST', school_name: 'BKHN', major_name: 'IT1', method: 'THPT_QG', scale: 30, cutoff: null, year: 2024, verified: false, source_url: 'https://example.vn' },
+  { school_code: 'HUST', school_name: 'BKHN', major_name: 'IT1', method: 'THPT_QG', scale: 30, cutoff: 28, year: 2024, reliability: 'C', verified: true, source_url: 'https://example.vn' },
+  { school_code: 'HUST', school_name: 'BKHN', major_name: 'IT1', method: 'THPT_QG', scale: 30, cutoff: 28.5, year: 2026, reliability: 'A', verified: true, source_url: 'https://example.vn' },
+  { school_code: 'HUST', school_name: 'BKHN', major_name: 'IT1', method: 'THPT_QG', scale: 30, cutoff: 28.2, year: 2025, reliability: 'C', verified: true, source_url: 'https://example.vn' },
+  { school_code: 'HUST', school_name: 'BKHN', major_name: 'IT1', method: 'THPT_QG', scale: 30, cutoff: null, year: 2023, verified: false, source_url: 'https://example.vn' },
 ]);
-ok('groupHistories gom 1 nhóm, 2 năm, mới trước', groups.length === 1 && groups[0].history.length === 2 && groups[0].history[0].year === 2026);
+ok('groupHistories gom 1 nhóm, 3 năm, mới trước, giữ reliability năm mới nhất (2026=A)', groups.length === 1 && groups[0].history.length === 3 && groups[0].history[0].year === 2026 && groups[0].reliability === 'A');
 
 // 8b) Chống hồi quy 22/10/2026: combo từ Supabase là text[] (MẢNG), từ JSON là
 // chuỗi. normalizeRecord phải chuẩn hoá về chuỗi + mảng mã ở mọi nguồn, và
@@ -179,7 +180,7 @@ ok('TC-12 vsatComboScore(95,110,80) = 285 (khớp điểm chuẩn V-SAT Y khoa H
 ok('TC-13 sptComboScore A00 (8.5, 9, 8) = 25.50 thang 30', near(sptComboScore({ toan: 8.5, ly: 9, hoa: 8 }, 'A00').value, 25.5, 0.01));
 ok('TC-13b hscaComboScore (0.5*9 + 0.35*8 + 0.15*7) * 3 = 25.05', near(hscaComboScore({ monChinh: 9, hb1: 8, hb2: 7 }).value, 25.05, 0.01));
 ok('TC-13c UEH tổng hợp: chưa có văn bản -> formula-unverified minh bạch', integrated100Score('UEH', {}).reason === 'formula-unverified');
-ok('TC-13d HCMUT t?ng h?p thi?u input -> reason missing-input kh?ng tr? null', integrated100Score('HCMUT', {}).reason === 'missing-input');
+ok('TC-13d HCMUT tổng hợp thiếu input -> reason missing-input không trả null', integrated100Score('HCMUT', {}).reason === 'missing-input');
 
 // TC-14 tổ hợp đầy đủ
 const fullSubjects = { toan: 9, ly: 8.5, hoa: 8, sinh: 7.5, van: 8, su: 7, dia: 7.5, anh: 9, gdkp: 8 };
@@ -244,8 +245,10 @@ ok('TC-19 tên trường 100% có dấu; tên ngành không dấu chỉ thuộc 
 ok('TC-19 số record sau merge >= 1200 và verified >= 1150', merged.records.length >= 1200 && merged.meta.verified_count >= 1150);
 ok('TC-19 conversions trong file >= 19 bộ và các bộ verified đơn điệu', merged.conversions.length >= 19 && merged.conversions.filter((c) => c.status === 'verified').every((c) => validateAnchorSet({ anchors: [...(c.anchors || [])].sort((a, b) => b.src - a.src) }).ok));
 ok('TC-19 bộ neo HSA A00 trong conversions.js đơn điệu + đủ mốc', CONVERSION_SETS.filter((s) => s.status === 'verified').every((s) => validateAnchorSet(s).ok));
-ok('TC-19 phổ điểm: HSA 2025 bằng chứng official', spectrumEvidence('hsa', 2025) === 'official');
+ok('TC-19 phổ điểm: HSA 2025 và THPT 2026 bằng chứng official', spectrumEvidence('hsa', 2025) === 'official' && spectrumEvidence('thpt', 2026) === 'official');
 ok('TC-19 normalizeMarginTo30 chỉ cho margin: 2.5 trên thang 100 -> 0.75', near(normalizeMarginTo30(2.5, 100), 0.75, 1e-9));
+ok('TC-19b GPACalculator lưu hocba.total theo bestComboTotal (thang 30), không gán gpa10 thang 10 vào total', gpaSrc.includes('total: bestComboTotal'));
+ok('TC-19c AdmissionCalculator dùng previewPartsTotal cho BCA/HCMUT và previewVsatTotal cho V-SAT', admSrc.includes("previewPartsTotal('bca'") && admSrc.includes("previewPartsTotal('vact'") && admSrc.includes('previewVsatTotal'));
 
 // TC-20 đầu-cuối: HSA 105 -> quy đổi 27.875 -> ước tính band an toàn với ngành ổn định ~25
 const conv20 = convertScore(105, { fromExam: 'hsa', combo: 'A00', year: 2025 });

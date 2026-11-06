@@ -42,6 +42,7 @@ const UserProfile = lazyRetry(routeModuleLoaders.UserProfile);
 const OnlineLearning = lazyRetry(routeModuleLoaders.OnlineLearning);
 const Notes = lazyRetry(routeModuleLoaders.Notes);
 const CourseComboHs12 = lazyRetry(routeModuleLoaders.CourseComboHs12);
+const AuthCallback = lazyRetry(routeModuleLoaders.AuthCallback);
 
 const scheduleIdleTask = (callback, timeout = 1500) => {
   if (typeof window === 'undefined') {
@@ -109,6 +110,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<AuthScreen />} />
                 <Route path="/auth" element={<AuthScreen />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
 
                 <Route element={<RootLayout />}>
                   <Route path="home" element={<Home />} />

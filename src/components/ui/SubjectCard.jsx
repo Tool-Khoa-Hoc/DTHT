@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 export default function SubjectCard({ subject, count, active = false, onSelect }) {
   const subjectCode = subject.id || 'DEFAULT';
@@ -20,7 +20,7 @@ export default function SubjectCard({ subject, count, active = false, onSelect }
         aria-hidden="true"
         className={`flex h-11 w-11 no-shrink items-center justify-center rounded-xl transition-transform group-hover:scale-105 ${badgeClass}`}
       >
-        <span className="material-symbols-outlined text-2xl">{subject.icon || 'menu_book'}</span>
+        <span className="material-symbols-outlined text-2xl" aria-hidden="true">{subject.icon || 'menu_book'}</span>
       </span>
 
       <span className="min-w-0 flex-1">

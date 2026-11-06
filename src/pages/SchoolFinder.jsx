@@ -89,7 +89,7 @@ function buildEstimate(group, profileV2, spectrumMethods, baseYear) {
   const ctxBase = {
     reliability: group.reliability || null,
     hasSpectrum: spectrumMethods.has(group.method) ? 'official' : 'none',
-    quotaYears: 0,
+    quotaYears: group.history.filter((h) => h.quota != null).length,
     latestYearIsCurrentSeason: baseYear != null && latestYear >= baseYear,
   };
 
@@ -124,15 +124,23 @@ function buildEstimate(group, profileV2, spectrumMethods, baseYear) {
     // THPT: thử quy đổi bách phân vị (equipercentile) từ kỳ thi khác qua
     // conversions.js — neo là dữ liệu có cấu trúc, KHÔNG trích từ note bằng
     // regex như bản cũ. Chưa có neo chính thức -> trạng thái minh bạch.
+    let noAnchorReason = null;
     for (const other of ['hsa', 'vact', 'tsa']) {
       const otherEntry = getScore(profileV2, other);
       if (otherEntry?.total != null) {
-        const firstCombo = (group.combos && group.combos[0]) || 'A00';
-        const conv = convertScore(parseFloat(otherEntry.total), {
-          fromExam: other, combo: firstCombo, year: 2025,
-        });
-        if (conv.value != null) {
-          const candidate = conv.value + priorityApplied(conv.value, region, category);
+        const candidateCombos =
+          group.combos && group.combos.length > 0 ? group.combos : ['A00'];
+        let bestConv = null;
+        for (const c of candidateCombos) {
+          const conv = convertScore(parseFloat(otherEntry.total), {
+            fromExam: other, combo: c, year: 2025,
+          });
+          if (conv.value != null && (!bestConv || conv.value > bestConv.value)) {
+            bestConv = conv;
+          }
+        }
+        if (bestConv && bestConv.value != null) {
+          const candidate = bestConv.value + priorityApplied(bestConv.value, region, category);
           const estimate = estimateChannel(candidate, group.history, 'thpt', {
             ...ctxBase,
             channel: 'equi-official',
@@ -146,13 +154,13 @@ function buildEstimate(group, profileV2, spectrumMethods, baseYear) {
             reason: null,
           };
         }
-        if (anchorStatus(other, 2025).status === 'chua-co-neo-chinh-thuc') {
-          return {
-            estimate: null,
-            reason: `Chưa có bảng quy đổi chính thức cho kỳ thi ${getExam(other).label} — chỉ ước tính được ở ngành có điểm chuẩn ${getExam(other).label} riêng.`,
-          };
+        if (!noAnchorReason && anchorStatus(other, 2025).status === 'chua-co-neo-chinh-thuc') {
+          noAnchorReason = `Chưa có bảng quy đổi chính thức cho kỳ thi ${getExam(other).label} — chỉ ước tính được ở ngành có điểm chuẩn ${getExam(other).label} riêng.`;
         }
       }
+    }
+    if (noAnchorReason) {
+      return { estimate: null, reason: noAnchorReason };
     }
     const hasAnyScore = Object.keys(profileV2?.scores || {}).length > 0;
     return {
@@ -252,10 +260,16 @@ function buildEstimate(group, profileV2, spectrumMethods, baseYear) {
       return { estimate: null, reason: `Bạn chưa có điểm tổ hợp ${getExam(group.method).label} cho ngành này — nhập điểm từng môn ở trang Nhập điểm.` };
     }
   }
-  // V-SAT: hồ sơ lưu từng môn x150 — tính tổng tổ hợp khi chưa có total.
-  if (group.method === 'vsat' && candidateTotal == null && entry.subjects) {
-    const vals = Object.values(entry.subjects).filter((v) => v != null).map(Number);
-    if (vals.length === 3) candidateTotal = vals.reduce((a, b) => a + b, 0);
+  // V-SAT: ưu tiên lấy điểm theo đúng tổ hợp của ngành (từ byGroup / subjects),
+  // sau đó mới fallback sang tổng 3 môn hoặc total đã lưu.
+  if (group.method === 'vsat') {
+    const byCombo = comboRaw(entry, group.combo);
+    if (byCombo != null) {
+      candidateTotal = byCombo;
+    } else if (candidateTotal == null && entry.subjects) {
+      const vals = Object.values(entry.subjects).filter((v) => v != null).map(Number);
+      if (vals.length === 3) candidateTotal = vals.reduce((a, b) => a + b, 0);
+    }
   }
   if (candidateTotal == null) {
     return { estimate: null, reason: `Bạn chưa nhập điểm ${getExam(group.method).label} — nhập điểm để xem ước tính theo phương thức này.` };
@@ -392,6 +406,11 @@ function ProgramCard({ group, built, inWishlist, onToggleWish, onGoScores }) {
             <span className="tabular font-bold text-foreground">{fmt(Math.abs(built.marginNative))} điểm</span>
             {' '}· Độ tin cậy ước tính: {estimate.confidenceLabel.toLowerCase()}
           </p>
+          {estimate.reliabilityWarning && (
+            <p className="text-[11px] text-accent">
+              {estimate.reliabilityWarning}
+            </p>
+          )}
         </div>
       ) : (
         <div className="rounded-xl px-3 py-2.5 border border-border bg-surface-alt">

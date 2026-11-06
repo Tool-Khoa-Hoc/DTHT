@@ -14,4 +14,4 @@ Allow: /library
 Allow: /roadmap
 Allow: /schools
 
-Sitemap: https://www.dautruonghoctap.io.vn/sitemap.xml
+Sitemap: https://www.dautruonghoctap.dev/sitemap.xml
