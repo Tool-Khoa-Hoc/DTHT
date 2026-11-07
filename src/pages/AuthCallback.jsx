@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { sanitizeNextPath, useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { translate } from '../i18n';
 import RankSeal from '../components/ui/RankSeal';
+import LanguageToggle from '../components/ui/LanguageToggle';
 import ThemeToggle from '../components/ui/ThemeToggle';
 
 function GoogleLogoMark() {
@@ -28,7 +31,7 @@ function GoogleLogoMark() {
   );
 }
 
-function translateCallbackError(errorCode, errorDescription) {
+function translateCallbackError(errorCode, errorDescription, lang = 'vi') {
   const combined = `${errorCode || ''} ${errorDescription || ''}`
     .replace(/\+/g, ' ')
     .toLowerCase();
@@ -38,7 +41,7 @@ function translateCallbackError(errorCode, errorDescription) {
     combined.includes('user_cancelled') ||
     combined.includes('canceled')
   ) {
-    return 'Bạn đã hủy đăng nhập bằng Google. Bạn có thể nhấn thử lại bất cứ lúc nào.';
+    return translate(lang, 'authCallback.errors.cancelled');
   }
 
   if (
@@ -46,43 +49,56 @@ function translateCallbackError(errorCode, errorDescription) {
     combined.includes('flow_state_expired') ||
     combined.includes('expired')
   ) {
-    return 'Liên kết xác thực đã hết hạn hoặc đã được sử dụng trước đó. Vui lòng đăng nhập lại bằng Google hoặc yêu cầu gửi email mới.';
+    return translate(lang, 'authCallback.errors.expired');
   }
 
   if (
     combined.includes('bad_oauth_state') ||
     combined.includes('invalid_request') ||
-    combined.includes('code verifier')
+    combined.includes('code verifier') ||
+    combined.includes('pkce')
   ) {
-    return 'Phiên xác thực Google đã hết hạn hoặc bị gián đoạn khi chuyển hướng. Vui lòng thử đăng nhập lại.';
+    return translate(lang, 'authCallback.errors.pkceOrState');
   }
 
   if (combined.includes('email not confirmed')) {
-    return 'Địa chỉ email chưa được kích hoạt. Vui lòng kiểm tra hộp thư hoặc đăng nhập nhanh bằng Google.';
+    return translate(lang, 'authCallback.errors.unconfirmed');
   }
 
   if (
     combined.includes('server_error') ||
     combined.includes('temporarily_unavailable')
   ) {
-    return 'Dịch vụ xác thực đang bận trong giây lát. Vui lòng thử lại ngay sau đây.';
+    return translate(lang, 'authCallback.errors.serverBusy');
+  }
+
+  if (
+    combined.includes('failed to fetch') ||
+    combined.includes('networkerror') ||
+    combined.includes('network request failed') ||
+    combined.includes('load failed')
+  ) {
+    return translate(lang, 'authCallback.errors.network');
   }
 
   const readable = (errorDescription || errorCode || '').replace(/\+/g, ' ').trim();
   if (readable) {
-    return `Không thể hoàn tất xác thực: ${readable}`;
+    return translate(lang, 'authCallback.errors.genericWithReason', {
+      reason: readable,
+    });
   }
 
-  return 'Không thể hoàn tất đăng nhập lúc này. Vui lòng thử lại.';
+  return translate(lang, 'authCallback.errors.genericFallback');
 }
 
 export default function AuthCallback() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { lang, t } = useLanguage();
   const { user, isPasswordRecovery, signInWithGoogle, refreshProfile } =
     useAuth();
 
-  const [runtimeError, setRuntimeError] = useState('');
+  const [runtimeErrorInfo, setRuntimeErrorInfo] = useState(null);
   const [dismissedUrlError, setDismissedUrlError] = useState(false);
   const [isRetryingGoogle, setIsRetryingGoogle] = useState(false);
   const redirectedRef = useRef(false);
@@ -116,14 +132,36 @@ export default function AuthCallback() {
       errorDescription,
       safeNext,
       hasUrlError,
-      urlErrorMessage: hasUrlError
-        ? translateCallbackError(errorCode, errorDescription)
-        : '',
     };
   }, [location.hash, location.search]);
 
-  const errorMessage =
-    runtimeError || (!dismissedUrlError ? parsedParams.urlErrorMessage : '');
+  const errorMessage = useMemo(() => {
+    if (runtimeErrorInfo) {
+      if (runtimeErrorInfo.isTimeout) {
+        return translate(lang, 'authCallback.errors.timeout');
+      }
+      return translateCallbackError(
+        runtimeErrorInfo.code,
+        runtimeErrorInfo.message,
+        lang,
+      );
+    }
+    if (!dismissedUrlError && parsedParams.hasUrlError) {
+      return translateCallbackError(
+        parsedParams.errorCode,
+        parsedParams.errorDescription,
+        lang,
+      );
+    }
+    return '';
+  }, [
+    dismissedUrlError,
+    lang,
+    parsedParams.errorCode,
+    parsedParams.errorDescription,
+    parsedParams.hasUrlError,
+    runtimeErrorInfo,
+  ]);
 
   const targetDestination = useMemo(() => {
     if (parsedParams.flowType === 'recovery' || isPasswordRecovery) {
@@ -186,12 +224,10 @@ export default function AuthCallback() {
               return;
             }
 
-            setRuntimeError(
-              translateCallbackError(
-                exchangeError.code || exchangeError.name,
-                exchangeError.message,
-              ),
-            );
+            setRuntimeErrorInfo({
+              code: exchangeError.code || exchangeError.name,
+              message: exchangeError.message,
+            });
             return;
           }
 
@@ -221,9 +257,10 @@ export default function AuthCallback() {
               return;
             }
 
-            setRuntimeError(
-              translateCallbackError(otpError.code, otpError.message),
-            );
+            setRuntimeErrorInfo({
+              code: otpError.code,
+              message: otpError.message,
+            });
             return;
           }
 
@@ -247,7 +284,10 @@ export default function AuthCallback() {
         }
       } catch (err) {
         if (!active || redirectedRef.current) return;
-        setRuntimeError(translateCallbackError('', err?.message));
+        setRuntimeErrorInfo({
+          code: '',
+          message: err?.message,
+        });
       }
     };
 
@@ -273,10 +313,7 @@ export default function AuthCallback() {
         // Ignore and fall through to friendly timeout prompt
       }
 
-      setRuntimeError((prev) =>
-        prev ||
-        'Quá trình xác thực mất nhiều thời gian hơn dự kiến hoặc phiên đăng nhập không hợp lệ. Vui lòng thử lại.',
-      );
+      setRuntimeErrorInfo((prev) => prev || { isTimeout: true });
     }, 10000);
 
     return () => {
@@ -295,16 +332,22 @@ export default function AuthCallback() {
 
   const handleRetryGoogle = async () => {
     setDismissedUrlError(true);
-    setRuntimeError('');
+    setRuntimeErrorInfo(null);
     setIsRetryingGoogle(true);
     try {
       const { error } = await signInWithGoogle(parsedParams.safeNext);
       if (error) {
-        setRuntimeError(translateCallbackError(error.code, error.message));
+        setRuntimeErrorInfo({
+          code: error.code,
+          message: error.message,
+        });
         setIsRetryingGoogle(false);
       }
     } catch (err) {
-      setRuntimeError(translateCallbackError('', err?.message));
+      setRuntimeErrorInfo({
+        code: '',
+        message: err?.message,
+      });
       setIsRetryingGoogle(false);
     }
   };
@@ -329,38 +372,45 @@ export default function AuthCallback() {
         登科
       </span>
 
-      <header className="relative z-10 flex items-center justify-between px-6 py-4 max-w-2xl mx-auto w-full">
-        <Link to="/home" className="flex items-center gap-2.5">
+      <header className="relative z-10 flex items-center justify-between gap-3 px-4 sm:px-6 py-4 max-w-2xl mx-auto w-full">
+        <Link to="/home" className="flex items-center gap-2.5 min-w-0">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary-soft border border-gold overflow-hidden no-shrink shadow-xs">
             <img
               src="/logo.webp"
-              alt="Đấu Trường Học Tập"
+              alt={t('brand.name')}
               width={40}
               height={40}
               className="w-full h-full object-cover"
             />
           </div>
-          <div>
-            <span className="font-display font-extrabold text-base tracking-tight text-foreground block leading-none">
-              Đấu Trường Học Tập
+          <div className="min-w-0">
+            <span className="font-display font-extrabold text-base tracking-tight text-foreground block leading-none truncate">
+              {t('brand.name')}
             </span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-accent">
-              Trạm Học Sinh Sinh Viên
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-accent block truncate mt-0.5">
+              {t('brand.stationShort')}
             </span>
           </div>
         </Link>
 
-        <ThemeToggle variant="compact" />
+        <div className="flex items-center gap-2 shrink-0">
+          <LanguageToggle variant="compact" />
+          <ThemeToggle variant="compact" />
+        </div>
       </header>
 
-      <main className="relative z-10 flex-1 flex items-center justify-center px-5 pb-10">
+      <main className="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-5 pb-10">
         <div className="imperial-frame w-full max-w-md p-6 sm:p-8 text-center">
           <div className="mb-4 flex justify-center">
             <RankSeal
               size="sm"
               variant={errorMessage ? 'outline' : 'solid'}
               icon={errorMessage ? 'error' : 'verified_user'}
-              label={errorMessage ? 'Gián đoạn xác thực' : 'Ấn tín nhập trường'}
+              label={
+                errorMessage
+                  ? t('authCallback.sealError')
+                  : t('authCallback.sealVerifying')
+              }
             />
           </div>
 
@@ -368,14 +418,17 @@ export default function AuthCallback() {
             <div role="alert" aria-live="assertive" className="space-y-5">
               <div>
                 <h1 className="text-xl sm:text-2xl font-display font-extrabold text-foreground mb-2">
-                  Chưa thể hoàn tất đăng nhập
+                  {t('authCallback.errorHeading')}
                 </h1>
                 <p className="text-sm text-secondary-text leading-relaxed">
                   {errorMessage}
                 </p>
               </div>
 
-              <div className="lattice-divider [&::before]:!bg-surface" aria-hidden="true" />
+              <div
+                className="lattice-divider [&::before]:!bg-surface"
+                aria-hidden="true"
+              />
 
               <div className="space-y-3">
                 <button
@@ -392,12 +445,12 @@ export default function AuthCallback() {
                       >
                         progress_activity
                       </span>
-                      <span>Đang kết nối lại với Google...</span>
+                      <span>{t('authCallback.retryingGoogle')}</span>
                     </>
                   ) : (
                     <>
                       <GoogleLogoMark />
-                      <span>Thử đăng nhập lại bằng Google</span>
+                      <span>{t('authCallback.retryGoogleBtn')}</span>
                     </>
                   )}
                 </button>
@@ -409,7 +462,7 @@ export default function AuthCallback() {
                   <span className="material-symbols-outlined text-lg" aria-hidden="true">
                     arrow_back
                   </span>
-                  <span>Quay về trang Đăng nhập</span>
+                  <span>{t('authCallback.backToLoginBtn')}</span>
                 </Link>
               </div>
             </div>
@@ -425,10 +478,10 @@ export default function AuthCallback() {
               </div>
               <div>
                 <h1 className="text-xl sm:text-2xl font-display font-extrabold text-foreground mb-1.5">
-                  Đang xác thực hồ sơ sĩ tử...
+                  {t('authCallback.verifyingHeading')}
                 </h1>
                 <p className="text-xs sm:text-sm text-secondary-text leading-relaxed">
-                  Hệ thống đang đồng bộ tài khoản và đưa bạn vào học đường ngay lập tức.
+                  {t('authCallback.verifyingDesc')}
                 </p>
               </div>
             </div>

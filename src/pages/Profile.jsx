@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
-import { getUserRank, RANK_TIERS } from '../utils/rankHelper';
+import { getUserRank, getRankDisplayName, RANK_TIERS } from '../utils/rankHelper';
 import {
   getLevelFromExp,
   getLevelAccent,
@@ -38,6 +39,13 @@ function detectGoogleIdentity(user) {
   return false;
 }
 
+function toLocalDateKey(dateObj) {
+  const y = dateObj.getFullYear();
+  const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const d = String(dateObj.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 export default function Profile() {
   const navigate = useNavigate();
   const {
@@ -48,11 +56,15 @@ export default function Profile() {
     signInWithGoogle,
     signOut,
   } = useAuth();
+  const { lang, locale, t, formatNumber, formatDate } = useLanguage();
   const { showToast } = useToast();
 
   const fileInputRef = useRef(null);
   const profileRef = useRef(profile);
-  profileRef.current = profile;
+
+  useEffect(() => {
+    profileRef.current = profile;
+  }, [profile]);
 
   // Live extra data from tram_sv
   const [extraProfile, setExtraProfile] = useState({
@@ -76,6 +88,12 @@ export default function Profile() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isLinkingGoogle, setIsLinkingGoogle] = useState(false);
   const [isRankModalOpen, setIsRankModalOpen] = useState(false);
+
+  // Password / account security state
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
   const [formState, setFormState] = useState({
     display_name: '',
@@ -165,7 +183,7 @@ export default function Profile() {
         setStudyDailyRows(dailyRes.data);
       }
     } catch (err) {
-      console.error('Lỗi tải dữ liệu hồ sơ:', err);
+      console.error('Error loading profile dashboard:', err);
     } finally {
       setLoadingStats(false);
     }
@@ -216,12 +234,12 @@ export default function Profile() {
     if (!file || !user) return;
 
     if (!file.type.startsWith('image/')) {
-      showToast('Vui lòng chỉ chọn tệp hình ảnh (JPG, PNG, WEBP, GIF).', 'warning');
+      showToast(t('profile.toastImageTypeOnly'), 'warning');
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      showToast('Ảnh đại diện không vượt quá 2MB. Hãy chọn ảnh nhẹ hơn.', 'warning');
+      showToast(t('profile.toastAvatarMaxSize'), 'warning');
       return;
     }
 
@@ -235,14 +253,9 @@ export default function Profile() {
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) {
-        // Graceful fallback if `avatars` storage bucket is not configured on project
         console.warn('Storage upload fallback:', uploadError.message);
         if (!isEditing) handleOpenEdit();
-        showToast(
-          'Kho lưu trữ ảnh trực tiếp chưa bật. Bạn có thể dán liên kết ảnh (URL) vào ô Ảnh đại diện bên dưới!',
-          'info',
-          5000,
-        );
+        showToast(t('profile.toastStorageFallback'), 'info', 5000);
         return;
       }
 
@@ -250,7 +263,7 @@ export default function Profile() {
       const publicUrl = pubData?.publicUrl;
 
       if (!publicUrl) {
-        throw new Error('Không lấy được đường dẫn ảnh công khai.');
+        throw new Error(t('profile.toastNoPublicUrl'));
       }
 
       const { error: updateErr } = await supabase
@@ -265,10 +278,10 @@ export default function Profile() {
 
       setFormState((prev) => ({ ...prev, avatar_url: publicUrl }));
       await refreshProfile?.();
-      showToast('Đã cập nhật ảnh đại diện mới!', 'success');
+      showToast(t('profile.toastAvatarUpdated'), 'success');
     } catch (err) {
-      console.error('Lỗi cập nhật ảnh đại diện:', err);
-      showToast('Không thể tải ảnh đại diện: ' + err.message, 'error');
+      console.error('Avatar upload error:', err);
+      showToast(t('profile.toastAvatarError', { error: err.message }), 'error');
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -280,7 +293,7 @@ export default function Profile() {
 
     const cleanDisplayName = formState.display_name.trim();
     if (!cleanDisplayName) {
-      showToast('Vui lòng nhập Tên hiển thị trên Bảng Vàng.', 'warning');
+      showToast(t('profile.toastDisplayNameRequired'), 'warning');
       return;
     }
 
@@ -288,7 +301,7 @@ export default function Profile() {
     if (formState.avatar_url.trim()) {
       safeAvatarUrl = sanitizeExternalUrl(formState.avatar_url.trim());
       if (!safeAvatarUrl) {
-        showToast('Đường dẫn ảnh đại diện (URL) không hợp lệ (cần bắt đầu bằng https://).', 'error');
+        showToast(t('profile.toastInvalidAvatarUrl'), 'error');
         return;
       }
     }
@@ -297,7 +310,7 @@ export default function Profile() {
     if (String(formState.starting_year).trim() !== '') {
       const y = parseInt(formState.starting_year, 10);
       if (!Number.isFinite(y) || y < 1990 || y > 2040) {
-        showToast('Năm nhập học / khoá thi phải nằm trong khoảng 1990 – 2040.', 'warning');
+        showToast(t('profile.toastYearRange'), 'warning');
         return;
       }
       parsedYear = y;
@@ -336,12 +349,38 @@ export default function Profile() {
 
       setIsEditing(false);
       await Promise.all([refreshProfile?.(), fetchProfileDashboard()]);
-      showToast('Đã lưu thông tin hồ sơ thành công!', 'success');
+      showToast(t('profile.toastProfileSaved'), 'success');
     } catch (err) {
-      console.error('Lỗi cập nhật hồ sơ:', err);
-      showToast('Không thể cập nhật hồ sơ: ' + err.message, 'error');
+      console.error('Profile save error:', err);
+      showToast(t('profile.toastProfileError', { error: err.message }), 'error');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    if (!user) return;
+    if (newPassword.length < 6) {
+      showToast(t('profile.toastPasswordShort'), 'warning');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      showToast(t('profile.toastPasswordMismatch'), 'warning');
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setNewPassword('');
+      setConfirmPassword('');
+      showToast(t('profile.toastPasswordUpdated'), 'success');
+    } catch (err) {
+      showToast(t('profile.toastPasswordError', { error: err.message }), 'error');
+    } finally {
+      setIsUpdatingPassword(false);
     }
   };
 
@@ -359,8 +398,8 @@ export default function Profile() {
         if (error) throw error;
       }
     } catch (err) {
-      console.error('Lỗi kết nối Google:', err);
-      showToast('Không thể chuyển hướng đăng nhập Google: ' + err.message, 'error');
+      console.error('Google link error:', err);
+      showToast(t('profile.toastGoogleError', { error: err.message }), 'error');
       setIsLinkingGoogle(false);
     }
   };
@@ -374,9 +413,49 @@ export default function Profile() {
       }
       navigate('/auth');
     } catch (err) {
-      showToast('Không thể đăng xuất: ' + err.message, 'error');
+      showToast(t('profile.toastLogoutError', { error: err.message }), 'error');
     }
   };
+
+  const sevenDayChart = useMemo(() => {
+    const byDate = new Map();
+    for (const row of studyDailyRows) {
+      const key = String(row.study_date || '').slice(0, 10);
+      if (key) {
+        byDate.set(key, {
+          seconds: Number(row.seconds) || 0,
+          exp: Number(row.exp) || 0,
+        });
+      }
+    }
+
+    const days = [];
+    for (let offset = 6; offset >= 0; offset -= 1) {
+      const d = new Date();
+      d.setHours(12, 0, 0, 0);
+      d.setDate(d.getDate() - offset);
+      const iso = toLocalDateKey(d);
+      const entry = byDate.get(iso);
+      const seconds = entry?.seconds || 0;
+      const minutes = Math.round(seconds / 60);
+      const exp = entry?.exp || 0;
+      days.push({
+        iso,
+        weekday: d.toLocaleDateString(locale, { weekday: 'short' }),
+        dateShort: d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' }),
+        seconds,
+        minutes,
+        exp,
+        isToday: offset === 0,
+      });
+    }
+
+    const maxMinutes = Math.max(60, ...days.map((item) => item.minutes));
+    const totalMinutes = days.reduce((sum, item) => sum + item.minutes, 0);
+    const totalExp = days.reduce((sum, item) => sum + item.exp, 0);
+
+    return { days, maxMinutes, totalMinutes, totalExp };
+  }, [studyDailyRows, locale]);
 
   const googleConnected = Boolean(isGoogleLinked ?? detectGoogleIdentity(user));
   const activeMode = normalizeUserMode(profile?.user_mode);
@@ -385,7 +464,7 @@ export default function Profile() {
     extraProfile.full_name ||
     user?.user_metadata?.full_name ||
     user?.email?.split('@')[0] ||
-    'Sĩ tử';
+    t('profile.defaultScholar');
   const currentAvatar =
     profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || '';
 
@@ -398,6 +477,7 @@ export default function Profile() {
     profile?.role,
     profile?.is_approved_bang_chu,
     user?.id,
+    lang,
   );
   const levelInfo = getLevelFromExp(expTotal);
   const levelAccent = getLevelAccent(levelInfo.level);
@@ -415,8 +495,8 @@ export default function Profile() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10 space-y-6">
-        {/* SCHOLAR IDENTITY HEADER CARD */}
-        <section className="imperial-frame p-6">
+        {/* SCHOLAR IDENTITY HEADER CARD — calibrated p-5 sm:p-8 inside 5px gold frame */}
+        <section className="imperial-frame p-5 sm:p-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-5">
             <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
               {/* Avatar with Optional Upload */}
@@ -440,7 +520,8 @@ export default function Profile() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploadingAvatar}
-                  title="Tải ảnh đại diện mới"
+                  title={t('profile.uploadNewAvatar')}
+                  aria-label={t('profile.uploadNewAvatar')}
                   className="absolute inset-0 rounded-full bg-foreground/55 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity cursor-pointer"
                 >
                   {isUploadingAvatar ? (
@@ -452,7 +533,9 @@ export default function Profile() {
                       <span className="material-symbols-outlined text-xl" aria-hidden="true">
                         photo_camera
                       </span>
-                      <span className="text-[10px] font-bold mt-0.5">Đổi ảnh</span>
+                      <span className="text-[10px] font-bold mt-0.5">
+                        {t('profile.changeAvatarShort')}
+                      </span>
                     </>
                   )}
                 </button>
@@ -460,8 +543,8 @@ export default function Profile() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  aria-label="Đổi ảnh đại diện"
-                  className="sm:hidden absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md border-2 border-surface cursor-pointer"
+                  aria-label={t('profile.changeAvatarAria')}
+                  className="sm:hidden absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md border-2 border-surface cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-sm" aria-hidden="true">
                     photo_camera
@@ -471,7 +554,7 @@ export default function Profile() {
 
               <div className="space-y-1.5">
                 <div className="flex flex-col sm:flex-row items-center gap-2 flex-wrap justify-center sm:justify-start">
-                  <h1 className="text-2xl font-display font-extrabold text-foreground">
+                  <h1 className="text-2xl font-display font-extrabold text-foreground leading-snug">
                     {displayName}
                   </h1>
 
@@ -479,17 +562,17 @@ export default function Profile() {
                     <button
                       type="button"
                       onClick={() => setIsRankModalOpen(true)}
-                      title="Nhấn để xem Hệ thống Quân hàm"
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${rankInfo.bg} ${rankInfo.color} ${rankInfo.border} hover:opacity-85 transition-opacity cursor-pointer`}
+                      title={t('profile.viewRankSystemTitle')}
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border whitespace-nowrap ${rankInfo.bg} ${rankInfo.color} ${rankInfo.border} hover:opacity-85 transition-opacity cursor-pointer`}
                     >
                       <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
                         {rankInfo.icon}
                       </span>
-                      <span>{rankInfo.name}</span>
+                      <span>{rankInfo.displayName}</span>
                     </button>
 
                     <span
-                      className={`tabular inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${levelAccent.badge}`}
+                      className={`tabular inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold border whitespace-nowrap ${levelAccent.badge}`}
                     >
                       <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
                         bolt
@@ -498,54 +581,62 @@ export default function Profile() {
                     </span>
 
                     {profile?.role === 'admin' && (
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary text-primary-foreground">
-                        Quản trị viên
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary text-on-primary whitespace-nowrap">
+                        {t('profile.roleAdmin')}
                       </span>
                     )}
                     {profile?.role === 'collaborator' && (
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-jade text-white">
-                        Cộng tác viên
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-jade text-white whitespace-nowrap">
+                        {t('profile.roleCollaborator')}
                       </span>
                     )}
                     {extraProfile.is_vip && (
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold-soft text-gold-dark border border-gold">
-                        VIP
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold-soft text-gold-dark border border-gold whitespace-nowrap">
+                        {t('profile.roleVip')}
                       </span>
                     )}
                   </div>
                 </div>
 
                 <p className="text-xs sm:text-sm text-secondary-text">
-                  {user?.email || 'Chưa có email'}
+                  {user?.email || t('profile.noEmail')}
                   {profile?.university ? ` · ${profile.university}` : ''}
                 </p>
 
                 {/* Social & Achievement Counters */}
-                <div className="flex items-center justify-center sm:justify-start gap-4 pt-1 flex-wrap text-xs">
+                <div className="flex items-center justify-center sm:justify-start gap-3 sm:gap-4 pt-1 flex-wrap text-xs">
                   <span className="text-secondary-text">
                     <strong className="text-foreground font-display tabular">
-                      {followersCount}
+                      {formatNumber(followersCount)}
                     </strong>{' '}
-                    người theo dõi
+                    {t('profile.followers')}
                   </span>
-                  <span className="text-border-strong">•</span>
+                  <span className="text-border-strong" aria-hidden="true">
+                    •
+                  </span>
                   <span className="text-secondary-text">
                     <strong className="text-foreground font-display tabular">
-                      {followingCount}
+                      {formatNumber(followingCount)}
                     </strong>{' '}
-                    đang theo dõi
+                    {t('profile.following')}
                   </span>
-                  <span className="text-border-strong">•</span>
+                  <span className="text-border-strong" aria-hidden="true">
+                    •
+                  </span>
                   <span className="text-secondary-text">
                     <strong className="text-foreground font-display tabular">
-                      {completedCampaignsCount}
+                      {formatNumber(completedCampaignsCount)}
                     </strong>{' '}
-                    chiến dịch hoàn thành
+                    {t('profile.completedCampaigns')}
                   </span>
-                  <span className="text-border-strong">•</span>
+                  <span className="text-border-strong" aria-hidden="true">
+                    •
+                  </span>
                   <span className="text-secondary-text">
-                    <strong className="text-foreground font-display tabular">{uploadCount}</strong>{' '}
-                    tài liệu đóng góp
+                    <strong className="text-foreground font-display tabular">
+                      {formatNumber(uploadCount)}
+                    </strong>{' '}
+                    {t('profile.contributedDocs')}
                   </span>
                 </div>
               </div>
@@ -560,17 +651,17 @@ export default function Profile() {
                 <span className="material-symbols-outlined text-base" aria-hidden="true">
                   {isEditing ? 'close' : 'edit'}
                 </span>
-                <span>{isEditing ? 'Đóng' : 'Chỉnh sửa'}</span>
+                <span>{isEditing ? t('profile.closeEdit') : t('profile.editBtn')}</span>
               </button>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="btn-arena btn-arena-sm bg-primary-soft text-primary border border-primary/30 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+                className="btn-arena btn-arena-sm bg-primary-soft text-primary border border-primary/30 hover:bg-primary hover:text-on-primary transition-colors cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base" aria-hidden="true">
                   logout
                 </span>
-                <span>Đăng xuất</span>
+                <span>{t('profile.signOutBtn')}</span>
               </button>
             </div>
           </div>
@@ -596,14 +687,10 @@ export default function Profile() {
             </div>
             <div>
               <h2 className="text-xs sm:text-sm font-display font-bold text-foreground">
-                {googleConnected
-                  ? 'Tài khoản đã xác thực với Google'
-                  : 'Chưa kết nối phiên đăng nhập Google'}
+                {googleConnected ? t('profile.googleLinkedTitle') : t('profile.googleUnlinkedTitle')}
               </h2>
-              <p className="text-xs text-secondary-text mt-0.5">
-                {googleConnected
-                  ? 'Bạn có thể truy cập mượt mà các khoá học Google Sheets và thư mục Google Drive trong mục Học Online.'
-                  : 'Đăng nhập bằng Google cùng địa chỉ email để mở thẳng bảng tính khoá học và tài liệu Google Drive không bị chặn quyền.'}
+              <p className="text-xs text-secondary-text mt-0.5 leading-relaxed">
+                {googleConnected ? t('profile.googleLinkedDesc') : t('profile.googleUnlinkedDesc')}
               </p>
             </div>
           </div>
@@ -618,274 +705,417 @@ export default function Profile() {
               <span className="material-symbols-outlined text-base" aria-hidden="true">
                 login
               </span>
-              <span>{isLinkingGoogle ? 'Đang chuyển hướng...' : 'Đăng nhập với Google'}</span>
+              <span>
+                {isLinkingGoogle ? t('profile.redirectingGoogle') : t('profile.signInWithGoogle')}
+              </span>
             </button>
           )}
         </section>
 
         {isEditing ? (
           /* =============================================================== */
-          /* EDIT PROFILE FORM (REAL tram_sv COLUMNS ONLY)                   */
+          /* EDIT PROFILE & SECURITY SECTION (REAL tram_sv COLUMNS ONLY)     */
           /* =============================================================== */
-          <form onSubmit={handleSaveProfile} className="paper-card p-6 space-y-5">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div>
-                <h2 className="text-lg font-display font-extrabold text-foreground">
-                  Cập Nhật Danh Thiếp Học Giả
-                </h2>
-                <p className="text-xs text-secondary-text">
-                  Lưu trực tiếp vào hệ thống Trạm Sinh Viên
-                </p>
-              </div>
-              <div className="inline-flex p-1 rounded-xl bg-surface-alt border border-border gap-1">
-                <button
-                  type="button"
-                  onClick={() => setFormState((s) => ({ ...s, user_mode: 'university' }))}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
-                    formState.user_mode === 'university'
-                      ? 'bg-paper text-primary border border-border-strong'
-                      : 'text-secondary-text hover:text-foreground'
-                  }`}
-                >
-                  Sinh viên ĐH
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormState((s) => ({ ...s, user_mode: 'student' }))}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
-                    formState.user_mode === 'student'
-                      ? 'bg-paper text-primary border border-border-strong'
-                      : 'text-secondary-text hover:text-foreground'
-                  }`}
-                >
-                  Học sinh THPT
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="prof-display-name"
-                  className="block text-xs font-bold text-foreground mb-1.5"
-                >
-                  Tên hiển thị (Bảng Vàng &amp; Cộng đồng) <span className="text-primary">*</span>
-                </label>
-                <input
-                  id="prof-display-name"
-                  type="text"
-                  required
-                  maxLength={50}
-                  value={formState.display_name}
-                  onChange={(e) => setFormState((s) => ({ ...s, display_name: e.target.value }))}
-                  placeholder="VD: Minh Quân · Bách Khoa"
-                  className="w-full px-3.5 py-2.5 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="prof-full-name"
-                  className="block text-xs font-bold text-foreground mb-1.5"
-                >
-                  Họ và tên đầy đủ
-                </label>
-                <input
-                  id="prof-full-name"
-                  type="text"
-                  maxLength={80}
-                  value={formState.full_name}
-                  onChange={(e) => setFormState((s) => ({ ...s, full_name: e.target.value }))}
-                  placeholder="VD: Nguyễn Minh Quân"
-                  className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="prof-university"
-                  className="block text-xs font-bold text-foreground mb-1.5"
-                >
-                  {formState.user_mode === 'student'
-                    ? 'Trường THPT đang học / Trường ĐH mục tiêu'
-                    : 'Trường Đại học / Học viện'}
-                </label>
-                <input
-                  id="prof-university"
-                  type="text"
-                  value={formState.university}
-                  onChange={(e) => setFormState((s) => ({ ...s, university: e.target.value }))}
-                  placeholder={
-                    formState.user_mode === 'student'
-                      ? 'VD: THPT Chuyên Phan Bội Châu'
-                      : 'VD: Đại học Bách Khoa Hà Nội'
-                  }
-                  className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="prof-major"
-                  className="block text-xs font-bold text-foreground mb-1.5"
-                >
-                  {formState.user_mode === 'student'
-                    ? 'Khối xét tuyển / Ngành mơ ước'
-                    : 'Chuyên ngành đào tạo'}
-                </label>
-                <input
-                  id="prof-major"
-                  type="text"
-                  value={formState.major}
-                  onChange={(e) => setFormState((s) => ({ ...s, major: e.target.value }))}
-                  placeholder={
-                    formState.user_mode === 'student'
-                      ? 'VD: Khoa học Máy tính (Khối A00 / A01)'
-                      : 'VD: Kỹ thuật Phần mềm'
-                  }
-                  className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="prof-year"
-                  className="block text-xs font-bold text-foreground mb-1.5"
-                >
-                  {formState.user_mode === 'student' ? 'Năm dự thi Đại học' : 'Năm nhập học'}
-                </label>
-                <input
-                  id="prof-year"
-                  type="number"
-                  min="1990"
-                  max="2040"
-                  value={formState.starting_year}
-                  onChange={(e) => setFormState((s) => ({ ...s, starting_year: e.target.value }))}
-                  placeholder="VD: 2026"
-                  className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground tabular focus:outline-none focus:border-primary"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="prof-avatar-url"
-                  className="block text-xs font-bold text-foreground mb-1.5"
-                >
-                  Liên kết ảnh đại diện (URL tuỳ chọn)
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    id="prof-avatar-url"
-                    type="url"
-                    value={formState.avatar_url}
-                    onChange={(e) => setFormState((s) => ({ ...s, avatar_url: e.target.value }))}
-                    placeholder="https://..."
-                    className="flex-1 px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
-                  />
+          <div className="space-y-6">
+            <form onSubmit={handleSaveProfile} className="paper-card p-5 sm:p-6 space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
+                <div>
+                  <h2 className="text-lg font-display font-extrabold text-foreground leading-snug">
+                    {t('profile.editFormTitle')}
+                  </h2>
+                  <p className="text-xs text-secondary-text">{t('profile.editFormSubtitle')}</p>
+                </div>
+                <div className="inline-flex p-1 rounded-xl bg-surface-alt border border-border gap-1 self-start sm:self-auto">
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploadingAvatar}
-                    className="px-3 py-2 rounded-xl bg-surface-alt border border-border hover:border-primary text-xs font-bold text-foreground cursor-pointer shrink-0"
+                    onClick={() => setFormState((s) => ({ ...s, user_mode: 'university' }))}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors whitespace-nowrap ${
+                      formState.user_mode === 'university'
+                        ? 'bg-paper text-primary border border-border'
+                        : 'text-secondary-text hover:text-foreground'
+                    }`}
                   >
-                    Tải tệp
+                    {t('profile.modeUniShort')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormState((s) => ({ ...s, user_mode: 'student' }))}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors whitespace-nowrap ${
+                      formState.user_mode === 'student'
+                        ? 'bg-paper text-primary border border-border'
+                        : 'text-secondary-text hover:text-foreground'
+                    }`}
+                  >
+                    {t('profile.modeStudentShort')}
                   </button>
                 </div>
               </div>
-            </div>
 
-            {/* Academic Score Targets */}
-            <div className="pt-2 border-t border-border">
-              <h3 className="text-xs font-display font-bold text-secondary-text uppercase tracking-wider mb-3">
-                Chỉ tiêu học thuật cá nhân
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label
-                    htmlFor="prof-target-gpa"
-                    className="block text-xs font-bold text-foreground mb-1"
+                    htmlFor="prof-display-name"
+                    className="block text-xs font-bold text-foreground mb-1.5"
                   >
-                    Mục tiêu GPA Đại học (Hệ 4.0)
+                    {t('profile.displayNameLabel')} <span className="text-primary">*</span>
                   </label>
                   <input
-                    id="prof-target-gpa"
-                    type="number"
-                    step="0.05"
-                    min="0"
-                    max="4"
-                    value={formState.target_gpa}
-                    onChange={(e) => setFormState((s) => ({ ...s, target_gpa: e.target.value }))}
-                    className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-sm font-bold text-primary tabular focus:outline-none focus:border-primary"
+                    id="prof-display-name"
+                    type="text"
+                    required
+                    maxLength={50}
+                    value={formState.display_name}
+                    onChange={(e) => setFormState((s) => ({ ...s, display_name: e.target.value }))}
+                    placeholder={t('profile.displayNamePlaceholder')}
+                    className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
 
                 <div>
                   <label
-                    htmlFor="prof-target-thpt"
-                    className="block text-xs font-bold text-foreground mb-1"
+                    htmlFor="prof-full-name"
+                    className="block text-xs font-bold text-foreground mb-1.5"
                   >
-                    Mục tiêu THPTQG (/30)
+                    {t('profile.fullNameLabel')}
                   </label>
                   <input
-                    id="prof-target-thpt"
-                    type="number"
-                    step="0.25"
-                    min="0"
-                    max="30"
-                    value={formState.target_thpt}
-                    onChange={(e) => setFormState((s) => ({ ...s, target_thpt: e.target.value }))}
-                    className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-sm font-bold text-accent tabular focus:outline-none focus:border-primary"
+                    id="prof-full-name"
+                    type="text"
+                    maxLength={80}
+                    value={formState.full_name}
+                    onChange={(e) => setFormState((s) => ({ ...s, full_name: e.target.value }))}
+                    placeholder={t('profile.fullNamePlaceholder')}
+                    className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
 
                 <div>
                   <label
-                    htmlFor="prof-target-dgnl"
-                    className="block text-xs font-bold text-foreground mb-1"
+                    htmlFor="prof-university"
+                    className="block text-xs font-bold text-foreground mb-1.5"
                   >
-                    Mục tiêu ĐGNL (HSA / V-ACT)
+                    {formState.user_mode === 'student'
+                      ? t('profile.uniFieldStudent')
+                      : t('profile.uniFieldUni')}
                   </label>
                   <input
-                    id="prof-target-dgnl"
+                    id="prof-university"
+                    type="text"
+                    value={formState.university}
+                    onChange={(e) => setFormState((s) => ({ ...s, university: e.target.value }))}
+                    placeholder={
+                      formState.user_mode === 'student'
+                        ? t('profile.uniPlaceholderStudent')
+                        : t('profile.uniPlaceholderUni')
+                    }
+                    className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="prof-major"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
+                    {formState.user_mode === 'student'
+                      ? t('profile.majorFieldStudent')
+                      : t('profile.majorFieldUni')}
+                  </label>
+                  <input
+                    id="prof-major"
+                    type="text"
+                    value={formState.major}
+                    onChange={(e) => setFormState((s) => ({ ...s, major: e.target.value }))}
+                    placeholder={
+                      formState.user_mode === 'student'
+                        ? t('profile.majorPlaceholderStudent')
+                        : t('profile.majorPlaceholderUni')
+                    }
+                    className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="prof-year"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
+                    {formState.user_mode === 'student'
+                      ? t('profile.yearFieldStudent')
+                      : t('profile.yearFieldUni')}
+                  </label>
+                  <input
+                    id="prof-year"
                     type="number"
-                    step="5"
-                    min="0"
-                    max="1500"
-                    value={formState.target_dgnl}
-                    onChange={(e) => setFormState((s) => ({ ...s, target_dgnl: e.target.value }))}
-                    className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-sm font-bold text-jade tabular focus:outline-none focus:border-primary"
+                    min="1990"
+                    max="2040"
+                    value={formState.starting_year}
+                    onChange={(e) => setFormState((s) => ({ ...s, starting_year: e.target.value }))}
+                    placeholder={t('profile.yearPlaceholder')}
+                    className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground tabular focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="prof-avatar-url"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
+                    {t('profile.avatarUrlLabel')}
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      id="prof-avatar-url"
+                      type="url"
+                      value={formState.avatar_url}
+                      onChange={(e) => setFormState((s) => ({ ...s, avatar_url: e.target.value }))}
+                      placeholder={t('profile.avatarUrlPlaceholder')}
+                      className="flex-1 px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploadingAvatar}
+                      className="px-3 py-2 rounded-xl bg-surface-alt border border-border hover:border-primary text-xs font-bold text-foreground cursor-pointer shrink-0 whitespace-nowrap"
+                    >
+                      {t('profile.uploadFileBtn')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Academic Score Targets */}
+              <div className="pt-2 border-t border-border">
+                <h3 className="text-xs font-display font-bold text-secondary-text uppercase tracking-wider mb-3">
+                  {t('profile.personalTargetsHeading')}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label
+                      htmlFor="prof-target-gpa"
+                      className="block text-xs font-bold text-foreground mb-1"
+                    >
+                      {t('profile.formTargetGpa')}
+                    </label>
+                    <input
+                      id="prof-target-gpa"
+                      type="number"
+                      step="0.05"
+                      min="0"
+                      max="4"
+                      value={formState.target_gpa}
+                      onChange={(e) => setFormState((s) => ({ ...s, target_gpa: e.target.value }))}
+                      className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-sm font-bold text-primary tabular focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="prof-target-thpt"
+                      className="block text-xs font-bold text-foreground mb-1"
+                    >
+                      {t('profile.formTargetThpt')}
+                    </label>
+                    <input
+                      id="prof-target-thpt"
+                      type="number"
+                      step="0.25"
+                      min="0"
+                      max="30"
+                      value={formState.target_thpt}
+                      onChange={(e) => setFormState((s) => ({ ...s, target_thpt: e.target.value }))}
+                      className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-sm font-bold text-accent tabular focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="prof-target-dgnl"
+                      className="block text-xs font-bold text-foreground mb-1"
+                    >
+                      {t('profile.formTargetDgnl')}
+                    </label>
+                    <input
+                      id="prof-target-dgnl"
+                      type="number"
+                      step="5"
+                      min="0"
+                      max="1500"
+                      value={formState.target_dgnl}
+                      onChange={(e) => setFormState((s) => ({ ...s, target_dgnl: e.target.value }))}
+                      className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-sm font-bold text-jade tabular focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="btn-arena btn-arena-secondary btn-arena-sm cursor-pointer"
+                >
+                  {t('profile.cancelBtn')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="btn-arena btn-arena-primary btn-arena-sm cursor-pointer disabled:opacity-60"
+                >
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">
+                    {isSaving ? 'hourglass_empty' : 'save'}
+                  </span>
+                  <span>{isSaving ? t('profile.savingBtn') : t('profile.saveProfileBtn')}</span>
+                </button>
+              </div>
+            </form>
+
+            {/* ACCOUNT SECURITY & PASSWORD SECTION */}
+            <form onSubmit={handleUpdatePassword} className="paper-card p-5 sm:p-6 space-y-4">
+              <div className="flex items-start justify-between gap-3 border-b border-border pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-primary-soft border border-primary/25 text-primary flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                      lock
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-base font-display font-bold text-foreground">
+                      {t('profile.securityTitle')}
+                    </h3>
+                    <p className="text-xs text-secondary-text">{t('profile.securitySubtitle')}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={t('profile.togglePwdAria')}
+                  className="px-2.5 py-1 rounded-lg bg-surface-alt border border-border text-xs font-bold text-secondary-text hover:text-foreground cursor-pointer shrink-0"
+                >
+                  {showPassword ? t('profile.hidePwd') : t('profile.showPwd')}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="prof-new-password"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
+                    {t('profile.newPasswordLabel')}
+                  </label>
+                  <input
+                    id="prof-new-password"
+                    type={showPassword ? 'text' : 'password'}
+                    minLength={6}
+                    autoComplete="new-password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder={t('profile.newPasswordPlaceholder')}
+                    className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="prof-confirm-password"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
+                    {t('profile.confirmPasswordLabel')}
+                  </label>
+                  <input
+                    id="prof-confirm-password"
+                    type={showPassword ? 'text' : 'password'}
+                    minLength={6}
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder={t('profile.confirmPasswordPlaceholder')}
+                    className="w-full px-3.5 py-2.5 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="btn-arena btn-arena-secondary btn-arena-sm cursor-pointer"
-              >
-                Huỷ bỏ
-              </button>
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="btn-arena btn-arena-primary btn-arena-sm cursor-pointer disabled:opacity-60"
-              >
-                <span className="material-symbols-outlined text-base" aria-hidden="true">
-                  {isSaving ? 'hourglass_empty' : 'save'}
-                </span>
-                <span>{isSaving ? 'Đang lưu...' : 'Lưu hồ sơ'}</span>
-              </button>
-            </div>
-          </form>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="text-xs font-bold text-primary hover:underline flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+                >
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">
+                    logout
+                  </span>
+                  <span>{t('profile.signOutSecurityBtn')}</span>
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isUpdatingPassword || !newPassword}
+                  className="btn-arena btn-arena-secondary btn-arena-sm cursor-pointer disabled:opacity-55 self-end sm:self-auto"
+                >
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">
+                    {isUpdatingPassword ? 'hourglass_empty' : 'lock'}
+                  </span>
+                  <span>
+                    {isUpdatingPassword
+                      ? t('profile.updatingPasswordBtn')
+                      : t('profile.updatePasswordBtn')}
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
         ) : (
           /* =============================================================== */
-          /* VIEW MODE: GAMIFICATION, DAILY LOGS, ACADEMICS & TARGETS        */
+          /* VIEW MODE: STATS CARDS, PROGRESSION, 7D CHART, ACADEMICS        */
           /* =============================================================== */
           <div className="space-y-6">
+            {/* CRISP BORDER-BORDER STAT TILES */}
+            <section className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div className="bg-surface p-3.5 rounded-2xl border border-border">
+                <p className="text-[11px] text-secondary-text">{t('profile.statRank')}</p>
+                <p className={`text-sm sm:text-base font-display font-extrabold mt-0.5 truncate ${rankInfo.color}`}>
+                  {rankInfo.displayName}
+                </p>
+              </div>
+
+              <div className="bg-surface p-3.5 rounded-2xl border border-border">
+                <p className="text-[11px] text-secondary-text">{t('profile.statLevel')}</p>
+                <p className="text-sm sm:text-base font-display font-extrabold text-foreground tabular mt-0.5">
+                  Lv.{levelInfo.level}
+                </p>
+              </div>
+
+              <div className="bg-surface p-3.5 rounded-2xl border border-border">
+                <p className="text-[11px] text-secondary-text">{t('profile.statExp')}</p>
+                <p className="text-sm sm:text-base font-display font-extrabold text-jade tabular mt-0.5">
+                  {formatNumber(expTotal)} EXP
+                </p>
+              </div>
+
+              <div className="bg-surface p-3.5 rounded-2xl border border-border">
+                <p className="text-[11px] text-secondary-text">{t('profile.statStudyTime')}</p>
+                <p className="text-sm sm:text-base font-display font-extrabold text-primary tabular mt-0.5">
+                  {formatStudyTime(studySeconds, lang)}
+                </p>
+              </div>
+
+              <div className="col-span-2 sm:col-span-1 bg-surface p-3.5 rounded-2xl border border-border">
+                <p className="text-[11px] text-secondary-text">{t('profile.statStreak')}</p>
+                <p className="text-sm sm:text-base font-display font-extrabold text-accent tabular mt-0.5 flex items-center gap-1">
+                  <span
+                    className="material-symbols-outlined text-base text-primary"
+                    aria-hidden="true"
+                  >
+                    local_fire_department
+                  </span>
+                  <span>{t('profile.streakDays', { days: formatNumber(studyStreak) })}</span>
+                </p>
+              </div>
+            </section>
+
             {/* RANK & CÔNG LỰC PROGRESSION CARD */}
-            <section className="paper-card p-6 space-y-5">
+            <section className="paper-card p-5 sm:p-6 space-y-5">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
                   <div
@@ -896,9 +1126,9 @@ export default function Profile() {
                     </span>
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs font-bold text-secondary-text uppercase tracking-wider">
-                        Quân hàm Công Lực
+                        {t('profile.rankTitle')}
                       </span>
                       <button
                         type="button"
@@ -908,33 +1138,12 @@ export default function Profile() {
                         <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
                           info
                         </span>
-                        <span>Bảng quân hàm</span>
+                        <span>{t('profile.rankTableBtn')}</span>
                       </button>
                     </div>
-                    <h2 className={`text-2xl font-display font-extrabold ${rankInfo.color}`}>
-                      {rankInfo.name}
+                    <h2 className={`text-2xl font-display font-extrabold leading-snug ${rankInfo.color}`}>
+                      {rankInfo.displayName}
                     </h2>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2.5 w-full sm:w-auto">
-                  <div className="bg-paper px-3.5 py-2.5 rounded-xl border border-border">
-                    <p className="text-[11px] text-secondary-text">Giờ học xác thực</p>
-                    <p className="text-base font-display font-extrabold text-primary tabular">
-                      {formatStudyTime(studySeconds)}
-                    </p>
-                  </div>
-                  <div className="bg-paper px-3.5 py-2.5 rounded-xl border border-border">
-                    <p className="text-[11px] text-secondary-text">Chuỗi chuyên cần</p>
-                    <p className="text-base font-display font-extrabold text-accent tabular flex items-center gap-1">
-                      <span
-                        className="material-symbols-outlined text-base text-primary"
-                        aria-hidden="true"
-                      >
-                        local_fire_department
-                      </span>
-                      {studyStreak} ngày
-                    </p>
                   </div>
                 </div>
               </div>
@@ -946,16 +1155,18 @@ export default function Profile() {
                     value={rankInfo.progress.percentage}
                     max={100}
                     tone="primary"
-                    label={`Tiến trình thăng Quân hàm → ${rankInfo.nextRank.name}`}
-                    sublabel={`${expTotal.toLocaleString('vi-VN')} / ${rankInfo.progress.target.toLocaleString('vi-VN')} EXP`}
+                    label={t('profile.rankProgressLabel', {
+                      nextRank: rankInfo.nextRank.displayName,
+                    })}
+                    sublabel={`${formatNumber(expTotal)} / ${formatNumber(rankInfo.progress.target)} EXP`}
                   />
                   <p className="text-xs text-secondary-text mt-2 tabular">
-                    Tích lũy thêm{' '}
+                    {t('profile.rankProgressHintPrefix')}
                     <strong className="text-foreground">
-                      {rankInfo.progress.remaining.toLocaleString('vi-VN')} EXP
-                    </strong>{' '}
-                    qua thời gian tự học xác thực để thăng lên mức hạng{' '}
-                    <strong className="text-foreground">{rankInfo.nextRank.name}</strong>.
+                      {formatNumber(rankInfo.progress.remaining)} EXP
+                    </strong>
+                    {t('profile.rankProgressHintMid')}
+                    <strong className="text-foreground">{rankInfo.nextRank.displayName}</strong>.
                   </p>
                 </div>
               ) : (
@@ -964,9 +1175,11 @@ export default function Profile() {
                     <span className="material-symbols-outlined text-lg" aria-hidden="true">
                       workspace_premium
                     </span>
-                    {rankInfo.isBangChu
-                      ? 'Ngôi vị Độc Tôn Duy Nhất: Bang Chủ tối cao'
-                      : `Đã đạt mức hạng tích lũy tối đa: ${rankInfo.name}`}
+                    <span>
+                      {rankInfo.isBangChu
+                        ? t('profile.soleBangChuBanner')
+                        : t('profile.maxRankBanner', { rank: rankInfo.displayName })}
+                    </span>
                   </p>
                 </div>
               )}
@@ -980,11 +1193,11 @@ export default function Profile() {
                     >
                       Lv.{levelInfo.level}
                     </span>
-                    <span>Công lực tu luyện (EXP)</span>
+                    <span>{t('profile.levelProgressTitle')}</span>
                   </span>
                   <span className="tabular font-bold text-foreground">
-                    {levelInfo.expIntoLevel.toLocaleString('vi-VN')} /{' '}
-                    {levelInfo.expForThisLevel.toLocaleString('vi-VN')} EXP ({levelInfo.progressPct}%)
+                    {formatNumber(levelInfo.expIntoLevel)} / {formatNumber(levelInfo.expForThisLevel)}{' '}
+                    EXP ({levelInfo.progressPct}%)
                   </span>
                 </div>
                 <ProgressBar
@@ -995,17 +1208,15 @@ export default function Profile() {
                 />
                 <div className="flex items-center justify-between mt-2 text-xs text-secondary-text flex-wrap gap-2">
                   <span className="tabular">
-                    Tổng Công Lực:{' '}
-                    <strong className="text-foreground">
-                      {levelInfo.totalExp.toLocaleString('vi-VN')} EXP
-                    </strong>
+                    {t('profile.totalExpLabel')}{' '}
+                    <strong className="text-foreground">{formatNumber(levelInfo.totalExp)} EXP</strong>
                   </span>
                   <button
                     type="button"
                     onClick={() => navigate('/hoc-online')}
                     className="font-bold text-jade hover:underline cursor-pointer"
                   >
-                    Vào Học Online nhận +EXP →
+                    {t('profile.goStudyOnlineBtn')}
                   </button>
                 </div>
               </div>
@@ -1013,53 +1224,63 @@ export default function Profile() {
 
             {/* ACADEMIC DETAILS & TARGETS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <section className="md:col-span-2 paper-card p-6 space-y-4">
-                <div className="flex items-center justify-between">
+              <section className="md:col-span-2 paper-card p-5 sm:p-6 space-y-4">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <h2 className="text-base font-display font-bold text-foreground flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary" aria-hidden="true">
                       school
                     </span>
-                    <span>Hồ sơ Học vấn</span>
+                    <span>{t('profile.academicTitle')}</span>
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-surface-alt border border-border text-foreground">
-                    {activeMode === 'student' ? 'Chế độ Học sinh THPT' : 'Chế độ Sinh viên ĐH'}
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-surface-alt border border-border text-foreground whitespace-nowrap">
+                    {activeMode === 'student'
+                      ? t('profile.modeStudent')
+                      : t('profile.modeUniversity')}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
                   <div className="p-3.5 rounded-xl bg-paper border border-border">
                     <p className="text-xs text-secondary-text mb-1">
-                      {activeMode === 'student' ? 'Trường THPT / Nguyện vọng 1' : 'Trường Đại học'}
+                      {activeMode === 'student'
+                        ? t('profile.schoolLabelStudent')
+                        : t('profile.schoolLabelUni')}
                     </p>
                     <p className="text-sm font-bold text-foreground">
-                      {profile?.university || 'Chưa cập nhật'}
+                      {profile?.university || t('profile.notUpdated')}
                     </p>
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-paper border border-border">
                     <p className="text-xs text-secondary-text mb-1">
-                      {activeMode === 'student' ? 'Khối / Ngành định hướng' : 'Chuyên ngành'}
+                      {activeMode === 'student'
+                        ? t('profile.majorLabelStudent')
+                        : t('profile.majorLabelUni')}
                     </p>
                     <p className="text-sm font-bold text-foreground">
-                      {extraProfile.major || 'Chưa cập nhật'}
+                      {extraProfile.major || t('profile.notUpdated')}
                     </p>
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-paper border border-border">
                     <p className="text-xs text-secondary-text mb-1">
-                      {activeMode === 'student' ? 'Khoá thi Đại học' : 'Năm nhập học'}
+                      {activeMode === 'student'
+                        ? t('profile.yearLabelStudent')
+                        : t('profile.yearLabelUni')}
                     </p>
                     <p className="text-sm font-bold text-foreground tabular">
-                      {extraProfile.starting_year || 'Chưa cập nhật'}
+                      {extraProfile.starting_year || t('profile.notUpdated')}
                     </p>
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-paper border border-border">
-                    <p className="text-xs text-secondary-text mb-1">GPA Đại học hiện tại (Hệ 4.0)</p>
+                    <p className="text-xs text-secondary-text mb-1">
+                      {t('profile.currentGpaLabel')}
+                    </p>
                     <p className="text-sm font-bold text-jade tabular">
                       {profile?.current_gpa != null
                         ? `${Number(profile.current_gpa).toFixed(2)} / 4.00`
-                        : 'Chưa lưu GPA'}
+                        : t('profile.noGpaSaved')}
                     </p>
                   </div>
                 </div>
@@ -1073,7 +1294,7 @@ export default function Profile() {
                     <span className="material-symbols-outlined text-base" aria-hidden="true">
                       calculate
                     </span>
-                    <span>Mở Bàn Tính GPA</span>
+                    <span>{t('profile.openGpaCalcBtn')}</span>
                   </button>
                   <button
                     type="button"
@@ -1083,24 +1304,24 @@ export default function Profile() {
                     <span className="material-symbols-outlined text-base" aria-hidden="true">
                       conversion_path
                     </span>
-                    <span>Lộ Trình Học Tập</span>
+                    <span>{t('profile.openRoadmapBtn')}</span>
                   </button>
                 </div>
               </section>
 
               {/* TARGET METRICS CARD */}
-              <section className="paper-card p-6 space-y-3.5">
+              <section className="paper-card p-5 sm:p-6 space-y-3.5">
                 <h2 className="text-base font-display font-bold text-foreground flex items-center gap-2">
                   <span className="material-symbols-outlined text-accent" aria-hidden="true">
                     flag
                   </span>
-                  <span>Mục tiêu Điểm số</span>
+                  <span>{t('profile.targetsTitle')}</span>
                 </h2>
 
                 <div className="p-3.5 rounded-xl bg-jade-soft border border-jade-border flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-jade font-bold">GPA Đại học</p>
-                    <p className="text-[11px] text-secondary-text">Thang chuẩn 4.0</p>
+                    <p className="text-xs text-jade font-bold">{t('profile.targetGpaTitle')}</p>
+                    <p className="text-[11px] text-secondary-text">{t('profile.targetGpaScale')}</p>
                   </div>
                   <span className="text-xl font-display font-extrabold text-jade tabular">
                     {profile?.target_gpa != null ? Number(profile.target_gpa).toFixed(2) : '3.20'}
@@ -1109,8 +1330,8 @@ export default function Profile() {
 
                 <div className="p-3.5 rounded-xl bg-gold-soft/65 border border-gold flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-gold-dark font-bold">Tổ hợp THPTQG</p>
-                    <p className="text-[11px] text-secondary-text">Thang điểm 30</p>
+                    <p className="text-xs text-gold-dark font-bold">{t('profile.targetThptTitle')}</p>
+                    <p className="text-[11px] text-secondary-text">{t('profile.targetThptScale')}</p>
                   </div>
                   <span className="text-xl font-display font-extrabold text-accent tabular">
                     {profile?.target_thpt != null ? Number(profile.target_thpt).toFixed(2) : '26.00'}
@@ -1119,8 +1340,8 @@ export default function Profile() {
 
                 <div className="p-3.5 rounded-xl bg-primary-soft/60 border border-primary/30 flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-primary font-bold">Đánh giá năng lực</p>
-                    <p className="text-[11px] text-secondary-text">HSA / V-ACT</p>
+                    <p className="text-xs text-primary font-bold">{t('profile.targetDgnlTitle')}</p>
+                    <p className="text-[11px] text-secondary-text">{t('profile.targetDgnlScale')}</p>
                   </div>
                   <span className="text-xl font-display font-extrabold text-primary tabular">
                     {profile?.target_dgnl ?? 900}
@@ -1129,38 +1350,104 @@ export default function Profile() {
               </section>
             </div>
 
-            {/* RECENT 7-DAY STUDY LOG (`public.study_daily`) */}
-            <section className="paper-card p-6 space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <h2 className="text-base font-display font-bold text-foreground flex items-center gap-2">
-                  <span className="material-symbols-outlined text-jade" aria-hidden="true">
-                    history_edu
+            {/* 7-DAY VERIFIED STUDY CHART & LOG (`public.study_daily`) */}
+            <section className="paper-card p-5 sm:p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h2 className="text-base font-display font-bold text-foreground flex items-center gap-2">
+                    <span className="material-symbols-outlined text-jade" aria-hidden="true">
+                      history_edu
+                    </span>
+                    <span>{t('profile.chartTitle')}</span>
+                  </h2>
+                  <p className="text-xs text-secondary-text mt-0.5">{t('profile.chartSubtitle')}</p>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-1 rounded-lg bg-surface-alt border border-border text-xs font-bold text-foreground tabular whitespace-nowrap">
+                    {t('profile.chartTotal7d', {
+                      minutes: formatNumber(sevenDayChart.totalMinutes),
+                    })}
                   </span>
-                  <span>Nhật Ký Tu Luyện Gần Đây</span>
-                </h2>
-                <span className="text-xs text-secondary-text">
-                  Tối đa 5 giờ được cộng EXP mỗi ngày
-                </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-jade-soft border border-jade-border text-xs font-bold text-jade tabular whitespace-nowrap">
+                    {t('profile.chartTotalExp7d', {
+                      exp: formatNumber(sevenDayChart.totalExp),
+                    })}
+                  </span>
+                </div>
+              </div>
+
+              {/* 7-Day Bar Chart */}
+              <div className="p-3.5 sm:p-4 rounded-xl bg-paper border border-border">
+                <div className="grid grid-cols-7 gap-1.5 sm:gap-3 items-end">
+                  {sevenDayChart.days.map((day) => {
+                    const barHeightPct =
+                      day.minutes > 0
+                        ? Math.max(10, Math.min(100, Math.round((day.minutes / sevenDayChart.maxMinutes) * 100)))
+                        : 0;
+                    const tooltip = t('profile.chartBarTooltip', {
+                      date: day.dateShort,
+                      minutes: formatNumber(day.minutes),
+                      exp: formatNumber(day.exp),
+                    });
+
+                    return (
+                      <div
+                        key={day.iso}
+                        title={tooltip}
+                        className="flex flex-col items-center gap-1.5"
+                      >
+                        <span className="text-[10px] font-bold text-secondary-text tabular">
+                          {t('profile.chartMinutesUnit', { minutes: day.minutes })}
+                        </span>
+
+                        <div className="w-full max-w-[36px] h-24 rounded-lg bg-surface-alt border border-border overflow-hidden flex items-end p-0.5">
+                          <div
+                            style={{ height: `${barHeightPct}%` }}
+                            className={`w-full rounded-md transition-all ${
+                              day.minutes > 0
+                                ? day.isToday
+                                  ? 'bg-primary'
+                                  : 'bg-jade'
+                                : 'bg-transparent'
+                            }`}
+                          />
+                        </div>
+
+                        <div className="text-center leading-tight">
+                          <p
+                            className={`text-[11px] font-bold ${
+                              day.isToday ? 'text-primary' : 'text-foreground'
+                            }`}
+                          >
+                            {day.weekday}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground tabular">
+                            {day.dateShort}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {loadingStats ? (
-                <p className="text-xs text-secondary-text py-4 text-center">
-                  Đang tải nhật ký học tập...
+                <p className="text-xs text-secondary-text py-3 text-center">
+                  {t('profile.loadingLogs')}
                 </p>
               ) : studyDailyRows.length === 0 ? (
                 <div className="p-6 rounded-xl bg-surface-alt border border-dashed border-border text-center space-y-2">
                   <p className="text-sm font-display font-bold text-foreground">
-                    Chưa có phiên học online nào được ghi nhận
+                    {t('profile.emptyLogsTitle')}
                   </p>
-                  <p className="text-xs text-secondary-text">
-                    Mỗi phút tự học tại khu vực Học Online sẽ tự động lưu vào nhật ký và cộng thêm +10 EXP!
-                  </p>
+                  <p className="text-xs text-secondary-text">{t('profile.emptyLogsDesc')}</p>
                   <button
                     type="button"
                     onClick={() => navigate('/hoc-online')}
                     className="btn-arena btn-arena-primary btn-arena-sm mt-1 cursor-pointer"
                   >
-                    Bắt đầu học ngay
+                    {t('profile.startStudyNowBtn')}
                   </button>
                 </div>
               ) : (
@@ -1179,10 +1466,10 @@ export default function Profile() {
                       >
                         <div className="flex items-center gap-3">
                           <span className="px-2.5 py-1 rounded-lg bg-surface-alt border border-border text-xs font-bold text-foreground tabular">
-                            {new Date(row.study_date).toLocaleDateString('vi-VN')}
+                            {formatDate(row.study_date)}
                           </span>
                           <span className="text-xs sm:text-sm font-semibold text-foreground tabular">
-                            {formatStudyTime(sec)}
+                            {formatStudyTime(sec, lang)}
                           </span>
                         </div>
 
@@ -1191,7 +1478,7 @@ export default function Profile() {
                             <ProgressBar value={pct} max={100} tone="jade" showPercent={false} />
                           </div>
                           <span className="text-xs font-display font-extrabold text-jade tabular shrink-0">
-                            +{earnedExp.toLocaleString('vi-VN')} EXP
+                            +{formatNumber(earnedExp)} EXP
                           </span>
                         </div>
                       </div>
@@ -1211,6 +1498,9 @@ export default function Profile() {
           onClick={() => setIsRankModalOpen(false)}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('profile.rankModalTitle')}
             className="imperial-frame w-full max-w-lg overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
@@ -1220,13 +1510,13 @@ export default function Profile() {
                   military_tech
                 </span>
                 <h3 className="font-display font-bold text-base text-foreground">
-                  Hệ Thống Quân Hàm Công Lực (EXP)
+                  {t('profile.rankModalTitle')}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsRankModalOpen(false)}
-                aria-label="Đóng"
+                aria-label={t('profile.closeModalAria')}
                 className="text-muted-foreground hover:text-foreground p-1 rounded-lg cursor-pointer"
               >
                 <span className="material-symbols-outlined" aria-hidden="true">
@@ -1237,53 +1527,52 @@ export default function Profile() {
 
             <div className="p-6 space-y-3 max-h-[75vh] overflow-y-auto bg-surface">
               <div className="p-3.5 rounded-xl bg-gold-soft/50 border border-gold text-xs text-foreground leading-relaxed">
-                Tích lũy <strong>EXP càng cao thì mức hạng càng cao</strong>. Riêng ngôi vị{' '}
-                <strong>Bang Chủ</strong> chỉ dành duy nhất cho 1 tài khoản tối cao (không ai khác
-                được phép là Bang Chủ).
+                {t('profile.rankModalIntro')}
               </div>
               {RANK_TIERS.map((tier) => {
-                const isCurrent = rankInfo.name === tier.name;
+                const isCurrent = rankInfo.key === tier.key;
+                const tierTitle = getRankDisplayName(tier, lang);
                 return (
                   <div
-                    key={tier.name}
-                    className={`flex items-center justify-between p-3.5 rounded-xl border transition-all ${
+                    key={tier.key}
+                    className={`flex items-center justify-between gap-3 p-3.5 rounded-xl border transition-all ${
                       isCurrent
                         ? `${tier.bg} ${tier.border} ring-1 ring-primary/30`
                         : 'bg-paper border-border'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
                       <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center border ${tier.bg} ${tier.color} ${tier.border}`}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 ${tier.bg} ${tier.color} ${tier.border}`}
                       >
                         <span className="material-symbols-outlined text-xl" aria-hidden="true">
                           {tier.icon}
                         </span>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h4 className={`font-display font-bold text-sm ${tier.color}`}>
-                            {tier.name}
+                            {tierTitle}
                           </h4>
                           {isCurrent && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground">
-                              Hiện tại
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary text-on-primary whitespace-nowrap">
+                              {t('profile.currentBadge')}
                             </span>
                           )}
                         </div>
                         <p className="text-xs text-secondary-text mt-0.5 tabular">
                           {tier.exclusiveBangChu
-                            ? 'Ngôi vị độc tôn — Chỉ duy nhất 1 tài khoản được phép là Bang Chủ'
+                            ? t('profile.soleTierDesc')
                             : tier.min === 0
-                              ? 'Khởi điểm khi gia nhập (0 EXP)'
-                              : `Tích lũy đạt từ ${tier.min.toLocaleString('vi-VN')} EXP`}
+                              ? t('profile.initialTierDesc')
+                              : t('profile.minExpTierDesc', { exp: formatNumber(tier.min) })}
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-display font-extrabold text-secondary-text tabular">
+                    <span className="text-xs font-display font-extrabold text-secondary-text tabular shrink-0 whitespace-nowrap">
                       {tier.exclusiveBangChu
-                        ? 'Độc tôn'
-                        : `${tier.min.toLocaleString('vi-VN')} EXP`}
+                        ? t('profile.exclusiveTag')
+                        : `${formatNumber(tier.min)} EXP`}
                     </span>
                   </div>
                 );

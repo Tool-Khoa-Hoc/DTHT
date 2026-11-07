@@ -2,52 +2,119 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useToast } from '../components/ui/ToastProvider';
 import { sanitizeExternalUrl } from '../utils/urlSecurity';
 import { getDocumentKindMeta } from '../lib/documents';
 import RankSeal from '../components/ui/RankSeal';
-import Avatar from '../components/Avatar';
 
 const THPT_CATEGORIES = [
-  { label: 'Tất cả môn', value: '' },
-  { label: 'Toán', value: 'toan', icon: 'functions' },
-  { label: 'Vật Lý', value: 'ly', icon: 'bolt' },
-  { label: 'Hóa Học', value: 'hoa', icon: 'science' },
-  { label: 'Sinh Học', value: 'sinh', icon: 'biotech' },
-  { label: 'Ngữ Văn', value: 'van', icon: 'menu_book' },
-  { label: 'Tiếng Anh', value: 'anh', icon: 'language' },
-  { label: 'Lịch Sử', value: 'su', icon: 'history_edu' },
-  { label: 'Địa Lý', value: 'dia', icon: 'public' },
-  { label: 'GDCD / PL', value: 'gdcd', icon: 'gavel' },
-  { label: 'Tin Học', value: 'tin', icon: 'computer' },
-  { label: 'Khác', value: 'khac', icon: 'folder' },
+  { labelVi: 'Tất cả môn', labelEn: 'All Subjects', value: '' },
+  { labelVi: 'Toán', labelEn: 'Mathematics', value: 'toan', icon: 'functions' },
+  { labelVi: 'Vật Lý', labelEn: 'Physics', value: 'ly', icon: 'bolt' },
+  { labelVi: 'Hóa Học', labelEn: 'Chemistry', value: 'hoa', icon: 'science' },
+  { labelVi: 'Sinh Học', labelEn: 'Biology', value: 'sinh', icon: 'biotech' },
+  { labelVi: 'Ngữ Văn', labelEn: 'Literature', value: 'van', icon: 'menu_book' },
+  { labelVi: 'Tiếng Anh', labelEn: 'English', value: 'anh', icon: 'language' },
+  { labelVi: 'Lịch Sử', labelEn: 'History', value: 'su', icon: 'history_edu' },
+  { labelVi: 'Địa Lý', labelEn: 'Geography', value: 'dia', icon: 'public' },
+  { labelVi: 'GDCD / PL', labelEn: 'Civics & Law', value: 'gdcd', icon: 'gavel' },
+  { labelVi: 'Tin Học', labelEn: 'Informatics', value: 'tin', icon: 'computer' },
+  { labelVi: 'Khác', labelEn: 'Other', value: 'khac', icon: 'folder' },
 ];
 
 const UNI_CATEGORIES = [
-  { label: 'Tất cả học phần', value: '' },
-  { label: 'Giải Tích / Toán CC', value: 'giai_tich', icon: 'functions' },
-  { label: 'Lập Trình / CNTT', value: 'lap_trinh', icon: 'code' },
-  { label: 'Kinh Tế / QTKD', value: 'kinh_te', icon: 'trending_up' },
-  { label: 'Kiến Trúc / Kỹ Thuật', value: 'kien_truc', icon: 'architecture' },
-  { label: 'Khác', value: 'khac', icon: 'folder' },
+  { labelVi: 'Tất cả học phần', labelEn: 'All Courses', value: '' },
+  { labelVi: 'Giải Tích / Toán CC', labelEn: 'Calculus & Higher Math', value: 'giai_tich', icon: 'functions' },
+  { labelVi: 'Lập Trình / CNTT', labelEn: 'Programming & IT', value: 'lap_trinh', icon: 'code' },
+  { labelVi: 'Kinh Tế / QTKD', labelEn: 'Economics & Business', value: 'kinh_te', icon: 'trending_up' },
+  { labelVi: 'Kiến Trúc / Kỹ Thuật', labelEn: 'Architecture & Engineering', value: 'kien_truc', icon: 'architecture' },
+  { labelVi: 'Khác', labelEn: 'Other', value: 'khac', icon: 'folder' },
 ];
 
+const CATEGORY_LABELS_MAP = {
+  toan: { vi: 'Toán', en: 'Mathematics' },
+  ly: { vi: 'Vật Lý', en: 'Physics' },
+  hoa: { vi: 'Hóa Học', en: 'Chemistry' },
+  sinh: { vi: 'Sinh Học', en: 'Biology' },
+  van: { vi: 'Ngữ Văn', en: 'Literature' },
+  anh: { vi: 'Tiếng Anh', en: 'English' },
+  su: { vi: 'Lịch Sử', en: 'History' },
+  dia: { vi: 'Địa Lý', en: 'Geography' },
+  gdcd: { vi: 'GDCD / PL', en: 'Civics & Law' },
+  tin: { vi: 'Tin Học', en: 'Informatics' },
+  giai_tich: { vi: 'Giải Tích / Toán CC', en: 'Calculus & Higher Math' },
+  lap_trinh: { vi: 'Lập Trình / CNTT', en: 'Programming & IT' },
+  kinh_te: { vi: 'Kinh Tế / QTKD', en: 'Economics & Business' },
+  kien_truc: { vi: 'Kiến Trúc / Kỹ Thuật', en: 'Architecture & Engineering' },
+  khac: { vi: 'Khác', en: 'Other' },
+  Toán: { vi: 'Toán', en: 'Mathematics' },
+  'Vật Lý': { vi: 'Vật Lý', en: 'Physics' },
+  'Vật lý': { vi: 'Vật lý', en: 'Physics' },
+  'Hóa Học': { vi: 'Hóa Học', en: 'Chemistry' },
+  'Hóa học': { vi: 'Hóa học', en: 'Chemistry' },
+  'Sinh Học': { vi: 'Sinh Học', en: 'Biology' },
+  'Sinh học': { vi: 'Sinh học', en: 'Biology' },
+  'Ngữ Văn': { vi: 'Ngữ Văn', en: 'Literature' },
+  'Ngữ văn': { vi: 'Ngữ văn', en: 'Literature' },
+  'Tiếng Anh': { vi: 'Tiếng Anh', en: 'English' },
+  'Lịch Sử': { vi: 'Lịch Sử', en: 'History' },
+  'Lịch sử': { vi: 'Lịch sử', en: 'History' },
+  'Địa Lý': { vi: 'Địa Lý', en: 'Geography' },
+  'Địa lý': { vi: 'Địa lý', en: 'Geography' },
+  GDCD: { vi: 'GDCD', en: 'Civics' },
+  'Tin Học': { vi: 'Tin Học', en: 'Informatics' },
+  'Tin học': { vi: 'Tin học', en: 'Informatics' },
+  Khác: { vi: 'Khác', en: 'Other' },
+};
+
+function getCategoryDisplayLabel(rawCat, isEn) {
+  if (!rawCat) return '';
+  const mapped = CATEGORY_LABELS_MAP[rawCat];
+  if (mapped) return isEn ? mapped.en : mapped.vi;
+  return rawCat;
+}
+
+const OTHER_REPORT_REASON_VALUE = 'Lý do khác';
+
 const REPORT_REASONS = [
-  'Link tài liệu bị lỗi hoặc không mở được',
-  'Nội dung sai lệch kiến thức hoặc thông tin sai',
-  'Tài liệu không phù hợp hoặc trùng lặp',
-  'Vi phạm bản quyền',
-  'Lý do khác',
+  {
+    value: 'Link tài liệu bị lỗi hoặc không mở được',
+    labelVi: 'Link tài liệu bị lỗi hoặc không mở được',
+    labelEn: 'Broken or inaccessible resource link',
+  },
+  {
+    value: 'Nội dung sai lệch kiến thức hoặc thông tin sai',
+    labelVi: 'Nội dung sai lệch kiến thức hoặc thông tin sai',
+    labelEn: 'Inaccurate academic content or misleading information',
+  },
+  {
+    value: 'Tài liệu không phù hợp hoặc trùng lặp',
+    labelVi: 'Tài liệu không phù hợp hoặc trùng lặp',
+    labelEn: 'Inappropriate or duplicate resource',
+  },
+  {
+    value: 'Vi phạm bản quyền',
+    labelVi: 'Vi phạm bản quyền',
+    labelEn: 'Copyright infringement',
+  },
+  {
+    value: OTHER_REPORT_REASON_VALUE,
+    labelVi: 'Lý do khác',
+    labelEn: 'Other reason',
+  },
 ];
 
 export default function Library() {
   const { user, isAdmin, isCollaborator } = useAuth();
+  const { lang, isEn, pick, formatNumber, formatDate } = useLanguage();
   const { showToast } = useToast();
 
   const [educationLevel, setEducationLevel] = useState('all'); // 'all' | 'thpt' | 'university'
   const [selectedCategory, setSelectedCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSavedOnly, setShowSavedOnly] = useState(false);
+  const [sortBy, setSortBy] = useState('featured'); // 'featured' | 'newest' | 'rating'
 
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +133,7 @@ export default function Library() {
 
   // Report Modal State
   const [reportingDoc, setReportingDoc] = useState(null);
-  const [reportReason, setReportReason] = useState(REPORT_REASONS[0]);
+  const [reportReason, setReportReason] = useState(REPORT_REASONS[0].value);
   const [customReportReason, setCustomReportReason] = useState('');
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
 
@@ -97,11 +164,14 @@ export default function Library() {
       setDocuments(data || []);
     } catch (err) {
       console.error('Lỗi tải tài liệu:', err.message);
-      showToast('Không thể tải kho tài liệu: ' + err.message, 'error');
+      showToast(
+        pick('Không thể tải kho tài liệu: ', 'Unable to load library resources: ') + err.message,
+        'error',
+      );
     } finally {
       setLoading(false);
     }
-  }, [educationLevel, selectedCategory, showToast]);
+  }, [educationLevel, selectedCategory, showToast, pick]);
 
   // Fetch Saved Bookmarks for logged in user
   const fetchSavedBookmarks = useCallback(async () => {
@@ -135,7 +205,13 @@ export default function Library() {
   const handleToggleBookmark = async (docId, e) => {
     if (e) e.stopPropagation();
     if (!user) {
-      showToast('Vui lòng đăng nhập để lưu tài liệu vào Tàng Thư riêng!', 'warning');
+      showToast(
+        pick(
+          'Vui lòng đăng nhập để lưu tài liệu vào Tàng Thư riêng!',
+          'Please sign in to save resources to your personal library!',
+        ),
+        'warning',
+      );
       return;
     }
 
@@ -155,7 +231,7 @@ export default function Library() {
           next.delete(docId);
           return next;
         });
-        showToast('Đã xóa khỏi tài liệu đã lưu', 'info', 2000);
+        showToast(pick('Đã xóa khỏi tài liệu đã lưu', 'Removed from saved resources'), 'info', 2000);
       } else {
         const { error } = await supabase
           .from('user_saved_documents')
@@ -163,10 +239,17 @@ export default function Library() {
 
         if (error) throw error;
         setSavedDocIds((prev) => new Set(prev).add(docId));
-        showToast('Đã lưu tài liệu vào Tàng Thư của bạn', 'success', 2000);
+        showToast(
+          pick('Đã lưu tài liệu vào Tàng Thư của bạn', 'Saved to your personal library'),
+          'success',
+          2000,
+        );
       }
     } catch (err) {
-      showToast('Lỗi cập nhật lưu trữ: ' + err.message, 'error');
+      showToast(
+        pick('Lỗi cập nhật lưu trữ: ', 'Failed to update bookmark: ') + err.message,
+        'error',
+      );
     } finally {
       setBookmarkingId(null);
     }
@@ -201,11 +284,17 @@ export default function Library() {
   const handleAddReview = async (e) => {
     e.preventDefault();
     if (!user) {
-      showToast('Vui lòng đăng nhập để gửi đánh giá!', 'warning');
+      showToast(
+        pick('Vui lòng đăng nhập để gửi đánh giá!', 'Please sign in to submit a review!'),
+        'warning',
+      );
       return;
     }
     if (!newReviewText.trim()) {
-      showToast('Vui lòng nhập cảm nhận về tài liệu!', 'warning');
+      showToast(
+        pick('Vui lòng nhập cảm nhận về tài liệu!', 'Please enter your review comment!'),
+        'warning',
+      );
       return;
     }
 
@@ -227,9 +316,12 @@ export default function Library() {
       if (error) throw error;
       setReviews((prev) => [data, ...prev]);
       setNewReviewText('');
-      showToast('Cảm ơn bạn đã gửi đánh giá!', 'success');
+      showToast(pick('Cảm ơn bạn đã gửi đánh giá!', 'Thank you for your review!'), 'success');
     } catch (err) {
-      showToast('Lỗi khi gửi đánh giá: ' + err.message, 'error');
+      showToast(
+        pick('Lỗi khi gửi đánh giá: ', 'Failed to submit review: ') + err.message,
+        'error',
+      );
     } finally {
       setIsSubmittingReview(false);
     }
@@ -238,11 +330,14 @@ export default function Library() {
   const handleOpenReport = (doc, e) => {
     if (e) e.stopPropagation();
     if (!user) {
-      showToast('Vui lòng đăng nhập để báo cáo tài liệu!', 'warning');
+      showToast(
+        pick('Vui lòng đăng nhập để báo cáo tài liệu!', 'Please sign in to report a resource!'),
+        'warning',
+      );
       return;
     }
     setReportingDoc(doc);
-    setReportReason(REPORT_REASONS[0]);
+    setReportReason(REPORT_REASONS[0].value);
     setCustomReportReason('');
   };
 
@@ -251,7 +346,7 @@ export default function Library() {
     if (!user || !reportingDoc) return;
 
     const finalReason =
-      reportReason === 'Lý do khác' && customReportReason.trim()
+      reportReason === OTHER_REPORT_REASON_VALUE && customReportReason.trim()
         ? customReportReason.trim()
         : reportReason;
 
@@ -266,18 +361,24 @@ export default function Library() {
       ]);
 
       if (error) throw error;
-      showToast('Đã gửi báo cáo. Ban quản trị sẽ kiểm tra sớm nhất!', 'success');
+      showToast(
+        pick(
+          'Đã gửi báo cáo. Ban quản trị sẽ kiểm tra sớm nhất!',
+          'Report submitted. Our moderators will inspect it shortly!',
+        ),
+        'success',
+      );
       setReportingDoc(null);
     } catch (err) {
-      showToast('Lỗi gửi báo cáo: ' + err.message, 'error');
+      showToast(pick('Lỗi gửi báo cáo: ', 'Failed to submit report: ') + err.message, 'error');
     } finally {
       setIsSubmittingReport(false);
     }
   };
 
-  // Filtered documents
+  // Filtered & sorted documents
   const filteredDocs = useMemo(() => {
-    return documents.filter((doc) => {
+    const matched = documents.filter((doc) => {
       if (showSavedOnly && !savedDocIds.has(doc.id)) {
         return false;
       }
@@ -290,7 +391,19 @@ export default function Library() {
       const inMajor = (doc.major || '').toLowerCase().includes(q);
       return inTitle || inDesc || inAuthor || inMajor;
     });
-  }, [documents, searchQuery, showSavedOnly, savedDocIds]);
+
+    if (sortBy === 'newest') {
+      return [...matched].sort(
+        (a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime(),
+      );
+    }
+    if (sortBy === 'rating') {
+      return [...matched].sort(
+        (a, b) => (Number(b.avg_rating) || 5) - (Number(a.avg_rating) || 5),
+      );
+    }
+    return matched;
+  }, [documents, searchQuery, showSavedOnly, savedDocIds, sortBy]);
 
   const activeCategoryList =
     educationLevel === 'university' ? UNI_CATEGORIES : THPT_CATEGORIES;
@@ -310,25 +423,32 @@ export default function Library() {
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
             <div>
               <div className="mb-2">
-                <RankSeal size="sm" icon="library_books" label="Tàng Thư Các · Học liệu miễn phí" />
+                <RankSeal
+                  size="sm"
+                  icon="library_books"
+                  label={pick(
+                    'Tàng Thư Các · Học liệu miễn phí',
+                    'Imperial Library · Free Study Resources',
+                  )}
+                />
               </div>
               <h1 className="text-2xl sm:text-3xl font-display font-extrabold tracking-tight text-foreground">
-                Thư Viện Tài Liệu Free
+                {pick('Thư Viện Tài Liệu Free', 'Free Resource Library')}
               </h1>
               <p className="text-xs sm:text-sm text-secondary-text mt-1">
-                Kho đề thi thử, chuyên đề và sơ đồ tư duy chọn lọc cho học sinh THPT &amp; Đại học
+                {pick(
+                  'Kho đề thi thử, chuyên đề và sơ đồ tư duy chọn lọc cho học sinh THPT & Đại học',
+                  'Curated mock exams, topic guides, and mind maps for High School & University scholars',
+                )}
               </p>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <Link
-                to="/hoc-online"
-                className="btn-arena btn-arena-gold btn-arena-sm"
-              >
+              <Link to="/hoc-online" className="btn-arena btn-arena-gold btn-arena-sm">
                 <span className="material-symbols-outlined text-base" aria-hidden="true">
                   cast_for_education
                 </span>
-                <span>Mở Kho Học Online</span>
+                <span>{pick('Mở Kho Học Online', 'Open Online Study Hub')}</span>
               </Link>
               {(isAdmin || isCollaborator) && (
                 <Link
@@ -338,7 +458,7 @@ export default function Library() {
                   <span className="material-symbols-outlined text-base" aria-hidden="true">
                     cloud_upload
                   </span>
-                  <span>Đăng tài liệu</span>
+                  <span>{pick('Đăng tài liệu', 'Upload Resource')}</span>
                 </Link>
               )}
             </div>
@@ -357,14 +477,17 @@ export default function Library() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm theo tên tài liệu, môn học, tác giả, chuyên ngành..."
+                placeholder={pick(
+                  'Tìm kiếm theo tên tài liệu, môn học, tác giả, chuyên ngành...',
+                  'Search by resource title, subject, author, or major...',
+                )}
                 className="w-full pl-12 pr-10 py-3 bg-surface border border-border-strong rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-sm text-foreground placeholder:text-muted-foreground transition-all"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  aria-label="Xóa tìm kiếm"
+                  aria-label={pick('Xóa tìm kiếm', 'Clear search')}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-sm" aria-hidden="true">
@@ -378,7 +501,7 @@ export default function Library() {
               <button
                 type="button"
                 onClick={() => setShowSavedOnly(!showSavedOnly)}
-                className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all cursor-pointer no-shrink ${
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all cursor-pointer shrink-0 ${
                   showSavedOnly
                     ? 'bg-primary-soft text-primary border-primary/40 shadow-xs'
                     : 'bg-surface border-border text-secondary-text hover:text-foreground hover:border-border-strong'
@@ -392,39 +515,69 @@ export default function Library() {
                 >
                   bookmark
                 </span>
-                <span>Đã lưu ({savedDocIds.size})</span>
+                <span>
+                  {pick('Đã lưu', 'Saved')} ({formatNumber(savedDocIds.size)})
+                </span>
               </button>
             )}
           </div>
 
-          {/* Education Level Selector */}
-          <div className="relative z-10 flex flex-wrap items-center gap-2 pt-2 border-t border-border">
-            <span className="text-xs font-bold text-secondary-text mr-1">Cấp học:</span>
-            {[
-              { id: 'all', label: 'Tất cả cấp học' },
-              { id: 'thpt', label: 'THPT (Lớp 10 · 11 · 12)' },
-              { id: 'university', label: 'Đại học' },
-            ].map((lvl) => (
-              <button
-                key={lvl.id}
-                type="button"
-                onClick={() => {
-                  setEducationLevel(lvl.id);
-                  setSelectedCategory('');
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                  educationLevel === lvl.id
-                    ? 'bg-primary text-white border-primary'
-                    : 'bg-surface border-border text-secondary-text hover:text-foreground'
-                }`}
-              >
-                {lvl.label}
-              </button>
-            ))}
+          {/* Education Level Selector & Sort Controls */}
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-secondary-text mr-1">
+                {pick('Cấp học:', 'Level:')}
+              </span>
+              {[
+                { id: 'all', label: pick('Tất cả cấp học', 'All Levels') },
+                { id: 'thpt', label: pick('THPT (Lớp 10 · 11 · 12)', 'High School (Grades 10–12)') },
+                { id: 'university', label: pick('Đại học', 'University') },
+              ].map((lvl) => (
+                <button
+                  key={lvl.id}
+                  type="button"
+                  onClick={() => {
+                    setEducationLevel(lvl.id);
+                    setSelectedCategory('');
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                    educationLevel === lvl.id
+                      ? 'bg-primary text-on-primary border-primary'
+                      : 'bg-surface border-border text-secondary-text hover:text-foreground hover:border-border-strong'
+                  }`}
+                >
+                  {lvl.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-xs font-bold text-secondary-text mr-0.5">
+                {pick('Sắp xếp:', 'Sort:')}
+              </span>
+              {[
+                { id: 'featured', label: pick('Nổi bật', 'Featured') },
+                { id: 'newest', label: pick('Mới nhất', 'Newest') },
+                { id: 'rating', label: pick('Đánh giá cao', 'Top Rated') },
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setSortBy(opt.id)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                    sortBy === opt.id
+                      ? 'bg-surface-alt text-primary border-border-strong'
+                      : 'bg-surface border-border text-secondary-text hover:text-foreground hover:border-border-strong'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Category Chips */}
-          <div className="relative z-10 flex gap-2 overflow-x-auto pb-1 mt-3 no-scrollbar">
+          <div className="relative z-10 flex flex-wrap gap-2 mt-3">
             {activeCategoryList.map((cat) => (
               <button
                 key={cat.value}
@@ -433,7 +586,7 @@ export default function Library() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
                   selectedCategory === cat.value
                     ? 'bg-gold-soft text-gold-dark border-gold shadow-2xs'
-                    : 'bg-surface border-border text-secondary-text hover:text-foreground'
+                    : 'bg-surface border-border text-secondary-text hover:text-foreground hover:border-border-strong'
                 }`}
               >
                 {cat.icon && (
@@ -441,7 +594,7 @@ export default function Library() {
                     {cat.icon}
                   </span>
                 )}
-                {cat.label}
+                <span>{isEn ? cat.labelEn : cat.labelVi}</span>
               </button>
             ))}
           </div>
@@ -450,7 +603,11 @@ export default function Library() {
         {/* Documents Grid */}
         <main>
           {loading ? (
-            <div className="flex justify-center py-20">
+            <div
+              className="flex justify-center py-20"
+              role="status"
+              aria-label={pick('Đang tải kho tài liệu', 'Loading library resources')}
+            >
               <span
                 className="material-symbols-outlined animate-spin text-4xl text-primary"
                 aria-hidden="true"
@@ -461,22 +618,25 @@ export default function Library() {
           ) : filteredDocs.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredDocs.map((doc) => {
-                const kind = getDocumentKindMeta(doc.title, doc.file_url);
+                const kind = getDocumentKindMeta(doc.title, doc.file_url, lang);
                 const safeUrl = sanitizeExternalUrl(doc.file_url);
                 const isSaved = savedDocIds.has(doc.id);
+                const uploadDateText = formatDate(doc.created_at);
 
                 return (
                   <div
                     key={doc.id}
                     onClick={() => handleOpenDoc(doc)}
-                    className={`group relative paper-card paper-card-interactive p-5 flex flex-col justify-between cursor-pointer ${
-                      doc.is_featured ? 'border-gold ring-1 ring-gold/40' : ''
+                    className={`group relative paper-card paper-card-interactive p-5 flex flex-col justify-between cursor-pointer border transition-all ${
+                      doc.is_featured
+                        ? 'border-gold ring-1 ring-gold/40 hover:border-gold'
+                        : 'border-border hover:border-border-strong'
                     }`}
                   >
                     <div>
                       {/* Card Header */}
                       <div className="flex items-center justify-between gap-2 mb-3">
-                        <div className="flex items-center gap-1.5 flex-wrap">
+                        <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                           <span
                             className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md ${kind.badgeClass}`}
                           >
@@ -488,22 +648,31 @@ export default function Library() {
 
                           {doc.is_featured && (
                             <span className="inline-flex items-center gap-0.5 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-gold-soft text-gold-dark border border-gold">
-                              <span className="material-symbols-outlined text-[11px] icon-fill" aria-hidden="true">
+                              <span
+                                className="material-symbols-outlined text-[11px] icon-fill"
+                                aria-hidden="true"
+                              >
                                 star
                               </span>
-                              Nổi bật
+                              {pick('Nổi bật', 'Featured')}
                             </span>
                           )}
 
                           <span className="text-[10px] uppercase font-bold text-secondary-text">
-                            {doc.education_level === 'university' ? 'ĐH' : 'THPT'}
+                            {doc.education_level === 'university'
+                              ? pick('ĐH', 'UNI')
+                              : pick('THPT', 'HS')}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 shrink-0">
                           <button
                             type="button"
-                            aria-label={isSaved ? 'Bỏ lưu tài liệu' : 'Lưu tài liệu vào Tàng Thư'}
+                            aria-label={
+                              isSaved
+                                ? pick('Bỏ lưu tài liệu', 'Remove bookmark')
+                                : pick('Lưu tài liệu vào Tàng Thư', 'Save resource to library')
+                            }
                             onClick={(e) => handleToggleBookmark(doc.id, e)}
                             disabled={bookmarkingId === doc.id}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
@@ -511,7 +680,11 @@ export default function Library() {
                                 ? 'text-primary bg-primary-soft'
                                 : 'text-muted-foreground hover:text-foreground hover:bg-surface-alt'
                             }`}
-                            title={isSaved ? 'Bỏ lưu' : 'Lưu tài liệu'}
+                            title={
+                              isSaved
+                                ? pick('Bỏ lưu', 'Remove bookmark')
+                                : pick('Lưu tài liệu', 'Bookmark resource')
+                            }
                           >
                             <span
                               className={`material-symbols-outlined text-lg ${
@@ -525,10 +698,13 @@ export default function Library() {
 
                           <button
                             type="button"
-                            aria-label="Báo cáo tài liệu hoặc sự cố link"
+                            aria-label={pick(
+                              'Báo cáo tài liệu hoặc sự cố link',
+                              'Report resource or broken link',
+                            )}
                             onClick={(e) => handleOpenReport(doc, e)}
                             className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary-soft transition-colors cursor-pointer"
-                            title="Báo lỗi link"
+                            title={pick('Báo lỗi link', 'Report issue')}
                           >
                             <span className="material-symbols-outlined text-lg" aria-hidden="true">
                               flag
@@ -542,22 +718,34 @@ export default function Library() {
                         {doc.title}
                       </h3>
                       <p className="text-xs text-secondary-text line-clamp-3 leading-relaxed mb-4">
-                        {doc.description || 'Tài liệu tuyển chọn, chuyên đề ôn tập trọng tâm.'}
+                        {doc.description ||
+                          pick(
+                            'Tài liệu tuyển chọn, chuyên đề ôn tập trọng tâm.',
+                            'Curated study material covering core exam topics.',
+                          )}
                       </p>
                     </div>
 
                     {/* Meta Footer */}
-                    <div className="pt-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground">
-                      <div className="flex items-center gap-1.5 truncate">
-                        <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
+                    <div className="pt-3 mt-auto border-t border-border flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span
+                          className="material-symbols-outlined text-[14px] shrink-0"
+                          aria-hidden="true"
+                        >
                           person
                         </span>
-                        <span className="truncate max-w-[120px]">
-                          {doc.author_name || 'Khuyết danh'}
+                        <span className="truncate max-w-[110px]">
+                          {doc.author_name || pick('Khuyết danh', 'Anonymous')}
                         </span>
+                        {uploadDateText && (
+                          <span className="hidden sm:inline text-muted-foreground tabular shrink-0">
+                            · {uploadDateText}
+                          </span>
+                        )}
                       </div>
 
-                      <div className="flex items-center gap-2 no-shrink font-bold">
+                      <div className="flex items-center gap-2 shrink-0 font-bold whitespace-nowrap">
                         {safeUrl ? (
                           <a
                             href={safeUrl}
@@ -567,12 +755,17 @@ export default function Library() {
                             className="inline-flex items-center gap-1 text-primary hover:text-primary-hover hover:underline"
                           >
                             <span>{kind.actionLabel}</span>
-                            <span className="material-symbols-outlined text-[12px]" aria-hidden="true">
+                            <span
+                              className="material-symbols-outlined text-[12px]"
+                              aria-hidden="true"
+                            >
                               open_in_new
                             </span>
                           </a>
                         ) : (
-                          <span className="text-primary/70">Mở xem chi tiết</span>
+                          <span className="text-primary/70">
+                            {pick('Mở xem chi tiết', 'View details')}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -581,17 +774,20 @@ export default function Library() {
               })}
             </div>
           ) : (
-            <div className="text-center py-16 paper-card border-dashed max-w-lg mx-auto my-8 p-6">
+            <div className="text-center py-16 paper-card border border-dashed border-border-strong max-w-lg mx-auto my-8 p-6">
               <div className="w-16 h-16 rounded-2xl bg-primary-soft border border-primary/30 text-primary flex items-center justify-center mx-auto mb-4">
                 <span className="material-symbols-outlined text-3xl" aria-hidden="true">
                   folder_off
                 </span>
               </div>
               <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                Không tìm thấy tài liệu phù hợp
+                {pick('Không tìm thấy tài liệu phù hợp', 'No matching resources found')}
               </h3>
               <p className="text-xs text-secondary-text mb-6 max-w-xs mx-auto leading-relaxed">
-                Hãy thử đổi từ khóa tìm kiếm hoặc chọn cấp học và bộ lọc môn học khác.
+                {pick(
+                  'Hãy thử đổi từ khóa tìm kiếm hoặc chọn cấp học và bộ lọc môn học khác.',
+                  'Try changing your search keywords or selecting a different education level and subject filter.',
+                )}
               </p>
               <button
                 type="button"
@@ -600,10 +796,11 @@ export default function Library() {
                   setSelectedCategory('');
                   setEducationLevel('all');
                   setShowSavedOnly(false);
+                  setSortBy('featured');
                 }}
                 className="btn-arena btn-arena-secondary btn-arena-sm"
               >
-                Đặt lại bộ lọc
+                {pick('Đặt lại bộ lọc', 'Reset filters')}
               </button>
             </div>
           )}
@@ -625,11 +822,13 @@ export default function Library() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-primary-soft text-primary border border-primary/30">
-                    {selectedDoc.education_level === 'university' ? 'Đại học' : 'THPT'}
+                    {selectedDoc.education_level === 'university'
+                      ? pick('Đại học', 'University')
+                      : pick('THPT', 'High School')}
                   </span>
                   {selectedDoc.category && (
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-surface-alt text-secondary-text border border-border">
-                      {selectedDoc.category}
+                      {getCategoryDisplayLabel(selectedDoc.category, isEn)}
                     </span>
                   )}
                   {selectedDoc.major && (
@@ -646,8 +845,8 @@ export default function Library() {
               <button
                 type="button"
                 onClick={() => setSelectedDoc(null)}
-                aria-label="Đóng"
-                className="p-2 rounded-xl text-muted-foreground hover:bg-surface-alt hover:text-foreground transition-colors cursor-pointer"
+                aria-label={pick('Đóng', 'Close')}
+                className="p-2 rounded-xl text-muted-foreground hover:bg-surface-alt hover:text-foreground transition-colors cursor-pointer shrink-0"
               >
                 <span className="material-symbols-outlined text-xl" aria-hidden="true">
                   close
@@ -660,36 +859,49 @@ export default function Library() {
               {/* Description */}
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-secondary-text mb-2">
-                  Mô tả tài liệu
+                  {pick('Mô tả tài liệu', 'Resource Description')}
                 </h4>
                 <p className="text-sm text-foreground leading-relaxed whitespace-pre-line bg-paper p-4 rounded-xl border border-border">
-                  {selectedDoc.description || 'Tài liệu này chưa có mô tả chi tiết từ tác giả.'}
+                  {selectedDoc.description ||
+                    pick(
+                      'Tài liệu này chưa có mô tả chi tiết từ tác giả.',
+                      'No detailed description has been provided by the author yet.',
+                    )}
                 </p>
               </div>
 
               {/* Meta information */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-3 rounded-xl bg-paper border border-border">
-                  <div className="text-[10px] text-secondary-text">Tác giả</div>
+                  <div className="text-[10px] text-secondary-text">
+                    {pick('Tác giả', 'Author')}
+                  </div>
                   <div className="font-bold text-xs text-foreground mt-0.5 truncate">
-                    {selectedDoc.author_name || 'Khuyết danh'}
+                    {selectedDoc.author_name || pick('Khuyết danh', 'Anonymous')}
                   </div>
                 </div>
                 <div className="p-3 rounded-xl bg-paper border border-border">
-                  <div className="text-[10px] text-secondary-text">Ngày tải lên</div>
-                  <div className="font-bold text-xs text-foreground mt-0.5">
-                    {new Date(selectedDoc.created_at).toLocaleDateString('vi-VN')}
+                  <div className="text-[10px] text-secondary-text">
+                    {pick('Ngày tải lên', 'Uploaded')}
+                  </div>
+                  <div className="font-bold text-xs text-foreground mt-0.5 tabular">
+                    {formatDate(selectedDoc.created_at) || '—'}
                   </div>
                 </div>
                 <div className="p-3 rounded-xl bg-paper border border-border">
-                  <div className="text-[10px] text-secondary-text">Định dạng</div>
-                  <div className="font-bold text-xs text-foreground mt-0.5 uppercase">
-                    {selectedDoc.file_type || 'Link / Sheet'}
+                  <div className="text-[10px] text-secondary-text">
+                    {pick('Định dạng', 'Format')}
+                  </div>
+                  <div className="font-bold text-xs text-foreground mt-0.5 uppercase truncate">
+                    {selectedDoc.file_type ||
+                      getDocumentKindMeta(selectedDoc.title, selectedDoc.file_url, lang).label}
                   </div>
                 </div>
                 <div className="p-3 rounded-xl bg-paper border border-border">
-                  <div className="text-[10px] text-secondary-text">Đánh giá TB</div>
-                  <div className="font-bold text-xs text-accent mt-0.5 flex items-center gap-1">
+                  <div className="text-[10px] text-secondary-text">
+                    {pick('Đánh giá TB', 'Avg. Rating')}
+                  </div>
+                  <div className="font-bold text-xs text-accent mt-0.5 flex items-center gap-1 tabular">
                     <span className="material-symbols-outlined text-xs icon-fill" aria-hidden="true">
                       star
                     </span>
@@ -699,29 +911,29 @@ export default function Library() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-3 pt-2">
+              <div className="flex flex-wrap items-center gap-3 pt-2">
                 {sanitizeExternalUrl(selectedDoc.file_url) ? (
                   <a
                     href={sanitizeExternalUrl(selectedDoc.file_url)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-arena btn-arena-primary flex-1 text-center justify-center"
+                    className="btn-arena btn-arena-primary flex-1 min-w-[180px] text-center justify-center"
                   >
                     <span className="material-symbols-outlined text-lg" aria-hidden="true">
                       open_in_new
                     </span>
-                    <span>Mở / Tải tài liệu ngay</span>
+                    <span>{pick('Mở / Tải tài liệu ngay', 'Open / Download Resource')}</span>
                   </a>
                 ) : (
-                  <span className="btn-arena btn-arena-secondary flex-1 text-center justify-center opacity-60">
-                    Link tài liệu không khả dụng
+                  <span className="btn-arena btn-arena-secondary flex-1 min-w-[180px] text-center justify-center opacity-60">
+                    {pick('Link tài liệu không khả dụng', 'Resource link unavailable')}
                   </span>
                 )}
 
                 <button
                   type="button"
                   onClick={(e) => handleToggleBookmark(selectedDoc.id, e)}
-                  className={`btn-arena btn-arena-secondary no-shrink ${
+                  className={`btn-arena btn-arena-secondary shrink-0 ${
                     savedDocIds.has(selectedDoc.id) ? 'text-primary border-primary/40' : ''
                   }`}
                 >
@@ -733,15 +945,22 @@ export default function Library() {
                   >
                     bookmark
                   </span>
-                  <span>{savedDocIds.has(selectedDoc.id) ? 'Đã lưu' : 'Lưu lại'}</span>
+                  <span>
+                    {savedDocIds.has(selectedDoc.id)
+                      ? pick('Đã lưu', 'Saved')
+                      : pick('Lưu lại', 'Save')}
+                  </span>
                 </button>
 
                 <button
                   type="button"
-                  aria-label="Báo cáo tài liệu hoặc link hỏng"
+                  aria-label={pick(
+                    'Báo cáo tài liệu hoặc link hỏng',
+                    'Report resource or broken link',
+                  )}
                   onClick={(e) => handleOpenReport(selectedDoc, e)}
-                  className="btn-arena btn-arena-secondary no-shrink text-muted-foreground hover:text-primary"
-                  title="Báo cáo link hỏng"
+                  className="btn-arena btn-arena-secondary shrink-0 text-muted-foreground hover:text-primary"
+                  title={pick('Báo cáo link hỏng', 'Report broken link')}
                 >
                   <span className="material-symbols-outlined text-lg" aria-hidden="true">
                     flag
@@ -756,7 +975,10 @@ export default function Library() {
                     <span className="material-symbols-outlined text-accent text-lg" aria-hidden="true">
                       reviews
                     </span>
-                    Đánh giá từ người học ({reviews.length})
+                    <span>
+                      {pick('Đánh giá từ người học', 'Learner Reviews')} (
+                      {formatNumber(reviews.length)})
+                    </span>
                   </h4>
                 </div>
 
@@ -766,16 +988,22 @@ export default function Library() {
                     onSubmit={handleAddReview}
                     className="p-4 rounded-xl bg-paper border border-border space-y-3"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
                       <span className="text-xs font-bold text-foreground">
-                        Bạn đánh giá tài liệu này thế nào?
+                        {pick(
+                          'Bạn đánh giá tài liệu này thế nào?',
+                          'How would you rate this resource?',
+                        )}
                       </span>
                       <div className="flex items-center gap-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             key={star}
                             type="button"
-                            aria-label={`Đánh giá ${star} sao`}
+                            aria-label={pick(
+                              `Đánh giá ${star} sao`,
+                              `Rate ${star} out of 5 stars`,
+                            )}
                             onClick={() => setNewRating(star)}
                             className="text-accent cursor-pointer hover:scale-110 transition-transform"
                           >
@@ -796,7 +1024,10 @@ export default function Library() {
                       type="text"
                       value={newReviewText}
                       onChange={(e) => setNewReviewText(e.target.value)}
-                      placeholder="Chia sẻ nhận xét ngắn của bạn về tài liệu này..."
+                      placeholder={pick(
+                        'Chia sẻ nhận xét ngắn của bạn về tài liệu này...',
+                        'Share a brief review of this resource...',
+                      )}
                       className="w-full px-3 py-2 bg-surface border border-border-strong rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
                     />
 
@@ -806,16 +1037,21 @@ export default function Library() {
                         disabled={isSubmittingReview}
                         className="btn-arena btn-arena-primary btn-arena-sm"
                       >
-                        {isSubmittingReview ? 'Đang gửi...' : 'Gửi nhận xét'}
+                        {isSubmittingReview
+                          ? pick('Đang gửi...', 'Submitting...')
+                          : pick('Gửi nhận xét', 'Post Review')}
                       </button>
                     </div>
                   </form>
                 ) : (
                   <p className="text-xs text-secondary-text italic p-3 rounded-xl bg-paper border border-border text-center">
                     <Link to="/auth" className="text-primary font-bold hover:underline">
-                      Đăng nhập
+                      {pick('Đăng nhập', 'Sign in')}
                     </Link>{' '}
-                    để để lại đánh giá và nhận xét cho tài liệu này.
+                    {pick(
+                      'để để lại đánh giá và nhận xét cho tài liệu này.',
+                      'to rate and review this resource.',
+                    )}
                   </p>
                 )}
 
@@ -823,7 +1059,10 @@ export default function Library() {
                 <div className="space-y-2.5">
                   {loadingReviews ? (
                     <div className="py-4 text-center">
-                      <span className="material-symbols-outlined animate-spin text-primary" aria-hidden="true">
+                      <span
+                        className="material-symbols-outlined animate-spin text-primary"
+                        aria-hidden="true"
+                      >
                         sync
                       </span>
                     </div>
@@ -847,14 +1086,17 @@ export default function Library() {
                               </span>
                             ))}
                           </div>
-                          <span>{new Date(r.created_at).toLocaleDateString('vi-VN')}</span>
+                          <span className="tabular">{formatDate(r.created_at)}</span>
                         </div>
                         <p className="text-foreground leading-relaxed">{r.review_text}</p>
                       </div>
                     ))
                   ) : (
                     <p className="text-xs text-muted-foreground italic text-center py-2">
-                      Chưa có đánh giá nào cho tài liệu này.
+                      {pick(
+                        'Chưa có đánh giá nào cho tài liệu này.',
+                        'No reviews yet for this resource.',
+                      )}
                     </p>
                   )}
                 </div>
@@ -875,16 +1117,16 @@ export default function Library() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center no-shrink">
+              <div className="w-10 h-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-2xl" aria-hidden="true">
                   flag
                 </span>
               </div>
-              <div>
+              <div className="min-w-0">
                 <h3 className="font-display font-bold text-base text-foreground">
-                  Báo cáo sự cố tài liệu
+                  {pick('Báo cáo sự cố tài liệu', 'Report Resource Issue')}
                 </h3>
-                <p className="text-xs text-secondary-text mt-0.5 truncate max-w-[260px]">
+                <p className="text-xs text-secondary-text mt-0.5 truncate">
                   {reportingDoc.title}
                 </p>
               </div>
@@ -892,30 +1134,37 @@ export default function Library() {
 
             <form onSubmit={handleSubmitReport} className="space-y-3 pt-2">
               <div className="space-y-2">
-                <label className="block text-xs font-bold text-foreground">Lý do báo cáo:</label>
+                <label className="block text-xs font-bold text-foreground">
+                  {pick('Lý do báo cáo:', 'Reason for report:')}
+                </label>
                 {REPORT_REASONS.map((reason) => (
                   <label
-                    key={reason}
+                    key={reason.value}
                     className="flex items-center gap-2 p-2.5 rounded-xl border border-border hover:bg-paper cursor-pointer text-xs"
                   >
                     <input
                       type="radio"
                       name="reportReason"
-                      value={reason}
-                      checked={reportReason === reason}
+                      value={reason.value}
+                      checked={reportReason === reason.value}
                       onChange={(e) => setReportReason(e.target.value)}
                       className="text-primary focus:ring-primary"
                     />
-                    <span className="text-foreground">{reason}</span>
+                    <span className="text-foreground">
+                      {isEn ? reason.labelEn : reason.labelVi}
+                    </span>
                   </label>
                 ))}
               </div>
 
-              {reportReason === 'Lý do khác' && (
+              {reportReason === OTHER_REPORT_REASON_VALUE && (
                 <div>
                   <textarea
                     rows={3}
-                    placeholder="Mô tả chi tiết vấn đề bạn gặp phải..."
+                    placeholder={pick(
+                      'Mô tả chi tiết vấn đề bạn gặp phải...',
+                      'Describe the issue in detail...',
+                    )}
                     value={customReportReason}
                     onChange={(e) => setCustomReportReason(e.target.value)}
                     className="w-full p-2.5 bg-paper border border-border-strong rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
@@ -929,14 +1178,16 @@ export default function Library() {
                   onClick={() => setReportingDoc(null)}
                   className="btn-arena btn-arena-secondary btn-arena-sm"
                 >
-                  Hủy
+                  {pick('Hủy', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingReport}
                   className="btn-arena btn-arena-primary btn-arena-sm"
                 >
-                  {isSubmittingReport ? 'Đang gửi...' : 'Gửi báo cáo'}
+                  {isSubmittingReport
+                    ? pick('Đang gửi...', 'Submitting...')
+                    : pick('Gửi báo cáo', 'Submit Report')}
                 </button>
               </div>
             </form>

@@ -1,30 +1,76 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
 import ProgressBar from '../components/ui/ProgressBar';
 import RankSeal from '../components/ui/RankSeal';
 import { ListItemSkeleton } from '../components/ui/Skeleton';
 import { useToast } from '../components/ui/ToastProvider';
 import { toGpa4, gpaSemester, gpaCumulative, getGpaScale } from '../lib/admission/gpa';
-import { SUBJECTS, SUBJECT_LABEL, canonicalSubjectKey, canonicalSubjects } from '../lib/admission/subjects';
+import {
+  SUBJECTS,
+  getSubjectLabel,
+  canonicalSubjectKey,
+  canonicalSubjects,
+} from '../lib/admission/subjects';
 import { COMBOS, allComboScores } from '../lib/admission/combos';
 import { migrateLegacyScores, saveScoreEntry } from '../lib/admission/scores';
+import { fmt } from '../lib/admission/format';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+const STARTER_UNI_LABELS = {
+  u1: { vi: 'Toán cao cấp', en: 'Advanced Calculus' },
+  u2: { vi: 'Triết học Mác – Lênin', en: 'Marxist–Leninist Philosophy' },
+  u3: { vi: 'Tiếng Anh học thuật', en: 'Academic English' },
+};
+
+const UNI_DATALIST_SUGGESTIONS = {
+  vi: [
+    'Triết học Mác – Lênin',
+    'Kinh tế chính trị Mác – Lênin',
+    'Chủ nghĩa xã hội khoa học',
+    'Tư tưởng Hồ Chí Minh',
+    'Lịch sử Đảng Cộng sản Việt Nam',
+    'Toán cao cấp',
+    'Đại số tuyến tính',
+    'Giải tích 1',
+    'Giải tích 2',
+    'Xác suất thống kê',
+    'Vật lí đại cương',
+    'Pháp luật đại cương',
+    'Tiếng Anh học thuật',
+    'Tin học đại cương',
+  ],
+  en: [
+    'Advanced Calculus',
+    'Linear Algebra',
+    'Calculus I',
+    'Calculus II',
+    'Probability & Statistics',
+    'General Physics',
+    'Introduction to Law',
+    'Academic English',
+    'Introduction to Informatics',
+    'Microeconomics',
+    'Macroeconomics',
+    'Data Structures & Algorithms',
+  ],
+};
+
 const DEFAULT_UNI_COURSES = [
-  { id: 'tmp-u1', name: 'Toán cao cấp', code: '', credits: 3, grade: '', persisted: false },
-  { id: 'tmp-u2', name: 'Triết học Mác – Lênin', code: '', credits: 3, grade: '', persisted: false },
-  { id: 'tmp-u3', name: 'Tiếng Anh học thuật', code: '', credits: 2, grade: '', persisted: false },
+  { id: 'tmp-u1', name: 'Toán cao cấp', starterKey: 'u1', code: '', credits: 3, grade: '', persisted: false },
+  { id: 'tmp-u2', name: 'Triết học Mác – Lênin', starterKey: 'u2', code: '', credits: 3, grade: '', persisted: false },
+  { id: 'tmp-u3', name: 'Tiếng Anh học thuật', starterKey: 'u3', code: '', credits: 2, grade: '', persisted: false },
 ];
 
 const DEFAULT_THPT_SUBJECTS = [
-  { id: 'tmp-s1', name: 'Toán', credits: 1, score: '8.5' },
-  { id: 'tmp-s2', name: 'Ngữ văn', credits: 1, score: '7.8' },
-  { id: 'tmp-s3', name: 'Tiếng Anh', credits: 1, score: '8.4' },
-  { id: 'tmp-s4', name: 'Vật lí', credits: 1, score: '8.2' },
-  { id: 'tmp-s5', name: 'Hoá học', credits: 1, score: '8.0' },
+  { id: 'tmp-s1', name: 'Toán', starterKey: 'toan', credits: 1, score: '8.5' },
+  { id: 'tmp-s2', name: 'Ngữ văn', starterKey: 'van', credits: 1, score: '7.8' },
+  { id: 'tmp-s3', name: 'Tiếng Anh', starterKey: 'anh', credits: 1, score: '8.4' },
+  { id: 'tmp-s4', name: 'Vật lí', starterKey: 'ly', credits: 1, score: '8.2' },
+  { id: 'tmp-s5', name: 'Hoá học', starterKey: 'hoa', credits: 1, score: '8.0' },
 ];
 
 const THPT_SUBJECT_ICONS = {
@@ -47,8 +93,22 @@ const THPT_SUBJECT_ICONS = {
   nga: 'translate',
 };
 
-function getThptSubjectIcon(name) {
-  const key = canonicalSubjectKey(name);
+function resolveUniCourseName(course, lang) {
+  if (course?.starterKey && STARTER_UNI_LABELS[course.starterKey]) {
+    return STARTER_UNI_LABELS[course.starterKey][lang === 'en' ? 'en' : 'vi'];
+  }
+  return course?.name ?? '';
+}
+
+function resolveThptSubjectName(subj, lang) {
+  if (subj?.starterKey) {
+    return getSubjectLabel(subj.starterKey, lang);
+  }
+  return subj?.name ?? '';
+}
+
+function getThptSubjectIcon(name, starterKey) {
+  const key = starterKey || canonicalSubjectKey(name);
   return (key && THPT_SUBJECT_ICONS[key]) || 'book';
 }
 
@@ -77,81 +137,78 @@ function toLetterGrade(score10) {
   return 'F';
 }
 
-function formatNum(value, digits = 2) {
-  if (value == null || !Number.isFinite(Number(value))) return '—';
-  return Number(value).toFixed(digits);
-}
-
-function getUniAcademicRank(gpa4) {
+function getUniAcademicRank(gpa4, lang = 'vi') {
+  const isEn = lang === 'en';
   if (gpa4 == null || !Number.isFinite(gpa4)) {
     return {
-      label: 'Chưa xếp loại',
+      label: isEn ? 'Unranked' : 'Chưa xếp loại',
       color: 'text-secondary-text bg-surface-alt border-border',
     };
   }
   if (gpa4 >= 3.6) {
     return {
-      label: 'Xuất sắc',
+      label: isEn ? 'Distinction' : 'Xuất sắc',
       color: 'text-completed bg-completed-soft border-completed-border',
     };
   }
   if (gpa4 >= 3.2) {
     return {
-      label: 'Giỏi',
+      label: isEn ? 'Very Good' : 'Giỏi',
       color: 'text-jade bg-jade-soft border-jade-border',
     };
   }
   if (gpa4 >= 2.5) {
     return {
-      label: 'Khá',
+      label: isEn ? 'Good' : 'Khá',
       color: 'text-gold-dark bg-gold-soft border-gold',
     };
   }
   if (gpa4 >= 2.0) {
     return {
-      label: 'Trung bình',
+      label: isEn ? 'Average' : 'Trung bình',
       color: 'text-accent bg-gold-soft/60 border-border-strong',
     };
   }
   return {
-    label: 'Cảnh báo học vụ',
+    label: isEn ? 'Below Average' : 'Yếu',
     color: 'text-primary bg-primary-soft border-primary/35',
   };
 }
 
-function getThptAcademicRank(gpa10) {
+function getThptAcademicRank(gpa10, lang = 'vi') {
+  const isEn = lang === 'en';
   if (gpa10 == null || !Number.isFinite(gpa10)) {
     return {
-      label: 'Chưa xếp loại',
+      label: isEn ? 'Unranked' : 'Chưa xếp loại',
       color: 'text-secondary-text bg-surface-alt border-border',
     };
   }
   if (gpa10 >= 9.0) {
     return {
-      label: 'Xuất sắc',
+      label: isEn ? 'Distinction' : 'Xuất sắc',
       color: 'text-completed bg-completed-soft border-completed-border',
     };
   }
   if (gpa10 >= 8.0) {
     return {
-      label: 'Giỏi',
+      label: isEn ? 'Very Good' : 'Giỏi',
       color: 'text-jade bg-jade-soft border-jade-border',
     };
   }
   if (gpa10 >= 6.5) {
     return {
-      label: 'Khá',
+      label: isEn ? 'Good' : 'Khá',
       color: 'text-gold-dark bg-gold-soft border-gold',
     };
   }
   if (gpa10 >= 5.0) {
     return {
-      label: 'Đạt',
+      label: isEn ? 'Average' : 'Trung bình',
       color: 'text-accent bg-gold-soft/60 border-border-strong',
     };
   }
   return {
-    label: 'Chưa đạt',
+    label: isEn ? 'Below Average' : 'Yếu',
     color: 'text-primary bg-primary-soft border-primary/35',
   };
 }
@@ -159,6 +216,7 @@ function getThptAcademicRank(gpa10) {
 export default function GPACalculator() {
   const navigate = useNavigate();
   const { user, profile, refreshProfile } = useAuth();
+  const { lang, isEn, locale, pick, t } = useLanguage();
   const { showToast } = useToast();
 
   const tempIdRef = useRef(100);
@@ -181,6 +239,7 @@ export default function GPACalculator() {
     const raw = Number(profile?.target_gpa);
     return Number.isFinite(raw) && raw > 0 && raw <= 4 ? String(raw) : '3.20';
   });
+  const [plannedCredits, setPlannedCredits] = useState('15');
 
   // Semester management UI state
   const [showNewSemForm, setShowNewSemForm] = useState(false);
@@ -307,13 +366,19 @@ export default function GPACalculator() {
           setUniSubjects(DEFAULT_UNI_COURSES);
         }
       } catch (err) {
-        console.error('Lỗi tải dữ liệu học kỳ:', err);
-        showToast('Không thể tải dữ liệu học kỳ từ máy chủ.', 'error');
+        console.error('Failed to load semester data:', err);
+        showToast(
+          pick(
+            'Không thể tải dữ liệu học kỳ từ máy chủ.',
+            'Could not load semester data from the server.',
+          ),
+          'error',
+        );
       } finally {
         setIsLoading(false);
       }
     },
-    [loadSemesterSubjects, showToast, user],
+    [loadSemesterSubjects, pick, showToast, user],
   );
 
   const loadStudentData = useCallback(async () => {
@@ -344,7 +409,8 @@ export default function GPACalculator() {
           setThptSubjects(
             Object.entries(hocbaSubs).map(([key, val], index) => ({
               id: `hb-${index}-${key}`,
-              name: SUBJECT_LABEL[key] || key,
+              name: getSubjectLabel(key, 'vi'),
+              starterKey: canonicalSubjectKey(key) || undefined,
               credits: 1,
               score: String(val),
             })),
@@ -352,12 +418,15 @@ export default function GPACalculator() {
         }
       }
     } catch (err) {
-      console.error('Lỗi tải bảng điểm THPT:', err);
-      showToast('Không thể tải bảng điểm học bạ.', 'error');
+      console.error('Failed to load high school transcript:', err);
+      showToast(
+        pick('Không thể tải bảng điểm học bạ.', 'Could not load high school transcript.'),
+        'error',
+      );
     } finally {
       setIsLoading(false);
     }
-  }, [profile?.admission_scores, showToast, user]);
+  }, [pick, profile?.admission_scores, showToast, user]);
 
   useEffect(() => {
     if (!user) return;
@@ -385,8 +454,11 @@ export default function GPACalculator() {
     try {
       await loadSemesterSubjects(semId);
     } catch (err) {
-      console.error('Lỗi tải môn học của kỳ:', err);
-      showToast('Không thể tải danh sách môn học.', 'error');
+      console.error('Failed to load semester courses:', err);
+      showToast(
+        pick('Không thể tải danh sách môn học.', 'Could not load courses for this semester.'),
+        'error',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -394,12 +466,24 @@ export default function GPACalculator() {
 
   const handleCreateSemester = async () => {
     if (!user) {
-      showToast('Vui lòng đăng nhập để tạo học kỳ mới.', 'warning');
+      showToast(
+        pick(
+          'Vui lòng đăng nhập để tạo học kỳ mới.',
+          'Please sign in to create a new semester.',
+        ),
+        'warning',
+      );
       return;
     }
     const cleanName = newSemName.trim();
     if (!cleanName) {
-      showToast('Vui lòng nhập tên học kỳ (ví dụ: Học kỳ 1 - Năm 1).', 'warning');
+      showToast(
+        pick(
+          'Vui lòng nhập tên học kỳ (ví dụ: Học kỳ 1 - Năm 1).',
+          'Please enter a semester name (e.g. Semester 1 - Year 1).',
+        ),
+        'warning',
+      );
       return;
     }
     setIsCreatingSem(true);
@@ -423,10 +507,16 @@ export default function GPACalculator() {
       setNewSemName('');
       setShowNewSemForm(false);
       await loadUniversityData(data.id);
-      showToast(`Đã tạo "${cleanName}"!`, 'success');
+      showToast(
+        pick(`Đã tạo "${cleanName}"!`, `Created "${cleanName}"!`),
+        'success',
+      );
     } catch (err) {
-      console.error('Lỗi tạo học kỳ:', err);
-      showToast('Không thể tạo học kỳ: ' + err.message, 'error');
+      console.error('Failed to create semester:', err);
+      showToast(
+        pick('Không thể tạo học kỳ: ', 'Could not create semester: ') + err.message,
+        'error',
+      );
     } finally {
       setIsCreatingSem(false);
     }
@@ -436,7 +526,10 @@ export default function GPACalculator() {
     if (!user || !selectedSemId) return;
     const cleanName = renameSemValue.trim();
     if (!cleanName) {
-      showToast('Tên học kỳ không được để trống.', 'warning');
+      showToast(
+        pick('Tên học kỳ không được để trống.', 'Semester name cannot be empty.'),
+        'warning',
+      );
       return;
     }
     try {
@@ -451,10 +544,13 @@ export default function GPACalculator() {
       setSemesters((prev) =>
         prev.map((sem) => (sem.id === selectedSemId ? { ...sem, name: cleanName } : sem)),
       );
-      showToast('Đã đổi tên học kỳ.', 'success');
+      showToast(pick('Đã đổi tên học kỳ.', 'Semester renamed.'), 'success');
     } catch (err) {
-      console.error('Lỗi đổi tên học kỳ:', err);
-      showToast('Không thể đổi tên học kỳ: ' + err.message, 'error');
+      console.error('Failed to rename semester:', err);
+      showToast(
+        pick('Không thể đổi tên học kỳ: ', 'Could not rename semester: ') + err.message,
+        'error',
+      );
     }
   };
 
@@ -489,10 +585,19 @@ export default function GPACalculator() {
       setConfirmDeleteSem(false);
       await loadUniversityData();
       await refreshProfile?.();
-      showToast('Đã xoá học kỳ và cập nhật lại GPA tích luỹ.', 'info');
+      showToast(
+        pick(
+          'Đã xoá học kỳ và cập nhật lại GPA tích luỹ.',
+          'Semester deleted and cumulative GPA updated.',
+        ),
+        'info',
+      );
     } catch (err) {
-      console.error('Lỗi xoá học kỳ:', err);
-      showToast('Không thể xoá học kỳ: ' + err.message, 'error');
+      console.error('Failed to delete semester:', err);
+      showToast(
+        pick('Không thể xoá học kỳ: ', 'Could not delete semester: ') + err.message,
+        'error',
+      );
     } finally {
       setIsSaving(false);
     }
@@ -537,12 +642,27 @@ export default function GPACalculator() {
     );
   }, [allUniSubjects, selectedSemId, uniSubjects]);
 
-  const uniRank = getUniAcademicRank(semResult.gpa4);
+  const uniRank = getUniAcademicRank(semResult.gpa4, lang);
   const parsedTargetGpa4 = Number(targetGpa4) || 3.2;
   const activeGpaForTarget = liveCumulative.gpa4 ?? semResult.gpa4 ?? 0;
+  const activeCreditsForTarget = liveCumulative.credits || semResult.credits || 0;
   const isUniTargetReached =
-    (liveCumulative.credits > 0 || semResult.credits > 0) && activeGpaForTarget >= parsedTargetGpa4;
-  const uniTargetDiff = Math.max(0, parsedTargetGpa4 - activeGpaForTarget).toFixed(2);
+    activeCreditsForTarget > 0 && activeGpaForTarget >= parsedTargetGpa4;
+  const uniTargetDiff = Math.max(0, parsedTargetGpa4 - activeGpaForTarget);
+
+  // Target GPA Simulator for planned remaining credits
+  const parsedPlannedCredits = Math.max(1, Math.round(Number(plannedCredits) || 15));
+  const requiredFutureGpa4 = useMemo(() => {
+    const totalNeededPoints = parsedTargetGpa4 * (activeCreditsForTarget + parsedPlannedCredits);
+    const currentPoints = activeGpaForTarget * activeCreditsForTarget;
+    const req = (totalNeededPoints - currentPoints) / parsedPlannedCredits;
+    return Math.round(req * 100) / 100;
+  }, [activeCreditsForTarget, activeGpaForTarget, parsedPlannedCredits, parsedTargetGpa4]);
+
+  const maxReachableGpa4 = useMemo(() => {
+    const maxPts = activeGpaForTarget * activeCreditsForTarget + 4.0 * parsedPlannedCredits;
+    return Math.round((maxPts / (activeCreditsForTarget + parsedPlannedCredits)) * 100) / 100;
+  }, [activeCreditsForTarget, activeGpaForTarget, parsedPlannedCredits]);
 
   // THPT calculations
   const thptResult = useMemo(() => {
@@ -565,10 +685,11 @@ export default function GPACalculator() {
   const thptCanonicalMap = useMemo(() => {
     const raw = {};
     for (const row of thptSubjects) {
-      if (!row.name?.trim() || row.score === '' || row.score == null) continue;
+      const effectiveKey = row.starterKey || row.name?.trim();
+      if (!effectiveKey || row.score === '' || row.score == null) continue;
       const sc = Number(row.score);
       if (Number.isFinite(sc) && sc >= 0 && sc <= 10) {
-        raw[row.name.trim()] = sc;
+        raw[effectiveKey] = sc;
       }
     }
     return canonicalSubjects(raw);
@@ -582,7 +703,7 @@ export default function GPACalculator() {
         code,
         score: Math.round(score * 100) / 100,
         subjectLabels: (COMBOS[code]?.subjects || [])
-          .map((k) => SUBJECT_LABEL[k] || k)
+          .map((k) => getSubjectLabel(k, lang))
           .join(' · '),
         priorityIdx: priority.indexOf(code),
       }))
@@ -592,18 +713,25 @@ export default function GPACalculator() {
         const pb = b.priorityIdx === -1 ? 99 : b.priorityIdx;
         return pa - pb;
       });
-  }, [thptCanonicalMap]);
+  }, [lang, thptCanonicalMap]);
 
-  const thptRank = getThptAcademicRank(thptResult.gpa10);
+  const thptRank = getThptAcademicRank(thptResult.gpa10, lang);
   const bestCombo = thptCombos[0] || null;
   const parsedTargetThpt = Number(targetThpt) || 25.5;
   const isThptTargetReached = bestCombo != null && bestCombo.score >= parsedTargetThpt;
-  const thptTargetDiff =
-    bestCombo != null ? Math.max(0, parsedTargetThpt - bestCombo.score).toFixed(2) : null;
+  const thptTargetDiff = bestCombo != null ? Math.max(0, parsedTargetThpt - bestCombo.score) : null;
 
   // Row mutators
   const updateUniCourse = (id, field, value) => {
-    setUniSubjects((prev) => prev.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
+    setUniSubjects((prev) =>
+      prev.map((c) => {
+        if (c.id !== id) return c;
+        if (field === 'name') {
+          return { ...c, name: value, starterKey: null };
+        }
+        return { ...c, [field]: value };
+      }),
+    );
   };
 
   const addUniCourse = () => {
@@ -622,7 +750,15 @@ export default function GPACalculator() {
   };
 
   const updateThptSubject = (id, field, value) => {
-    setThptSubjects((prev) => prev.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
+    setThptSubjects((prev) =>
+      prev.map((c) => {
+        if (c.id !== id) return c;
+        if (field === 'name') {
+          return { ...c, name: value, starterKey: null };
+        }
+        return { ...c, [field]: value };
+      }),
+    );
   };
 
   const addThptSubject = () => {
@@ -647,7 +783,13 @@ export default function GPACalculator() {
       setThptSubjects((prev) => prev.map((c) => ({ ...c, score: '' })));
     }
     setConfirmReset(false);
-    showToast('Đã đặt lại các ô điểm trên màn hình. Nhấn "Lưu bảng điểm" nếu muốn ghi nhận.', 'info');
+    showToast(
+      pick(
+        'Đã đặt lại các ô điểm trên màn hình. Nhấn "Lưu bảng điểm" nếu muốn ghi nhận.',
+        'Cleared score inputs on screen. Click "Save Grades" to persist changes.',
+      ),
+      'info',
+    );
   };
 
   const handleModeSwitch = async (nextMode) => {
@@ -665,7 +807,13 @@ export default function GPACalculator() {
 
   const handleSaveUniversity = async () => {
     if (!user) {
-      showToast('Vui lòng đăng nhập để lưu bảng điểm Đại học.', 'warning');
+      showToast(
+        pick(
+          'Vui lòng đăng nhập để lưu bảng điểm Đại học.',
+          'Please sign in to save your University transcript.',
+        ),
+        'warning',
+      );
       return;
     }
 
@@ -673,9 +821,13 @@ export default function GPACalculator() {
     for (const row of uniSubjects) {
       if (row.grade !== '' && row.grade != null) {
         const g = Number(row.grade);
+        const shownName = resolveUniCourseName(row, lang) || pick('Chưa đặt tên', 'Untitled course');
         if (!Number.isFinite(g) || g < 0 || g > 10) {
           showToast(
-            `Điểm môn "${row.name || 'Chưa đặt tên'}" phải nằm trong khoảng 0.0 – 10.0.`,
+            pick(
+              `Điểm môn "${shownName}" phải nằm trong khoảng 0.0 – 10.0.`,
+              `Grade for "${shownName}" must be between 0.0 and 10.0.`,
+            ),
             'error',
           );
           return;
@@ -688,7 +840,10 @@ export default function GPACalculator() {
     try {
       let activeSemId = selectedSemId;
       if (!activeSemId) {
-        const defaultName = semesters.length === 0 ? 'Học kỳ 1' : `Học kỳ ${semesters.length + 1}`;
+        const defaultName =
+          semesters.length === 0
+            ? pick('Học kỳ 1', 'Semester 1')
+            : pick(`Học kỳ ${semesters.length + 1}`, `Semester ${semesters.length + 1}`);
         const { data: createdSem, error: semCreateErr } = await supabase
           .from('semesters')
           .insert([
@@ -724,9 +879,10 @@ export default function GPACalculator() {
       if (semUpdateErr) throw semUpdateErr;
 
       // Prepare valid rows to persist
-      const nonEmptyRows = uniSubjects.filter(
-        (s) => s.name.trim() !== '' || (s.grade !== '' && s.grade != null),
-      );
+      const nonEmptyRows = uniSubjects.filter((s) => {
+        const effectiveName = resolveUniCourseName(s, lang).trim();
+        return effectiveName !== '' || (s.grade !== '' && s.grade != null);
+      });
 
       // Delete removed persisted rows while preserving existing subject UUIDs
       const existingIdsForSem = allUniSubjects
@@ -754,10 +910,13 @@ export default function GPACalculator() {
       nonEmptyRows.forEach((s, idx) => {
         const hasGrade = s.grade !== '' && s.grade != null && Number.isFinite(Number(s.grade));
         const grade10 = hasGrade ? Math.round(Number(s.grade) * 10) / 10 : null;
+        const effectiveName =
+          resolveUniCourseName(s, lang).trim() ||
+          pick(`Học phần ${idx + 1}`, `Course ${idx + 1}`);
         const baseRecord = {
           user_id: user.id,
           semester_id: activeSemId,
-          name: s.name.trim() || `Học phần ${idx + 1}`,
+          name: effectiveName,
           code: s.code?.trim() || null,
           credits: Math.max(1, Math.round(Number(s.credits) || 1)),
           grade_number: grade10,
@@ -803,10 +962,19 @@ export default function GPACalculator() {
 
       await loadUniversityData(activeSemId);
       await refreshProfile?.();
-      showToast('Đã lưu bảng điểm học kỳ và đồng bộ GPA tích luỹ!', 'success');
+      showToast(
+        pick(
+          'Đã lưu bảng điểm học kỳ và đồng bộ GPA tích luỹ!',
+          'Saved semester courses and synced cumulative GPA!',
+        ),
+        'success',
+      );
     } catch (err) {
-      console.error('Lỗi lưu GPA đại học:', err);
-      showToast('Không thể lưu bảng điểm: ' + err.message, 'error');
+      console.error('Failed to save university GPA:', err);
+      showToast(
+        pick('Không thể lưu bảng điểm: ', 'Could not save transcript: ') + err.message,
+        'error',
+      );
     } finally {
       setIsSaving(false);
     }
@@ -814,16 +982,26 @@ export default function GPACalculator() {
 
   const handleSaveStudent = async () => {
     if (!user) {
-      showToast('Vui lòng đăng nhập để lưu bảng điểm THPT & mục tiêu.', 'warning');
+      showToast(
+        pick(
+          'Vui lòng đăng nhập để lưu bảng điểm THPT & mục tiêu.',
+          'Please sign in to save your High School transcript & targets.',
+        ),
+        'warning',
+      );
       return;
     }
 
     for (const row of thptSubjects) {
       if (row.score !== '' && row.score != null) {
         const sc = Number(row.score);
+        const shownName = resolveThptSubjectName(row, lang) || pick('Chưa đặt tên', 'Untitled subject');
         if (!Number.isFinite(sc) || sc < 0 || sc > 10) {
           showToast(
-            `Điểm môn "${row.name || 'Chưa đặt tên'}" phải nằm trong khoảng 0.0 – 10.0.`,
+            pick(
+              `Điểm môn "${shownName}" phải nằm trong khoảng 0.0 – 10.0.`,
+              `Score for "${shownName}" must be between 0.0 and 10.0.`,
+            ),
             'error',
           );
           return;
@@ -834,10 +1012,13 @@ export default function GPACalculator() {
     setIsSaving(true);
     try {
       const validRows = thptSubjects
-        .filter((r) => r.name.trim() !== '' && r.score !== '' && r.score != null)
+        .filter((r) => {
+          const effectiveName = resolveThptSubjectName(r, lang).trim();
+          return effectiveName !== '' && r.score !== '' && r.score != null;
+        })
         .map((r) => ({
           user_id: user.id,
-          subject: r.name.trim(),
+          subject: r.starterKey ? getSubjectLabel(r.starterKey, 'vi') : r.name.trim(),
           credits: Math.max(1, Math.round(Number(r.credits) || 1)),
           score: Math.round(Number(r.score) * 100) / 100,
         }));
@@ -889,10 +1070,19 @@ export default function GPACalculator() {
 
       await loadStudentData();
       await refreshProfile?.();
-      showToast('Đã lưu bảng điểm học bạ và đồng bộ hồ sơ xét tuyển!', 'success');
+      showToast(
+        pick(
+          'Đã lưu bảng điểm học bạ và đồng bộ hồ sơ xét tuyển!',
+          'Saved high school transcript and synced admission profile!',
+        ),
+        'success',
+      );
     } catch (err) {
-      console.error('Lỗi lưu điểm THPT:', err);
-      showToast('Không thể lưu bảng điểm THPT: ' + err.message, 'error');
+      console.error('Failed to save high school transcript:', err);
+      showToast(
+        pick('Không thể lưu bảng điểm THPT: ', 'Could not save transcript: ') + err.message,
+        'error',
+      );
     } finally {
       setIsSaving(false);
     }
@@ -907,6 +1097,7 @@ export default function GPACalculator() {
   };
 
   const selectedSemesterObj = semesters.find((s) => s.id === selectedSemId) || null;
+  const gpaScaleMeta = getGpaScale(scaleId, lang);
 
   return (
     <div className="bg-background font-sans text-foreground min-h-full flex flex-col justify-between pb-24">
@@ -917,8 +1108,8 @@ export default function GPACalculator() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              aria-label="Quay lại"
-              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-alt transition-colors cursor-pointer shrink-0"
+              aria-label={pick('Quay lại', 'Go back')}
+              className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-surface-alt hover:bg-surface transition-colors cursor-pointer shrink-0"
             >
               <span className="material-symbols-outlined text-foreground" aria-hidden="true">
                 arrow_back
@@ -926,12 +1117,18 @@ export default function GPACalculator() {
             </button>
             <div className="min-w-0">
               <h1 className="font-display text-lg font-extrabold tracking-tight text-foreground truncate">
-                Bàn Tính Điểm Số
+                {pick('Bàn Tính Điểm Số', 'Academic GPA Calculator')}
               </h1>
               <p className="text-[11px] text-secondary-text truncate">
                 {mode === 'university'
-                  ? 'GPA Đại học (Hệ 4.0 & Hệ 10) · Quản lý học kỳ'
-                  : 'Học bạ THPT · Tổ hợp xét tuyển · Mục tiêu ĐH'}
+                  ? pick(
+                      'GPA Đại học (Hệ 4.0 & Hệ 10) · Quản lý học kỳ',
+                      'University GPA (4.0 & 10-pt Scales) · Semester Manager',
+                    )
+                  : pick(
+                      'Học bạ THPT · Tổ hợp xét tuyển · Mục tiêu ĐH',
+                      'High School Transcript · 3-Subject Combos · Admission Goals',
+                    )}
               </p>
             </div>
           </div>
@@ -940,9 +1137,9 @@ export default function GPACalculator() {
             <button
               type="button"
               onClick={() => setConfirmReset((v) => !v)}
-              aria-label="Đặt lại điểm trên màn hình"
-              title="Đặt lại điểm trên màn hình"
-              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-alt transition-colors text-secondary-text hover:text-foreground cursor-pointer"
+              aria-label={pick('Đặt lại điểm trên màn hình', 'Reset scores on screen')}
+              title={pick('Đặt lại điểm trên màn hình', 'Reset scores on screen')}
+              className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-surface-alt hover:bg-surface transition-colors text-secondary-text hover:text-foreground cursor-pointer"
             >
               <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
                 restart_alt
@@ -957,22 +1154,30 @@ export default function GPACalculator() {
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 {isSaving ? 'hourglass_empty' : 'save'}
               </span>
-              <span>{isSaving ? 'Đang lưu...' : 'Lưu bảng điểm'}</span>
+              <span>
+                {isSaving
+                  ? pick('Đang lưu...', 'Saving...')
+                  : pick('Lưu bảng điểm', 'Save Grades')}
+              </span>
             </button>
           </div>
         </header>
 
         {/* Cross-page Navigation Tabs */}
-        <div className="px-4 pt-4">
+        <nav
+          aria-label={pick('Điều hướng công cụ học thuật', 'Academic tools navigation')}
+          className="px-4 pt-4"
+        >
           <div className="flex border-b border-border gap-6 overflow-x-auto no-scrollbar">
             <button
               type="button"
+              aria-current="page"
               className="pb-3 border-b-2 border-primary text-primary font-display font-bold text-sm whitespace-nowrap flex items-center gap-2 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 school
               </span>
-              Bàn Tính GPA
+              {t('academics.nav.gpa')}
             </button>
             <button
               type="button"
@@ -982,7 +1187,7 @@ export default function GPACalculator() {
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 calculate
               </span>
-              Điểm Xét Tuyển ĐH
+              {t('academics.nav.admission')}
             </button>
             <button
               type="button"
@@ -992,21 +1197,24 @@ export default function GPACalculator() {
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 account_balance
               </span>
-              Chọn Trường ĐH
+              {t('academics.nav.schools')}
             </button>
           </div>
-        </div>
+        </nav>
 
         <main className="flex-1 px-4 py-5 space-y-5">
           {/* Guest Notice Banner */}
           {!user && (
-            <div className="paper-card p-3.5 flex flex-wrap items-center justify-between gap-3 border-gold/60 bg-gold-soft/40">
+            <div className="paper-card border border-gold/60 bg-gold-soft/40 p-3.5 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2.5 text-xs text-foreground">
                 <span className="material-symbols-outlined text-accent text-lg" aria-hidden="true">
                   info
                 </span>
                 <span>
-                  Bạn đang dùng bàn tính ở chế độ khách. Đăng nhập để lưu các học kỳ và đồng bộ mục tiêu vào hồ sơ.
+                  {pick(
+                    'Bạn đang dùng bàn tính ở chế độ khách. Đăng nhập để lưu các học kỳ và đồng bộ mục tiêu vào hồ sơ.',
+                    'You are using the calculator in guest mode. Sign in to save semesters and sync academic goals to your profile.',
+                  )}
                 </span>
               </div>
               <button
@@ -1014,41 +1222,44 @@ export default function GPACalculator() {
                 onClick={() => navigate('/auth')}
                 className="text-xs font-bold text-primary hover:underline cursor-pointer"
               >
-                Đăng nhập ngay
+                {pick('Đăng nhập ngay', 'Sign in now')}
               </button>
             </div>
           )}
 
           {/* Inline Reset Confirmation Banner */}
           {confirmReset && (
-            <div className="paper-card p-3.5 border-primary/40 bg-primary-soft/50 flex flex-wrap items-center justify-between gap-3">
+            <div className="paper-card border border-primary/40 bg-primary-soft/50 p-3.5 flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs font-semibold text-foreground">
-                Xoá trắng các ô điểm đang nhập trên màn hình hiện tại? (Chưa ảnh hưởng dữ liệu đã lưu)
+                {pick(
+                  'Xoá trắng các ô điểm đang nhập trên màn hình hiện tại? (Chưa ảnh hưởng dữ liệu đã lưu)',
+                  'Clear all score inputs currently on screen? (Saved database records remain untouched)',
+                )}
               </p>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleConfirmResetScores}
-                  className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold cursor-pointer"
+                  className="px-3.5 h-9 rounded-xl bg-primary text-on-primary border border-primary-hover text-xs font-bold cursor-pointer"
                 >
-                  Đặt lại điểm
+                  {pick('Đặt lại điểm', 'Clear Scores')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmReset(false)}
-                  className="px-3 py-1.5 rounded-lg bg-paper border border-border text-xs font-semibold text-secondary-text hover:text-foreground cursor-pointer"
+                  className="px-3.5 h-9 rounded-xl bg-surface border border-border text-xs font-semibold text-secondary-text hover:text-foreground cursor-pointer"
                 >
-                  Huỷ
+                  {pick('Huỷ', 'Cancel')}
                 </button>
               </div>
             </div>
           )}
 
-          {/* Dual-Mode Switcher: Sinh viên Đại học vs Học sinh THPT */}
+          {/* Dual-Mode Switcher: Sinh viên ĐH vs Học sinh THPT */}
           <div
             role="tablist"
-            aria-label="Chế độ tính điểm"
-            className="grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-surface-alt border border-border"
+            aria-label={pick('Chế độ tính điểm', 'Calculator mode')}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-surface-alt border border-border"
           >
             <button
               type="button"
@@ -1057,14 +1268,14 @@ export default function GPACalculator() {
               onClick={() => handleModeSwitch('university')}
               className={`py-2.5 px-3 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
                 mode === 'university'
-                  ? 'bg-paper text-primary shadow-sm border border-border-strong'
-                  : 'text-secondary-text hover:text-foreground'
+                  ? 'bg-primary text-on-primary border border-primary-hover shadow-xs'
+                  : 'border border-transparent text-secondary-text hover:text-foreground hover:bg-surface'
               }`}
             >
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 workspace_premium
               </span>
-              <span>Sinh viên Đại học (Hệ 4.0 &amp; 10)</span>
+              <span>{t('academics.modes.university')}</span>
             </button>
             <button
               type="button"
@@ -1073,21 +1284,21 @@ export default function GPACalculator() {
               onClick={() => handleModeSwitch('student')}
               className={`py-2.5 px-3 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
                 mode === 'student'
-                  ? 'bg-paper text-primary shadow-sm border border-border-strong'
-                  : 'text-secondary-text hover:text-foreground'
+                  ? 'bg-primary text-on-primary border border-primary-hover shadow-xs'
+                  : 'border border-transparent text-secondary-text hover:text-foreground hover:bg-surface'
               }`}
             >
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 menu_book
               </span>
-              <span>Học sinh THPT (Học bạ &amp; Tổ hợp)</span>
+              <span>{t('academics.modes.highSchool')}</span>
             </button>
           </div>
 
           {mode === 'university' ? (
             <>
               {/* UNIVERSITY SUMMARY & SEMESTER MANAGER */}
-              <section className="imperial-frame p-5 relative overflow-hidden space-y-4">
+              <section className="imperial-frame border border-border-strong p-5 relative overflow-hidden space-y-4">
                 <span
                   aria-hidden="true"
                   className="hanzi-watermark absolute -top-2 right-4 text-7xl font-bold text-accent/8 select-none pointer-events-none"
@@ -1100,17 +1311,19 @@ export default function GPACalculator() {
                   <div className="flex flex-wrap items-center gap-2">
                     <div className="relative">
                       <select
-                        aria-label="Chọn học kỳ Đại học"
+                        aria-label={pick('Chọn học kỳ Đại học', 'Select university semester')}
                         value={selectedSemId}
                         onChange={(e) => handleSelectSemester(e.target.value)}
-                        className="appearance-none bg-paper text-foreground font-display font-bold text-sm py-2 pl-3.5 pr-9 rounded-xl border border-border-strong focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+                        className="appearance-none h-10 bg-surface text-foreground font-display font-bold text-sm pl-3.5 pr-9 rounded-xl border border-border-strong focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary cursor-pointer"
                       >
                         {semesters.length === 0 ? (
-                          <option value="">Học kỳ 1 (Chưa lưu)</option>
+                          <option value="">
+                            {pick('Học kỳ 1 (Chưa lưu)', 'Semester 1 (Unsaved draft)')}
+                          </option>
                         ) : (
                           semesters.map((sem) => (
                             <option key={sem.id} value={sem.id}>
-                              {sem.name} · GPA {formatNum(sem.gpa ?? 0)}
+                              {sem.name} · GPA {fmt(sem.gpa ?? 0, 2, locale)}
                             </option>
                           ))
                         )}
@@ -1131,12 +1344,12 @@ export default function GPACalculator() {
                           setIsRenamingSem(false);
                           setConfirmDeleteSem(false);
                         }}
-                        className="px-2.5 py-2 rounded-xl bg-paper border border-border hover:border-primary text-xs font-bold text-primary flex items-center gap-1 transition-colors cursor-pointer"
+                        className="h-10 px-3 rounded-xl bg-surface border border-border hover:border-primary text-xs font-bold text-primary flex items-center gap-1 transition-colors cursor-pointer"
                       >
                         <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
                           add
                         </span>
-                        Kỳ mới
+                        {pick('Kỳ mới', 'New Term')}
                       </button>
                     )}
 
@@ -1150,9 +1363,9 @@ export default function GPACalculator() {
                             setShowNewSemForm(false);
                             setConfirmDeleteSem(false);
                           }}
-                          aria-label="Đổi tên học kỳ"
-                          title="Đổi tên học kỳ"
-                          className="p-2 rounded-xl bg-paper border border-border hover:border-border-strong text-secondary-text hover:text-foreground transition-colors cursor-pointer"
+                          aria-label={pick('Đổi tên học kỳ', 'Rename semester')}
+                          title={pick('Đổi tên học kỳ', 'Rename semester')}
+                          className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface border border-border hover:border-border-strong text-secondary-text hover:text-foreground transition-colors cursor-pointer"
                         >
                           <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
                             edit
@@ -1164,9 +1377,9 @@ export default function GPACalculator() {
                             setConfirmDeleteSem((v) => !v);
                             setShowNewSemForm(false);
                           }}
-                          aria-label="Xoá học kỳ này"
-                          title="Xoá học kỳ này"
-                          className="p-2 rounded-xl bg-paper border border-border hover:border-primary/40 text-secondary-text hover:text-primary transition-colors cursor-pointer"
+                          aria-label={pick('Xoá học kỳ này', 'Delete this semester')}
+                          title={pick('Xoá học kỳ này', 'Delete this semester')}
+                          className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface border border-border hover:border-primary/40 text-secondary-text hover:text-primary transition-colors cursor-pointer"
                         >
                           <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
                             delete
@@ -1177,7 +1390,7 @@ export default function GPACalculator() {
                   </div>
 
                   <span className={`text-xs font-bold px-3 py-1 rounded-full border ${uniRank.color}`}>
-                    Học lực: {uniRank.label}
+                    {pick('Học lực:', 'Standing:')} {uniRank.label}
                   </span>
                 </div>
 
@@ -1192,8 +1405,12 @@ export default function GPACalculator() {
                         if (e.key === 'Enter') handleCreateSemester();
                         if (e.key === 'Escape') setShowNewSemForm(false);
                       }}
-                      placeholder="Tên học kỳ mới (VD: HK1 Năm 2 / HK251)..."
-                      className="flex-1 min-w-[200px] bg-surface border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                      placeholder={pick(
+                        'Tên học kỳ mới (VD: HK1 Năm 2 / HK251)...',
+                        'New semester name (e.g. Fall Year 2 / Sem 1)...',
+                      )}
+                      aria-label={pick('Tên học kỳ mới', 'New semester name')}
+                      className="flex-1 min-w-[200px] h-10 rounded-xl border border-border bg-surface px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary"
                     />
                     <button
                       type="button"
@@ -1201,14 +1418,16 @@ export default function GPACalculator() {
                       disabled={isCreatingSem}
                       className="btn-arena btn-arena-primary btn-arena-sm cursor-pointer"
                     >
-                      {isCreatingSem ? 'Đang tạo...' : 'Tạo học kỳ'}
+                      {isCreatingSem
+                        ? pick('Đang tạo...', 'Creating...')
+                        : pick('Tạo học kỳ', 'Create Term')}
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowNewSemForm(false)}
-                      className="px-3 py-2 rounded-lg border border-border text-xs font-semibold text-secondary-text hover:text-foreground cursor-pointer"
+                      className="h-10 px-3 rounded-xl border border-border bg-surface text-xs font-semibold text-secondary-text hover:text-foreground cursor-pointer"
                     >
-                      Đóng
+                      {pick('Đóng', 'Close')}
                     </button>
                   </div>
                 )}
@@ -1224,22 +1443,23 @@ export default function GPACalculator() {
                         if (e.key === 'Enter') handleRenameSemester();
                         if (e.key === 'Escape') setIsRenamingSem(false);
                       }}
-                      placeholder="Nhập tên mới cho học kỳ..."
-                      className="flex-1 min-w-[200px] bg-surface border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                      placeholder={pick('Nhập tên mới cho học kỳ...', 'Enter new semester name...')}
+                      aria-label={pick('Tên mới cho học kỳ', 'New semester name')}
+                      className="flex-1 min-w-[200px] h-10 rounded-xl border border-border bg-surface px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary"
                     />
                     <button
                       type="button"
                       onClick={handleRenameSemester}
                       className="btn-arena btn-arena-primary btn-arena-sm cursor-pointer"
                     >
-                      Lưu tên
+                      {pick('Lưu tên', 'Save Name')}
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsRenamingSem(false)}
-                      className="px-3 py-2 rounded-lg border border-border text-xs font-semibold text-secondary-text hover:text-foreground cursor-pointer"
+                      className="h-10 px-3 rounded-xl border border-border bg-surface text-xs font-semibold text-secondary-text hover:text-foreground cursor-pointer"
                     >
-                      Huỷ
+                      {pick('Huỷ', 'Cancel')}
                     </button>
                   </div>
                 )}
@@ -1248,23 +1468,32 @@ export default function GPACalculator() {
                 {confirmDeleteSem && selectedSemesterObj && (
                   <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-primary-soft border border-primary/35">
                     <p className="text-xs font-semibold text-foreground">
-                      Xoá vĩnh viễn <strong>{selectedSemesterObj.name}</strong> cùng toàn bộ học phần trong kỳ này?
+                      {pick(
+                        <>
+                          Xoá vĩnh viễn <strong>{selectedSemesterObj.name}</strong> cùng toàn bộ học
+                          phần trong kỳ này?
+                        </>,
+                        <>
+                          Permanently delete <strong>{selectedSemesterObj.name}</strong> and all its
+                          courses?
+                        </>,
+                      )}
                     </p>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={handleDeleteSemester}
                         disabled={isSaving}
-                        className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold cursor-pointer"
+                        className="px-3.5 h-9 rounded-xl bg-primary text-on-primary border border-primary-hover text-xs font-bold cursor-pointer"
                       >
-                        Xoá học kỳ
+                        {pick('Xoá học kỳ', 'Delete Term')}
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirmDeleteSem(false)}
-                        className="px-3 py-1.5 rounded-lg bg-paper border border-border text-xs font-semibold text-secondary-text cursor-pointer"
+                        className="px-3.5 h-9 rounded-xl bg-surface border border-border text-xs font-semibold text-secondary-text hover:text-foreground cursor-pointer"
                       >
-                        Không
+                        {pick('Không', 'Cancel')}
                       </button>
                     </div>
                   </div>
@@ -1274,50 +1503,62 @@ export default function GPACalculator() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-10">
                   <div className="p-3.5 rounded-xl bg-paper/80 border border-border">
                     <p className="text-[11px] text-secondary-text font-semibold uppercase tracking-wider mb-1">
-                      GPA Học Kỳ (Hệ 4.0)
+                      {pick('GPA Học Kỳ (Hệ 4.0)', 'Semester GPA (4.0 Scale)')}
                     </p>
                     <div className="flex items-baseline gap-1.5">
                       <span className="font-display text-3xl font-extrabold text-primary tabular">
-                        {formatNum(semResult.gpa4)}
+                        {fmt(semResult.gpa4, 2, locale)}
                       </span>
-                      <span className="text-xs text-muted-foreground font-medium">/ 4.00</span>
+                      <span className="text-xs text-muted-foreground font-medium">
+                        / {fmt(4, 2, locale)}
+                      </span>
                     </div>
                     <p className="text-[11px] text-secondary-text mt-1 tabular">
-                      Hệ 10: <strong className="text-foreground">{formatNum(semResult.gpa10)}</strong> ·{' '}
-                      {semResult.credits} tín chỉ
+                      {pick('Hệ 10:', '10-pt:')}{' '}
+                      <strong className="text-foreground">{fmt(semResult.gpa10, 2, locale)}</strong>{' '}
+                      · {semResult.credits} {pick('tín chỉ', 'credits')}
                     </p>
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-paper/80 border border-border">
                     <p className="text-[11px] text-secondary-text font-semibold uppercase tracking-wider mb-1">
-                      GPA Tích Luỹ Toàn Khoá
+                      {pick('GPA Tích Luỹ Toàn Khoá', 'Cumulative GPA')}
                     </p>
                     <div className="flex items-baseline gap-1.5">
                       <span className="font-display text-3xl font-extrabold text-jade tabular">
-                        {formatNum(liveCumulative.gpa4)}
+                        {fmt(liveCumulative.gpa4, 2, locale)}
                       </span>
-                      <span className="text-xs text-muted-foreground font-medium">/ 4.00</span>
+                      <span className="text-xs text-muted-foreground font-medium">
+                        / {fmt(4, 2, locale)}
+                      </span>
                     </div>
                     <p className="text-[11px] text-secondary-text mt-1 tabular">
-                      Hệ 10: <strong className="text-foreground">{formatNum(liveCumulative.gpa10)}</strong> ·{' '}
-                      {liveCumulative.credits} TC tích luỹ
+                      {pick('Hệ 10:', '10-pt:')}{' '}
+                      <strong className="text-foreground">
+                        {fmt(liveCumulative.gpa10, 2, locale)}
+                      </strong>{' '}
+                      · {liveCumulative.credits} {pick('TC tích luỹ', 'earned credits')}
                     </p>
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-paper/80 border border-border flex flex-col justify-between">
                     <p className="text-[11px] text-secondary-text font-semibold uppercase tracking-wider">
-                      Tổng Quan Học Kỳ
+                      {pick('Tổng Quan Học Kỳ', 'Term Overview')}
                     </p>
                     <div className="flex items-baseline justify-between mt-1">
-                      <span className="text-xs text-secondary-text">Số kỳ đã tạo:</span>
+                      <span className="text-xs text-secondary-text">
+                        {pick('Số kỳ đã lưu:', 'Saved terms:')}
+                      </span>
                       <span className="font-display text-lg font-extrabold text-foreground tabular">
                         {semesters.length}
                       </span>
                     </div>
                     <div className="flex items-baseline justify-between">
-                      <span className="text-xs text-secondary-text">Môn trong kỳ:</span>
+                      <span className="text-xs text-secondary-text">
+                        {pick('Môn trong kỳ:', 'Courses in term:')}
+                      </span>
                       <span className="font-display text-sm font-bold text-foreground tabular">
-                        {uniSubjects.length} học phần
+                        {uniSubjects.length} {pick('học phần', 'courses')}
                       </span>
                     </div>
                   </div>
@@ -1328,61 +1569,137 @@ export default function GPACalculator() {
                     value={activeGpaForTarget}
                     max={4}
                     tone="primary"
-                    label="Tiến độ thang chuẩn 4.0"
-                    sublabel={`${formatNum(activeGpaForTarget)} / 4.00`}
+                    label={pick('Tiến độ thang chuẩn 4.0', '4.0 Scale Progress')}
+                    sublabel={`${fmt(activeGpaForTarget, 2, locale)} / ${fmt(4, 2, locale)}`}
                   />
                 </div>
               </section>
 
-              {/* UNIVERSITY TARGET GOAL CARD */}
-              <section className="paper-card p-4 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-gold-soft border border-gold flex items-center justify-center text-accent shrink-0">
-                    <span className="material-symbols-outlined" aria-hidden="true">
-                      flag
-                    </span>
-                  </div>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-sm font-display font-bold text-foreground">
-                        Mục tiêu GPA tích luỹ (Hệ 4.0)
-                      </h2>
-                      <input
-                        type="number"
-                        step="0.05"
-                        min="0"
-                        max="4"
-                        aria-label="Mục tiêu GPA hệ 4.0"
-                        value={targetGpa4}
-                        onChange={(e) => setTargetGpa4(e.target.value)}
-                        className="w-20 bg-paper border border-border-strong rounded-lg px-2 py-0.5 text-xs font-bold text-center text-primary tabular focus:outline-none focus:ring-1 focus:ring-primary"
-                      />
+              {/* UNIVERSITY TARGET GOAL & GPA PLANNER / SIMULATOR */}
+              <section className="paper-card border border-border p-4 space-y-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-11 h-11 rounded-xl bg-gold-soft border border-gold flex items-center justify-center text-accent shrink-0">
+                      <span className="material-symbols-outlined" aria-hidden="true">
+                        flag
+                      </span>
                     </div>
-                    <p className="text-xs text-secondary-text mt-1">
-                      {liveCumulative.credits === 0 && semResult.credits === 0 ? (
-                        <span>Nhập điểm hệ 10 các học phần bên dưới để đối chiếu mục tiêu GPA.</span>
-                      ) : isUniTargetReached ? (
-                        <span className="text-completed font-semibold">
-                          Xuất sắc! GPA hiện tại đã chạm/vượt ngưỡng mục tiêu đề ra.
-                        </span>
-                      ) : (
-                        <span>
-                          Cần tích luỹ thêm{' '}
-                          <span className="text-primary font-bold tabular">{uniTargetDiff}</span> điểm
-                          (hệ 4.0) để đạt mục tiêu.
-                        </span>
-                      )}
-                    </p>
+                    <div className="min-w-0">
+                      <h2 className="text-sm font-display font-bold text-foreground">
+                        {pick(
+                          'Hoạch định & Mô phỏng GPA mục tiêu (Hệ 4.0)',
+                          'Target GPA Planner & Credit Simulator (4.0 Scale)',
+                        )}
+                      </h2>
+                      <p className="text-xs text-secondary-text mt-0.5">
+                        {activeCreditsForTarget === 0 ? (
+                          <span>
+                            {pick(
+                              'Nhập điểm hệ 10 các học phần bên dưới để mô phỏng lộ trình GPA.',
+                              'Enter 10-pt course grades below to simulate your cumulative GPA trajectory.',
+                            )}
+                          </span>
+                        ) : isUniTargetReached ? (
+                          <span className="text-completed font-semibold">
+                            {pick(
+                              'Xuất sắc! GPA hiện tại đã chạm/vượt ngưỡng mục tiêu đề ra.',
+                              'On track! Your current GPA meets or exceeds your target.',
+                            )}
+                          </span>
+                        ) : (
+                          <span>
+                            {pick('Còn cách mục tiêu ', 'Currently ')}
+                            <span className="text-primary font-bold tabular">
+                              {fmt(uniTargetDiff, 2, locale)}
+                            </span>
+                            {pick(' điểm (hệ 4.0).', ' pts below your 4.0 target.')}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="hidden sm:block shrink-0">
+                    <RankSeal
+                      size="sm"
+                      variant="gold"
+                      icon="emoji_events"
+                      label={pick('Khoa Bảng', 'Honors')}
+                    />
                   </div>
                 </div>
-                <RankSeal size="sm" variant="gold" icon="emoji_events" label="Khoa Bảng" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-border">
+                  <div className="p-3 rounded-xl bg-surface-alt border border-border flex items-center justify-between gap-3">
+                    <div>
+                      <label
+                        htmlFor="target-gpa4-input"
+                        className="block text-xs font-bold text-foreground"
+                      >
+                        {pick('GPA mục tiêu (/ 4.00)', 'Target GPA (/ 4.00)')}
+                      </label>
+                      <span className="text-[11px] text-secondary-text">
+                        {pick('Ví dụ: 3.20 (Giỏi) · 3.60 (Xuất sắc)', 'e.g. 3.20 (Very Good) · 3.60 (Distinction)')}
+                      </span>
+                    </div>
+                    <input
+                      id="target-gpa4-input"
+                      type="number"
+                      step="0.05"
+                      min="0"
+                      max="4"
+                      value={targetGpa4}
+                      onChange={(e) => setTargetGpa4(e.target.value)}
+                      className="w-24 h-10 rounded-xl border border-border bg-surface px-3 text-sm font-bold text-center text-primary tabular focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary shrink-0"
+                    />
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-surface-alt border border-border flex items-center justify-between gap-3">
+                    <div>
+                      <label
+                        htmlFor="planned-credits-input"
+                        className="block text-xs font-bold text-foreground"
+                      >
+                        {pick('Số tín chỉ dự kiến học tiếp', 'Planned Next Credits')}
+                      </label>
+                      <span className="text-[11px] text-secondary-text">
+                        {requiredFutureGpa4 <= 0
+                          ? pick(
+                              'Đủ duy trì mục tiêu ngay cả ở mức đạt cơ bản',
+                              'Target maintained with passing coursework',
+                            )
+                          : requiredFutureGpa4 > 4.0
+                            ? pick(
+                                `Tối đa đạt ${fmt(maxReachableGpa4, 2, locale)} sau ${parsedPlannedCredits} TC — cần thêm tín chỉ`,
+                                `Max reachable is ${fmt(maxReachableGpa4, 2, locale)} in ${parsedPlannedCredits} cr — add more credits`,
+                              )
+                            : pick(
+                                `Cần TB tối thiểu ${fmt(requiredFutureGpa4, 2, locale)} / 4.00 trong ${parsedPlannedCredits} TC tới`,
+                                `Need ≥ ${fmt(requiredFutureGpa4, 2, locale)} / 4.00 across next ${parsedPlannedCredits} credits`,
+                              )}
+                      </span>
+                    </div>
+                    <input
+                      id="planned-credits-input"
+                      type="number"
+                      step="1"
+                      min="1"
+                      max="150"
+                      value={plannedCredits}
+                      onChange={(e) => setPlannedCredits(e.target.value)}
+                      className="w-24 h-10 rounded-xl border border-border bg-surface px-3 text-sm font-bold text-center text-jade tabular focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary shrink-0"
+                    />
+                  </div>
+                </div>
               </section>
 
               {/* UNIVERSITY COURSES TABLE */}
               <section className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <h2 className="font-display text-base font-extrabold text-foreground">
-                    Học phần trong kỳ ({uniSubjects.length})
+                    {pick(
+                      `Học phần trong kỳ (${uniSubjects.length})`,
+                      `Courses in Semester (${uniSubjects.length})`,
+                    )}
                   </h2>
                   <button
                     type="button"
@@ -1392,15 +1709,15 @@ export default function GPACalculator() {
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
                       add_circle
                     </span>
-                    Thêm học phần
+                    {pick('Thêm học phần', 'Add Course')}
                   </button>
                 </div>
 
                 <div className="hidden sm:grid grid-cols-12 gap-2 px-3 text-xs font-bold text-secondary-text">
-                  <div className="col-span-5">Tên học phần</div>
-                  <div className="col-span-2 text-center">Tín chỉ</div>
-                  <div className="col-span-2 text-center">Điểm hệ 10</div>
-                  <div className="col-span-2 text-center">Quy đổi</div>
+                  <div className="col-span-5">{pick('Tên học phần', 'Course Name')}</div>
+                  <div className="col-span-2 text-center">{pick('Tín chỉ', 'Credits')}</div>
+                  <div className="col-span-2 text-center">{pick('Điểm hệ 10', '10-pt Grade')}</div>
+                  <div className="col-span-2 text-center">{pick('Quy đổi', '4.0 / Letter')}</div>
                   <div className="col-span-1"></div>
                 </div>
 
@@ -1418,14 +1735,15 @@ export default function GPACalculator() {
                         course.grade === '' || course.grade == null
                           ? null
                           : toGpa4(course.grade, scaleId);
+                      const displayCourseName = resolveUniCourseName(course, lang);
                       return (
                         <div
                           key={course.id}
-                          className="grid grid-cols-12 gap-2 items-center paper-card p-2.5 focus-within:border-primary transition-all"
+                          className="grid grid-cols-12 gap-2 items-center paper-card border border-border p-3 focus-within:border-primary transition-all"
                         >
                           <div className="col-span-12 sm:col-span-5 flex items-center gap-2">
                             <span
-                              className="material-symbols-outlined text-accent text-lg ml-1 shrink-0"
+                              className="material-symbols-outlined text-accent text-lg shrink-0"
                               aria-hidden="true"
                             >
                               menu_book
@@ -1433,52 +1751,65 @@ export default function GPACalculator() {
                             <input
                               list="uni-subjects"
                               type="text"
-                              placeholder={`Học phần ${idx + 1} (VD: Giải tích 1)...`}
-                              value={course.name}
+                              placeholder={pick(
+                                `Học phần ${idx + 1} (VD: Giải tích 1)...`,
+                                `Course ${idx + 1} (e.g. Calculus I)...`,
+                              )}
+                              aria-label={pick(
+                                `Tên học phần ${idx + 1}`,
+                                `Course ${idx + 1} name`,
+                              )}
+                              value={displayCourseName}
                               onChange={(e) => updateUniCourse(course.id, 'name', e.target.value)}
-                              className="w-full bg-transparent border-none text-sm font-semibold text-foreground focus:outline-none p-1 placeholder:text-muted-foreground"
+                              className="w-full h-10 rounded-xl border border-border bg-surface px-3 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary placeholder:text-muted-foreground"
                             />
                           </div>
 
                           <div className="col-span-4 sm:col-span-2">
-                            <label className="sm:hidden block text-[10px] text-secondary-text mb-0.5 text-center">
-                              Tín chỉ
+                            <label className="sm:hidden block text-[10px] text-secondary-text mb-1 text-center">
+                              {pick('Tín chỉ', 'Credits')}
                             </label>
                             <input
                               type="number"
                               min="1"
                               max="20"
-                              aria-label={`Số tín chỉ ${course.name || idx + 1}`}
+                              aria-label={pick(
+                                `Số tín chỉ ${displayCourseName || idx + 1}`,
+                                `Credits for ${displayCourseName || idx + 1}`,
+                              )}
                               value={course.credits}
                               onChange={(e) => updateUniCourse(course.id, 'credits', e.target.value)}
-                              className="w-full bg-paper border border-border rounded-lg text-center text-sm font-medium text-foreground py-1.5 tabular focus:outline-none focus:ring-1 focus:ring-primary"
+                              className="w-full h-10 rounded-xl border border-border bg-surface px-3 text-center text-sm font-medium text-foreground tabular focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary"
                             />
                           </div>
 
                           <div className="col-span-4 sm:col-span-2">
-                            <label className="sm:hidden block text-[10px] text-secondary-text mb-0.5 text-center">
-                              Điểm hệ 10
+                            <label className="sm:hidden block text-[10px] text-secondary-text mb-1 text-center">
+                              {pick('Điểm hệ 10', '10-pt Grade')}
                             </label>
                             <input
                               type="number"
                               step="0.1"
                               min="0"
                               max="10"
-                              placeholder="Chưa có"
-                              aria-label={`Điểm hệ 10 ${course.name || idx + 1}`}
+                              placeholder={pick('Chưa có', 'Pending')}
+                              aria-label={pick(
+                                `Điểm hệ 10 ${displayCourseName || idx + 1}`,
+                                `10-pt grade for ${displayCourseName || idx + 1}`,
+                              )}
                               value={course.grade}
                               onChange={(e) => updateUniCourse(course.id, 'grade', e.target.value)}
-                              className="w-full bg-primary-soft border border-primary/30 text-primary rounded-lg text-center text-sm font-bold py-1.5 tabular focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground placeholder:font-normal"
+                              className="w-full h-10 rounded-xl border border-border bg-surface px-3 text-center text-sm font-bold text-primary tabular focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary placeholder:text-muted-foreground placeholder:font-normal"
                             />
                           </div>
 
                           <div className="col-span-3 sm:col-span-2 flex flex-col items-center justify-center">
-                            <span className="sm:hidden text-[10px] text-secondary-text mb-0.5">
-                              Hệ 4
+                            <span className="sm:hidden text-[10px] text-secondary-text mb-1">
+                              {pick('Hệ 4', '4.0')}
                             </span>
                             {letter ? (
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-jade-soft text-jade border border-jade-border tabular">
-                                {letter} · {formatNum(gpa4Val, 1)}
+                                {letter} · {fmt(gpa4Val, 1, locale)}
                               </span>
                             ) : (
                               <span className="text-xs text-muted-foreground tabular">—</span>
@@ -1489,8 +1820,11 @@ export default function GPACalculator() {
                             <button
                               type="button"
                               onClick={() => removeUniCourse(course.id)}
-                              aria-label={`Xoá học phần ${course.name || idx + 1}`}
-                              className="text-muted-foreground hover:text-primary transition-colors p-1 cursor-pointer"
+                              aria-label={pick(
+                                `Xoá học phần ${displayCourseName || idx + 1}`,
+                                `Remove course ${displayCourseName || idx + 1}`,
+                              )}
+                              className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-surface-alt transition-colors cursor-pointer"
                             >
                               <span className="material-symbols-outlined text-lg" aria-hidden="true">
                                 delete
@@ -1511,19 +1845,22 @@ export default function GPACalculator() {
                   <span className="material-symbols-outlined text-lg" aria-hidden="true">
                     add
                   </span>
-                  Thêm học phần mới
+                  {pick('Thêm học phần mới', 'Add New Course')}
                 </button>
 
                 <p className="text-[11px] text-secondary-text leading-relaxed px-1">
-                  Học phần để trống ô điểm sẽ được lưu ở trạng thái đang học và không bị tính là 0 điểm.{' '}
-                  {getGpaScale(scaleId).sourceNote}
+                  {pick(
+                    'Học phần để trống ô điểm sẽ được lưu ở trạng thái đang học và không bị tính là 0 điểm.',
+                    'Courses left blank are saved as in-progress and excluded from GPA rather than counted as 0.',
+                  )}{' '}
+                  {gpaScaleMeta.displaySourceNote}
                 </p>
               </section>
             </>
           ) : (
             <>
               {/* HIGH SCHOOL (THPT) SUMMARY CARD */}
-              <section className="imperial-frame p-5 relative overflow-hidden space-y-4">
+              <section className="imperial-frame border border-border-strong p-5 relative overflow-hidden space-y-4">
                 <span
                   aria-hidden="true"
                   className="hanzi-watermark absolute -top-2 right-4 text-7xl font-bold text-accent/8 select-none pointer-events-none"
@@ -1537,39 +1874,45 @@ export default function GPACalculator() {
                       workspace_premium
                     </span>
                     <span className="font-display font-bold text-sm text-foreground">
-                      Tổng hợp Học bạ &amp; Tổ hợp Xét tuyển THPT
+                      {pick(
+                        'Tổng hợp Học bạ & Tổ hợp Xét tuyển THPT',
+                        'High School Transcript & Admission Combo Summary',
+                      )}
                     </span>
                   </div>
                   <span className={`text-xs font-bold px-3 py-1 rounded-full border ${thptRank.color}`}>
-                    Học lực: {thptRank.label}
+                    {pick('Học lực:', 'Standing:')} {thptRank.label}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-10">
                   <div className="p-3.5 rounded-xl bg-paper/80 border border-border">
                     <p className="text-[11px] text-secondary-text font-semibold uppercase tracking-wider mb-1">
-                      Điểm TB Học Bạ
+                      {pick('Điểm TB Học Bạ', 'Transcript Average')}
                     </p>
                     <div className="flex items-baseline gap-1.5">
                       <span className="font-display text-3xl font-extrabold text-primary tabular">
-                        {formatNum(thptResult.gpa10)}
+                        {fmt(thptResult.gpa10, 2, locale)}
                       </span>
-                      <span className="text-xs text-muted-foreground font-medium">/ 10.0</span>
+                      <span className="text-xs text-muted-foreground font-medium">
+                        / {fmt(10, 1, locale)}
+                      </span>
                     </div>
                     <p className="text-[11px] text-secondary-text mt-1 tabular">
-                      Tổng hệ số: <strong className="text-foreground">{thptResult.credits}</strong>
+                      {pick('Tổng hệ số:', 'Total weight:')}{' '}
+                      <strong className="text-foreground">{thptResult.credits}</strong>
                     </p>
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-paper/80 border border-border">
                     <p className="text-[11px] text-secondary-text font-semibold uppercase tracking-wider mb-1">
-                      Tổ Hợp Cao Nhất
+                      {pick('Tổ Hợp Cao Nhất', 'Best 3-Subject Combo')}
                     </p>
                     {bestCombo ? (
                       <>
                         <div className="flex items-baseline gap-1.5">
                           <span className="font-display text-3xl font-extrabold text-jade tabular">
-                            {formatNum(bestCombo.score)}
+                            {fmt(bestCombo.score, 2, locale)}
                           </span>
                           <span className="text-xs font-bold text-jade px-2 py-0.5 rounded-full bg-jade-soft border border-jade-border">
                             {bestCombo.code}
@@ -1585,7 +1928,10 @@ export default function GPACalculator() {
                           —
                         </p>
                         <p className="text-[11px] text-secondary-text mt-1">
-                          Nhập tối thiểu 3 môn chuẩn để tính tổ hợp
+                          {pick(
+                            'Nhập tối thiểu 3 môn chuẩn để tính tổ hợp',
+                            'Enter at least 3 standard subjects to compute combos',
+                          )}
                         </p>
                       </>
                     )}
@@ -1593,17 +1939,22 @@ export default function GPACalculator() {
 
                   <div className="p-3.5 rounded-xl bg-paper/80 border border-border flex flex-col justify-between">
                     <p className="text-[11px] text-secondary-text font-semibold uppercase tracking-wider">
-                      Đồng Bộ Xét Tuyển
+                      {pick('Đồng Bộ Xét Tuyển', 'Admission Sync')}
                     </p>
                     <p className="text-xs text-secondary-text leading-snug my-1">
-                      Điểm học bạ tự động đồng bộ sang công cụ tính điểm &amp; tìm trường ĐH.
+                      {pick(
+                        'Điểm học bạ tự động đồng bộ sang công cụ tính điểm & tìm trường ĐH.',
+                        'Transcript scores automatically sync with Admission Scores & School Finder.',
+                      )}
                     </p>
                     <button
                       type="button"
                       onClick={() => navigate('/admission')}
                       className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
                     >
-                      <span>Mở máy tính ĐGNL / THPTQG</span>
+                      <span>
+                        {pick('Mở máy tính ĐGNL / THPTQG', 'Open Exam Score Calculator')}
+                      </span>
                       <span className="material-symbols-outlined text-sm" aria-hidden="true">
                         arrow_forward
                       </span>
@@ -1616,31 +1967,44 @@ export default function GPACalculator() {
                     value={thptResult.gpa10 ?? 0}
                     max={10}
                     tone="primary"
-                    label="Thang điểm 10"
-                    sublabel={`${formatNum(thptResult.gpa10)} / 10`}
+                    label={pick('Thang điểm 10', '10-Point Scale')}
+                    sublabel={`${fmt(thptResult.gpa10, 2, locale)} / 10`}
                   />
                 </div>
               </section>
 
               {/* THPT TARGETS CARD (target_thpt & target_dgnl) */}
-              <section className="paper-card p-4 space-y-3">
+              <section className="paper-card border border-border p-4 space-y-3">
                 <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div className="w-10 h-10 rounded-xl bg-gold-soft border border-gold flex items-center justify-center text-accent shrink-0">
                       <span className="material-symbols-outlined" aria-hidden="true">
                         ads_click
                       </span>
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <h2 className="text-sm font-display font-bold text-foreground">
-                        Mục tiêu Kỳ thi THPTQG &amp; Đánh giá năng lực
+                        {pick(
+                          'Mục tiêu Kỳ thi THPTQG & Đánh giá năng lực',
+                          'National Exam & Competency Assessment Targets',
+                        )}
                       </h2>
                       <p className="text-xs text-secondary-text">
-                        Lưu trực tiếp vào hồ sơ học giả để theo dõi tiến độ vượt vũ môn
+                        {pick(
+                          'Lưu trực tiếp vào hồ sơ học giả để theo dõi tiến độ vượt vũ môn',
+                          'Saved directly to your scholar profile to track admission readiness',
+                        )}
                       </p>
                     </div>
                   </div>
-                  <RankSeal size="sm" variant="gold" icon="military_tech" label="Mục tiêu" />
+                  <div className="hidden sm:block shrink-0">
+                    <RankSeal
+                      size="sm"
+                      variant="gold"
+                      icon="military_tech"
+                      label={pick('Mục tiêu', 'Targets')}
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
@@ -1650,14 +2014,20 @@ export default function GPACalculator() {
                         htmlFor="target-thpt-input"
                         className="block text-xs font-bold text-foreground"
                       >
-                        Mục tiêu Tổ hợp THPTQG (/30)
+                        {pick('Mục tiêu Tổ hợp THPTQG (/30)', 'National Exam Combo Target (/30)')}
                       </label>
                       <span className="text-[11px] text-secondary-text">
                         {bestCombo == null
-                          ? 'Nhập đủ 3 môn của tổ hợp để so sánh'
+                          ? pick(
+                              'Nhập đủ 3 môn của tổ hợp để so sánh',
+                              'Enter all 3 subjects in a combo to compare',
+                            )
                           : isThptTargetReached
-                            ? 'Đã đạt/vượt mục tiêu tổ hợp!'
-                            : `Còn thiếu ${thptTargetDiff} điểm so với tổ hợp ${bestCombo.code}`}
+                            ? pick('Đã đạt/vượt mục tiêu tổ hợp!', 'Combo target reached!')
+                            : pick(
+                                `Còn thiếu ${fmt(thptTargetDiff, 2, locale)} điểm so với tổ hợp ${bestCombo.code}`,
+                                `${fmt(thptTargetDiff, 2, locale)} pts below target on ${bestCombo.code}`,
+                              )}
                       </span>
                     </div>
                     <input
@@ -1668,7 +2038,7 @@ export default function GPACalculator() {
                       max="30"
                       value={targetThpt}
                       onChange={(e) => setTargetThpt(e.target.value)}
-                      className="w-20 bg-paper border border-border-strong rounded-lg px-2.5 py-1.5 text-sm font-bold text-center text-primary tabular focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-24 h-10 rounded-xl border border-border bg-surface px-3 text-sm font-bold text-center text-primary tabular focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary shrink-0"
                     />
                   </div>
 
@@ -1678,10 +2048,13 @@ export default function GPACalculator() {
                         htmlFor="target-dgnl-input"
                         className="block text-xs font-bold text-foreground"
                       >
-                        Mục tiêu ĐGNL (HSA / V-ACT)
+                        {pick('Mục tiêu ĐGNL (HSA / V-ACT)', 'Competency Target (HSA / V-ACT)')}
                       </label>
                       <span className="text-[11px] text-secondary-text">
-                        Ví dụ: 100+ (HSA) hoặc 900+ (V-ACT)
+                        {pick(
+                          'Ví dụ: 100+ (HSA) hoặc 900+ (V-ACT)',
+                          'e.g. 100+ (HSA /150) or 900+ (V-ACT /1200)',
+                        )}
                       </span>
                     </div>
                     <input
@@ -1692,7 +2065,7 @@ export default function GPACalculator() {
                       max="1500"
                       value={targetDgnl}
                       onChange={(e) => setTargetDgnl(e.target.value)}
-                      className="w-20 bg-paper border border-border-strong rounded-lg px-2.5 py-1.5 text-sm font-bold text-center text-jade tabular focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-24 h-10 rounded-xl border border-border bg-surface px-3 text-sm font-bold text-center text-jade tabular focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary shrink-0"
                     />
                   </div>
                 </div>
@@ -1700,17 +2073,20 @@ export default function GPACalculator() {
 
               {/* LIVE 3-SUBJECT COMBINATIONS PREVIEW */}
               {thptCombos.length > 0 && (
-                <section className="paper-card p-4 space-y-3">
-                  <div className="flex items-center justify-between">
+                <section className="paper-card border border-border p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
                     <h2 className="font-display text-sm font-extrabold text-foreground">
-                      Điểm Tổ Hợp 3 Môn Tự Động ({thptCombos.length} tổ hợp)
+                      {pick(
+                        `Điểm Tổ Hợp 3 Môn Tự Động (${thptCombos.length} tổ hợp)`,
+                        `Auto-Computed 3-Subject Combos (${thptCombos.length} eligible)`,
+                      )}
                     </h2>
                     <button
                       type="button"
                       onClick={() => navigate('/schools')}
-                      className="text-xs font-bold text-primary hover:underline cursor-pointer"
+                      className="text-xs font-bold text-primary hover:underline cursor-pointer shrink-0"
                     >
-                      Tra cứu điểm chuẩn
+                      {pick('Tra cứu điểm chuẩn', 'Browse Cutoffs')}
                     </button>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -1721,14 +2097,14 @@ export default function GPACalculator() {
                       >
                         <div className="min-w-0">
                           <span className="text-xs font-display font-extrabold text-primary block">
-                            Khối {item.code}
+                            {pick(`Khối ${item.code}`, `Group ${item.code}`)}
                           </span>
                           <span className="text-[10px] text-secondary-text block truncate">
                             {item.subjectLabels}
                           </span>
                         </div>
                         <span className="font-display text-base font-extrabold text-foreground tabular shrink-0">
-                          {formatNum(item.score)}
+                          {fmt(item.score, 2, locale)}
                         </span>
                       </div>
                     ))}
@@ -1740,7 +2116,10 @@ export default function GPACalculator() {
               <section className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <h2 className="font-display text-base font-extrabold text-foreground">
-                    Danh sách môn học THPT ({thptSubjects.length})
+                    {pick(
+                      `Danh sách môn học THPT (${thptSubjects.length})`,
+                      `High School Subjects (${thptSubjects.length})`,
+                    )}
                   </h2>
                   <button
                     type="button"
@@ -1750,14 +2129,14 @@ export default function GPACalculator() {
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
                       add_circle
                     </span>
-                    Thêm môn
+                    {pick('Thêm môn', 'Add Subject')}
                   </button>
                 </div>
 
-                <div className="grid grid-cols-12 gap-2 px-3 text-xs font-bold text-secondary-text">
-                  <div className="col-span-6">Tên môn học</div>
-                  <div className="col-span-2 text-center">Hệ số</div>
-                  <div className="col-span-3 text-center">Điểm TB</div>
+                <div className="hidden sm:grid grid-cols-12 gap-2 px-3 text-xs font-bold text-secondary-text">
+                  <div className="col-span-6">{pick('Tên môn học', 'Subject Name')}</div>
+                  <div className="col-span-2 text-center">{pick('Hệ số', 'Weight')}</div>
+                  <div className="col-span-3 text-center">{pick('Điểm TB', 'Avg Score')}</div>
                   <div className="col-span-1"></div>
                 </div>
 
@@ -1769,65 +2148,92 @@ export default function GPACalculator() {
                   </div>
                 ) : (
                   <div className="space-y-2.5">
-                    {thptSubjects.map((subj, idx) => (
-                      <div
-                        key={subj.id}
-                        className="grid grid-cols-12 gap-2 items-center paper-card p-2.5 focus-within:border-primary transition-all"
-                      >
-                        <div className="col-span-6 flex items-center gap-2">
-                          <span
-                            className="material-symbols-outlined text-accent text-lg ml-1 shrink-0"
-                            aria-hidden="true"
-                          >
-                            {getThptSubjectIcon(subj.name)}
-                          </span>
-                          <input
-                            list="thpt-subjects"
-                            type="text"
-                            placeholder={`Môn học ${idx + 1} (VD: Toán)...`}
-                            value={subj.name}
-                            onChange={(e) => updateThptSubject(subj.id, 'name', e.target.value)}
-                            className="w-full bg-transparent border-none text-sm font-semibold text-foreground focus:outline-none p-1 placeholder:text-muted-foreground"
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <input
-                            type="number"
-                            min="1"
-                            max="5"
-                            aria-label={`Hệ số môn ${subj.name || idx + 1}`}
-                            value={subj.credits}
-                            onChange={(e) => updateThptSubject(subj.id, 'credits', e.target.value)}
-                            className="w-full bg-paper border border-border rounded-lg text-center text-sm font-medium text-foreground py-1.5 tabular focus:outline-none focus:ring-1 focus:ring-primary"
-                          />
-                        </div>
-                        <div className="col-span-3">
-                          <input
-                            type="number"
-                            step="0.1"
-                            min="0"
-                            max="10"
-                            placeholder="0.0"
-                            aria-label={`Điểm trung bình môn ${subj.name || idx + 1}`}
-                            value={subj.score}
-                            onChange={(e) => updateThptSubject(subj.id, 'score', e.target.value)}
-                            className="w-full bg-primary-soft border border-primary/30 text-primary rounded-lg text-center text-sm font-bold py-1.5 tabular focus:outline-none focus:ring-1 focus:ring-primary"
-                          />
-                        </div>
-                        <div className="col-span-1 flex justify-center">
-                          <button
-                            type="button"
-                            onClick={() => removeThptSubject(subj.id)}
-                            aria-label={`Xoá môn ${subj.name || idx + 1}`}
-                            className="text-muted-foreground hover:text-primary transition-colors p-1 cursor-pointer"
-                          >
-                            <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                              delete
+                    {thptSubjects.map((subj, idx) => {
+                      const displaySubjName = resolveThptSubjectName(subj, lang);
+                      return (
+                        <div
+                          key={subj.id}
+                          className="grid grid-cols-12 gap-2 items-center paper-card border border-border p-3 focus-within:border-primary transition-all"
+                        >
+                          <div className="col-span-12 sm:col-span-6 flex items-center gap-2">
+                            <span
+                              className="material-symbols-outlined text-accent text-lg shrink-0"
+                              aria-hidden="true"
+                            >
+                              {getThptSubjectIcon(subj.name, subj.starterKey)}
                             </span>
-                          </button>
+                            <input
+                              list="thpt-subjects"
+                              type="text"
+                              placeholder={pick(
+                                `Môn học ${idx + 1} (VD: Toán)...`,
+                                `Subject ${idx + 1} (e.g. Mathematics)...`,
+                              )}
+                              aria-label={pick(
+                                `Tên môn học ${idx + 1}`,
+                                `Subject ${idx + 1} name`,
+                              )}
+                              value={displaySubjName}
+                              onChange={(e) => updateThptSubject(subj.id, 'name', e.target.value)}
+                              className="w-full h-10 rounded-xl border border-border bg-surface px-3 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary placeholder:text-muted-foreground"
+                            />
+                          </div>
+                          <div className="col-span-5 sm:col-span-2">
+                            <label className="sm:hidden block text-[10px] text-secondary-text mb-1 text-center">
+                              {pick('Hệ số', 'Weight')}
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="5"
+                              aria-label={pick(
+                                `Hệ số môn ${displaySubjName || idx + 1}`,
+                                `Weight for ${displaySubjName || idx + 1}`,
+                              )}
+                              value={subj.credits}
+                              onChange={(e) =>
+                                updateThptSubject(subj.id, 'credits', e.target.value)
+                              }
+                              className="w-full h-10 rounded-xl border border-border bg-surface px-3 text-center text-sm font-medium text-foreground tabular focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary"
+                            />
+                          </div>
+                          <div className="col-span-5 sm:col-span-3">
+                            <label className="sm:hidden block text-[10px] text-secondary-text mb-1 text-center">
+                              {pick('Điểm TB', 'Avg Score')}
+                            </label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              max="10"
+                              placeholder="0.0"
+                              aria-label={pick(
+                                `Điểm trung bình môn ${displaySubjName || idx + 1}`,
+                                `Average score for ${displaySubjName || idx + 1}`,
+                              )}
+                              value={subj.score}
+                              onChange={(e) => updateThptSubject(subj.id, 'score', e.target.value)}
+                              className="w-full h-10 rounded-xl border border-border bg-surface px-3 text-center text-sm font-bold text-primary tabular focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary placeholder:text-muted-foreground placeholder:font-normal"
+                            />
+                          </div>
+                          <div className="col-span-2 sm:col-span-1 flex justify-center items-end">
+                            <button
+                              type="button"
+                              onClick={() => removeThptSubject(subj.id)}
+                              aria-label={pick(
+                                `Xoá môn ${displaySubjName || idx + 1}`,
+                                `Remove subject ${displaySubjName || idx + 1}`,
+                              )}
+                              className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-surface-alt transition-colors cursor-pointer"
+                            >
+                              <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                                delete
+                              </span>
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
 
@@ -1839,7 +2245,7 @@ export default function GPACalculator() {
                   <span className="material-symbols-outlined text-lg" aria-hidden="true">
                     add
                   </span>
-                  Thêm môn học mới
+                  {pick('Thêm môn học mới', 'Add New Subject')}
                 </button>
               </section>
             </>
@@ -1849,25 +2255,14 @@ export default function GPACalculator() {
 
       {/* Subject Autocomplete Datalists */}
       <datalist id="uni-subjects">
-        <option value="Triết học Mác – Lênin" />
-        <option value="Kinh tế chính trị Mác – Lênin" />
-        <option value="Chủ nghĩa xã hội khoa học" />
-        <option value="Tư tưởng Hồ Chí Minh" />
-        <option value="Lịch sử Đảng Cộng sản Việt Nam" />
-        <option value="Toán cao cấp" />
-        <option value="Đại số tuyến tính" />
-        <option value="Giải tích 1" />
-        <option value="Giải tích 2" />
-        <option value="Xác suất thống kê" />
-        <option value="Vật lí đại cương" />
-        <option value="Pháp luật đại cương" />
-        <option value="Tiếng Anh học thuật" />
-        <option value="Tin học đại cương" />
+        {UNI_DATALIST_SUGGESTIONS[isEn ? 'en' : 'vi'].map((item) => (
+          <option key={item} value={item} />
+        ))}
       </datalist>
 
       <datalist id="thpt-subjects">
         {SUBJECTS.map((s) => (
-          <option key={s.key} value={s.label} />
+          <option key={s.key} value={isEn ? s.labelEn : s.label} />
         ))}
       </datalist>
     </div>

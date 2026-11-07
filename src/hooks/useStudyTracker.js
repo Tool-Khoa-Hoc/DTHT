@@ -45,11 +45,11 @@ const AWARD_THRESHOLD_S = 30;                // fallback min banked seconds to f
 const MAX_CHUNK_S = 120;                     // server award_study_exp clamp
 
 const CHECKIN_SYMBOLS = [
-  { symbol: '🔥', label: 'Ngọn lửa' },
-  { symbol: '📘', label: 'Sách vàng' },
-  { symbol: '⚡', label: 'Tia chớp' },
-  { symbol: '🎯', label: 'Hồng tâm' },
-  { symbol: '🏆', label: 'Cúp vàng' },
+  { symbol: 'local_fire_department', icon: 'local_fire_department', label: 'Ngọn lửa', labelEn: 'Flame' },
+  { symbol: 'menu_book', icon: 'menu_book', label: 'Sách vàng', labelEn: 'Scholar Book' },
+  { symbol: 'bolt', icon: 'bolt', label: 'Tia chớp', labelEn: 'Lightning' },
+  { symbol: 'ads_click', icon: 'ads_click', label: 'Hồng tâm', labelEn: 'Bullseye' },
+  { symbol: 'emoji_events', icon: 'emoji_events', label: 'Cúp vàng', labelEn: 'Trophy' },
 ];
 
 function createCheckinChallenge(seq) {
@@ -66,7 +66,9 @@ function createCheckinChallenge(seq) {
   return {
     id: `chk-${now}-${seq}`,
     targetSymbol: target.symbol,
+    targetIcon: target.icon,
     targetLabel: target.label,
+    targetLabelEn: target.labelEn,
     options,
     createdAt: now,
     expiresAt: now + CHECKIN_GRACE_MS,

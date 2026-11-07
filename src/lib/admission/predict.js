@@ -26,6 +26,33 @@ export const SIGMA_CAP = 2.5;
 export const SIGMA_DEFAULT_1Y = 1.1;
 export const DATA_FACTOR = { 3: 1.0, 2: 1.25, 1: 1.6 };
 
+export const BAND_LABELS = {
+  safe: 'An toàn',
+  likely: 'Khá an toàn',
+  borderline: 'Cân nhắc',
+  reach: 'Thử thách',
+  far: 'Xa tầm',
+};
+
+export const BAND_LABELS_EN = {
+  safe: 'Safe',
+  likely: 'Likely',
+  borderline: 'Target',
+  reach: 'Reach',
+  far: 'Far Reach',
+};
+
+export function getBandLabel(code, lang = 'vi') {
+  return (lang === 'en' ? BAND_LABELS_EN[code] : BAND_LABELS[code]) || BAND_LABELS[code] || code;
+}
+
+export function getConfidenceLabel(confidence, lang = 'vi') {
+  if (lang === 'en') {
+    return confidence >= 75 ? 'High' : confidence >= 50 ? 'Medium' : 'Low';
+  }
+  return confidence >= 75 ? 'Cao' : confidence >= 50 ? 'Trung bình' : 'Thấp';
+}
+
 export const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
 // Φ(z) — CDF chuẩn tắc qua erf xấp xỉ Abramowitz–Stegun 7.1.26
@@ -134,12 +161,12 @@ export function computeConfidence(history, ctx = {}) {
   return Math.round(clamp(score, 0, 100));
 }
 
-export function bandOf(p) {
-  if (p >= 0.9) return { code: 'safe', label: 'An toàn' };
-  if (p >= 0.7) return { code: 'likely', label: 'Khá an toàn' };
-  if (p >= 0.4) return { code: 'borderline', label: 'Cân nhắc' };
-  if (p >= 0.15) return { code: 'reach', label: 'Thử thách' };
-  return { code: 'far', label: 'Xa tầm' };
+export function bandOf(p, lang = 'vi') {
+  if (p >= 0.9) return { code: 'safe', label: getBandLabel('safe', lang) };
+  if (p >= 0.7) return { code: 'likely', label: getBandLabel('likely', lang) };
+  if (p >= 0.4) return { code: 'borderline', label: getBandLabel('borderline', lang) };
+  if (p >= 0.15) return { code: 'reach', label: getBandLabel('reach', lang) };
+  return { code: 'far', label: getBandLabel('far', lang) };
 }
 
 // Ước tính cho 1 kênh (ngành x phương thức).
@@ -149,6 +176,8 @@ export function bandOf(p) {
 // sigmaFloor tra theo methodCode trên thang 30).
 export function estimateChannel(candidate, history, methodCode, ctx = {}) {
   if (!history || history.length === 0 || candidate == null) return null;
+  const lang = ctx.lang || 'vi';
+  const isEn = lang === 'en';
   const cutoffHat = forecastCutoff(history, ctx.quotaNext, ctx.specShift ?? 0);
   const sig = sigmaEff(history, methodCode, {
     hasCurrentSpectrum: ctx.hasSpectrum != null && ctx.hasSpectrum !== 'none',
@@ -160,7 +189,7 @@ export function estimateChannel(candidate, history, methodCode, ctx = {}) {
   // bắt buộc gắn nhãn "nguồn thứ cấp — cần đối chiếu" (thiết kế Mục 2.5).
   if (ctx.reliability === 'C') confidence = Math.max(0, confidence - 10);
   if (confidence < 50) p = 0.5 + (p - 0.5) * (confidence / 50); // shrinkage
-  const band = bandOf(p);
+  const band = bandOf(p, lang);
   return {
     probability: p,
     probabilityRounded: Math.round(p * 20) * 5, // bội 5% khi hiển thị
@@ -174,8 +203,12 @@ export function estimateChannel(candidate, history, methodCode, ctx = {}) {
     confidence,
     reliability: ctx.reliability || null,
     reliabilityWarning:
-      ctx.reliability === 'C' ? 'Điểm chuẩn từ nguồn thứ cấp — cần đối chiếu văn bản chính thức của trường.' : null,
-    confidenceLabel: confidence >= 75 ? 'Cao' : confidence >= 50 ? 'Trung bình' : 'Thấp',
+      ctx.reliability === 'C'
+        ? isEn
+          ? 'Cutoff sourced from secondary press — verify against the official university announcement.'
+          : 'Điểm chuẩn từ nguồn thứ cấp — cần đối chiếu văn bản chính thức của trường.'
+        : null,
+    confidenceLabel: getConfidenceLabel(confidence, lang),
     showPercent: confidence >= 50,
     yearsUsed: history.map((h) => h.year),
   };
@@ -183,28 +216,35 @@ export function estimateChannel(candidate, history, methodCode, ctx = {}) {
 
 // Sức khoẻ danh sách nguyện vọng (ALGORITHM.md §4).
 // list: [{ probability, schoolCode, majorGroup }] theo thứ tự NV1..NVn.
-export function portfolioHealth(list) {
+export function portfolioHealth(list, lang = 'vi') {
+  const isEn = lang === 'en';
   const warnings = [];
   if (!list || list.length === 0) return { score: 0, warnings };
   if (!list.some((x) => x.probability >= 0.7))
     warnings.push({
       level: 'red',
       code: 'NO_SAFE',
-      text: 'Chưa có nguyện vọng nào Khá an toàn trở lên — hãy thêm 1–2 ngành có điểm chuẩn thấp hơn điểm của bạn khoảng 1,5–2 điểm.',
+      text: isEn
+        ? 'No “Likely” or “Safe” choice yet — add 1–2 majors whose historical cutoff sits ~1.5–2.0 pts below your score.'
+        : 'Chưa có nguyện vọng nào Khá an toàn trở lên — hãy thêm 1–2 ngành có điểm chuẩn thấp hơn điểm của bạn khoảng 1,5–2 điểm.',
     });
   const last = list[list.length - 1];
   if (last && last.probability < 0.7)
     warnings.push({
       level: 'red',
       code: 'WEAK_FLOOR',
-      text: 'Nguyện vọng cuối (sàn đỡ) chưa an toàn — nếu các nguyện vọng trên trượt, nguyện vọng này cũng có thể trượt.',
+      text: isEn
+        ? 'Your final choice (safety floor) is not yet safe — if higher choices miss, this floor could also miss.'
+        : 'Nguyện vọng cuối (sàn đỡ) chưa an toàn — nếu các nguyện vọng trên trượt, nguyện vọng này cũng có thể trượt.',
     });
   const sumP = list.reduce((s, x) => s + x.probability, 0);
   if (sumP < 1.5)
     warnings.push({
       level: 'orange',
       code: 'LOW_EXPECTED',
-      text: 'Tổng kỳ vọng đỗ của cả danh sách đang thấp — cân nhắc thêm nguyện vọng vừa sức.',
+      text: isEn
+        ? 'Overall expected admission odds across your wishlist are low — consider adding balanced target choices.'
+        : 'Tổng kỳ vọng đỗ của cả danh sách đang thấp — cân nhắc thêm nguyện vọng vừa sức.',
     });
   let score = 0;
   if (list.some((x) => x.probability >= 0.7)) score += 30;
@@ -222,3 +262,10 @@ export function portfolioHealth(list) {
 
 export const DISCLAIMER =
   'Kết quả là ước tính thống kê từ điểm chuẩn các năm trước. Điểm chuẩn thật phụ thuộc phổ điểm, số hồ sơ và chỉ tiêu của năm nay — chỉ công bố khi xét tuyển. Hãy luôn giữ ít nhất 1–2 nguyện vọng an toàn.';
+
+export const DISCLAIMER_EN =
+  'Results are statistical estimates based on prior years’ cutoffs. Official cutoffs depend on this year’s score distribution, applicant volume, and quotas — announced only during official admission rounds. Always keep at least 1–2 safe choices.';
+
+export function getDisclaimer(lang = 'vi') {
+  return lang === 'en' ? DISCLAIMER_EN : DISCLAIMER;
+}

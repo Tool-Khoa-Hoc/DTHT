@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 /**
  * ThemeToggle — Nút chuyển đổi phong cách "Thư Phòng Sáng" ⇋ "Mặc Dạ Tối"
@@ -7,15 +8,16 @@ import { useTheme } from '../../contexts/ThemeContext';
  */
 export default function ThemeToggle({ variant = 'desktop', className = '' }) {
   const { toggleTheme, isDark } = useTheme();
+  const { t } = useLanguage();
 
   if (variant === 'compact') {
     return (
       <button
         type="button"
         onClick={toggleTheme}
-        className={`relative flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface-alt text-foreground hover:bg-surface hover:border-gold transition-colors active:scale-95 cursor-pointer shadow-xs ${className}`.trim()}
-        title={isDark ? 'Chuyển sang Thư Phòng Sáng (Rice Paper Light)' : 'Chuyển sang Mặc Dạ Tối (Ink Night Dark)'}
-        aria-label={isDark ? 'Chuyển sang Thư Phòng Sáng' : 'Chuyển sang Mặc Dạ Tối'}
+        className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-alt text-foreground hover:bg-surface hover:border-gold transition-colors active:scale-95 cursor-pointer shadow-xs ${className}`.trim()}
+        title={isDark ? t('theme.toLightTitle') : t('theme.toDarkTitle')}
+        aria-label={isDark ? t('theme.toLight') : t('theme.toDark')}
       >
         <span
           className={`material-symbols-outlined text-lg transition-transform duration-300 ${
@@ -34,12 +36,12 @@ export default function ThemeToggle({ variant = 'desktop', className = '' }) {
       type="button"
       onClick={toggleTheme}
       className={`group flex items-center justify-between w-full px-3 py-2 rounded-xl border border-border bg-surface hover:bg-surface-alt hover:border-gold/60 transition-all cursor-pointer shadow-2xs ${className}`.trim()}
-      title={isDark ? 'Chuyển sang Thư Phòng Sáng (Rice Paper)' : 'Chuyển sang Mặc Dạ Tối (Ink Night)'}
-      aria-label="Chuyển đổi giao diện Sáng / Tối"
+      title={isDark ? t('theme.toLightTitle') : t('theme.toDarkTitle')}
+      aria-label={t('theme.toggleAria')}
     >
       <div className="flex items-center gap-2.5 min-w-0">
         <div
-          className={`flex h-7 w-7 items-center justify-center rounded-lg border transition-colors ${
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border transition-colors ${
             isDark
               ? 'border-gold/40 bg-gold-soft text-gold'
               : 'border-primary/30 bg-primary-soft text-primary'
@@ -51,10 +53,10 @@ export default function ThemeToggle({ variant = 'desktop', className = '' }) {
         </div>
         <div className="text-left min-w-0">
           <p className="text-xs font-bold leading-tight text-foreground truncate">
-            {isDark ? 'Mặc Dạ (Tối)' : 'Thư Phòng (Sáng)'}
+            {isDark ? t('theme.darkName') : t('theme.lightName')}
           </p>
           <p className="text-[10px] text-muted-foreground leading-none mt-0.5 truncate">
-            {isDark ? 'Đá Đoan Khê · Gỗ Tử Đàn' : 'Giấy Tuyên · Mực Tàu'}
+            {isDark ? t('theme.darkSub') : t('theme.lightSub')}
           </p>
         </div>
       </div>

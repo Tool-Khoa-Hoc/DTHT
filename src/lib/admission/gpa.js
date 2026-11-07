@@ -9,8 +9,11 @@ export const GPA_SCALES = {
   'vn-common': {
     id: 'vn-common',
     label: 'Thang bậc thang phổ biến (mặc định)',
+    labelEn: 'Standard Vietnamese Step Scale (Default)',
     sourceNote:
       'Thang quy đổi bậc thang đang được nhiều trường Việt Nam dùng: ≥8,5→4,0 · ≥8,0→3,5 · ≥7,0→3,0 · ≥6,5→2,5 · ≥5,5→2,0 · ≥5,0→1,5 · ≥4,0→1,0 · <4,0→0. Đây là bộ thang app đã dùng trước score-v3 — giữ làm mặc định để không đổi kết quả của sinh viên hiện tại.',
+    sourceNoteEn:
+      'Standard step conversion scale used across most Vietnamese universities: ≥8.5→4.0 · ≥8.0→3.5 · ≥7.0→3.0 · ≥6.5→2.5 · ≥5.5→2.0 · ≥5.0→1.5 · ≥4.0→1.0 · <4.0→0.',
     steps: [
       [8.5, 4.0], [8.0, 3.5], [7.0, 3.0], [6.5, 2.5],
       [5.5, 2.0], [5.0, 1.5], [4.0, 1.0], [0, 0],
@@ -18,8 +21,14 @@ export const GPA_SCALES = {
   },
 };
 
-export function getGpaScale(scaleId = 'vn-common') {
-  return GPA_SCALES[scaleId] || GPA_SCALES['vn-common'];
+export function getGpaScale(scaleId = 'vn-common', lang = 'vi') {
+  const base = GPA_SCALES[scaleId] || GPA_SCALES['vn-common'];
+  const isEn = lang === 'en';
+  return {
+    ...base,
+    displayLabel: isEn ? base.labelEn || base.label : base.label,
+    displaySourceNote: isEn ? base.sourceNoteEn || base.sourceNote : base.sourceNote,
+  };
 }
 
 export function convertTo4(grade10, scaleId = 'vn-common') {

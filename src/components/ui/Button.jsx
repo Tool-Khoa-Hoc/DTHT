@@ -26,13 +26,13 @@ export default function Button({
   return (
     <Tag className={`btn-arena ${v} ${s} ${className}`.trim()} {...extraProps} {...rest}>
       {icon ? (
-        <span className="material-symbols-outlined text-lg leading-none" aria-hidden="true">
+        <span className="material-symbols-outlined text-lg leading-none shrink-0" aria-hidden="true">
           {icon}
         </span>
       ) : null}
       {children}
       {trailingIcon ? (
-        <span className="material-symbols-outlined text-lg leading-none" aria-hidden="true">
+        <span className="material-symbols-outlined text-lg leading-none shrink-0" aria-hidden="true">
           {trailingIcon}
         </span>
       ) : null}

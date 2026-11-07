@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
-import { getUserRank, RANK_TIERS } from '../utils/rankHelper';
-import { getLevelFromExp, EXP_PER_MINUTE, getLevelAccent, formatStudyTime } from '../utils/levelHelper';
+import { getUserRank, getRankDisplayName, RANK_TIERS } from '../utils/rankHelper';
+import {
+  getLevelFromExp,
+  EXP_PER_MINUTE,
+  getLevelAccent,
+  formatStudyTime,
+} from '../utils/levelHelper';
 import { preloadRouteModule } from '../lib/routeModules';
 import { getDocumentKindMeta } from '../lib/documents';
+import { getComboHs12Course } from '../content/courseCatalog';
 import { sanitizeExternalUrl } from '../utils/urlSecurity';
 import Avatar from '../components/Avatar';
 import WelcomeModal from '../components/WelcomeModal';
@@ -18,44 +25,68 @@ const ARENA_GATES = [
     to: '/library',
     preloadKey: 'Library',
     icon: 'menu_book',
-    tag: 'KHO ĐỀ · PDF',
+    tagVi: 'KHO ĐỀ · PDF',
+    tagEn: 'EXAM BANK · PDF',
     hanzi: '書',
-    title: 'Thư viện tài liệu',
-    desc: 'Hơn 10.000 đề thi thử, chuyên đề và sơ đồ tư duy chọn lọc từ các trường chuyên toàn quốc.',
-    cta: 'Vào kho đề',
+    titleVi: 'Thư viện tài liệu',
+    titleEn: 'Resource Library',
+    descVi:
+      'Hơn 10.000 đề thi thử, chuyên đề và sơ đồ tư duy chọn lọc từ các trường chuyên toàn quốc.',
+    descEn:
+      'Over 10,000 curated mock exams, topic guides, and mindmaps from top specialized schools nationwide.',
+    ctaVi: 'Vào kho đề',
+    ctaEn: 'Browse exam bank',
     tone: 'primary',
   },
   {
     to: '/hoc-online',
     preloadKey: 'OnlineLearning',
     icon: 'cast_for_education',
-    tag: '47 GIÁO VIÊN · SHEET',
+    tagVi: '47 GIÁO VIÊN · SHEET',
+    tagEn: '47 INSTRUCTORS · SHEETS',
     hanzi: '師',
-    title: 'Học online',
-    desc: 'Kho sheet bài giảng theo từng môn và giáo viên — mở nhanh, theo dõi tiến độ từng buổi.',
-    cta: 'Mở kho sheet',
+    titleVi: 'Học online',
+    titleEn: 'Online Study Sheets',
+    descVi:
+      'Kho sheet bài giảng theo từng môn và giáo viên — mở nhanh, theo dõi tiến độ từng buổi.',
+    descEn:
+      'Structured Google Sheets syllabi organized by subject and instructor — open instantly and track every lesson.',
+    ctaVi: 'Mở kho sheet',
+    ctaEn: 'Open study sheets',
     tone: 'gold',
   },
   {
     to: '/roadmap',
     preloadKey: 'Roadmap',
     icon: 'route',
-    tag: 'CHIẾN LƯỢC · 2K9',
+    tagVi: 'CHIẾN LƯỢC · 2K9',
+    tagEn: 'STRATEGY · 2027',
     hanzi: '道',
-    title: 'Lộ trình ôn thi',
-    desc: 'Từng chặng từ nền tảng đến tổng ôn — phân bổ mục tiêu theo tuần và theo khối xét tuyển.',
-    cta: 'Xem lộ trình',
+    titleVi: 'Lộ trình ôn thi',
+    titleEn: 'Exam Prep Roadmap',
+    descVi:
+      'Từng chặng từ nền tảng đến tổng ôn — phân bổ mục tiêu theo tuần và theo khối xét tuyển.',
+    descEn:
+      'Step-by-step milestones from core foundations to final mock sprints — tailored to your admission group.',
+    ctaVi: 'Xem lộ trình',
+    ctaEn: 'View roadmap',
     tone: 'jade',
   },
   {
     to: '/arena',
     preloadKey: 'StudyArena',
     icon: 'local_fire_department',
-    tag: 'BẢNG VÀNG · QUÂN HÀM',
+    tagVi: 'BẢNG VÀNG · QUÂN HÀM',
+    tagEn: 'HONOR ROLL · RANKS',
     hanzi: '榜',
-    title: 'Đấu trường',
-    desc: 'Tích luỹ EXP từ thời gian học thực tế, leo bậc quân hàm mỗi ngày cùng bạn bè.',
-    cta: 'Vào đấu trường',
+    titleVi: 'Đấu trường',
+    titleEn: 'Study Arena',
+    descVi:
+      'Tích luỹ EXP từ thời gian học thực tế, leo bậc quân hàm mỗi ngày cùng bạn bè.',
+    descEn:
+      'Accrue verified EXP from real study minutes, maintain streaks, and ascend scholarly ranks daily.',
+    ctaVi: 'Vào đấu trường',
+    ctaEn: 'Enter arena',
     tone: 'primary',
   },
 ];
@@ -65,32 +96,40 @@ const QUICK_TOOLS = [
     to: '/gpa',
     preloadKey: 'GPACalculator',
     icon: 'calculate',
-    title: 'Tính GPA',
-    desc: 'Điểm trung bình học kỳ & mục tiêu học bạ',
+    titleVi: 'Tính GPA',
+    titleEn: 'GPA Calculator',
+    descVi: 'Điểm trung bình học kỳ & mục tiêu học bạ',
+    descEn: 'Semester GPA & high school transcript targets',
     badge: 'bg-jade-soft text-jade border-jade-border',
   },
   {
     to: '/schools',
     preloadKey: 'SchoolFinder',
     icon: 'school',
-    title: 'Tìm trường',
-    desc: 'Gợi ý đại học theo điểm và khối thi',
+    titleVi: 'Tìm trường',
+    titleEn: 'School Finder',
+    descVi: 'Gợi ý đại học theo điểm và khối thi',
+    descEn: 'Match universities by cutoff score & exam group',
     badge: 'bg-gold-soft text-gold-dark border-gold',
   },
   {
     to: '/admission',
     preloadKey: 'AdmissionCalculator',
     icon: 'trending_up',
-    title: 'Điểm xét tuyển',
-    desc: 'Quy đổi học bạ, ĐGNL và điểm thi THPT',
+    titleVi: 'Điểm xét tuyển',
+    titleEn: 'Admission Score',
+    descVi: 'Quy đổi học bạ, ĐGNL và điểm thi THPT',
+    descEn: 'Convert transcript, HSA/V-ACT/TSA & National scores',
     badge: 'bg-primary-soft text-primary border-primary/30',
   },
   {
     to: '/notes',
     preloadKey: 'Notes',
     icon: 'edit_note',
-    title: 'Ghi chú',
-    desc: 'Sổ tay công thức & lỗi sai cần nhớ',
+    titleVi: 'Ghi chú',
+    titleEn: 'Study Notes',
+    descVi: 'Sổ tay công thức & lỗi sai cần nhớ',
+    descEn: 'Personal formula notebook & mistake log',
     badge: 'bg-surface-alt text-foreground border-border-strong',
   },
 ];
@@ -115,12 +154,13 @@ const GATE_TONE_CLASSES = {
 
 export default function Home() {
   const { user, profile, signInWithGoogle } = useAuth();
+  const { lang, isEn, t, pick, formatNumber, formatDate } = useLanguage();
   const [isGoogleRedirecting, setIsGoogleRedirecting] = useState(false);
+
   const studyMinutes = profile?.total_study_minutes || 0;
   const studySeconds = Number(profile?.study_seconds) || studyMinutes * 60;
   const studyHours = (studySeconds / 3600).toFixed(1);
 
-  // Compute Level & EXP (ưu tiên lấy profile?.exp trực tiếp từ DB vì đã gồm điểm thưởng chuỗi ngày học)
   const totalExp =
     typeof profile?.exp === 'number'
       ? profile.exp
@@ -132,7 +172,9 @@ export default function Home() {
     profile?.role,
     profile?.is_approved_bang_chu || profile?.is_thong_soai,
     user?.id,
+    lang,
   );
+  const featuredCourse = getComboHs12Course(lang);
 
   // Live Supabase highlights
   const [featuredDocs, setFeaturedDocs] = useState([]);
@@ -148,7 +190,9 @@ export default function Home() {
         // 1. Featured / Latest 4 documents
         const { data: docData } = await supabase
           .from('documents')
-          .select('id, title, category, description, file_url, is_featured, created_at, author_name, education_level')
+          .select(
+            'id, title, category, description, file_url, is_featured, created_at, author_name, education_level',
+          )
           .eq('is_public', true)
           .order('is_featured', { ascending: false })
           .order('created_at', { ascending: false })
@@ -158,7 +202,7 @@ export default function Home() {
           setFeaturedDocs(docData);
         }
 
-        // 2. Sĩ tử tiêu biểu hôm nay (Phương án A: ưu tiên số phút học trong ngày + tự động lấp đầy đầu ngày)
+        // 2. Distinguished daily scholars
         try {
           const { data: dailyData, error: rpcErr } = await supabase.rpc(
             'get_daily_top_scholars',
@@ -171,7 +215,6 @@ export default function Home() {
             throw rpcErr || new Error('Empty daily RPC response');
           }
         } catch {
-          // Fallback 1: truy vấn public_profile_view (có today_seconds hoặc exp/study_seconds)
           let viewRes = await supabase
             .from('public_profile_view')
             .select(
@@ -219,7 +262,20 @@ export default function Home() {
     };
   }, []);
 
-  const displayName = profile?.display_name || profile?.full_name || (user?.email ? user.email.split('@')[0] : 'Chiến binh');
+  const displayName =
+    profile?.display_name ||
+    profile?.full_name ||
+    (user?.email ? user.email.split('@')[0] : t('homePage.defaultWarriorName'));
+
+  const formatEduLevel = (edu) => {
+    const raw = edu || 'THPT';
+    if (!isEn) return raw;
+    if (raw.toUpperCase() === 'THPT') return 'High School';
+    if (raw.toUpperCase() === 'ĐẠI HỌC' || raw.toUpperCase() === 'DAI HOC') {
+      return 'University';
+    }
+    return raw;
+  };
 
   return (
     <div className="min-h-full bg-background text-foreground font-sans selection:bg-primary/15 selection:text-primary">
@@ -242,20 +298,21 @@ export default function Home() {
                 <div className="mb-5">
                   <RankSeal
                     icon="local_fire_department"
-                    label="Học tập & Chinh phục · Mùa thi 2027"
+                    label={t('homePage.heroSeal')}
                   />
                 </div>
 
-                <h1 className="font-display text-3xl sm:text-5xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.1] text-foreground mb-4">
-                  Rèn mỗi ngày.
+                <h1 className="font-display text-3xl sm:text-5xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.12] text-foreground mb-4">
+                  {t('homePage.heroTitleLine1')}
                   <span className="block mt-1 text-primary">
-                    <span className="brush-underline">Chinh phục kỳ thi.</span>
+                    <span className="brush-underline">
+                      {t('homePage.heroTitleLine2')}
+                    </span>
                   </span>
                 </h1>
 
                 <p className="text-secondary-text text-sm sm:text-base leading-relaxed max-w-xl mb-7">
-                  Không gian học tập tập trung cho học sinh THPT: kho đề thi chọn lọc,
-                  lộ trình rõ ràng, công cụ tính điểm chuẩn xác và bảng xếp hạng thi đua mỗi ngày.
+                  {t('homePage.heroSubtitle')}
                 </p>
 
                 <div className="flex flex-wrap items-center gap-3 mb-8">
@@ -268,7 +325,7 @@ export default function Home() {
                     <span className="material-symbols-outlined text-xl" aria-hidden="true">
                       menu_book
                     </span>
-                    <span>Mở thư viện</span>
+                    <span>{t('homePage.ctaLibrary')}</span>
                     <span className="material-symbols-outlined text-lg" aria-hidden="true">
                       arrow_forward
                     </span>
@@ -283,7 +340,7 @@ export default function Home() {
                     <span className="material-symbols-outlined text-xl" aria-hidden="true">
                       cast_for_education
                     </span>
-                    <span>Kho Học Online</span>
+                    <span>{t('homePage.ctaOnline')}</span>
                   </Link>
 
                   <Link
@@ -295,61 +352,63 @@ export default function Home() {
                     <span className="material-symbols-outlined text-xl text-accent" aria-hidden="true">
                       route
                     </span>
-                    <span>Xem lộ trình</span>
+                    <span>{t('homePage.ctaRoadmap')}</span>
                   </Link>
                 </div>
               </div>
 
-              {/* Rank ladder strip */}
-              <div className="paper-card p-4 bg-surface/90">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-secondary-text flex items-center gap-1.5">
+              {/* Rank ladder strip — Uniform 7-tier grid */}
+              <div className="paper-card p-4 sm:p-5 bg-surface/90 border border-border">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-secondary-text flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-sm text-accent" aria-hidden="true">
                       military_tech
                     </span>
-                    Con đường thăng hạng
+                    <span>{t('homePage.rankStripTitle')}</span>
                   </span>
                   <Link
                     to="/arena"
                     onMouseEnter={() => preloadRouteModule('StudyArena')}
                     onFocus={() => preloadRouteModule('StudyArena')}
-                    className="text-xs font-bold text-primary hover:text-primary-hover flex items-center gap-0.5"
+                    className="text-xs font-bold text-primary hover:text-primary-hover flex items-center gap-0.5 shrink-0"
                   >
-                    Bảng xếp hạng
+                    <span>{t('homePage.rankStripLink')}</span>
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
                       chevron_right
                     </span>
                   </Link>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-2.5 items-stretch">
                   {RANK_TIERS.map((tier) => {
-                    const isCurrent = user && userRank.name === tier.name;
+                    const isCurrent = Boolean(user && userRank.key === tier.key);
+                    const rankTitle = getRankDisplayName(tier, lang);
                     return (
                       <div
-                        key={tier.name}
-                        className={`flex flex-col items-center justify-center px-2 py-2 rounded-xl border text-center transition-all ${
+                        key={tier.key}
+                        className={`h-full flex flex-col items-center justify-between gap-1 px-2 py-2.5 rounded-xl border text-center transition-all ${
                           isCurrent
                             ? 'bg-primary-soft border-primary ring-1 ring-primary/30 shadow-xs'
-                            : 'bg-paper border-border'
+                            : 'bg-paper border-border hover:border-border-strong'
                         }`}
                       >
                         <span
-                          className={`material-symbols-outlined text-lg mb-0.5 ${tier.color}`}
+                          className={`material-symbols-outlined text-lg shrink-0 ${tier.color}`}
                           aria-hidden="true"
                         >
                           {tier.icon}
                         </span>
                         <span
-                          className={`text-[11px] font-bold truncate w-full ${
+                          className={`text-[11px] font-bold leading-tight break-words w-full ${
                             isCurrent ? 'text-primary' : 'text-foreground'
                           }`}
                         >
-                          {tier.name}
+                          {rankTitle}
                         </span>
-                        <span className="text-[9px] text-secondary-text tabular mt-0.5">
+                        <span className="text-[9px] text-secondary-text tabular leading-tight">
                           {tier.exclusiveBangChu
-                            ? 'Độc tôn'
-                            : `${tier.min.toLocaleString('vi-VN')} EXP`}
+                            ? t('homePage.exclusiveRankLabel')
+                            : `${formatNumber(tier.min)} EXP`}
                         </span>
                       </div>
                     );
@@ -358,10 +417,10 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right column — Warrior status / Guest invitation */}
+            {/* Right column — Scholar dossier / Guest invitation */}
             <div className="lg:col-span-5 flex">
               {user ? (
-                <div className="w-full imperial-frame p-6 flex flex-col justify-between relative overflow-hidden">
+                <div className="w-full imperial-frame p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
                   <span
                     aria-hidden="true"
                     className="hanzi-watermark absolute -bottom-4 -right-2 text-8xl font-bold text-primary/6"
@@ -373,7 +432,7 @@ export default function Home() {
                     <div className="flex items-center justify-between gap-3 mb-5">
                       <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-jade animate-pulse" aria-hidden="true" />
-                        Hồ sơ chiến binh
+                        <span>{t('homePage.scholarCardEyebrow')}</span>
                       </span>
                       <Link
                         to="/profile"
@@ -381,7 +440,7 @@ export default function Home() {
                         onFocus={() => preloadRouteModule('Profile')}
                         className="text-xs font-bold text-secondary-text hover:text-primary flex items-center gap-1"
                       >
-                        Chi tiết
+                        <span>{t('homePage.scholarCardDetails')}</span>
                         <span className="material-symbols-outlined text-sm" aria-hidden="true">
                           open_in_new
                         </span>
@@ -409,17 +468,22 @@ export default function Home() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <h2 className="font-display text-lg font-extrabold text-foreground truncate">
-                          Chào {displayName}!
+                          {t('homePage.scholarGreeting', { name: displayName })}
                         </h2>
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-soft text-primary border border-primary/30">
                             <span className="material-symbols-outlined text-sm icon-fill" aria-hidden="true">
                               {userRank.icon}
                             </span>
-                            <span>{userRank.name}</span>
+                            <span>{userRank.displayName}</span>
                           </span>
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold border ${levelAccent.badge}`}>
-                            Cấp {levelInfo.level} · {levelInfo.exp} EXP
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold border tabular ${levelAccent.badge}`}
+                          >
+                            {t('homePage.levelBadge', {
+                              level: levelInfo.level,
+                              exp: formatNumber(levelInfo.exp),
+                            })}
                           </span>
                         </div>
                       </div>
@@ -431,8 +495,11 @@ export default function Home() {
                         value={levelInfo.progressPct}
                         max={100}
                         tone="primary"
-                        label={`Công lực Cấp ${levelInfo.level} → Cấp ${levelInfo.level + 1}`}
-                        sublabel={`${levelInfo.expIntoLevel}/${levelInfo.expForThisLevel} EXP`}
+                        label={t('homePage.levelProgressLabel', {
+                          current: levelInfo.level,
+                          next: levelInfo.level + 1,
+                        })}
+                        sublabel={`${formatNumber(levelInfo.expIntoLevel)}/${formatNumber(levelInfo.expForThisLevel)} EXP`}
                       />
                     </div>
 
@@ -442,19 +509,27 @@ export default function Home() {
                         <div className="font-display text-lg font-extrabold text-foreground tabular">
                           {studyHours}h
                         </div>
-                        <div className="text-[11px] text-secondary-text font-medium">Giờ tích luỹ</div>
+                        <div className="text-[11px] text-secondary-text font-medium">
+                          {t('homePage.statHours')}
+                        </div>
                       </div>
                       <div className="p-3 rounded-xl bg-paper border border-border text-center">
                         <div className="font-display text-lg font-extrabold text-accent tabular">
-                          {profile?.target_thpt ? `${profile.target_thpt}đ` : '27.0đ'}
+                          {profile?.target_thpt
+                            ? `${profile.target_thpt}${pick('đ', '')}`
+                            : pick('27.0đ', '27.0')}
                         </div>
-                        <div className="text-[11px] text-secondary-text font-medium">Mục tiêu THPT</div>
+                        <div className="text-[11px] text-secondary-text font-medium">
+                          {t('homePage.statTargetThpt')}
+                        </div>
                       </div>
                       <div className="p-3 rounded-xl bg-paper border border-border text-center">
                         <div className="font-display text-lg font-extrabold text-jade tabular">
                           {profile?.target_gpa ? profile.target_gpa : '8.5+'}
                         </div>
-                        <div className="text-[11px] text-secondary-text font-medium">Mục tiêu GPA</div>
+                        <div className="text-[11px] text-secondary-text font-medium">
+                          {t('homePage.statTargetGpa')}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -469,7 +544,7 @@ export default function Home() {
                       <span className="material-symbols-outlined text-lg" aria-hidden="true">
                         local_fire_department
                       </span>
-                      Vào đấu trường tích điểm hôm nay
+                      <span>{t('homePage.enterArenaToday')}</span>
                     </span>
                     <span className="material-symbols-outlined text-base" aria-hidden="true">
                       arrow_forward
@@ -477,7 +552,7 @@ export default function Home() {
                   </Link>
                 </div>
               ) : (
-                <div className="w-full imperial-frame p-6 sm:p-7 flex flex-col justify-between relative overflow-hidden">
+                <div className="w-full imperial-frame p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
                   <span
                     aria-hidden="true"
                     className="hanzi-watermark absolute -bottom-4 -right-2 text-8xl font-bold text-primary/6"
@@ -490,15 +565,14 @@ export default function Home() {
                       <span className="material-symbols-outlined text-sm icon-fill" aria-hidden="true">
                         emoji_events
                       </span>
-                      Bảng Phong Thần Cá Nhân
+                      <span>{t('homePage.guestBadge')}</span>
                     </div>
 
                     <h2 className="font-display text-2xl font-extrabold text-foreground mb-2 leading-snug">
-                      Ghi danh để lưu giờ học &amp; thăng hạng chiến binh
+                      {t('homePage.guestHeading')}
                     </h2>
                     <p className="text-sm text-secondary-text leading-relaxed mb-6">
-                      Tự động đếm thời gian ôn luyện khi bạn đọc đề, học online hoặc làm bài.
-                      EXP tích lũy càng cao thì mức hạng Quân hàm càng cao!
+                      {t('homePage.guestDesc')}
                     </p>
 
                     <div className="space-y-2.5 mb-6">
@@ -510,7 +584,7 @@ export default function Home() {
                           verified
                         </span>
                         <span className="text-xs sm:text-sm text-foreground font-medium">
-                          Mở toàn bộ kho tài liệu &amp; 47 sheet giáo viên
+                          {t('homePage.guestPerks1')}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-paper border border-border">
@@ -521,7 +595,7 @@ export default function Home() {
                           military_tech
                         </span>
                         <span className="text-xs sm:text-sm text-foreground font-medium">
-                          Theo dõi mục tiêu GPA, điểm chuẩn &amp; bảng xếp hạng tuần
+                          {t('homePage.guestPerks2')}
                         </span>
                       </div>
                     </div>
@@ -562,8 +636,8 @@ export default function Home() {
                       </svg>
                       <span>
                         {isGoogleRedirecting
-                          ? 'Đang chuyển tới Google...'
-                          : 'Tiếp tục nhanh với Google'}
+                          ? t('homePage.guestGoogleRedirecting')
+                          : t('homePage.guestGoogleBtn')}
                       </span>
                     </button>
 
@@ -574,7 +648,7 @@ export default function Home() {
                       <span className="material-symbols-outlined text-lg" aria-hidden="true">
                         login
                       </span>
-                      <span>Đăng nhập / Tạo tài khoản bằng Email</span>
+                      <span>{t('homePage.guestEmailBtn')}</span>
                     </Link>
                   </div>
                 </div>
@@ -589,20 +663,22 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Featured Documents (7 cols) */}
           <div className="lg:col-span-7 space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                  Tài nguyên tuyển chọn
+                  {t('homePage.docsEyebrow')}
                 </span>
                 <h2 className="font-display text-xl sm:text-2xl font-extrabold text-foreground">
-                  Học liệu nổi bật &amp; mới nhất
+                  {t('homePage.docsTitle')}
                 </h2>
               </div>
               <Link
                 to="/library"
-                className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                onMouseEnter={() => preloadRouteModule('Library')}
+                onFocus={() => preloadRouteModule('Library')}
+                className="text-xs font-bold text-primary hover:underline flex items-center gap-1 shrink-0"
               >
-                <span>Xem tất cả</span>
+                <span>{t('homePage.viewAll')}</span>
                 <span className="material-symbols-outlined text-sm" aria-hidden="true">
                   arrow_forward
                 </span>
@@ -611,32 +687,36 @@ export default function Home() {
 
             {loadingHighlights ? (
               <div className="py-12 flex justify-center">
-                <span className="material-symbols-outlined animate-spin text-2xl text-primary" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined animate-spin text-2xl text-primary"
+                  aria-hidden="true"
+                >
                   sync
                 </span>
               </div>
             ) : featuredDocs.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {featuredDocs.map((doc) => {
-                  const kind = getDocumentKindMeta(doc.title, doc.file_url);
+                  const kind = getDocumentKindMeta(doc.title, doc.file_url, lang);
                   const safeUrl = sanitizeExternalUrl(doc.file_url);
+                  const dateText = doc.created_at ? formatDate(doc.created_at) : null;
 
                   return (
                     <div
                       key={doc.id}
-                      className="paper-card paper-card-interactive p-4 flex flex-col justify-between"
+                      className="paper-card paper-card-interactive p-4 flex flex-col justify-between border border-border hover:border-border-strong"
                     >
                       <div>
-                        <div className="flex items-center gap-1.5 mb-2">
+                        <div className="flex items-center gap-1.5 flex-wrap mb-2">
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${kind.badgeClass}`}>
                             {kind.label}
                           </span>
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-surface-alt text-secondary-text border border-border uppercase">
-                            {doc.education_level || 'THPT'}
+                            {formatEduLevel(doc.education_level)}
                           </span>
                           {doc.is_featured && (
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gold-soft text-gold-dark border border-gold">
-                              Nổi bật
+                              {t('homePage.featuredBadge')}
                             </span>
                           )}
                         </div>
@@ -644,27 +724,33 @@ export default function Home() {
                           {doc.title}
                         </h3>
                         <p className="text-xs text-secondary-text line-clamp-2">
-                          {doc.description || 'Chuyên đề và tài liệu trọng tâm cho kỳ thi.'}
+                          {doc.description || t('homePage.defaultDocDesc')}
                         </p>
                       </div>
 
-                      <div className="pt-3 mt-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground">
-                        <span className="truncate max-w-[120px]">{doc.author_name || 'Khuyết danh'}</span>
+                      <div className="pt-3 mt-3 border-t border-border flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                        <span className="truncate min-w-0">
+                          {doc.author_name || t('homePage.unknownAuthor')}
+                          {dateText ? ` · ${dateText}` : ''}
+                        </span>
                         {safeUrl ? (
                           <a
                             href={safeUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-bold text-primary hover:underline flex items-center gap-0.5"
+                            className="font-bold text-primary hover:underline flex items-center gap-0.5 shrink-0"
                           >
-                            <span>Mở học</span>
+                            <span>{kind.actionLabel}</span>
                             <span className="material-symbols-outlined text-[12px]" aria-hidden="true">
                               open_in_new
                             </span>
                           </a>
                         ) : (
-                          <Link to="/library" className="font-bold text-primary hover:underline">
-                            Xem chi tiết
+                          <Link
+                            to="/library"
+                            className="font-bold text-primary hover:underline shrink-0"
+                          >
+                            {t('homePage.viewDetails')}
                           </Link>
                         )}
                       </div>
@@ -673,8 +759,8 @@ export default function Home() {
                 })}
               </div>
             ) : (
-              <div className="p-8 text-center text-xs text-secondary-text paper-card">
-                Chưa có tài liệu nổi bật nào được đăng tải.
+              <div className="p-8 text-center text-xs text-secondary-text paper-card border border-border">
+                {t('homePage.emptyDocs')}
               </div>
             )}
           </div>
@@ -683,36 +769,38 @@ export default function Home() {
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center justify-between gap-2">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
-                    Phong Thần Bảng
+                    {t('homePage.arenaEyebrow')}
                   </span>
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gold-soft text-gold-dark border border-gold">
                     <span
-                      className="material-symbols-outlined text-[12px] text-primary"
+                      className="material-symbols-outlined text-[12px] text-primary shrink-0"
                       aria-hidden="true"
                     >
                       local_fire_department
                     </span>
-                    Top Phút Học Ngày
+                    <span>{t('homePage.arenaDailyBadge')}</span>
                   </span>
                 </div>
                 <h2 className="font-display text-xl sm:text-2xl font-extrabold text-foreground">
-                  Sĩ tử tiêu biểu
+                  {t('homePage.arenaTitle')}
                 </h2>
               </div>
               <Link
                 to="/arena"
+                onMouseEnter={() => preloadRouteModule('StudyArena')}
+                onFocus={() => preloadRouteModule('StudyArena')}
                 className="text-xs font-bold text-primary hover:underline flex items-center gap-1 shrink-0"
               >
-                <span>Bảng đấu trường</span>
+                <span>{t('homePage.arenaLink')}</span>
                 <span className="material-symbols-outlined text-sm" aria-hidden="true">
                   arrow_forward
                 </span>
               </Link>
             </div>
 
-            <div className="paper-card divide-y divide-border overflow-hidden">
+            <div className="paper-card divide-y divide-border overflow-hidden border border-border">
               {topScholars.map((scholar, idx) => {
                 const todaySec = Number(scholar.today_seconds) || 0;
                 const todayMin =
@@ -725,6 +813,7 @@ export default function Home() {
                   scholar.role,
                   scholar.is_approved_bang_chu,
                   scholar.id,
+                  lang,
                 );
                 const hasTodayStudy = Boolean(scholar.is_today) || todayMin > 0;
 
@@ -750,29 +839,44 @@ export default function Home() {
                       </span>
                       <Avatar
                         src={scholar.avatar_url}
-                        name={scholar.display_name || 'Sĩ tử'}
+                        name={scholar.display_name || t('nav.defaultScholar')}
                         className="w-9 h-9 border border-border shrink-0"
                         textSize="text-xs"
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="font-display font-bold text-xs sm:text-sm text-foreground truncate">
-                            {scholar.display_name || 'Sĩ tử giấu tên'}
+                            {scholar.display_name || t('homePage.anonymousScholar')}
                           </span>
                           <span
                             className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${sRank.bg} ${sRank.color} ${sRank.border}`}
                           >
-                            {sRank.name}
+                            {sRank.displayName}
                           </span>
                           {totalExpVal > 0 && (
-                            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-surface-alt text-secondary-text border border-border tabular">
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-surface-alt text-secondary-text border border-border tabular">
                               Lv.{sLv.level}
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-muted-foreground truncate">
-                          {scholar.university || 'Sĩ tử THPTQG 2027'}
-                          {scholar.study_streak > 0 ? ` · 🔥${scholar.study_streak} ngày` : ''}
+                        <p className="text-[11px] text-muted-foreground flex items-center gap-1 min-w-0 mt-0.5">
+                          <span className="truncate">
+                            {scholar.university || t('homePage.defaultAffiliation')}
+                          </span>
+                          {scholar.study_streak > 0 && (
+                            <span className="inline-flex items-center gap-0.5 shrink-0 tabular text-foreground/85 font-semibold">
+                              <span aria-hidden="true">·</span>
+                              <span
+                                className="material-symbols-outlined text-[12px] text-primary shrink-0"
+                                aria-hidden="true"
+                              >
+                                local_fire_department
+                              </span>
+                              <span>
+                                {t('homePage.streakDays', { count: scholar.study_streak })}
+                              </span>
+                            </span>
+                          )}
                         </p>
                       </div>
                     </div>
@@ -787,43 +891,50 @@ export default function Home() {
                             >
                               schedule
                             </span>
-                            {todayMin >= 60
-                              ? formatStudyTime(todaySec || todayMin * 60)
-                              : `${todayMin} phút`}
+                            <span>
+                              {todayMin >= 60
+                                ? formatStudyTime(todaySec || todayMin * 60, lang)
+                                : t('homePage.minutesShort', { count: todayMin })}
+                            </span>
                           </span>
                           <p className="text-[10px] text-secondary-text font-semibold mt-0.5 tabular">
-                            Hôm nay
+                            {t('homePage.todayLabel')}
                             {Number(scholar.today_exp) > 0
-                              ? ` · +${Number(scholar.today_exp).toLocaleString('vi-VN')} EXP`
+                              ? ` · +${formatNumber(scholar.today_exp)} EXP`
                               : ''}
                           </p>
                         </div>
                       ) : totalSec >= 60 ? (
                         <div>
                           <span className="text-xs font-bold text-foreground tabular block">
-                            {formatStudyTime(totalSec)}
+                            {formatStudyTime(totalSec, lang)}
                           </span>
                           <span className="text-[10px] text-muted-foreground tabular">
-                            Tích luỹ · {totalExpVal.toLocaleString('vi-VN')} EXP
+                            {t('homePage.cumulativeLabel')} · {formatNumber(totalExpVal)} EXP
                           </span>
                         </div>
                       ) : totalExpVal > 0 ? (
                         <div>
                           <span className="text-xs font-bold text-accent tabular block">
-                            {totalExpVal.toLocaleString('vi-VN')} EXP
+                            {formatNumber(totalExpVal)} EXP
                           </span>
-                          <span className="text-[10px] text-muted-foreground">Công lực</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {t('homePage.powerLabel')}
+                          </span>
                         </div>
                       ) : scholar.target_thpt ? (
                         <span className="text-xs font-bold text-accent tabular">
-                          {scholar.target_thpt}đ
+                          {scholar.target_thpt}
+                          {pick('đ', ' pts')}
                         </span>
                       ) : scholar.target_gpa ? (
                         <span className="text-xs font-bold text-jade tabular">
                           GPA {scholar.target_gpa}
                         </span>
                       ) : (
-                        <span className="text-[11px] text-muted-foreground">Tích cực</span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {t('homePage.activeStatus')}
+                        </span>
                       )}
                     </div>
                   </Link>
@@ -832,7 +943,7 @@ export default function Home() {
 
               {topScholars.length === 0 && (
                 <div className="p-6 text-center text-xs text-secondary-text">
-                  Đang cập nhật bảng danh sách sĩ tử...
+                  {t('homePage.loadingScholars')}
                 </div>
               )}
 
@@ -840,15 +951,15 @@ export default function Home() {
                 to="/hoc-online"
                 onMouseEnter={() => preloadRouteModule('OnlineLearning')}
                 onFocus={() => preloadRouteModule('OnlineLearning')}
-                className="px-4 py-2.5 bg-paper hover:bg-primary-soft/50 flex items-center justify-between text-[11px] font-bold text-primary transition-colors"
+                className="px-4 py-2.5 bg-paper hover:bg-primary-soft/50 flex items-center justify-between gap-2 text-[11px] font-bold text-primary transition-colors"
               >
                 <span className="flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-sm" aria-hidden="true">
                     bolt
                   </span>
-                  Học tại Kho Học Online để ghi danh lên Bảng Vàng hôm nay
+                  <span>{t('homePage.arenaBottomCta')}</span>
                 </span>
-                <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                <span className="material-symbols-outlined text-sm shrink-0" aria-hidden="true">
                   chevron_right
                 </span>
               </Link>
@@ -857,16 +968,109 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══════════════ FEATURED COURSE SPOTLIGHT (getComboHs12Course) ═══════════════ */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="imperial-frame p-6 sm:p-8 relative overflow-hidden">
+          <span
+            aria-hidden="true"
+            className="hanzi-watermark hidden md:block absolute top-4 right-6 text-8xl font-bold text-accent/8"
+          >
+            學
+          </span>
+
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+            <div className="lg:col-span-7 space-y-3.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <RankSeal
+                  size="sm"
+                  variant="gold"
+                  icon="workspace_premium"
+                  label={t('homePage.featuredCourseEyebrow')}
+                />
+                <span className="paper-chip text-xs font-bold">
+                  {featuredCourse.audience}
+                </span>
+              </div>
+
+              <h2 className="font-display text-xl sm:text-2xl font-extrabold text-foreground leading-snug">
+                {featuredCourse.title}
+              </h2>
+              <p className="text-xs sm:text-sm text-secondary-text leading-relaxed">
+                {featuredCourse.subtitle}
+              </p>
+
+              <ul className="space-y-1.5 pt-1">
+                {featuredCourse.highlights.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-2 text-xs sm:text-sm text-foreground font-medium"
+                  >
+                    <span
+                      className="material-symbols-outlined text-jade text-base shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    >
+                      check_circle
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <Link
+                  to={featuredCourse.path}
+                  onMouseEnter={() => preloadRouteModule('CourseComboHs12')}
+                  onFocus={() => preloadRouteModule('CourseComboHs12')}
+                  className="btn-arena btn-arena-primary btn-arena-sm"
+                >
+                  <span>{t('homePage.featuredCourseExploreCta')}</span>
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">
+                    arrow_forward
+                  </span>
+                </Link>
+                <Link
+                  to="/hoc-online"
+                  onMouseEnter={() => preloadRouteModule('OnlineLearning')}
+                  onFocus={() => preloadRouteModule('OnlineLearning')}
+                  className="btn-arena btn-arena-secondary btn-arena-sm"
+                >
+                  <span className="material-symbols-outlined text-base text-accent" aria-hidden="true">
+                    cast_for_education
+                  </span>
+                  <span>{t('homePage.featuredCourseSheetsCta')}</span>
+                </Link>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 grid grid-cols-2 gap-3">
+              {featuredCourse.metrics.map((metric) => (
+                <div
+                  key={`${metric.value}-${metric.label}`}
+                  className="p-4 rounded-xl bg-paper border border-border hover:border-border-strong transition-colors flex flex-col justify-between"
+                >
+                  <span className="font-display text-lg sm:text-xl font-extrabold text-primary tabular">
+                    {metric.value}
+                  </span>
+                  <span className="text-xs text-secondary-text font-medium mt-1">
+                    {metric.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════════ 2. BỐN CỔNG CHÍNH — LỐI VÀO ĐẤU TRƯỜNG ═══════════════ */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
         <SectionHeading
-          eyebrow="Bốn mặt trận trọng điểm"
-          title="Lối vào đấu trường"
+          eyebrow={t('homePage.gatesEyebrow')}
+          title={t('homePage.gatesTitle')}
           hanzi="門"
           className="mb-7"
           action={
             <span className="text-xs text-secondary-text hidden sm:inline font-medium">
-              Chọn khu vực bạn muốn rèn luyện hôm nay
+              {t('homePage.gatesHint')}
             </span>
           }
         />
@@ -880,7 +1084,7 @@ export default function Home() {
                 to={gate.to}
                 onMouseEnter={() => preloadRouteModule(gate.preloadKey)}
                 onFocus={() => preloadRouteModule(gate.preloadKey)}
-                className={`group relative overflow-hidden paper-card paper-card-interactive p-6 flex flex-col justify-between ${tone.hoverBorder}`}
+                className={`group relative overflow-hidden paper-card paper-card-interactive p-6 flex flex-col justify-between border border-border ${tone.hoverBorder}`}
               >
                 <span
                   aria-hidden="true"
@@ -901,18 +1105,20 @@ export default function Home() {
                     <span
                       className={`text-[10px] font-extrabold tracking-[0.14em] px-2.5 py-1 rounded-full border ${tone.tag}`}
                     >
-                      {gate.tag}
+                      {pick(gate.tagVi, gate.tagEn)}
                     </span>
                   </div>
 
                   <h3 className="font-display text-xl font-extrabold text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {gate.title}
+                    {pick(gate.titleVi, gate.titleEn)}
                   </h3>
-                  <p className="text-sm text-secondary-text leading-relaxed mb-5">{gate.desc}</p>
+                  <p className="text-sm text-secondary-text leading-relaxed mb-5">
+                    {pick(gate.descVi, gate.descEn)}
+                  </p>
                 </div>
 
                 <div className="relative z-10 flex items-center justify-between pt-3 border-t border-border text-xs font-bold text-foreground group-hover:text-primary">
-                  <span>{gate.cta}</span>
+                  <span>{pick(gate.ctaVi, gate.ctaEn)}</span>
                   <span
                     className="material-symbols-outlined text-base transition-transform group-hover:translate-x-1"
                     aria-hidden="true"
@@ -933,8 +1139,8 @@ export default function Home() {
       {/* ═══════════════ 3. CÔNG CỤ NHANH — BÀN TÍNH & TRA CỨU ═══════════════ */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
         <SectionHeading
-          eyebrow="Trợ thủ học vụ"
-          title="Công cụ nhanh"
+          eyebrow={t('homePage.toolsEyebrow')}
+          title={t('homePage.toolsTitle')}
           hanzi="器"
           className="mb-6"
         />
@@ -946,7 +1152,7 @@ export default function Home() {
               to={tool.to}
               onMouseEnter={() => preloadRouteModule(tool.preloadKey)}
               onFocus={() => preloadRouteModule(tool.preloadKey)}
-              className="group paper-card paper-card-interactive p-4 sm:p-5 flex flex-col justify-between"
+              className="group paper-card paper-card-interactive p-4 sm:p-5 flex flex-col justify-between border border-border hover:border-border-strong"
             >
               <div
                 className={`w-10 h-10 rounded-xl border ${tool.badge} flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform`}
@@ -957,9 +1163,11 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="font-display text-sm sm:text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-                  {tool.title}
+                  {pick(tool.titleVi, tool.titleEn)}
                 </h3>
-                <p className="text-xs text-secondary-text leading-relaxed">{tool.desc}</p>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  {pick(tool.descVi, tool.descEn)}
+                </p>
               </div>
             </Link>
           ))}
@@ -978,10 +1186,10 @@ export default function Home() {
               </div>
               <div>
                 <div className="font-display text-xl font-extrabold text-foreground tabular">
-                  10k+ Học liệu
+                  {t('homePage.pillar1Title')}
                 </div>
                 <p className="text-xs text-secondary-text mt-1 leading-relaxed">
-                  Đề thi thử, chuyên đề và đáp án chi tiết phân loại theo từng môn học và kỳ thi THPT &amp; ĐGNL.
+                  {t('homePage.pillar1Desc')}
                 </p>
               </div>
             </div>
@@ -994,10 +1202,10 @@ export default function Home() {
               </div>
               <div>
                 <div className="font-display text-xl font-extrabold text-foreground">
-                  Công cụ GPA · THPT
+                  {t('homePage.pillar2Title')}
                 </div>
                 <p className="text-xs text-secondary-text mt-1 leading-relaxed">
-                  Tự động tính điểm học bạ, quy đổi điểm thi ĐGNL và sắp xếp nguyện vọng trường tối ưu.
+                  {t('homePage.pillar2Desc')}
                 </p>
               </div>
             </div>
@@ -1010,10 +1218,10 @@ export default function Home() {
               </div>
               <div>
                 <div className="font-display text-xl font-extrabold text-foreground tabular">
-                  Ôn thi 2027
+                  {t('homePage.pillar3Title')}
                 </div>
                 <p className="text-xs text-secondary-text mt-1 leading-relaxed">
-                  Bám sát chương trình GDPT mới và cấu trúc đề minh hoạ mới nhất của Bộ GD&amp;ĐT.
+                  {t('homePage.pillar3Desc')}
                 </p>
               </div>
             </div>
@@ -1032,13 +1240,13 @@ export default function Home() {
           </span>
           <div className="relative z-10">
             <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
-              Đấu Trường Học Tập
+              {t('brand.name')}
             </span>
             <h2 className="font-display text-xl sm:text-2xl font-extrabold text-foreground mt-1">
-              Sẵn sàng vào đấu trường?
+              {t('homePage.footerBannerTitle')}
             </h2>
             <p className="text-xs sm:text-sm text-secondary-text mt-1">
-              Chọn ngay một đề thi hoặc mở sheet bài giảng để bắt đầu tích luỹ phút học đầu tiên hôm nay.
+              {t('homePage.footerBannerDesc')}
             </p>
           </div>
           <Link
@@ -1047,7 +1255,7 @@ export default function Home() {
             onFocus={() => preloadRouteModule('Library')}
             className="relative z-10 no-shrink btn-arena btn-arena-primary"
           >
-            <span>Bắt đầu ngay</span>
+            <span>{t('homePage.footerBannerCta')}</span>
             <span className="material-symbols-outlined text-base" aria-hidden="true">
               arrow_forward
             </span>

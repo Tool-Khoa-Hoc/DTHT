@@ -58,10 +58,20 @@
       try {
         var theme = localStorage.getItem('dtht_theme');
         var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (theme === 'dark' || (!theme && prefersDark)) {
+        var isDark = theme === 'dark' || (!theme && prefersDark);
+        if (isDark) {
           document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = 'dark';
         } else {
           document.documentElement.classList.remove('dark');
+          document.documentElement.style.colorScheme = 'light';
+        }
+        var lang = localStorage.getItem('dtht_lang');
+        if (lang === 'en' || lang === 'vi') {
+          document.documentElement.lang = lang;
+          if (lang === 'en') {
+            document.title = 'Study Arena (DTHT) - National Exam Prep & University Admissions';
+          }
         }
       } catch (e) {}
     })();
@@ -219,13 +229,25 @@
   <div id="boot-shell" aria-hidden="true">
     <div class="boot-card">
       <div class="boot-mark">DT</div>
-      <h1 class="boot-title">Đấu Trường Học Tập</h1>
-      <p class="boot-copy">Đang mở thư phòng ôn luyện mùa thi 2027...</p>
+      <h1 class="boot-title" id="boot-title">Đấu Trường Học Tập</h1>
+      <p class="boot-copy" id="boot-copy">Đang mở thư phòng ôn luyện mùa thi 2027...</p>
       <div class="boot-track">
         <div class="boot-bar"></div>
       </div>
     </div>
   </div>
+  <script>
+    (function () {
+      try {
+        if (document.documentElement.lang === 'en') {
+          var t = document.getElementById('boot-title');
+          var c = document.getElementById('boot-copy');
+          if (t) t.textContent = 'Study Arena · DTHT';
+          if (c) c.textContent = 'Opening the 2027 scholarly study hall...';
+        }
+      } catch (e) {}
+    })();
+  </script>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

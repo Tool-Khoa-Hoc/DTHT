@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
-import { getUserRank, RANK_TIERS } from '../utils/rankHelper';
+import { getUserRank, getRankDisplayName, RANK_TIERS } from '../utils/rankHelper';
 import { getLevelFromExp, getLevelAccent, formatStudyTime } from '../utils/levelHelper';
 import Avatar from '../components/Avatar';
 import ProgressBar from '../components/ui/ProgressBar';
@@ -19,26 +20,28 @@ const PUBLIC_PROFILE_FULL_COLS =
 const PUBLIC_PROFILE_FALLBACK_COLS =
   'id, display_name, avatar_url, role, university, user_mode, target_gpa, target_thpt, target_dgnl, current_gpa, is_approved_bang_chu';
 
-function computeCampaignProgress(targets, isCompleted) {
-  if (isCompleted) return { pct: 100, label: '100% · Hoàn thành' };
+function computeCampaignProgress(targets, isCompleted, pick) {
+  if (isCompleted) {
+    return {
+      pct: 100,
+      label: pick ? pick('100% · Hoàn thành', '100% · Completed') : '100% · Hoàn thành',
+    };
+  }
   if (!Array.isArray(targets) || targets.length === 0) {
-    return { pct: 0, label: 'Đang thực hiện' };
+    return {
+      pct: 0,
+      label: pick ? pick('Đang thực hiện', 'In Progress') : 'Đang thực hiện',
+    };
   }
   const done = targets.filter((t) => Boolean(t?.completed)).length;
   const pct = Math.round((done / targets.length) * 100);
   return { pct, label: `${pct}% (${done}/${targets.length})` };
 }
 
-function formatDateVi(dateStr) {
-  if (!dateStr) return null;
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString('vi-VN');
-}
-
 export default function StudyArena() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
+  const { lang, pick, formatNumber, formatDate } = useLanguage();
   const { showToast } = useToast();
 
   const subTargetCounterRef = useRef(1);
@@ -277,12 +280,18 @@ export default function StudyArena() {
         }
       } catch (err) {
         console.error('Lỗi tải Bảng Vàng Công Lực:', err);
-        showToast('Không thể tải Bảng Vàng Công Lực lúc này.', 'error');
+        showToast(
+          pick(
+            'Không thể tải Bảng Vàng Công Lực lúc này.',
+            'Unable to load the Honor Roll right now.',
+          ),
+          'error',
+        );
       } finally {
         setLoadingLeaderboard(false);
       }
     },
-    [fetchCompletedCounts, leaderboardMode, showToast, user],
+    [fetchCompletedCounts, leaderboardMode, showToast, user, pick],
   );
 
   const fetchMyCampaigns = useCallback(async () => {
@@ -305,11 +314,17 @@ export default function StudyArena() {
       setMyCampaigns(data || []);
     } catch (err) {
       console.error('Lỗi tải chiến dịch cá nhân:', err);
-      showToast('Không thể tải danh sách chiến dịch của bạn.', 'error');
+      showToast(
+        pick(
+          'Không thể tải danh sách chiến dịch của bạn.',
+          'Unable to load your personal campaigns.',
+        ),
+        'error',
+      );
     } finally {
       setLoadingMyCampaigns(false);
     }
-  }, [showToast, user]);
+  }, [showToast, user, pick]);
 
   const fetchPublicCampaigns = useCallback(async () => {
     setLoadingPublicCampaigns(true);
@@ -340,11 +355,17 @@ export default function StudyArena() {
       );
     } catch (err) {
       console.error('Lỗi tải chiến dịch cộng đồng:', err);
-      showToast('Không thể tải chiến dịch cộng đồng.', 'error');
+      showToast(
+        pick(
+          'Không thể tải chiến dịch cộng đồng.',
+          'Unable to load community campaigns.',
+        ),
+        'error',
+      );
     } finally {
       setLoadingPublicCampaigns(false);
     }
-  }, [fetchCompletedCounts, fetchPublicProfilesByIds, showToast]);
+  }, [fetchCompletedCounts, fetchPublicProfilesByIds, showToast, pick]);
 
   // Initial load for leaderboard & my campaigns count
   useEffect(() => {
@@ -389,17 +410,35 @@ export default function StudyArena() {
   const handleCreateCampaign = async (e) => {
     e.preventDefault();
     if (!user) {
-      showToast('Vui lòng đăng nhập để khởi tạo chiến dịch.', 'warning');
+      showToast(
+        pick(
+          'Vui lòng đăng nhập để khởi tạo chiến dịch.',
+          'Please sign in to launch a campaign.',
+        ),
+        'warning',
+      );
       return;
     }
     const cleanTitle = title.trim();
     const cleanDesc = description.trim();
     if (!cleanTitle || !cleanDesc) {
-      showToast('Vui lòng nhập đầy đủ Tên chiến dịch và Mô tả kế hoạch.', 'warning');
+      showToast(
+        pick(
+          'Vui lòng nhập đầy đủ Tên chiến dịch và Mô tả kế hoạch.',
+          'Please fill in both the Campaign Title and Action Plan.',
+        ),
+        'warning',
+      );
       return;
     }
     if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-      showToast('Ngày bắt đầu không được lớn hơn ngày kết thúc.', 'error');
+      showToast(
+        pick(
+          'Ngày bắt đầu không được lớn hơn ngày kết thúc.',
+          'Start date cannot be later than deadline.',
+        ),
+        'error',
+      );
       return;
     }
 
@@ -435,10 +474,16 @@ export default function StudyArena() {
       setEndDate('');
       setSubTargets([]);
       setNewSubTargetText('');
-      showToast('Đã khởi động chiến dịch học tập mới!', 'success');
+      showToast(
+        pick('Đã khởi động chiến dịch học tập mới!', 'New study campaign launched!'),
+        'success',
+      );
     } catch (err) {
       console.error('Lỗi tạo chiến dịch:', err);
-      showToast('Không thể tạo chiến dịch: ' + err.message, 'error');
+      showToast(
+        pick('Không thể tạo chiến dịch: ', 'Failed to create campaign: ') + err.message,
+        'error',
+      );
     } finally {
       setIsCreatingCampaign(false);
     }
@@ -465,13 +510,22 @@ export default function StudyArena() {
       .eq('user_id', user.id);
 
     if (error) {
-      showToast('Không thể cập nhật mục tiêu nhỏ: ' + error.message, 'error');
+      showToast(
+        pick('Không thể cập nhật mục tiêu nhỏ: ', 'Failed to update sub-task: ') + error.message,
+        'error',
+      );
       fetchMyCampaigns();
       return;
     }
 
     if (allDone && !campaign.is_completed) {
-      showToast(`Chúc mừng! Bạn đã hoàn thành chiến dịch "${campaign.title}"!`, 'success');
+      showToast(
+        pick(
+          `Chúc mừng! Bạn đã hoàn thành chiến dịch "${campaign.title}"!`,
+          `Congratulations! You completed campaign "${campaign.title}"!`,
+        ),
+        'success',
+      );
     }
     if (allDone !== Boolean(campaign.is_completed)) {
       adjustMyCompletedCount(allDone ? 1 : -1);
@@ -493,15 +547,25 @@ export default function StudyArena() {
       .eq('user_id', user.id);
 
     if (error) {
-      showToast('Không thể cập nhật trạng thái chiến dịch: ' + error.message, 'error');
+      showToast(
+        pick('Không thể cập nhật trạng thái chiến dịch: ', 'Failed to update campaign status: ') +
+          error.message,
+        'error',
+      );
       fetchMyCampaigns();
       return;
     }
 
     showToast(
       nextCompleted
-        ? `Tuyệt vời! Đã hoàn thành chiến dịch "${campaign.title}".`
-        : 'Đã mở lại chiến dịch để tiếp tục rèn luyện.',
+        ? pick(
+            `Tuyệt vời! Đã hoàn thành chiến dịch "${campaign.title}".`,
+            `Awesome! Campaign "${campaign.title}" marked completed.`,
+          )
+        : pick(
+            'Đã mở lại chiến dịch để tiếp tục rèn luyện.',
+            'Campaign reopened for continued practice.',
+          ),
       nextCompleted ? 'success' : 'info',
     );
     adjustMyCompletedCount(nextCompleted ? 1 : -1);
@@ -522,13 +586,18 @@ export default function StudyArena() {
       .eq('user_id', user.id);
 
     if (error) {
-      showToast('Không thể đổi chế độ hiển thị: ' + error.message, 'error');
+      showToast(
+        pick('Không thể đổi chế độ hiển thị: ', 'Failed to change visibility: ') + error.message,
+        'error',
+      );
       fetchMyCampaigns();
       return;
     }
 
     showToast(
-      nextPublic ? 'Đã chia sẻ chiến dịch lên Cộng đồng.' : 'Đã chuyển chiến dịch về Riêng tư.',
+      nextPublic
+        ? pick('Đã chia sẻ chiến dịch lên Cộng đồng.', 'Campaign shared with Community.')
+        : pick('Đã chuyển chiến dịch về Riêng tư.', 'Campaign set to Private.'),
       'info',
     );
   };
@@ -548,11 +617,14 @@ export default function StudyArena() {
 
     if (error) {
       setMyCampaigns(backup);
-      showToast('Không thể xoá chiến dịch: ' + error.message, 'error');
+      showToast(
+        pick('Không thể xoá chiến dịch: ', 'Failed to delete campaign: ') + error.message,
+        'error',
+      );
       return;
     }
 
-    showToast('Đã xoá chiến dịch.', 'info');
+    showToast(pick('Đã xoá chiến dịch.', 'Campaign deleted.'), 'info');
     if (deletedTarget?.is_completed) {
       adjustMyCompletedCount(-1);
     }
@@ -571,13 +643,17 @@ export default function StudyArena() {
     profile?.role,
     profile?.is_approved_bang_chu,
     user?.id,
+    lang,
   );
   const myStudySeconds = Number(profile?.study_seconds) || 0;
   const myStreak = Number(profile?.study_streak) || 0;
   const myLevel = getLevelFromExp(myExp);
   const myLevelAccent = getLevelAccent(myLevel.level);
   const myDisplayName =
-    profile?.display_name || profile?.full_name || user?.email?.split('@')[0] || 'Học giả';
+    profile?.display_name ||
+    profile?.full_name ||
+    user?.email?.split('@')[0] ||
+    pick('Học giả', 'Scholar');
 
   // Filtered leaderboard
   const filteredLeaderboard = leaderboard.filter((item) => {
@@ -624,20 +700,35 @@ export default function StudyArena() {
 
         <div className="max-w-5xl mx-auto relative z-10 text-center">
           <div className="mb-3">
-            <RankSeal icon="local_fire_department" label="Đấu Trường Học Tập · Khoa Bảng" />
+            <RankSeal
+              icon="local_fire_department"
+              label={pick('Đấu Trường Học Tập · Khoa Bảng', 'Study Arena · Imperial Honor Roll')}
+            />
           </div>
           <h1 className="text-3xl sm:text-4xl font-display font-extrabold tracking-tight text-foreground mb-2">
-            Đấu Trường &amp; Bảng Vàng Công Lực
+            {pick('Đấu Trường & Bảng Vàng Công Lực', 'Study Arena & Honor Roll')}
           </h1>
           <p className="text-secondary-text text-sm sm:text-base max-w-2xl mx-auto mb-6 leading-relaxed">
-            Tích luỹ <strong className="text-foreground">Công Lực (EXP)</strong> qua thời gian tự học xác thực
-            và chinh phục các <strong className="text-foreground">Chiến Dịch Học Tập</strong> để thăng tiến Quân Hàm!
+            {lang === 'en' ? (
+              <>
+                Earn <strong className="text-foreground">Study Power (EXP)</strong> through verified
+                focus sessions and conquer <strong className="text-foreground">Study Campaigns</strong>{' '}
+                to ascend the Scholar Ranks!
+              </>
+            ) : (
+              <>
+                Tích luỹ <strong className="text-foreground">Công Lực (EXP)</strong> qua thời gian
+                tự học xác thực và chinh phục các{' '}
+                <strong className="text-foreground">Chiến Dịch Học Tập</strong> để thăng tiến Quân
+                Hàm!
+              </>
+            )}
           </p>
 
           {/* 3-Tab Switcher */}
           <div
             role="tablist"
-            aria-label="Phân khu Đấu Trường Học Tập"
+            aria-label={pick('Phân khu Đấu Trường Học Tập', 'Study Arena sections')}
             className="inline-flex flex-wrap justify-center p-1.5 bg-surface-alt border border-border rounded-2xl gap-1"
           >
             <button
@@ -647,14 +738,14 @@ export default function StudyArena() {
               onClick={() => handleSelectTab('leaderboard')}
               className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-display font-bold transition-all flex items-center gap-2 cursor-pointer ${
                 activeTab === 'leaderboard'
-                  ? 'bg-primary text-primary-foreground shadow-xs'
+                  ? 'bg-primary text-on-primary shadow-xs'
                   : 'text-secondary-text hover:text-foreground'
               }`}
             >
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 emoji_events
               </span>
-              <span>Bảng Vàng Công Lực</span>
+              <span>{pick('Bảng Vàng Công Lực', 'Honor Roll')}</span>
             </button>
 
             <button
@@ -664,23 +755,23 @@ export default function StudyArena() {
               onClick={() => handleSelectTab('my_campaigns')}
               className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-display font-bold transition-all flex items-center gap-2 cursor-pointer ${
                 activeTab === 'my_campaigns'
-                  ? 'bg-primary text-primary-foreground shadow-xs'
+                  ? 'bg-primary text-on-primary shadow-xs'
                   : 'text-secondary-text hover:text-foreground'
               }`}
             >
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 flag
               </span>
-              <span>Chiến Dịch Của Ta</span>
+              <span>{pick('Chiến Dịch Của Ta', 'My Campaigns')}</span>
               {user && myCampaigns.length > 0 && (
                 <span
                   className={`text-[10px] px-1.5 py-0.5 rounded-full tabular ${
                     activeTab === 'my_campaigns'
-                      ? 'bg-paper/20 text-primary-foreground'
+                      ? 'bg-paper/20 text-on-primary'
                       : 'bg-paper border border-border text-foreground'
                   }`}
                 >
-                  {myCampaigns.length}
+                  {formatNumber(myCampaigns.length)}
                 </span>
               )}
             </button>
@@ -692,14 +783,14 @@ export default function StudyArena() {
               onClick={() => handleSelectTab('public')}
               className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-display font-bold transition-all flex items-center gap-2 cursor-pointer ${
                 activeTab === 'public'
-                  ? 'bg-primary text-primary-foreground shadow-xs'
+                  ? 'bg-primary text-on-primary shadow-xs'
                   : 'text-secondary-text hover:text-foreground'
               }`}
             >
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 public
               </span>
-              <span>Chiến Dịch Cộng Đồng</span>
+              <span>{pick('Chiến Dịch Cộng Đồng', 'Community Campaigns')}</span>
             </button>
           </div>
         </div>
@@ -710,8 +801,8 @@ export default function StudyArena() {
         {user && (
           <section className="imperial-frame p-5 sm:p-6">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
-              <div className="flex items-center gap-4 min-w-0">
-                <div className="relative shrink-0">
+              <div className="flex items-center gap-4 min-w-0 w-full lg:w-auto">
+                <div className="relative shrink-0 mb-1">
                   <Avatar
                     src={profile?.avatar_url}
                     name={myDisplayName}
@@ -724,13 +815,15 @@ export default function StudyArena() {
                     <span className="material-symbols-outlined text-[12px]" aria-hidden="true">
                       {myRankInfo.icon}
                     </span>
-                    <span>{myRankInfo.name}</span>
+                    <span>{myRankInfo.displayName}</span>
                   </div>
                 </div>
 
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs text-secondary-text font-medium">Lệnh bài sĩ tử:</span>
+                    <span className="text-xs text-secondary-text font-medium">
+                      {pick('Lệnh bài sĩ tử:', 'Scholar Token:')}
+                    </span>
                     <button
                       type="button"
                       onClick={() => setIsRankModalOpen(true)}
@@ -739,7 +832,7 @@ export default function StudyArena() {
                       <span className="material-symbols-outlined text-[13px]" aria-hidden="true">
                         help_outline
                       </span>
-                      <span>Cấp bậc &amp; Quân hàm</span>
+                      <span>{pick('Cấp bậc & Quân hàm', 'Ranks & Titles')}</span>
                     </button>
                   </div>
 
@@ -747,15 +840,15 @@ export default function StudyArena() {
                     {myDisplayName}
                   </h2>
 
-                  <div className="flex items-center gap-2.5 mt-1.5 flex-wrap">
-                    <span className="text-xs font-semibold text-secondary-text flex items-center gap-1">
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <span className="text-xs font-semibold text-secondary-text flex items-center gap-1 whitespace-nowrap">
                       <span
                         className="material-symbols-outlined text-[15px] text-accent"
                         aria-hidden="true"
                       >
                         trophy
                       </span>
-                      Hạng:{' '}
+                      <span>{pick('Hạng:', 'Rank:')}</span>
                       <strong className="text-foreground tabular">
                         #{myRankPosition || '...'}
                       </strong>
@@ -764,37 +857,44 @@ export default function StudyArena() {
                     <span className="text-border-strong">•</span>
 
                     <span
-                      className={`tabular inline-flex items-center gap-1 text-[11px] font-extrabold px-2 py-0.5 rounded-full border ${myLevelAccent.badge}`}
+                      className={`tabular inline-flex items-center gap-1 text-[11px] font-extrabold px-2 py-0.5 rounded-full border whitespace-nowrap ${myLevelAccent.badge}`}
                     >
                       <span className="material-symbols-outlined text-[13px]" aria-hidden="true">
                         bolt
                       </span>
-                      Lv.{myLevel.level} · {myLevel.totalExp.toLocaleString('vi-VN')} EXP
+                      <span>
+                        Lv.{myLevel.level} · {formatNumber(myLevel.totalExp)} EXP
+                      </span>
                     </span>
 
                     <span className="text-border-strong">•</span>
 
-                    <span className="text-xs font-semibold text-secondary-text flex items-center gap-1 tabular">
+                    <span className="text-xs font-semibold text-secondary-text flex items-center gap-1 tabular whitespace-nowrap">
                       <span
                         className="material-symbols-outlined text-[15px] text-jade"
                         aria-hidden="true"
                       >
                         schedule
                       </span>
-                      <strong className="text-foreground">{formatStudyTime(myStudySeconds)}</strong>
+                      <strong className="text-foreground">
+                        {formatStudyTime(myStudySeconds, lang)}
+                      </strong>
                     </span>
 
                     {myStreak > 0 && (
                       <>
                         <span className="text-border-strong">•</span>
-                        <span className="text-xs font-bold text-primary flex items-center gap-0.5 tabular">
+                        <span className="text-xs font-bold text-primary flex items-center gap-0.5 tabular whitespace-nowrap">
                           <span
-                            className="material-symbols-outlined text-[15px]"
+                            className="material-symbols-outlined text-[15px] shrink-0"
                             aria-hidden="true"
                           >
                             local_fire_department
                           </span>
-                          {myStreak} ngày liên tiếp
+                          <span>
+                            {formatNumber(myStreak)}{' '}
+                            {pick('ngày liên tiếp', myStreak === 1 ? 'day streak' : 'day streak')}
+                          </span>
                         </span>
                       </>
                     )}
@@ -803,13 +903,16 @@ export default function StudyArena() {
               </div>
 
               {/* Dual Progression Box: Level EXP & Campaign Rank */}
-              <div className="w-full lg:w-80 bg-paper p-3.5 rounded-xl border border-border space-y-3">
+              <div className="w-full lg:w-80 bg-paper p-3.5 rounded-xl border border-border space-y-3 shrink-0">
                 <ProgressBar
                   value={myLevel.progressPct}
                   max={100}
                   tone="jade"
-                  label={`Công lực Lv.${myLevel.level} → Lv.${myLevel.level + 1}`}
-                  sublabel={`${myLevel.expIntoLevel}/${myLevel.expForThisLevel} EXP`}
+                  label={pick(
+                    `Công lực Lv.${myLevel.level} → Lv.${myLevel.level + 1}`,
+                    `Power Lv.${myLevel.level} → Lv.${myLevel.level + 1}`,
+                  )}
+                  sublabel={`${formatNumber(myLevel.expIntoLevel)}/${formatNumber(myLevel.expForThisLevel)} EXP`}
                 />
 
                 {myRankInfo.nextRank && myRankInfo.progress ? (
@@ -818,22 +921,31 @@ export default function StudyArena() {
                       value={myRankInfo.progress.percentage}
                       max={100}
                       tone="primary"
-                      label={`Quân hàm → ${myRankInfo.nextRank.name}`}
-                      sublabel={`${myExp.toLocaleString('vi-VN')}/${myRankInfo.progress.target.toLocaleString('vi-VN')} EXP`}
+                      label={pick(
+                        `Quân hàm → ${myRankInfo.nextRank.displayName}`,
+                        `Rank → ${myRankInfo.nextRank.displayName}`,
+                      )}
+                      sublabel={`${formatNumber(myExp)}/${formatNumber(myRankInfo.progress.target)} EXP`}
                     />
                   </div>
                 ) : (
-                  <p className="text-[11px] font-display font-bold text-primary flex items-center justify-between pt-1 border-t border-border">
-                    <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                  <p className="text-[11px] font-display font-bold text-primary flex items-center justify-between gap-2 pt-1 border-t border-border">
+                    <span className="flex items-center gap-1 min-w-0 truncate">
+                      <span className="material-symbols-outlined text-sm shrink-0" aria-hidden="true">
                         auto_awesome
                       </span>
-                      {myRankInfo.isBangChu
-                        ? 'Ngôi vị độc tôn: Bang Chủ'
-                        : `Hạng tối đa: ${myRankInfo.name}`}
+                      <span className="truncate">
+                        {myRankInfo.isBangChu
+                          ? pick('Ngôi vị độc tôn: Bang Chủ', 'Supreme Title: Guildmaster')
+                          : pick(
+                              `Hạng tối đa: ${myRankInfo.displayName}`,
+                              `Max Rank: ${myRankInfo.displayName}`,
+                            )}
+                      </span>
                     </span>
-                    <span className="tabular text-secondary-text">
-                      {myExp.toLocaleString('vi-VN')} EXP · {myCompletedCount} CD
+                    <span className="tabular text-secondary-text whitespace-nowrap shrink-0">
+                      {formatNumber(myExp)} EXP · {formatNumber(myCompletedCount)}{' '}
+                      {pick('CD', 'camp.')}
                     </span>
                   </p>
                 )}
@@ -848,8 +960,8 @@ export default function StudyArena() {
         {activeTab === 'leaderboard' && (
           <div className="space-y-6">
             {/* Search & Controls */}
-            <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-              <div className="relative w-full sm:max-w-md">
+            <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+              <div className="relative w-full lg:max-w-sm">
                 <span
                   className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"
                   aria-hidden="true"
@@ -858,7 +970,10 @@ export default function StudyArena() {
                 </span>
                 <input
                   type="text"
-                  placeholder="Tìm sĩ tử theo tên hiển thị hoặc trường học..."
+                  placeholder={pick(
+                    'Tìm sĩ tử theo tên hiển thị hoặc trường học...',
+                    'Search scholars by display name or school...',
+                  )}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-9 py-2.5 bg-surface border border-border-strong rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
@@ -867,7 +982,7 @@ export default function StudyArena() {
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    aria-label="Xoá từ khoá tìm kiếm"
+                    aria-label={pick('Xoá từ khoá tìm kiếm', 'Clear search query')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
@@ -877,24 +992,24 @@ export default function StudyArena() {
                 )}
               </div>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                <div className="inline-flex p-1 rounded-xl bg-surface-alt border border-border gap-1">
+              <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto lg:justify-end">
+                <div className="inline-flex flex-wrap p-1 rounded-xl bg-surface-alt border border-border gap-1">
                   <button
                     type="button"
                     onClick={() => {
                       setLeaderboardMode('daily');
                       fetchLeaderboardData('daily');
                     }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 whitespace-nowrap transition-all cursor-pointer ${
                       leaderboardMode === 'daily'
-                        ? 'bg-primary text-primary-foreground shadow-2xs'
+                        ? 'bg-primary text-on-primary shadow-2xs'
                         : 'text-secondary-text hover:text-foreground'
                     }`}
                   >
                     <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
                       local_fire_department
                     </span>
-                    <span>Top Hôm Nay (Phút học)</span>
+                    <span>{pick('Top Hôm Nay (Phút học)', 'Daily Top (Study Time)')}</span>
                   </button>
                   <button
                     type="button"
@@ -902,16 +1017,16 @@ export default function StudyArena() {
                       setLeaderboardMode('all_time');
                       fetchLeaderboardData('all_time');
                     }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 whitespace-nowrap transition-all cursor-pointer ${
                       leaderboardMode === 'all_time'
-                        ? 'bg-primary text-primary-foreground shadow-2xs'
+                        ? 'bg-primary text-on-primary shadow-2xs'
                         : 'text-secondary-text hover:text-foreground'
                     }`}
                   >
                     <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
                       emoji_events
                     </span>
-                    <span>Tổng Công Lực</span>
+                    <span>{pick('Tổng Công Lực', 'All-Time EXP')}</span>
                   </button>
                 </div>
 
@@ -923,7 +1038,7 @@ export default function StudyArena() {
                   <span className="material-symbols-outlined text-base text-jade" aria-hidden="true">
                     bolt
                   </span>
-                  <span>Luyện công +EXP</span>
+                  <span>{pick('Luyện công +EXP', 'Focus +EXP')}</span>
                 </button>
                 <button
                   type="button"
@@ -936,7 +1051,7 @@ export default function StudyArena() {
                   >
                     military_tech
                   </span>
-                  <span>Quân hàm</span>
+                  <span>{pick('Quân hàm', 'Ranks')}</span>
                 </button>
                 <button
                   type="button"
@@ -946,7 +1061,7 @@ export default function StudyArena() {
                   <span className="material-symbols-outlined text-base" aria-hidden="true">
                     refresh
                   </span>
-                  <span>Làm mới</span>
+                  <span>{pick('Làm mới', 'Refresh')}</span>
                 </button>
               </div>
             </div>
@@ -959,7 +1074,7 @@ export default function StudyArena() {
                 <ListItemSkeleton />
               </div>
             ) : filteredLeaderboard.length === 0 ? (
-              <div className="text-center py-16 paper-card border-dashed">
+              <div className="text-center py-16 paper-card border border-dashed border-border-strong">
                 <span
                   className="material-symbols-outlined text-4xl text-muted-foreground mb-2"
                   aria-hidden="true"
@@ -968,13 +1083,25 @@ export default function StudyArena() {
                 </span>
                 <p className="text-foreground font-display font-bold">
                   {isSearching
-                    ? 'Không tìm thấy sĩ tử nào khớp với từ khoá'
-                    : 'Bảng Vàng đang chờ những sĩ tử đầu tiên ghi danh'}
+                    ? pick(
+                        'Không tìm thấy sĩ tử nào khớp với từ khoá',
+                        'No scholars matched your search',
+                      )
+                    : pick(
+                        'Bảng Vàng đang chờ những sĩ tử đầu tiên ghi danh',
+                        'The Honor Roll awaits its first scholars',
+                      )}
                 </p>
                 <p className="text-xs text-secondary-text mt-1">
                   {isSearching
-                    ? 'Hãy thử tìm bằng tên khác hoặc tên trường viết tắt.'
-                    : 'Mở trang Học Online để tích luỹ Công Lực (EXP) và chiếm ngôi Trạng Nguyên!'}
+                    ? pick(
+                        'Hãy thử tìm bằng tên khác hoặc tên trường viết tắt.',
+                        'Try searching with a different display name or school abbreviation.',
+                      )
+                    : pick(
+                        'Mở trang Học Online để tích luỹ Công Lực (EXP) và chiếm ngôi Trạng Nguyên!',
+                        'Open Online Study Hub to earn EXP and claim the Grand Laureate spot!',
+                      )}
                 </p>
               </div>
             ) : (
@@ -1010,7 +1137,7 @@ export default function StudyArena() {
                 )}
 
                 {/* Detailed Leaderboard List */}
-                <div className="paper-card overflow-hidden">
+                <div className="paper-card border border-border overflow-hidden">
                   <div className="px-5 py-4 border-b border-border flex flex-wrap items-center justify-between gap-2 bg-paper">
                     <h3 className="font-display font-bold text-sm text-foreground flex items-center gap-2">
                       <span
@@ -1019,14 +1146,28 @@ export default function StudyArena() {
                       >
                         format_list_bulleted
                       </span>
-                      {isSearching
-                        ? `Kết quả tìm kiếm (${filteredLeaderboard.length})`
-                        : leaderboardMode === 'daily'
-                          ? 'Sĩ Tử Tiêu Biểu Trong Ngày (Theo Số Phút Học Thực Tế)'
-                          : 'Danh Sách Khoa Bảng Chi Tiết (Top 50 Công Lực)'}
+                      <span>
+                        {isSearching
+                          ? pick(
+                              `Kết quả tìm kiếm (${formatNumber(filteredLeaderboard.length)})`,
+                              `Search Results (${formatNumber(filteredLeaderboard.length)})`,
+                            )
+                          : leaderboardMode === 'daily'
+                            ? pick(
+                                'Sĩ Tử Tiêu Biểu Trong Ngày (Theo Số Phút Học Thực Tế)',
+                                'Top Scholars Today (By Verified Study Minutes)',
+                              )
+                            : pick(
+                                'Danh Sách Khoa Bảng Chi Tiết (Top 50 Công Lực)',
+                                'Honor Roll Standings (Top 50 All-Time EXP)',
+                              )}
+                      </span>
                     </h3>
                     <span className="text-[11px] text-secondary-text font-medium">
-                      Nhấn vào sĩ tử để xem Hồ sơ &amp; Chiến dịch công khai
+                      {pick(
+                        'Nhấn vào sĩ tử để xem Hồ sơ & Chiến dịch công khai',
+                        'Click a scholar to view their public profile & campaigns',
+                      )}
                     </span>
                   </div>
 
@@ -1039,6 +1180,7 @@ export default function StudyArena() {
                           scholar.role,
                           scholar.is_approved_bang_chu,
                           scholar.id,
+                          lang,
                         );
                         const sLv = getLevelFromExp(scholar.exp);
                         const sLvAccent = getLevelAccent(sLv.level);
@@ -1051,9 +1193,9 @@ export default function StudyArena() {
                               isMe ? 'bg-primary-soft/50' : ''
                             }`}
                           >
-                            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                            <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
                               <span
-                                className={`w-8 text-center font-display font-extrabold text-sm shrink-0 tabular ${
+                                className={`w-8 text-center font-display font-extrabold text-sm shrink-0 tabular whitespace-nowrap ${
                                   scholar.rank <= 3
                                     ? 'text-accent'
                                     : isMe
@@ -1066,27 +1208,28 @@ export default function StudyArena() {
 
                               <Avatar
                                 src={scholar.avatar_url}
-                                name={scholar.display_name || 'Sĩ tử'}
+                                name={scholar.display_name || pick('Sĩ tử', 'Scholar')}
                                 className="w-10 h-10 shrink-0"
                                 textSize="text-sm"
                               />
 
-                              <div className="min-w-0">
+                              <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <p
-                                    className={`text-sm font-bold truncate ${
+                                    className={`text-sm font-bold truncate max-w-[140px] sm:max-w-[220px] ${
                                       isMe ? 'text-primary' : 'text-foreground'
                                     }`}
                                   >
-                                    {scholar.display_name || 'Sĩ tử ẩn danh'}
+                                    {scholar.display_name ||
+                                      pick('Sĩ tử ẩn danh', 'Anonymous Scholar')}
                                   </p>
                                   {isMe && (
-                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary text-primary-foreground">
-                                      Bạn
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary text-on-primary whitespace-nowrap">
+                                      {pick('Bạn', 'You')}
                                     </span>
                                   )}
                                   <span
-                                    className={`hidden sm:inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded border ${sRank.bg} ${sRank.color} ${sRank.border}`}
+                                    className={`hidden sm:inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded border whitespace-nowrap ${sRank.bg} ${sRank.color} ${sRank.border}`}
                                   >
                                     <span
                                       className="material-symbols-outlined text-[12px]"
@@ -1094,51 +1237,79 @@ export default function StudyArena() {
                                     >
                                       {sRank.icon}
                                     </span>
-                                    {sRank.name}
+                                    <span>{sRank.displayName}</span>
                                   </span>
                                   <span
-                                    className={`tabular inline-flex items-center text-[10px] font-extrabold px-1.5 py-0.5 rounded border ${sLvAccent.badge}`}
+                                    className={`tabular inline-flex items-center text-[10px] font-extrabold px-1.5 py-0.5 rounded border whitespace-nowrap ${sLvAccent.badge}`}
                                   >
                                     Lv.{sLv.level}
                                   </span>
                                 </div>
 
                                 <p className="text-xs text-secondary-text truncate mt-0.5">
-                                  {scholar.university || 'Chưa cập nhật trường'}
+                                  {scholar.university ||
+                                    pick('Chưa cập nhật trường', 'School not set')}
                                   {scholar.completedCampaigns > 0
-                                    ? ` · ${scholar.completedCampaigns} chiến dịch hoàn thành`
+                                    ? pick(
+                                        ` · ${scholar.completedCampaigns} chiến dịch hoàn thành`,
+                                        ` · ${scholar.completedCampaigns} completed ${
+                                          scholar.completedCampaigns === 1
+                                            ? 'campaign'
+                                            : 'campaigns'
+                                        }`,
+                                      )
                                     : ''}
                                 </p>
                               </div>
                             </div>
 
-                            <div className="text-right shrink-0 flex items-center gap-2.5">
+                            <div className="text-right shrink-0 flex items-center gap-2">
                               <div>
                                 {leaderboardMode === 'daily' && scholar.today_minutes > 0 ? (
                                   <>
-                                    <p className="text-sm font-display font-extrabold text-jade tabular">
+                                    <p className="text-sm font-display font-extrabold text-jade tabular whitespace-nowrap">
                                       {scholar.today_minutes >= 60
-                                        ? formatStudyTime(scholar.today_seconds)
-                                        : `${scholar.today_minutes} phút hôm nay`}
+                                        ? formatStudyTime(scholar.today_seconds, lang)
+                                        : pick(
+                                            `${scholar.today_minutes} phút hôm nay`,
+                                            `${scholar.today_minutes}m today`,
+                                          )}
                                     </p>
-                                    <p className="text-[11px] text-secondary-text tabular">
-                                      +{scholar.today_exp.toLocaleString('vi-VN')} EXP hôm nay · Tổng{' '}
-                                      {scholar.exp.toLocaleString('vi-VN')} EXP
+                                    <p className="text-[11px] text-secondary-text tabular whitespace-nowrap">
+                                      +{formatNumber(scholar.today_exp)} EXP ·{' '}
+                                      {pick('Tổng', 'Total')} {formatNumber(scholar.exp)} EXP
                                     </p>
                                   </>
                                 ) : (
                                   <>
-                                    <p className="text-sm font-display font-extrabold text-primary tabular">
-                                      {scholar.exp.toLocaleString('vi-VN')} EXP
+                                    <p className="text-sm font-display font-extrabold text-primary tabular whitespace-nowrap">
+                                      {formatNumber(scholar.exp)} EXP
                                     </p>
-                                    <p className="text-[11px] text-secondary-text tabular">
-                                      {formatStudyTime(scholar.study_seconds)}
-                                      {scholar.today_minutes > 0
-                                        ? ` · Hôm nay ${scholar.today_minutes}p`
-                                        : ''}
-                                      {scholar.study_streak > 0
-                                        ? ` · 🔥${scholar.study_streak}n`
-                                        : ''}
+                                    <p className="text-[11px] text-secondary-text tabular flex items-center justify-end gap-1 flex-wrap">
+                                      <span className="whitespace-nowrap">
+                                        {formatStudyTime(scholar.study_seconds, lang)}
+                                        {scholar.today_minutes > 0
+                                          ? pick(
+                                              ` · Hôm nay ${scholar.today_minutes}p`,
+                                              ` · Today ${scholar.today_minutes}m`,
+                                            )
+                                          : ''}
+                                      </span>
+                                      {scholar.study_streak > 0 && (
+                                        <span className="inline-flex items-center gap-0.5 whitespace-nowrap">
+                                          <span>·</span>
+                                          <span
+                                            className="material-symbols-outlined text-[12px] text-primary shrink-0"
+                                            aria-hidden="true"
+                                          >
+                                            local_fire_department
+                                          </span>
+                                          <span>
+                                            {scholar.study_streak}
+                                            {pick('n', 'd')}
+                                          </span>
+                                        </span>
+                                      )}
                                     </p>
                                   </>
                                 )}
@@ -1157,7 +1328,10 @@ export default function StudyArena() {
                   ) : (
                     !isSearching && (
                       <div className="p-8 text-center text-secondary-text text-sm">
-                        Hiện có {top3.length} sĩ tử dẫn đầu trên Bục Vinh Quang. Hãy rủ thêm đồng môn cùng thi đua!
+                        {pick(
+                          `Hiện có ${top3.length} sĩ tử dẫn đầu trên Bục Vinh Quang. Hãy rủ thêm đồng môn cùng thi đua!`,
+                          `Currently ${top3.length} leading scholars stand on the Podium. Invite fellow scholars to compete!`,
+                        )}
                       </div>
                     )
                   )}
@@ -1173,7 +1347,7 @@ export default function StudyArena() {
         {activeTab === 'my_campaigns' && (
           <div>
             {!user ? (
-              <div className="paper-card p-10 text-center space-y-4">
+              <div className="paper-card border border-border p-10 text-center space-y-4">
                 <span
                   className="material-symbols-outlined text-5xl text-accent"
                   aria-hidden="true"
@@ -1181,36 +1355,44 @@ export default function StudyArena() {
                   flag_circle
                 </span>
                 <h3 className="font-display text-xl font-extrabold text-foreground">
-                  Đăng nhập để lập Chiến Dịch Học Tập
+                  {pick(
+                    'Đăng nhập để lập Chiến Dịch Học Tập',
+                    'Sign in to launch Study Campaigns',
+                  )}
                 </h3>
                 <p className="text-sm text-secondary-text max-w-md mx-auto">
-                  Chia nhỏ mục tiêu ôn thi thành từng chặng rõ ràng, theo dõi tiến độ mỗi ngày và
-                  kết hợp tích lũy EXP học tập để thăng cấp Quân Hàm!
+                  {pick(
+                    'Chia nhỏ mục tiêu ôn thi thành từng chặng rõ ràng, theo dõi tiến độ mỗi ngày và kết hợp tích lũy EXP học tập để thăng cấp Quân Hàm!',
+                    'Break your exam goals into clear milestones, track daily progress, and combine campaign completions with study EXP to climb the ranks!',
+                  )}
                 </p>
                 <button
                   type="button"
                   onClick={() => navigate('/auth')}
                   className="btn-arena btn-arena-primary cursor-pointer"
                 >
-                  Đăng nhập ngay
+                  {pick('Đăng nhập ngay', 'Sign in now')}
                 </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 {/* Left Column: Campaign Creation Form */}
-                <div className="lg:col-span-5 paper-card p-5 space-y-4">
+                <div className="lg:col-span-5 paper-card border border-border p-5 space-y-4">
                   <div className="flex items-center gap-2.5 pb-3 border-b border-border">
-                    <div className="w-9 h-9 rounded-xl bg-primary-soft border border-primary/30 flex items-center justify-center text-primary">
+                    <div className="w-9 h-9 rounded-xl bg-primary-soft border border-primary/30 flex items-center justify-center text-primary shrink-0">
                       <span className="material-symbols-outlined text-lg" aria-hidden="true">
                         add_task
                       </span>
                     </div>
                     <div>
                       <h3 className="font-display text-base font-extrabold text-foreground">
-                        Khởi Tạo Chiến Dịch Mới
+                        {pick('Khởi Tạo Chiến Dịch Mới', 'Launch New Campaign')}
                       </h3>
                       <p className="text-[11px] text-secondary-text">
-                        Hoàn thành chiến dịch để thăng Quân Hàm
+                        {pick(
+                          'Hoàn thành chiến dịch để ghi dấu kỷ luật học tập',
+                          'Complete campaigns to build disciplined study habits',
+                        )}
                       </p>
                     </div>
                   </div>
@@ -1221,7 +1403,8 @@ export default function StudyArena() {
                         htmlFor="camp-title"
                         className="block text-xs font-bold text-foreground mb-1.5"
                       >
-                        Tên chiến dịch <span className="text-primary">*</span>
+                        {pick('Tên chiến dịch', 'Campaign Title')}{' '}
+                        <span className="text-primary">*</span>
                       </label>
                       <input
                         id="camp-title"
@@ -1229,7 +1412,10 @@ export default function StudyArena() {
                         required
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="VD: Tổng ôn 30 đề Toán chinh phục 9.2+"
+                        placeholder={pick(
+                          'VD: Tổng ôn 30 đề Toán chinh phục 9.2+',
+                          'e.g., Solve 30 Math mock papers for 9.2+ score',
+                        )}
                         className="w-full bg-surface border border-border-strong rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                       />
                     </div>
@@ -1239,14 +1425,17 @@ export default function StudyArena() {
                         htmlFor="camp-target"
                         className="block text-xs font-bold text-foreground mb-1.5"
                       >
-                        Mục tiêu trọng tâm (Đích đến)
+                        {pick('Mục tiêu trọng tâm (Đích đến)', 'Primary Target Goal')}
                       </label>
                       <input
                         id="camp-target"
                         type="text"
                         value={targetGoal}
                         onChange={(e) => setTargetGoal(e.target.value)}
-                        placeholder="VD: Đỗ NV1 Bách Khoa · 27.5+ Khối A00 / GPA 3.6"
+                        placeholder={pick(
+                          'VD: Đỗ NV1 Bách Khoa · 27.5+ Khối A00 / GPA 3.6',
+                          'e.g., Top-choice admission · 27.5+ Block A00 / 3.6 GPA',
+                        )}
                         className="w-full bg-surface border border-border rounded-xl px-3.5 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                       />
                     </div>
@@ -1256,7 +1445,8 @@ export default function StudyArena() {
                         htmlFor="camp-desc"
                         className="block text-xs font-bold text-foreground mb-1.5"
                       >
-                        Lời thề quyết tâm / Kế hoạch <span className="text-primary">*</span>
+                        {pick('Lời thề quyết tâm / Kế hoạch', 'Commitment / Action Plan')}{' '}
+                        <span className="text-primary">*</span>
                       </label>
                       <textarea
                         id="camp-desc"
@@ -1264,18 +1454,21 @@ export default function StudyArena() {
                         required
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Mô tả chiến lược ôn luyện, khung giờ học mỗi ngày..."
+                        placeholder={pick(
+                          'Mô tả chiến lược ôn luyện, khung giờ học mỗi ngày...',
+                          'Outline your study routine, daily schedule, and milestones...',
+                        )}
                         className="w-full bg-surface border border-border-strong rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label
                           htmlFor="camp-start"
                           className="block text-xs font-bold text-foreground mb-1"
                         >
-                          Ngày bắt đầu
+                          {pick('Ngày bắt đầu', 'Start Date')}
                         </label>
                         <input
                           id="camp-start"
@@ -1290,7 +1483,7 @@ export default function StudyArena() {
                           htmlFor="camp-end"
                           className="block text-xs font-bold text-foreground mb-1"
                         >
-                          Hạn hoàn thành
+                          {pick('Hạn hoàn thành', 'Target Deadline')}
                         </label>
                         <input
                           id="camp-end"
@@ -1307,10 +1500,11 @@ export default function StudyArena() {
                     <div className="p-3.5 rounded-xl bg-surface-alt border border-border space-y-2.5">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-foreground">
-                          Danh sách nhiệm vụ nhỏ
+                          {pick('Danh sách nhiệm vụ nhỏ', 'Sub-task Checklist')}
                         </span>
                         <span className="text-[11px] text-secondary-text tabular">
-                          {subTargets.length} nhiệm vụ
+                          {formatNumber(subTargets.length)}{' '}
+                          {pick('nhiệm vụ', subTargets.length === 1 ? 'task' : 'tasks')}
                         </span>
                       </div>
 
@@ -1325,16 +1519,19 @@ export default function StudyArena() {
                               handleAddSubTarget();
                             }
                           }}
-                          placeholder="Thêm bước thực hiện (Enter để thêm)..."
-                          className="flex-1 bg-paper border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                          placeholder={pick(
+                            'Thêm bước thực hiện (Enter để thêm)...',
+                            'Add an action step (press Enter)...',
+                          )}
+                          className="flex-1 min-w-0 bg-paper border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
                         />
                         <button
                           type="button"
                           onClick={handleAddSubTarget}
-                          aria-label="Thêm nhiệm vụ nhỏ"
-                          className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-bold cursor-pointer"
+                          aria-label={pick('Thêm nhiệm vụ nhỏ', 'Add sub-task')}
+                          className="px-3 py-2 rounded-lg bg-primary text-on-primary text-xs font-bold cursor-pointer shrink-0"
                         >
-                          Thêm
+                          {pick('Thêm', 'Add')}
                         </button>
                       </div>
 
@@ -1354,7 +1551,10 @@ export default function StudyArena() {
                               <button
                                 type="button"
                                 onClick={() => handleRemoveSubTarget(item.id)}
-                                aria-label={`Xoá mục ${item.text}`}
+                                aria-label={pick(
+                                  `Xoá mục ${item.text}`,
+                                  `Remove task ${item.text}`,
+                                )}
                                 className="text-muted-foreground hover:text-primary cursor-pointer shrink-0"
                               >
                                 <span
@@ -1372,21 +1572,27 @@ export default function StudyArena() {
 
                     {/* Public Toggle */}
                     <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-paper border border-border cursor-pointer hover:border-border-strong transition-colors">
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2.5 min-w-0">
                         <span
-                          className={`material-symbols-outlined text-lg ${
+                          className={`material-symbols-outlined text-lg shrink-0 ${
                             isPublicOption ? 'text-jade' : 'text-secondary-text'
                           }`}
                           aria-hidden="true"
                         >
                           {isPublicOption ? 'public' : 'lock'}
                         </span>
-                        <div>
+                        <div className="min-w-0">
                           <span className="block text-xs font-bold text-foreground">
-                            Công khai lên Chiến Dịch Cộng Đồng
+                            {pick(
+                              'Công khai lên Chiến Dịch Cộng Đồng',
+                              'Share on Community Campaigns',
+                            )}
                           </span>
                           <span className="block text-[11px] text-secondary-text">
-                            Lan toả tinh thần hiếu học cùng các đồng môn
+                            {pick(
+                              'Lan toả tinh thần hiếu học cùng các đồng môn',
+                              'Inspire fellow scholars with your study commitment',
+                            )}
                           </span>
                         </div>
                       </div>
@@ -1394,7 +1600,7 @@ export default function StudyArena() {
                         type="checkbox"
                         checked={isPublicOption}
                         onChange={(e) => setIsPublicOption(e.target.checked)}
-                        className="w-4 h-4 accent-primary cursor-pointer"
+                        className="w-4 h-4 accent-primary cursor-pointer shrink-0"
                       />
                     </label>
 
@@ -1407,7 +1613,9 @@ export default function StudyArena() {
                         {isCreatingCampaign ? 'hourglass_empty' : 'rocket_launch'}
                       </span>
                       <span>
-                        {isCreatingCampaign ? 'Đang khởi tạo...' : 'Phất Cờ Khởi Động Chiến Dịch'}
+                        {isCreatingCampaign
+                          ? pick('Đang khởi tạo...', 'Launching...')
+                          : pick('Phất Cờ Khởi Động Chiến Dịch', 'Launch Study Campaign')}
                       </span>
                     </button>
                   </form>
@@ -1423,14 +1631,17 @@ export default function StudyArena() {
                       >
                         swords
                       </span>
-                      <span>Chiến Dịch Đang Theo Đuổi ({myCampaigns.length})</span>
+                      <span>
+                        {pick('Chiến Dịch Đang Theo Đuổi', 'Your Study Campaigns')} (
+                        {formatNumber(myCampaigns.length)})
+                      </span>
                     </h3>
 
-                    <div className="inline-flex p-1 rounded-xl bg-surface-alt border border-border gap-1">
+                    <div className="inline-flex flex-wrap p-1 rounded-xl bg-surface-alt border border-border gap-1">
                       {[
-                        { key: 'all', label: 'Tất cả' },
-                        { key: 'active', label: 'Đang chạy' },
-                        { key: 'completed', label: 'Hoàn thành' },
+                        { key: 'all', label: pick('Tất cả', 'All') },
+                        { key: 'active', label: pick('Đang chạy', 'Active') },
+                        { key: 'completed', label: pick('Hoàn thành', 'Completed') },
                       ].map((f) => (
                         <button
                           key={f.key}
@@ -1454,7 +1665,7 @@ export default function StudyArena() {
                       <ListItemSkeleton />
                     </div>
                   ) : visibleMyCampaigns.length === 0 ? (
-                    <div className="paper-card border-dashed p-10 text-center space-y-2">
+                    <div className="paper-card border border-dashed border-border-strong p-10 text-center space-y-2">
                       <span
                         className="material-symbols-outlined text-4xl text-muted-foreground"
                         aria-hidden="true"
@@ -1463,27 +1674,40 @@ export default function StudyArena() {
                       </span>
                       <p className="font-display font-bold text-foreground">
                         {myCampaigns.length === 0
-                          ? 'Bạn chưa lập chiến dịch nào'
-                          : 'Không có chiến dịch nào trong bộ lọc này'}
+                          ? pick(
+                              'Bạn chưa lập chiến dịch nào',
+                              'You have not created any campaigns yet',
+                            )
+                          : pick(
+                              'Không có chiến dịch nào trong bộ lọc này',
+                              'No campaigns match this filter',
+                            )}
                       </p>
                       <p className="text-xs text-secondary-text">
-                        Điền biểu mẫu bên trái để dựng ngọn cờ mục tiêu đầu tiên của bạn!
+                        {pick(
+                          'Điền biểu mẫu bên trái để dựng ngọn cờ mục tiêu đầu tiên của bạn!',
+                          'Use the form on the left to launch your first study campaign!',
+                        )}
                       </p>
                     </div>
                   ) : (
                     <div className="space-y-4">
                       {visibleMyCampaigns.map((camp) => {
-                        const prog = computeCampaignProgress(camp.targets, camp.is_completed);
-                        const startFmt = formatDateVi(camp.start_date);
-                        const endFmt = formatDateVi(camp.end_date);
+                        const prog = computeCampaignProgress(
+                          camp.targets,
+                          camp.is_completed,
+                          pick,
+                        );
+                        const startFmt = formatDate(camp.start_date);
+                        const endFmt = formatDate(camp.end_date);
 
                         return (
                           <article
                             key={camp.id}
-                            className={`paper-card p-5 space-y-4 transition-all ${
+                            className={`paper-card border p-5 space-y-4 transition-all ${
                               camp.is_completed
                                 ? 'border-completed-border bg-completed-soft/25'
-                                : ''
+                                : 'border-border hover:border-border-strong'
                             }`}
                           >
                             <div className="flex items-start justify-between gap-3">
@@ -1493,14 +1717,14 @@ export default function StudyArena() {
                                     {camp.title}
                                   </h4>
                                   {camp.is_completed && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-completed-soft text-completed border border-completed-border">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-completed-soft text-completed border border-completed-border whitespace-nowrap">
                                       <span
                                         className="material-symbols-outlined text-[12px]"
                                         aria-hidden="true"
                                       >
                                         verified
                                       </span>
-                                      Đã hoàn thành
+                                      <span>{pick('Đã hoàn thành', 'Completed')}</span>
                                     </span>
                                   )}
                                   {camp.target && (
@@ -1511,7 +1735,7 @@ export default function StudyArena() {
                                       >
                                         ads_click
                                       </span>
-                                      {camp.target}
+                                      <span>{camp.target}</span>
                                     </span>
                                   )}
                                 </div>
@@ -1525,7 +1749,8 @@ export default function StudyArena() {
                                       calendar_month
                                     </span>
                                     <span>
-                                      {startFmt || 'Bắt đầu ngay'} → {endFmt || 'Không giới hạn'}
+                                      {startFmt || pick('Bắt đầu ngay', 'Immediate start')} →{' '}
+                                      {endFmt || pick('Không giới hạn', 'Open-ended')}
                                     </span>
                                   </p>
                                 )}
@@ -1538,10 +1763,16 @@ export default function StudyArena() {
                                   onClick={() => handleToggleCampaignPublic(camp)}
                                   title={
                                     camp.is_public
-                                      ? 'Đang công khai · Nhấn để chuyển sang Riêng tư'
-                                      : 'Đang riêng tư · Nhấn để chia sẻ Cộng đồng'
+                                      ? pick(
+                                          'Đang công khai · Nhấn để chuyển sang Riêng tư',
+                                          'Public · Click to make Private',
+                                        )
+                                      : pick(
+                                          'Đang riêng tư · Nhấn để chia sẻ Cộng đồng',
+                                          'Private · Click to share publicly',
+                                        )
                                   }
-                                  className={`px-2.5 py-1 rounded-lg border text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer ${
+                                  className={`px-2.5 py-1 rounded-lg border text-[11px] font-bold flex items-center gap-1 whitespace-nowrap transition-colors cursor-pointer ${
                                     camp.is_public
                                       ? 'bg-jade-soft text-jade border-jade-border'
                                       : 'bg-surface-alt text-secondary-text border-border'
@@ -1553,7 +1784,11 @@ export default function StudyArena() {
                                   >
                                     {camp.is_public ? 'public' : 'lock'}
                                   </span>
-                                  <span>{camp.is_public ? 'Công khai' : 'Riêng tư'}</span>
+                                  <span>
+                                    {camp.is_public
+                                      ? pick('Công khai', 'Public')
+                                      : pick('Riêng tư', 'Private')}
+                                  </span>
                                 </button>
 
                                 <button
@@ -1563,7 +1798,10 @@ export default function StudyArena() {
                                       prev === camp.id ? null : camp.id,
                                     )
                                   }
-                                  aria-label={`Xoá chiến dịch ${camp.title}`}
+                                  aria-label={pick(
+                                    `Xoá chiến dịch ${camp.title}`,
+                                    `Delete campaign ${camp.title}`,
+                                  )}
                                   className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors cursor-pointer"
                                 >
                                   <span
@@ -1580,22 +1818,25 @@ export default function StudyArena() {
                             {confirmDeleteId === camp.id && (
                               <div className="p-3 rounded-xl bg-primary-soft border border-primary/35 flex flex-wrap items-center justify-between gap-2">
                                 <span className="text-xs font-semibold text-foreground">
-                                  Xác nhận xoá chiến dịch này?
+                                  {pick(
+                                    'Xác nhận xoá chiến dịch này?',
+                                    'Delete this campaign permanently?',
+                                  )}
                                 </span>
                                 <div className="flex items-center gap-2">
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteCampaign(camp.id)}
-                                    className="px-3 py-1 rounded-lg bg-primary text-primary-foreground text-xs font-bold cursor-pointer"
+                                    className="px-3 py-1 rounded-lg bg-primary text-on-primary text-xs font-bold cursor-pointer"
                                   >
-                                    Xoá vĩnh viễn
+                                    {pick('Xoá vĩnh viễn', 'Delete Permanently')}
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => setConfirmDeleteId(null)}
                                     className="px-3 py-1 rounded-lg bg-paper border border-border text-xs font-semibold text-secondary-text cursor-pointer"
                                   >
-                                    Huỷ
+                                    {pick('Huỷ', 'Cancel')}
                                   </button>
                                 </div>
                               </div>
@@ -1609,7 +1850,7 @@ export default function StudyArena() {
                               value={prog.pct}
                               max={100}
                               tone={camp.is_completed ? 'jade' : 'primary'}
-                              label="Tiến độ chiến dịch"
+                              label={pick('Tiến độ chiến dịch', 'Campaign Progress')}
                               sublabel={prog.label}
                             />
 
@@ -1667,8 +1908,11 @@ export default function StudyArena() {
                                 </span>
                                 <span>
                                   {camp.is_completed
-                                    ? 'Mở lại chiến dịch'
-                                    : 'Đánh dấu Hoàn thành Chiến dịch'}
+                                    ? pick('Mở lại chiến dịch', 'Reopen Campaign')
+                                    : pick(
+                                        'Đánh dấu Hoàn thành Chiến dịch',
+                                        'Mark Campaign Completed',
+                                      )}
                                 </span>
                               </button>
                             </div>
@@ -1700,14 +1944,17 @@ export default function StudyArena() {
                   type="text"
                   value={communitySearch}
                   onChange={(e) => setCommunitySearch(e.target.value)}
-                  placeholder="Tìm chiến dịch theo chủ đề, mục tiêu hoặc tên sĩ tử..."
+                  placeholder={pick(
+                    'Tìm chiến dịch theo chủ đề, mục tiêu hoặc tên sĩ tử...',
+                    'Search campaigns by topic, goal, or scholar name...',
+                  )}
                   className="w-full pl-10 pr-9 py-2.5 bg-surface border border-border-strong rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                 />
                 {communitySearch && (
                   <button
                     type="button"
                     onClick={() => setCommunitySearch('')}
-                    aria-label="Xoá tìm kiếm"
+                    aria-label={pick('Xoá tìm kiếm', 'Clear search')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
@@ -1725,7 +1972,7 @@ export default function StudyArena() {
                 <span className="material-symbols-outlined text-base" aria-hidden="true">
                   refresh
                 </span>
-                <span>Làm mới</span>
+                <span>{pick('Làm mới', 'Refresh')}</span>
               </button>
             </div>
 
@@ -1736,7 +1983,7 @@ export default function StudyArena() {
                 <ListItemSkeleton />
               </div>
             ) : visiblePublicCampaigns.length === 0 ? (
-              <div className="paper-card border-dashed p-12 text-center space-y-2">
+              <div className="paper-card border border-dashed border-border-strong p-12 text-center space-y-2">
                 <span
                   className="material-symbols-outlined text-4xl text-muted-foreground"
                   aria-hidden="true"
@@ -1745,11 +1992,20 @@ export default function StudyArena() {
                 </span>
                 <p className="font-display font-bold text-foreground">
                   {communitySearch.trim()
-                    ? 'Không tìm thấy chiến dịch cộng đồng phù hợp'
-                    : 'Chưa có chiến dịch công khai nào'}
+                    ? pick(
+                        'Không tìm thấy chiến dịch cộng đồng phù hợp',
+                        'No matching community campaigns found',
+                      )
+                    : pick(
+                        'Chưa có chiến dịch công khai nào',
+                        'No public campaigns shared yet',
+                      )}
                 </p>
                 <p className="text-xs text-secondary-text">
-                  Hãy tạo một chiến dịch ở mục &ldquo;Chiến Dịch Của Ta&rdquo; và bật chế độ Công khai để truyền cảm hứng!
+                  {pick(
+                    'Hãy tạo một chiến dịch ở mục “Chiến Dịch Của Ta” và bật chế độ Công khai để truyền cảm hứng!',
+                    'Create a campaign under “My Campaigns” and enable Public sharing to inspire fellow scholars!',
+                  )}
                 </p>
               </div>
             ) : (
@@ -1761,16 +2017,17 @@ export default function StudyArena() {
                     author?.role,
                     author?.is_approved_bang_chu,
                     camp.user_id,
+                    lang,
                   );
                   const authorLv = getLevelFromExp(author?.exp || 0);
                   const authorLvAccent = getLevelAccent(authorLv.level);
-                  const prog = computeCampaignProgress(camp.targets, camp.is_completed);
-                  const endFmt = formatDateVi(camp.end_date);
+                  const prog = computeCampaignProgress(camp.targets, camp.is_completed, pick);
+                  const endFmt = formatDate(camp.end_date);
 
                   return (
                     <article
                       key={camp.id}
-                      className="paper-card p-5 flex flex-col justify-between gap-4 hover:border-border-strong transition-all"
+                      className="paper-card border border-border p-5 flex flex-col justify-between gap-4 hover:border-border-strong transition-all"
                     >
                       <div className="space-y-3">
                         {/* Author Header */}
@@ -1781,17 +2038,18 @@ export default function StudyArena() {
                           >
                             <Avatar
                               src={author?.avatar_url}
-                              name={author?.display_name || 'Sĩ tử'}
+                              name={author?.display_name || pick('Sĩ tử', 'Scholar')}
                               className="w-10 h-10 border border-border shrink-0"
                               textSize="text-xs"
                             />
                             <div className="min-w-0">
                               <p className="text-xs sm:text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
-                                {author?.display_name || 'Sĩ tử ẩn danh'}
+                                {author?.display_name ||
+                                  pick('Sĩ tử ẩn danh', 'Anonymous Scholar')}
                               </p>
                               <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
                                 <span
-                                  className={`inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded border ${authorRank.bg} ${authorRank.color} ${authorRank.border}`}
+                                  className={`inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded border whitespace-nowrap ${authorRank.bg} ${authorRank.color} ${authorRank.border}`}
                                 >
                                   <span
                                     className="material-symbols-outlined text-[11px]"
@@ -1799,10 +2057,10 @@ export default function StudyArena() {
                                   >
                                     {authorRank.icon}
                                   </span>
-                                  {authorRank.name}
+                                  <span>{authorRank.displayName}</span>
                                 </span>
                                 <span
-                                  className={`tabular text-[10px] font-extrabold px-1.5 py-0.5 rounded border ${authorLvAccent.badge}`}
+                                  className={`tabular text-[10px] font-extrabold px-1.5 py-0.5 rounded border whitespace-nowrap ${authorLvAccent.badge}`}
                                 >
                                   Lv.{authorLv.level}
                                 </span>
@@ -1810,8 +2068,8 @@ export default function StudyArena() {
                             </div>
                           </Link>
 
-                          <span className="text-[11px] text-muted-foreground tabular shrink-0">
-                            {formatDateVi(camp.created_at)}
+                          <span className="text-[11px] text-muted-foreground tabular shrink-0 whitespace-nowrap">
+                            {formatDate(camp.created_at)}
                           </span>
                         </div>
 
@@ -1837,7 +2095,11 @@ export default function StudyArena() {
                           value={prog.pct}
                           max={100}
                           tone={camp.is_completed ? 'jade' : 'primary'}
-                          label={camp.is_completed ? 'Đã về đích' : 'Tiến độ'}
+                          label={
+                            camp.is_completed
+                              ? pick('Đã về đích', 'Completed')
+                              : pick('Tiến độ', 'Progress')
+                          }
                           sublabel={prog.label}
                         />
                         {endFmt && (
@@ -1848,7 +2110,9 @@ export default function StudyArena() {
                             >
                               event
                             </span>
-                            Hạn đích: {endFmt}
+                            <span>
+                              {pick('Hạn đích:', 'Deadline:')} {endFmt}
+                            </span>
                           </p>
                         )}
                       </div>
@@ -1868,23 +2132,29 @@ export default function StudyArena() {
           onClick={() => setIsRankModalOpen(false)}
         >
           <div
-            className="imperial-frame w-full max-w-lg overflow-hidden"
+            className="imperial-frame w-full max-w-lg overflow-hidden bg-surface"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-paper">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary" aria-hidden="true">
+            <div className="px-5 sm:px-6 py-4 border-b border-border flex items-center justify-between gap-3 bg-paper">
+              <div className="flex items-center gap-2 min-w-0">
+                <span
+                  className="material-symbols-outlined text-primary shrink-0"
+                  aria-hidden="true"
+                >
                   military_tech
                 </span>
-                <h3 className="font-display font-bold text-base text-foreground">
-                  Hệ Thống Công Lực &amp; Quân Hàm (EXP)
+                <h3 className="font-display font-bold text-base text-foreground truncate">
+                  {pick(
+                    'Hệ Thống Công Lực & Quân Hàm (EXP)',
+                    'Study Power & Scholar Ranks (EXP)',
+                  )}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsRankModalOpen(false)}
-                aria-label="Đóng hộp thoại"
-                className="text-muted-foreground hover:text-foreground p-1 rounded-lg cursor-pointer"
+                aria-label={pick('Đóng hộp thoại', 'Close dialog')}
+                className="text-muted-foreground hover:text-foreground p-1 rounded-lg cursor-pointer shrink-0"
               >
                 <span className="material-symbols-outlined" aria-hidden="true">
                   close
@@ -1892,59 +2162,91 @@ export default function StudyArena() {
               </button>
             </div>
 
-            <div className="p-6 space-y-3 max-h-[75vh] overflow-y-auto bg-surface">
+            <div className="p-5 sm:p-6 space-y-3 max-h-[75vh] overflow-y-auto bg-surface">
               <div className="p-3.5 rounded-xl bg-jade-soft/50 border border-jade-border text-xs text-foreground leading-relaxed">
-                <strong>1. Cấp độ Công Lực (Lv &amp; EXP):</strong> Tích luỹ tự động mỗi phút bạn ôn tập tại{' '}
-                <strong>Học Online</strong> (+10 EXP/phút, tối đa 5 giờ/ngày + thưởng chuỗi ngày học liên tiếp).
+                {lang === 'en' ? (
+                  <>
+                    <strong>1. Study Power (Lv &amp; EXP):</strong> Earned automatically for every
+                    verified minute of focus in <strong>Online Study Hub</strong> (+10 EXP/min, up
+                    to 5 hours/day + daily streak bonuses).
+                  </>
+                ) : (
+                  <>
+                    <strong>1. Cấp độ Công Lực (Lv &amp; EXP):</strong> Tích luỹ tự động mỗi phút
+                    bạn ôn tập tại <strong>Học Online</strong> (+10 EXP/phút, tối đa 5 giờ/ngày +
+                    thưởng chuỗi ngày học liên tiếp).
+                  </>
+                )}
               </div>
               <div className="p-3.5 rounded-xl bg-gold-soft/50 border border-gold text-xs text-foreground leading-relaxed">
-                <strong>2. Mức Hạng Quân Hàm:</strong> EXP tích luỹ càng cao thì mức hạng càng cao.
-                Riêng ngôi vị <strong>Bang Chủ</strong> chỉ có duy nhất 1 tài khoản tối cao nắm giữ (không ai khác được phép là Bang Chủ):
+                {lang === 'en' ? (
+                  <>
+                    <strong>2. Scholar Ranks:</strong> Your lifetime EXP unlocks progressively
+                    higher titles. The supreme <strong>Guildmaster</strong> rank is reserved
+                    exclusively for the sole founder account:
+                  </>
+                ) : (
+                  <>
+                    <strong>2. Mức Hạng Quân Hàm:</strong> EXP tích luỹ càng cao thì mức hạng càng
+                    cao. Riêng ngôi vị <strong>Bang Chủ</strong> chỉ có duy nhất 1 tài khoản tối
+                    cao nắm giữ (không ai khác được phép là Bang Chủ):
+                  </>
+                )}
               </div>
 
               {RANK_TIERS.map((tier) => {
-                const isCurrent = myRankInfo.name === tier.name;
+                const isCurrent = myRankInfo.key === tier.key;
+                const tierLabel = getRankDisplayName(tier, lang);
                 return (
                   <div
-                    key={tier.name}
-                    className={`flex items-center justify-between p-3.5 rounded-xl border transition-all ${
+                    key={tier.key}
+                    className={`flex items-center justify-between gap-3 p-3.5 rounded-xl border transition-all ${
                       isCurrent
                         ? `${tier.bg} ${tier.border} ring-1 ring-primary/30`
                         : 'bg-paper border-border'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
                       <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center border ${tier.bg} ${tier.color} ${tier.border}`}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 ${tier.bg} ${tier.color} ${tier.border}`}
                       >
                         <span className="material-symbols-outlined text-xl" aria-hidden="true">
                           {tier.icon}
                         </span>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h4 className={`font-display font-bold text-sm ${tier.color}`}>
-                            {tier.name}
+                            {tierLabel}
                           </h4>
                           {isCurrent && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground">
-                              Quân hàm hiện tại
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary text-on-primary whitespace-nowrap">
+                              {pick('Quân hàm hiện tại', 'Current Rank')}
                             </span>
                           )}
                         </div>
                         <p className="text-xs text-secondary-text mt-0.5 tabular">
                           {tier.exclusiveBangChu
-                            ? 'Ngôi vị độc tôn — Chỉ duy nhất 1 tài khoản được phép là Bang Chủ'
+                            ? pick(
+                                'Ngôi vị độc tôn — Chỉ duy nhất 1 tài khoản được phép là Bang Chủ',
+                                'Supreme exclusive rank — Held solely by the founder account',
+                              )
                             : tier.min === 0
-                              ? 'Khởi điểm khi gia nhập Đấu Trường (0 EXP)'
-                              : `Tích lũy đạt từ ${tier.min.toLocaleString('vi-VN')} EXP`}
+                              ? pick(
+                                  'Khởi điểm khi gia nhập Đấu Trường (0 EXP)',
+                                  'Starting rank upon joining the Arena (0 EXP)',
+                                )
+                              : pick(
+                                  `Tích lũy đạt từ ${formatNumber(tier.min)} EXP`,
+                                  `Unlocked at ${formatNumber(tier.min)} EXP`,
+                                )}
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-display font-extrabold text-secondary-text tabular">
+                    <span className="text-xs font-display font-extrabold text-secondary-text tabular whitespace-nowrap shrink-0">
                       {tier.exclusiveBangChu
-                        ? 'Độc tôn'
-                        : `${tier.min.toLocaleString('vi-VN')} EXP`}
+                        ? pick('Độc tôn', 'Exclusive')
+                        : `${formatNumber(tier.min)} EXP`}
                     </span>
                   </div>
                 );
@@ -1958,11 +2260,13 @@ export default function StudyArena() {
 }
 
 function PodiumCard({ scholar, place, mode = 'daily', isCurrentUser }) {
+  const { lang, pick, formatNumber } = useLanguage();
   const rank = getUserRank(
     scholar.exp || 0,
     scholar.role,
     scholar.is_approved_bang_chu,
     scholar.id,
+    lang,
   );
   const lv = getLevelFromExp(scholar.exp || 0);
   const lvAccent = getLevelAccent(lv.level);
@@ -1975,8 +2279,8 @@ function PodiumCard({ scholar, place, mode = 'daily', isCurrentUser }) {
       order: 'md:order-2 md:-mt-4',
       border:
         'border-gold ring-2 ring-gold/35 bg-gradient-to-b from-gold-soft/70 via-surface to-surface',
-      badgeBg: 'bg-primary text-primary-foreground border border-gold',
-      label: 'TRẠNG NGUYÊN · TOP 1',
+      badgeBg: 'bg-primary text-on-primary border border-gold',
+      label: pick('TRẠNG NGUYÊN · TOP 1', 'GRAND LAUREATE · TOP 1'),
       icon: 'workspace_premium',
       avatarSize: 'w-20 h-20',
     },
@@ -1984,7 +2288,7 @@ function PodiumCard({ scholar, place, mode = 'daily', isCurrentUser }) {
       order: 'md:order-1',
       border: 'border-border-strong bg-surface',
       badgeBg: 'bg-surface-alt text-foreground border border-border-strong',
-      label: 'BẢNG NHÃN · TOP 2',
+      label: pick('BẢNG NHÃN · TOP 2', 'SECOND LAUREATE · TOP 2'),
       icon: 'diamond',
       avatarSize: 'w-16 h-16',
     },
@@ -1992,7 +2296,7 @@ function PodiumCard({ scholar, place, mode = 'daily', isCurrentUser }) {
       order: 'md:order-3',
       border: 'border-gold/60 bg-surface',
       badgeBg: 'bg-gold-soft text-gold-dark border border-gold',
-      label: 'THÁM HOA · TOP 3',
+      label: pick('THÁM HOA · TOP 3', 'THIRD LAUREATE · TOP 3'),
       icon: 'local_fire_department',
       avatarSize: 'w-16 h-16',
     },
@@ -2001,10 +2305,10 @@ function PodiumCard({ scholar, place, mode = 'daily', isCurrentUser }) {
   return (
     <Link
       to={`/profile/${scholar.id}`}
-      className={`${placeConfig.order} relative flex flex-col items-center p-5 rounded-2xl border ${placeConfig.border} shadow-sm transition-transform hover:-translate-y-1 cursor-pointer group`}
+      className={`${placeConfig.order} relative flex flex-col items-center p-5 rounded-2xl border ${placeConfig.border} shadow-sm transition-transform hover:-translate-y-1 cursor-pointer group min-w-0`}
     >
       <div
-        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider mb-3 shadow-xs ${placeConfig.badgeBg}`}
+        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider mb-3 shadow-xs whitespace-nowrap ${placeConfig.badgeBg}`}
       >
         <span className="material-symbols-outlined text-xs" aria-hidden="true">
           {placeConfig.icon}
@@ -2012,33 +2316,34 @@ function PodiumCard({ scholar, place, mode = 'daily', isCurrentUser }) {
         <span>{placeConfig.label}</span>
       </div>
 
-      <div className="relative mb-3">
+      <div className="relative mb-3 shrink-0">
         <Avatar
           src={scholar.avatar_url}
-          name={scholar.display_name || 'Sĩ tử'}
+          name={scholar.display_name || pick('Sĩ tử', 'Scholar')}
           className={`${placeConfig.avatarSize} border-2 border-gold shadow-xs group-hover:scale-105 transition-transform`}
           textSize={place === 1 ? 'text-2xl' : 'text-xl'}
         />
       </div>
 
-      <h3 className="font-display font-bold text-base text-foreground text-center line-clamp-1 group-hover:text-primary transition-colors">
-        {scholar.display_name || 'Sĩ tử ẩn danh'} {isCurrentUser ? '(Bạn)' : ''}
+      <h3 className="font-display font-bold text-base text-foreground text-center truncate w-full group-hover:text-primary transition-colors">
+        {scholar.display_name || pick('Sĩ tử ẩn danh', 'Anonymous Scholar')}{' '}
+        {isCurrentUser ? pick('(Bạn)', '(You)') : ''}
       </h3>
-      <p className="text-xs text-secondary-text text-center line-clamp-1 mb-3">
-        {scholar.university || 'Chưa cập nhật trường'}
+      <p className="text-xs text-secondary-text text-center truncate w-full mb-3">
+        {scholar.university || pick('Chưa cập nhật trường', 'School not set')}
       </p>
 
       <div className="flex items-center gap-1.5 mb-3 flex-wrap justify-center">
         <span
-          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${rank.bg} ${rank.color} ${rank.border}`}
+          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border whitespace-nowrap ${rank.bg} ${rank.color} ${rank.border}`}
         >
           <span className="material-symbols-outlined text-[13px]" aria-hidden="true">
             {rank.icon}
           </span>
-          {rank.name}
+          <span>{rank.displayName}</span>
         </span>
         <span
-          className={`tabular inline-flex items-center text-[11px] font-extrabold px-2 py-0.5 rounded-full border ${lvAccent.badge}`}
+          className={`tabular inline-flex items-center text-[11px] font-extrabold px-2 py-0.5 rounded-full border whitespace-nowrap ${lvAccent.badge}`}
         >
           Lv.{lv.level}
         </span>
@@ -2048,22 +2353,40 @@ function PodiumCard({ scholar, place, mode = 'daily', isCurrentUser }) {
         {mode === 'daily' && todayMin > 0 ? (
           <>
             <p className="text-lg font-display font-extrabold text-jade tabular">
-              {todayMin >= 60 ? formatStudyTime(scholar.today_seconds) : `${todayMin} phút hôm nay`}
+              {todayMin >= 60
+                ? formatStudyTime(scholar.today_seconds, lang)
+                : pick(`${todayMin} phút hôm nay`, `${todayMin}m today`)}
             </p>
             <p className="text-[11px] text-secondary-text tabular">
-              +{(scholar.today_exp || 0).toLocaleString('vi-VN')} EXP hôm nay · Tổng{' '}
-              {(scholar.exp || 0).toLocaleString('vi-VN')} EXP
+              +{formatNumber(scholar.today_exp || 0)} EXP · {pick('Tổng', 'Total')}{' '}
+              {formatNumber(scholar.exp || 0)} EXP
             </p>
           </>
         ) : (
           <>
             <p className="text-lg font-display font-extrabold text-primary tabular">
-              {(scholar.exp || 0).toLocaleString('vi-VN')} EXP
+              {formatNumber(scholar.exp || 0)} EXP
             </p>
-            <p className="text-[11px] text-secondary-text tabular">
-              {formatStudyTime(scholar.study_seconds)}
-              {todayMin > 0 ? ` · Hôm nay ${todayMin}p` : ''}
-              {scholar.study_streak > 0 ? ` · 🔥 ${scholar.study_streak} ngày` : ''}
+            <p className="text-[11px] text-secondary-text tabular flex items-center justify-center gap-1 flex-wrap">
+              <span>
+                {formatStudyTime(scholar.study_seconds, lang)}
+                {todayMin > 0 ? pick(` · Hôm nay ${todayMin}p`, ` · Today ${todayMin}m`) : ''}
+              </span>
+              {scholar.study_streak > 0 && (
+                <span className="inline-flex items-center gap-0.5 whitespace-nowrap">
+                  <span>·</span>
+                  <span
+                    className="material-symbols-outlined text-[12px] text-primary shrink-0"
+                    aria-hidden="true"
+                  >
+                    local_fire_department
+                  </span>
+                  <span>
+                    {scholar.study_streak}{' '}
+                    {pick('ngày', scholar.study_streak === 1 ? 'day' : 'days')}
+                  </span>
+                </span>
+              )}
             </p>
           </>
         )}

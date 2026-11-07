@@ -1,12 +1,14 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { preloadRouteModule } from '../lib/routeModules';
 import { getUserRank } from '../utils/rankHelper';
 import { getLevelFromExp, getLevelAccent } from '../utils/levelHelper';
 import Avatar from './Avatar';
 import { PageSkeleton } from './ui/Skeleton';
 import ThemeToggle from './ui/ThemeToggle';
+import LanguageToggle from './ui/LanguageToggle';
 
 const WelcomeModal = lazy(() => import('./WelcomeModal'));
 
@@ -22,12 +24,12 @@ const scheduleIdleTask = (callback, timeout = 1800) => {
   return () => window.clearTimeout(timerId);
 };
 
-function GoogleLinkedBadge() {
+function GoogleLinkedBadge({ label }) {
   return (
     <span
-      className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface border border-border no-shrink shadow-2xs"
-      title="Đã đồng bộ tài khoản Google"
-      aria-label="Đã đồng bộ tài khoản Google"
+      className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface border border-border shrink-0 shadow-2xs"
+      title={label}
+      aria-label={label}
     >
       <svg className="h-2.5 w-2.5" viewBox="0 0 24 24" aria-hidden="true">
         <path
@@ -63,6 +65,7 @@ export default function RootLayout() {
     signOut,
     loading,
   } = useAuth();
+  const { lang, t } = useLanguage();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [shouldLoadWelcomeModal, setShouldLoadWelcomeModal] = useState(false);
@@ -118,7 +121,9 @@ export default function RootLayout() {
     profile?.role,
     profile?.is_approved_bang_chu,
     user?.id,
+    lang,
   );
+  const rankDisplayName = userRank.displayName || userRank.name;
 
   const displayAvatar =
     profile?.avatar_url ||
@@ -130,17 +135,17 @@ export default function RootLayout() {
     user?.user_metadata?.full_name ||
     user?.user_metadata?.name ||
     user?.email?.split('@')[0] ||
-    'Sĩ tử';
+    t('nav.defaultScholar');
 
   return (
     <div className="flex h-dvh w-full bg-background font-sans text-foreground overflow-hidden">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-paper border-r border-border no-shrink z-50">
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-border bg-surface/70">
-          <div className="w-10 h-10 rounded-xl bg-primary-soft border border-gold flex items-center justify-center overflow-hidden no-shrink shadow-xs">
+      <aside className="hidden md:flex flex-col w-64 bg-paper border-r border-border shrink-0 z-50">
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border bg-surface/70">
+          <div className="w-10 h-10 rounded-xl bg-primary-soft border border-gold flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
             <img
               src="/logo.webp"
-              alt="Logo"
+              alt={t('brand.name')}
               width={40}
               height={40}
               fetchPriority="high"
@@ -149,77 +154,77 @@ export default function RootLayout() {
             />
           </div>
           <div className="min-w-0">
-            <h1 className="text-base font-extrabold tracking-tight font-display leading-tight text-foreground">
-              Đấu Trường Học Tập
+            <h1 className="text-base font-extrabold tracking-tight font-display leading-tight text-foreground truncate">
+              {t('brand.name')}
             </h1>
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-accent">
-              Khoa Trường · 2027
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-accent truncate mt-0.5">
+              {t('brand.subtitle')}
             </p>
           </div>
         </div>
 
-        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto" aria-label="Điều hướng chính">
+        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto" aria-label={t('nav.mainAria')}>
           <SidebarLink
             to="/home"
             preloadKey="Home"
             icon="home"
-            label="Trang chủ"
+            label={t('nav.home')}
             currentPath={location.pathname}
           />
           <SidebarLink
             to="/gpa"
             preloadKey="GPACalculator"
             icon="calculate"
-            label="Tính điểm"
+            label={t('nav.gpa')}
             currentPath={location.pathname}
           />
           <SidebarLink
             to="/schools"
             preloadKey="SchoolFinder"
             icon="apartment"
-            label="Trường phù hợp"
+            label={t('nav.schools')}
             currentPath={location.pathname}
           />
           <SidebarLink
             to="/roadmap"
             preloadKey="Roadmap"
             icon="timeline"
-            label="Lộ trình"
+            label={t('nav.roadmap')}
             currentPath={location.pathname}
           />
           <SidebarLink
             to="/library"
             preloadKey="Library"
             icon="folder_open"
-            label="Tài Liệu Học Free"
+            label={t('nav.library')}
             currentPath={location.pathname}
           />
           <SidebarLink
             to="/courses/combo-dtht-hs12-2k9-chinh-phuc-dai-hoc"
             preloadKey="CourseComboHs12"
             icon="auto_stories"
-            label="Các khóa học"
+            label={t('nav.courses')}
             currentPath={location.pathname}
           />
           <SidebarLink
             to="/hoc-online"
             preloadKey="OnlineLearning"
             icon="computer"
-            label="Học online"
+            label={t('nav.onlineLearning')}
             currentPath={location.pathname}
           />
           <SidebarLink
             to="/arena"
             preloadKey="StudyArena"
             icon="local_fire_department"
-            label="Đấu trường"
+            label={t('nav.arena')}
             currentPath={location.pathname}
           />
           <SidebarLink
             to="/notes"
             preloadKey="Notes"
             icon="edit_note"
-            label="Ghi chú"
+            label={t('nav.notes')}
             currentPath={location.pathname}
           />
           {isAdmin && (
@@ -227,7 +232,7 @@ export default function RootLayout() {
               to="/admin"
               preloadKey="Admin"
               icon="admin_panel_settings"
-              label="Admin Panel"
+              label={t('nav.admin')}
               currentPath={location.pathname}
             />
           )}
@@ -236,14 +241,17 @@ export default function RootLayout() {
               to="/collaborator"
               preloadKey="Collaborator"
               icon="local_library"
-              label="Truyền Đạo Sư"
+              label={t('nav.collaborator')}
               currentPath={location.pathname}
             />
           )}
         </nav>
 
         <div className="p-3 border-t border-border bg-surface/60 space-y-2">
-          <ThemeToggle variant="desktop" />
+          <div className="space-y-1.5">
+            <ThemeToggle variant="desktop" />
+            <LanguageToggle variant="segmented" />
+          </div>
           {user ? (
             <div className="flex items-stretch gap-1.5">
               <Link
@@ -268,22 +276,22 @@ export default function RootLayout() {
                     <p className="text-xs font-bold truncate text-foreground">
                       {displayName}
                     </p>
-                    {isGoogleLinked && <GoogleLinkedBadge />}
+                    {isGoogleLinked && <GoogleLinkedBadge label={t('nav.googleSynced')} />}
                   </div>
                   <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                     <span
-                      className={`inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded border ${userRank.bg} ${userRank.color} ${userRank.border}`}
+                      className={`inline-flex items-center gap-0.5 whitespace-nowrap text-[10px] font-bold px-1.5 py-0.5 rounded border ${userRank.bg} ${userRank.color} ${userRank.border}`}
                     >
-                      <span className="material-symbols-outlined text-[11px]" aria-hidden="true">
+                      <span className="material-symbols-outlined text-[11px] shrink-0" aria-hidden="true">
                         {userRank.icon}
                       </span>
-                      {userRank.name}
+                      <span className="truncate max-w-[92px]">{rankDisplayName}</span>
                     </span>
                     <span
-                      className={`tabular inline-flex items-center text-[10px] font-extrabold px-1.5 py-0.5 rounded border ${lvAccent.badge}`}
-                      title={`${lv.expInLevel}/${lv.expForNext} EXP tới cấp tiếp theo`}
+                      className={`tabular inline-flex items-center whitespace-nowrap text-[10px] font-extrabold px-1.5 py-0.5 rounded border ${lvAccent.badge}`}
+                      title={t('nav.expToNextTitle', { current: lv.expInLevel, total: lv.expForNext })}
                     >
-                      Cấp {lv.level}
+                      {t('nav.levelBadge', { level: lv.level })}
                     </span>
                   </div>
                 </div>
@@ -293,9 +301,9 @@ export default function RootLayout() {
                 type="button"
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                title="Đăng xuất tài khoản"
-                aria-label="Đăng xuất tài khoản"
-                className="flex w-10 items-center justify-center rounded-xl border border-border bg-surface text-secondary-text hover:bg-primary-soft hover:text-primary hover:border-primary/35 transition-colors cursor-pointer no-shrink disabled:opacity-50"
+                title={t('nav.signOut')}
+                aria-label={t('nav.signOut')}
+                className="flex w-10 items-center justify-center rounded-xl border border-border bg-surface text-secondary-text hover:bg-primary-soft hover:text-primary hover:border-primary/35 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
               >
                 <span
                   className={`material-symbols-outlined text-lg ${isSigningOut ? 'animate-spin' : ''}`}
@@ -310,10 +318,10 @@ export default function RootLayout() {
               to={authLinkWithNext}
               className="btn-arena btn-arena-primary w-full text-sm"
             >
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">
+              <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
                 login
               </span>
-              <span>Đăng nhập / Đăng ký</span>
+              <span className="truncate">{t('nav.signInRegister')}</span>
             </Link>
           )}
         </div>
@@ -329,22 +337,22 @@ export default function RootLayout() {
           <aside
             id="mobile-main-menu"
             className="safe-top animate-page-in absolute left-0 top-0 bottom-0 flex w-72 flex-col border-r border-border bg-paper shadow-xl"
-            aria-label="Menu chính"
+            aria-label={t('nav.mobileMenuAria')}
           >
-            <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-border bg-surface">
-              <div className="flex flex-col">
-                <h2 className="font-display text-lg font-extrabold uppercase leading-none tracking-tight text-primary">
-                  Đấu Trường
+            <div className="flex items-center justify-between px-4 pt-4 pb-3.5 border-b border-border bg-surface">
+              <div className="flex flex-col min-w-0">
+                <h2 className="font-display text-lg font-extrabold uppercase leading-none tracking-tight text-primary truncate">
+                  {t('brand.shortName')}
                 </h2>
-                <span className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.24em] text-accent">
-                  Học Tập · 2027
+                <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-accent truncate">
+                  {t('brand.mobileSub')}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-alt border border-border text-foreground active:bg-surface-hover cursor-pointer"
-                aria-label="Đóng menu"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-surface-alt border border-border text-foreground hover:bg-surface-hover active:bg-surface-hover cursor-pointer"
+                aria-label={t('nav.closeMenu')}
               >
                 <span className="material-symbols-outlined" aria-hidden="true">close</span>
               </button>
@@ -358,37 +366,40 @@ export default function RootLayout() {
                 }
               }}
             >
-              <SidebarLink to="/home" preloadKey="Home" icon="home" label="Trang chủ" currentPath={location.pathname} />
-              <SidebarLink to="/gpa" preloadKey="GPACalculator" icon="calculate" label="Tính điểm" currentPath={location.pathname} />
-              <SidebarLink to="/schools" preloadKey="SchoolFinder" icon="apartment" label="Trường phù hợp" currentPath={location.pathname} />
-              <SidebarLink to="/roadmap" preloadKey="Roadmap" icon="timeline" label="Lộ trình" currentPath={location.pathname} />
-              <SidebarLink to="/library" preloadKey="Library" icon="folder_open" label="Tài Liệu Học Free" currentPath={location.pathname} />
+              <SidebarLink to="/home" preloadKey="Home" icon="home" label={t('nav.home')} currentPath={location.pathname} />
+              <SidebarLink to="/gpa" preloadKey="GPACalculator" icon="calculate" label={t('nav.gpa')} currentPath={location.pathname} />
+              <SidebarLink to="/schools" preloadKey="SchoolFinder" icon="apartment" label={t('nav.schools')} currentPath={location.pathname} />
+              <SidebarLink to="/roadmap" preloadKey="Roadmap" icon="timeline" label={t('nav.roadmap')} currentPath={location.pathname} />
+              <SidebarLink to="/library" preloadKey="Library" icon="folder_open" label={t('nav.library')} currentPath={location.pathname} />
               <SidebarLink
                 to="/courses/combo-dtht-hs12-2k9-chinh-phuc-dai-hoc"
                 preloadKey="CourseComboHs12"
                 icon="auto_stories"
-                label="Các khóa học"
+                label={t('nav.courses')}
                 currentPath={location.pathname}
               />
-              <SidebarLink to="/hoc-online" preloadKey="OnlineLearning" icon="computer" label="Học online" currentPath={location.pathname} />
-              <SidebarLink to="/arena" preloadKey="StudyArena" icon="local_fire_department" label="Đấu trường" currentPath={location.pathname} />
-              <SidebarLink to="/notes" preloadKey="Notes" icon="edit_note" label="Ghi chú" currentPath={location.pathname} />
+              <SidebarLink to="/hoc-online" preloadKey="OnlineLearning" icon="computer" label={t('nav.onlineLearning')} currentPath={location.pathname} />
+              <SidebarLink to="/arena" preloadKey="StudyArena" icon="local_fire_department" label={t('nav.arena')} currentPath={location.pathname} />
+              <SidebarLink to="/notes" preloadKey="Notes" icon="edit_note" label={t('nav.notes')} currentPath={location.pathname} />
               {isAdmin && (
-                <SidebarLink to="/admin" preloadKey="Admin" icon="admin_panel_settings" label="Admin Panel" currentPath={location.pathname} />
+                <SidebarLink to="/admin" preloadKey="Admin" icon="admin_panel_settings" label={t('nav.admin')} currentPath={location.pathname} />
               )}
               {isCollaborator && (
-                <SidebarLink to="/collaborator" preloadKey="Collaborator" icon="local_library" label="Truyền Đạo Sư" currentPath={location.pathname} />
+                <SidebarLink to="/collaborator" preloadKey="Collaborator" icon="local_library" label={t('nav.collaborator')} currentPath={location.pathname} />
               )}
             </nav>
 
-            <div className="px-3 pb-4 pt-2 border-t border-border bg-surface pb-safe space-y-2">
-              <ThemeToggle variant="desktop" />
+            <div className="px-3 pb-4 pt-2.5 border-t border-border bg-surface pb-safe space-y-2">
+              <div className="space-y-1.5">
+                <ThemeToggle variant="desktop" />
+                <LanguageToggle variant="segmented" />
+              </div>
               {user ? (
                 <div className="flex items-stretch gap-1.5">
                   <Link
                     to="/profile"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex flex-1 min-w-0 items-center gap-2.5 rounded-xl bg-surface-alt border border-border px-3 py-2.5 transition-colors active:bg-surface-hover"
+                    className="flex flex-1 min-w-0 items-center gap-2.5 rounded-xl bg-surface-alt border border-border px-3 py-2.5 transition-colors hover:bg-surface-hover active:bg-surface-hover"
                   >
                     <Avatar
                       src={displayAvatar}
@@ -402,10 +413,10 @@ export default function RootLayout() {
                         <span className="truncate text-sm font-bold text-foreground">
                           {displayName}
                         </span>
-                        {isGoogleLinked && <GoogleLinkedBadge />}
+                        {isGoogleLinked && <GoogleLinkedBadge label={t('nav.googleSynced')} />}
                       </div>
                       <span className="text-[11px] text-secondary-text block truncate">
-                        {userRank.name} · Cấp {lv.level}
+                        {rankDisplayName} · {t('nav.levelBadge', { level: lv.level })}
                       </span>
                     </div>
                   </Link>
@@ -413,9 +424,9 @@ export default function RootLayout() {
                     type="button"
                     onClick={handleSignOut}
                     disabled={isSigningOut}
-                    title="Đăng xuất tài khoản"
-                    aria-label="Đăng xuất tài khoản"
-                    className="flex min-w-[44px] items-center justify-center rounded-xl border border-border bg-surface-alt text-secondary-text hover:bg-primary-soft hover:text-primary hover:border-primary/35 transition-colors cursor-pointer no-shrink disabled:opacity-50"
+                    title={t('nav.signOut')}
+                    aria-label={t('nav.signOut')}
+                    className="flex min-w-[44px] items-center justify-center rounded-xl border border-border bg-surface-alt text-secondary-text hover:bg-primary-soft hover:text-primary hover:border-primary/35 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
                   >
                     <span
                       className={`material-symbols-outlined text-lg ${isSigningOut ? 'animate-spin' : ''}`}
@@ -431,10 +442,10 @@ export default function RootLayout() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="btn-arena btn-arena-primary w-full text-sm"
                 >
-                  <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                  <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
                     login
                   </span>
-                  <span>Đăng nhập / Đăng ký</span>
+                  <span className="truncate">{t('nav.signInRegister')}</span>
                 </Link>
               )}
             </div>
@@ -445,34 +456,35 @@ export default function RootLayout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">
         {/* Mobile Top Navigation Bar */}
-        <header className="safe-top md:hidden flex items-center justify-between px-4 py-2.5 bg-paper/95 backdrop-blur-md border-b border-border z-40 no-shrink">
+        <header className="safe-top md:hidden flex items-center justify-between gap-2 px-3.5 py-2.5 bg-paper/95 backdrop-blur-md border-b border-border z-40 shrink-0">
           <Link
             to="/home"
             onMouseEnter={() => preloadRouteModule('Home')}
             onFocus={() => preloadRouteModule('Home')}
-            className="flex items-center gap-2.5"
+            className="flex items-center gap-2 min-w-0 flex-1"
           >
             <img
               src="/logo.webp"
-              alt="Đấu Trường Học Tập"
+              alt={t('brand.name')}
               width={32}
               height={32}
               fetchPriority="high"
               decoding="async"
-              className="w-8 h-8 rounded-lg object-cover border border-gold"
+              className="w-8 h-8 rounded-lg object-cover border border-gold shrink-0"
             />
-            <span className="font-extrabold text-sm tracking-tight font-display text-primary">
-              Đấu Trường Học Tập
+            <span className="font-extrabold text-sm tracking-tight font-display text-primary truncate">
+              {t('brand.name')}
             </span>
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
+            <LanguageToggle variant="compact" />
             <ThemeToggle variant="compact" />
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-alt border border-border text-foreground transition-colors active:bg-surface-hover cursor-pointer"
-              aria-label="Menu"
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-alt border border-border text-foreground transition-colors hover:bg-surface-hover active:bg-surface-hover cursor-pointer"
+              aria-label={t('nav.openMenu')}
               aria-controls="mobile-main-menu"
               aria-expanded={isMobileMenuOpen}
             >
@@ -496,35 +508,35 @@ export default function RootLayout() {
         {/* Mobile Bottom Navigation */}
         <nav
           className="safe-bottom md:hidden fixed bottom-0 left-0 right-0 bg-paper/95 backdrop-blur-md border-t border-border px-2 pt-1.5 z-50"
-          aria-label="Điều hướng di động"
+          aria-label={t('nav.mobileBottomAria')}
         >
-          <div className="flex justify-around items-center max-w-md mx-auto">
+          <div className="grid grid-cols-4 gap-1 items-center max-w-md mx-auto">
             <MobileNavLink
               to="/home"
               preloadKey="Home"
               icon="home"
-              label="Trang chủ"
+              label={t('nav.home')}
               currentPath={location.pathname}
             />
             <MobileNavLink
               to="/gpa"
               preloadKey="GPACalculator"
               icon="calculate"
-              label="Tính điểm"
+              label={t('nav.gpa')}
               currentPath={location.pathname}
             />
             <MobileNavLink
               to="/arena"
               preloadKey="StudyArena"
               icon="local_fire_department"
-              label="Đấu trường"
+              label={t('nav.arena')}
               currentPath={location.pathname}
             />
             <MobileNavLink
               to={user ? '/profile' : authLinkWithNext}
               preloadKey={user ? 'Profile' : undefined}
               icon={user ? 'person' : 'login'}
-              label={user ? 'Cá nhân' : 'Đăng nhập'}
+              label={user ? t('nav.profile') : t('nav.signIn')}
               currentPath={location.pathname}
             />
           </div>
@@ -552,7 +564,7 @@ function SidebarLink({ to, preloadKey, icon, label, currentPath }) {
     >
       <span
         aria-hidden="true"
-        className={`material-symbols-outlined text-xl transition-transform ${
+        className={`material-symbols-outlined text-xl shrink-0 transition-transform ${
           isActive ? 'icon-fill text-white scale-105' : 'text-accent group-hover:text-primary'
         }`}
       >
@@ -574,7 +586,7 @@ function MobileNavLink({ to, preloadKey, icon, label, currentPath }) {
       onFocus={warmUpRoute}
       onTouchStart={warmUpRoute}
       aria-current={isActive ? 'page' : undefined}
-      className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-1.5 rounded-xl transition-colors min-h-[44px] ${
+      className={`flex min-w-0 flex-col items-center justify-center gap-0.5 py-1.5 rounded-xl transition-colors min-h-[44px] ${
         isActive ? 'text-primary font-bold' : 'text-secondary-text hover:text-foreground'
       }`}
     >
@@ -590,7 +602,7 @@ function MobileNavLink({ to, preloadKey, icon, label, currentPath }) {
           {icon}
         </span>
       </div>
-      <span className="text-[10px] tracking-tight leading-none">{label}</span>
+      <span className="text-[10px] tracking-tight leading-none truncate max-w-full px-1">{label}</span>
     </Link>
   );
 }

@@ -1,32 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { sanitizeNextPath, useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { translate } from '../i18n';
 import RankSeal from '../components/ui/RankSeal';
+import LanguageToggle from '../components/ui/LanguageToggle';
 import ThemeToggle from '../components/ui/ThemeToggle';
-
-const SCHOLAR_PILLARS = [
-  {
-    icon: 'auto_stories',
-    badgeClass: 'bg-jade-soft text-jade border-jade-border',
-    title: 'Kho Tài Liệu & Học Online đồng bộ Google Sheets',
-    description:
-      'Mở trực tiếp giáo trình, bài giảng và đề luyện chọn lọc của từng thầy cô ngay trên trình duyệt.',
-  },
-  {
-    icon: 'calculate',
-    badgeClass: 'bg-gold-soft text-gold-dark border-gold-border',
-    title: 'Công cụ Tính GPA & Dự báo Tuyển sinh 2027',
-    description:
-      'Quy đổi điểm THPT, ĐGNL, ĐGTD, đối chiếu điểm chuẩn đại học và quản lý tín chỉ học kỳ chính xác.',
-  },
-  {
-    icon: 'local_fire_department',
-    badgeClass: 'bg-primary-soft text-primary border-primary/30',
-    title: 'Đấu Trường Công Lực & Bảng Vàng Sĩ Tử',
-    description:
-      'Ghi nhận thời gian thực học thành EXP, duy trì chuỗi ngày ôn luyện và thăng bậc quân hàm khoa trường.',
-  },
-];
 
 function GoogleLogoMark() {
   return (
@@ -51,9 +30,77 @@ function GoogleLogoMark() {
   );
 }
 
+function isUnconfirmedAuthMessage(errOrMessage) {
+  const raw =
+    typeof errOrMessage === 'string'
+      ? errOrMessage
+      : errOrMessage?.message || errOrMessage?.code || '';
+  return String(raw).toLowerCase().includes('email not confirmed');
+}
+
+function translateAuthError(errOrMessage, lang = 'vi') {
+  const rawMessage =
+    typeof errOrMessage === 'string'
+      ? errOrMessage
+      : errOrMessage?.message || '';
+  const msg = String(rawMessage || '').toLowerCase();
+
+  if (
+    msg.includes('invalid login credentials') ||
+    msg.includes('invalid credentials')
+  ) {
+    return translate(lang, 'authPage.errors.invalidCredentials');
+  }
+  if (msg.includes('email not confirmed')) {
+    return translate(lang, 'authPage.errors.unconfirmedEmail');
+  }
+  if (
+    msg.includes('user already registered') ||
+    msg.includes('already exists')
+  ) {
+    return translate(lang, 'authPage.errors.alreadyRegistered');
+  }
+  if (msg.includes('password should be at least') || msg.includes('weak_password')) {
+    return translate(lang, 'authPage.errors.passwordTooShort');
+  }
+  if (msg.includes('same password') || msg.includes('different from the old')) {
+    return translate(lang, 'authPage.errors.samePassword');
+  }
+  if (
+    msg.includes('rate limit') ||
+    msg.includes('too many requests') ||
+    msg.includes('for security purposes') ||
+    msg.includes('over_email_send_rate_limit')
+  ) {
+    return translate(lang, 'authPage.errors.rateLimited');
+  }
+  if (
+    msg.includes('unable to validate email') ||
+    msg.includes('invalid email')
+  ) {
+    return translate(lang, 'authPage.errors.invalidEmail');
+  }
+  if (msg.includes('provider is not enabled')) {
+    return translate(lang, 'authPage.errors.providerDisabled');
+  }
+  if (
+    msg.includes('failed to fetch') ||
+    msg.includes('networkerror') ||
+    msg.includes('network request failed') ||
+    msg.includes('load failed') ||
+    msg.includes('fetch failed')
+  ) {
+    return translate(lang, 'authPage.errors.networkError');
+  }
+  return rawMessage
+    ? translate(lang, 'authPage.errors.genericWithReason', { reason: rawMessage })
+    : translate(lang, 'authPage.errors.genericFallback');
+}
+
 export default function AuthScreen() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { lang, t } = useLanguage();
 
   const {
     user,
@@ -95,8 +142,8 @@ export default function AuthScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [errorState, setErrorState] = useState(null);
+  const [successState, setSuccessState] = useState(null);
   const [isUnconfirmedError, setIsUnconfirmedError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -114,57 +161,37 @@ export default function AuthScreen() {
     }
   }, [authLoading, effectiveMode, navigate, safeNext, user]);
 
-  const translateAuthError = (rawMessage) => {
-    const msg = String(rawMessage || '').toLowerCase();
+  const errorMsg = useMemo(() => {
+    if (!errorState) return '';
+    if (errorState.key) return t(errorState.key, errorState.params);
+    return translateAuthError(errorState.raw, lang);
+  }, [errorState, lang, t]);
 
-    if (
-      msg.includes('invalid login credentials') ||
-      msg.includes('invalid credentials')
-    ) {
-      return 'Email hoặc mật khẩu chưa chính xác. Nếu bạn đăng ký bằng Google, hãy nhấn nút "Tiếp tục với Google" ở trên nhé!';
-    }
-    if (msg.includes('email not confirmed')) {
+  const successMsg = useMemo(() => {
+    if (!successState) return '';
+    return t(successState.key, successState.params);
+  }, [successState, t]);
+
+  const clearFeedback = () => {
+    setErrorState(null);
+    setSuccessState(null);
+    setIsUnconfirmedError(false);
+  };
+
+  const setValidationError = (key, params) => {
+    setErrorState({ key, params });
+  };
+
+  const setAuthException = (err) => {
+    if (isUnconfirmedAuthMessage(err)) {
       setIsUnconfirmedError(true);
-      return 'Tài khoản của bạn chưa được kích hoạt! Vui lòng mở hộp thư (kiểm tra cả mục Thư rác / Spam) và nhấn vào liên kết xác nhận.';
     }
-    if (
-      msg.includes('user already registered') ||
-      msg.includes('already exists')
-    ) {
-      return 'Email này đã được đăng ký trước đó. Vui lòng chuyển sang Đăng nhập hoặc dùng tính năng Quên mật khẩu.';
-    }
-    if (msg.includes('password should be at least')) {
-      return 'Mật khẩu quá ngắn. Vui lòng nhập tối thiểu 6 ký tự.';
-    }
-    if (msg.includes('same password') || msg.includes('different from the old')) {
-      return 'Mật khẩu mới cần khác với mật khẩu cũ bạn đang sử dụng.';
-    }
-    if (
-      msg.includes('rate limit') ||
-      msg.includes('too many requests') ||
-      msg.includes('for security purposes')
-    ) {
-      return 'Bạn thao tác hơi nhanh. Vui lòng đợi khoảng 60 giây rồi thử lại nhé!';
-    }
-    if (
-      msg.includes('unable to validate email') ||
-      msg.includes('invalid email')
-    ) {
-      return 'Định dạng địa chỉ email chưa hợp lệ. Vui lòng kiểm tra lại.';
-    }
-    if (msg.includes('provider is not enabled')) {
-      return 'Phương thức đăng nhập này hiện đang bảo trì. Vui lòng thử phương thức khác.';
-    }
-    return rawMessage
-      ? `Không thể hoàn tất yêu cầu: ${rawMessage}`
-      : 'Đã xảy ra lỗi kết nối. Vui lòng thử lại sau giây lát.';
+    setErrorState({ raw: err?.message || '' });
   };
 
   const switchMode = (nextMode) => {
     setMode(nextMode);
-    setErrorMsg('');
-    setSuccessMsg('');
-    setIsUnconfirmedError(false);
+    clearFeedback();
 
     if (queryMode === 'update-password' || isPasswordRecovery) {
       clearPasswordRecovery();
@@ -175,9 +202,7 @@ export default function AuthScreen() {
   };
 
   const handleGoogleSignIn = async () => {
-    setErrorMsg('');
-    setSuccessMsg('');
-    setIsUnconfirmedError(false);
+    clearFeedback();
     setIsGoogleLoading(true);
 
     try {
@@ -188,30 +213,31 @@ export default function AuthScreen() {
       // Browser navigates to Google OAuth consent screen
     } catch (err) {
       console.error('[AuthScreen] Google OAuth error:', err);
-      setErrorMsg(translateAuthError(err?.message));
+      setAuthException(err);
       setIsGoogleLoading(false);
     }
   };
 
   const handleResendEmail = async () => {
     if (!email.trim()) {
-      setErrorMsg('Vui lòng nhập địa chỉ email vào ô bên dưới trước khi yêu cầu gửi lại liên kết kích hoạt.');
+      setValidationError('authPage.validation.enterEmailBeforeResend');
       return;
     }
 
     setIsResending(true);
-    setErrorMsg('');
-    setSuccessMsg('');
+    setErrorState(null);
+    setSuccessState(null);
 
     try {
       const { error } = await resendConfirmation(email);
       if (error) throw error;
-      setSuccessMsg(
-        `Đã gửi lại email kích hoạt tới ${email.trim()}. Vui lòng kiểm tra cả hộp thư đến và mục Thư rác (Spam).`,
-      );
+      setSuccessState({
+        key: 'authPage.success.resentEmail',
+        params: { email: email.trim() },
+      });
       setIsUnconfirmedError(false);
     } catch (err) {
-      setErrorMsg(translateAuthError(err?.message));
+      setAuthException(err);
     } finally {
       setIsResending(false);
     }
@@ -219,17 +245,15 @@ export default function AuthScreen() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg('');
-    setSuccessMsg('');
-    setIsUnconfirmedError(false);
+    clearFeedback();
 
     if (effectiveMode === 'update-password') {
       if (!password || password.length < 6) {
-        setErrorMsg('Mật khẩu mới cần có ít nhất 6 ký tự.');
+        setValidationError('authPage.validation.newPasswordMin');
         return;
       }
       if (password !== confirmPassword) {
-        setErrorMsg('Mật khẩu xác nhận chưa trùng khớp. Vui lòng kiểm tra lại.');
+        setValidationError('authPage.validation.passwordMismatch');
         return;
       }
 
@@ -245,12 +269,12 @@ export default function AuthScreen() {
 
         setPassword('');
         setConfirmPassword('');
-        setSuccessMsg('Đã cập nhật mật khẩu mới thành công! Đang đưa bạn vào học đường...');
+        setSuccessState({ key: 'authPage.success.passwordUpdated' });
         window.setTimeout(() => {
           navigate(safeNext, { replace: true });
         }, 900);
       } catch (err) {
-        setErrorMsg(translateAuthError(err?.message));
+        setAuthException(err);
       } finally {
         setIsSubmitting(false);
       }
@@ -259,7 +283,7 @@ export default function AuthScreen() {
 
     const trimmedEmail = email.trim();
     if (!trimmedEmail) {
-      setErrorMsg('Vui lòng nhập địa chỉ email của bạn.');
+      setValidationError('authPage.validation.enterEmail');
       return;
     }
 
@@ -268,11 +292,12 @@ export default function AuthScreen() {
       try {
         const { error } = await resetPassword(trimmedEmail);
         if (error) throw error;
-        setSuccessMsg(
-          `Liên kết đặt lại mật khẩu đã được gửi tới ${trimmedEmail}. Vui lòng kiểm tra hộp thư email (kể cả mục Spam).`,
-        );
+        setSuccessState({
+          key: 'authPage.success.resetLinkSent',
+          params: { email: trimmedEmail },
+        });
       } catch (err) {
-        setErrorMsg(translateAuthError(err?.message));
+        setAuthException(err);
       } finally {
         setIsSubmitting(false);
       }
@@ -280,17 +305,17 @@ export default function AuthScreen() {
     }
 
     if (!password) {
-      setErrorMsg('Vui lòng nhập mật khẩu.');
+      setValidationError('authPage.validation.enterPassword');
       return;
     }
 
     if (effectiveMode === 'register' && !fullName.trim()) {
-      setErrorMsg('Vui lòng nhập họ và tên hiển thị của bạn.');
+      setValidationError('authPage.validation.enterFullName');
       return;
     }
 
     if (effectiveMode === 'register' && password.length < 6) {
-      setErrorMsg('Mật khẩu cần có tối thiểu 6 ký tự.');
+      setValidationError('authPage.validation.passwordMin');
       return;
     }
 
@@ -309,16 +334,15 @@ export default function AuthScreen() {
           Array.isArray(data.user.identities) &&
           data.user.identities.length === 0
         ) {
-          setErrorMsg(
-            'Email này đã được đăng ký trước đó. Vui lòng chuyển sang tab Đăng nhập hoặc tiếp tục với Google!',
-          );
+          setValidationError('authPage.validation.alreadyRegisteredGoogleHint');
           return;
         }
 
         if (data?.user && !data?.session) {
-          setSuccessMsg(
-            `Đăng ký thành công! Email kích hoạt đã được gửi tới ${trimmedEmail}. Vui lòng mở hộp thư (và mục Spam) để xác nhận trước khi đăng nhập.`,
-          );
+          setSuccessState({
+            key: 'authPage.success.registeredVerifyEmail',
+            params: { email: trimmedEmail },
+          });
           setMode('login');
           setPassword('');
         } else {
@@ -327,7 +351,7 @@ export default function AuthScreen() {
       }
     } catch (err) {
       console.error('[AuthScreen] Submit error:', err);
-      setErrorMsg(translateAuthError(err?.message));
+      setAuthException(err);
     } finally {
       setIsSubmitting(false);
     }
@@ -337,37 +361,40 @@ export default function AuthScreen() {
   const showGoogleAndTabs =
     effectiveMode === 'login' || effectiveMode === 'register';
 
+  const rawPillars = t('authPage.pillars');
+  const scholarPillars = Array.isArray(rawPillars) ? rawPillars : [];
+
   const sealConfig =
     effectiveMode === 'update-password'
-      ? { icon: 'lock_reset', label: 'Thiết lập mật khẩu mới' }
+      ? { icon: 'lock_reset', label: t('authPage.sealUpdatePassword') }
       : effectiveMode === 'forgot-password'
-        ? { icon: 'mail_lock', label: 'Khôi phục tài khoản' }
+        ? { icon: 'mail_lock', label: t('authPage.sealForgotPassword') }
         : effectiveMode === 'register'
-          ? { icon: 'person_add', label: 'Tân sĩ tử ghi danh' }
-          : { icon: 'school', label: 'Ghi danh nhập trường' };
+          ? { icon: 'person_add', label: t('authPage.sealRegister') }
+          : { icon: 'school', label: t('authPage.sealLogin') };
 
   const headingText =
     effectiveMode === 'update-password'
-      ? 'Đặt mật khẩu mới'
+      ? t('authPage.headingUpdatePassword')
       : effectiveMode === 'forgot-password'
-        ? 'Khôi phục mật khẩu'
+        ? t('authPage.headingForgotPassword')
         : effectiveMode === 'register'
-          ? 'Tạo hồ sơ sĩ tử mới'
-          : 'Chào mừng sĩ tử trở lại!';
+          ? t('authPage.headingRegister')
+          : t('authPage.headingLogin');
 
   const subtitleText =
     effectiveMode === 'update-password'
-      ? 'Nhập mật khẩu mới tối thiểu 6 ký tự để bảo vệ tài khoản học tập của bạn.'
+      ? t('authPage.subUpdatePassword')
       : effectiveMode === 'forgot-password'
-        ? 'Nhập địa chỉ email bạn đã đăng ký, hệ thống sẽ gửi liên kết đặt lại mật khẩu ngay.'
+        ? t('authPage.subForgotPassword')
         : effectiveMode === 'register'
-          ? 'Đồng bộ lộ trình ôn luyện, công cụ tính điểm và tích lũy công lực trên Bảng Vàng.'
+          ? t('authPage.subRegister')
           : safeNext !== '/home'
-            ? 'Đăng nhập để tiếp tục truy cập ngay vào chuyên mục học tập bạn vừa chọn.'
-            : 'Đăng nhập để lưu tiến độ học online, tính điểm xét tuyển và đua top Bảng Vàng.';
+            ? t('authPage.subLoginNext')
+            : t('authPage.subLoginDefault');
 
   const inputBaseClass =
-    'w-full pl-11 pr-4 py-3 bg-paper border border-border-strong rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-foreground placeholder:text-muted-foreground text-sm transition-all outline-none disabled:opacity-60';
+    'w-full pl-11 pr-4 py-3 bg-paper border border-border-strong rounded-xl focus:ring-2 focus:ring-primary/35 focus:border-primary text-foreground placeholder:text-muted-foreground text-sm transition-all outline-none disabled:opacity-60';
 
   return (
     <div className="bg-background font-sans text-foreground min-h-dvh flex flex-col justify-between relative overflow-x-hidden">
@@ -386,34 +413,35 @@ export default function AuthScreen() {
       </span>
 
       {/* Top Navigation Header */}
-      <header className="relative z-10 flex items-center justify-between px-4 sm:px-6 lg:px-10 py-4 max-w-6xl mx-auto w-full">
-        <Link to="/home" className="flex items-center gap-2.5 group">
+      <header className="relative z-10 flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-10 py-4 max-w-6xl mx-auto w-full">
+        <Link to="/home" className="flex items-center gap-2.5 group min-w-0">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary-soft border border-gold overflow-hidden no-shrink shadow-xs">
             <img
               src="/logo.webp"
-              alt="Đấu Trường Học Tập"
+              alt={t('brand.name')}
               width={40}
               height={40}
               className="w-full h-full object-cover"
             />
           </div>
-          <div>
-            <span className="font-display font-extrabold text-base sm:text-lg tracking-tight text-foreground block leading-none">
-              Đấu Trường Học Tập
+          <div className="min-w-0">
+            <span className="font-display font-extrabold text-base sm:text-lg tracking-tight text-foreground block leading-none truncate">
+              {t('brand.name')}
             </span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-accent">
-              Trạm Học Sinh Sinh Viên · 2027
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-accent block truncate mt-0.5">
+              {t('brand.stationSub')}
             </span>
           </div>
         </Link>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <LanguageToggle variant="compact" />
           <ThemeToggle variant="compact" />
           <Link
             to="/home"
             className="text-xs font-bold text-primary hover:text-primary-hover flex items-center gap-1 px-3 py-2 min-h-[36px] rounded-xl bg-primary-soft border border-primary/25 transition-colors"
           >
-            <span>Khám phá trước</span>
+            <span className="hidden xs:inline sm:inline">{t('authPage.exploreFirst')}</span>
             <span className="material-symbols-outlined text-sm" aria-hidden="true">
               arrow_forward
             </span>
@@ -426,7 +454,7 @@ export default function AuthScreen() {
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-center">
           {/* Left Panel: Brand Storytelling (Desktop) */}
           <section
-            aria-label="Giới thiệu nền tảng Trạm Học Sinh Sinh Viên"
+            aria-label={t('authPage.showcaseAria')}
             className="hidden lg:flex lg:col-span-6 xl:col-span-7 flex-col justify-center space-y-6 pr-2 relative"
           >
             <div className="space-y-4">
@@ -434,27 +462,27 @@ export default function AuthScreen() {
                 size="sm"
                 variant="gold"
                 icon="workspace_premium"
-                label="Trạm Học Sinh Sinh Viên"
-                sublabel="Khoa Bảng 2027"
+                label={t('brand.stationShort')}
+                sublabel={t('authPage.showcaseSubseal')}
               />
 
               <h2 className="text-3xl xl:text-4xl font-display font-extrabold tracking-tight text-foreground leading-[1.22]">
-                Rèn Luyện Công Lực,{' '}
+                {t('authPage.showcaseTitleLead')}{' '}
                 <span className="brush-underline text-primary">
-                  Ghi Danh Bảng Vàng
+                  {t('authPage.showcaseTitleHighlight')}
                 </span>
               </h2>
 
               <p className="text-sm xl:text-base text-secondary-text leading-relaxed max-w-xl">
-                Không gian học thuật toàn diện kết nối học sinh THPT ôn thi đại học và sinh viên đại học: học trực tuyến đồng bộ Google Sheets, dự báo điểm chuẩn và tích lũy thời gian thực học minh bạch.
+                {t('authPage.showcaseDesc')}
               </p>
             </div>
 
             <div className="space-y-3.5 max-w-xl">
-              {SCHOLAR_PILLARS.map((pillar) => (
+              {scholarPillars.map((pillar) => (
                 <div
                   key={pillar.title}
-                  className="paper-card p-4 flex items-start gap-3.5 bg-paper/90"
+                  className="paper-card p-4 flex items-start gap-3.5 bg-paper/90 border border-border hover:border-border-strong"
                 >
                   <div
                     className={`flex h-10 w-10 items-center justify-center rounded-xl border no-shrink ${pillar.badgeClass}`}
@@ -481,7 +509,7 @@ export default function AuthScreen() {
             <div className="max-w-xl pt-1 space-y-3">
               <div className="lattice-divider" aria-hidden="true" />
               <p className="text-xs text-muted-foreground italic font-serif">
-                “Ngọc bất trác bất thành khí — Mỗi giờ tự học nghiêm túc hôm nay là một bậc vững chắc dẫn tới cổng trường mơ ước.”
+                {t('authPage.quote')}
               </p>
             </div>
           </section>
@@ -506,38 +534,51 @@ export default function AuthScreen() {
                 </p>
               </div>
 
-              {/* Segmented Mode Switch (Login / Register) */}
-              {showGoogleAndTabs && (
+              {/* Segmented Mode Switch (Login / Register / Forgot Password) */}
+              {effectiveMode !== 'update-password' && (
                 <div
-                  className="p-1 bg-surface-alt rounded-xl flex mb-5 border border-border"
+                  className="p-1 bg-surface-alt rounded-xl grid grid-cols-3 gap-1 mb-5 border border-border"
                   role="group"
-                  aria-label="Chọn chế độ Đăng nhập hoặc Đăng ký"
+                  aria-label={t('authPage.modeGroupAria')}
                 >
                   <button
                     type="button"
                     aria-pressed={effectiveMode === 'login'}
                     disabled={isBusy}
                     onClick={() => switchMode('login')}
-                    className={`flex-1 py-2.5 text-sm font-display font-bold rounded-lg transition-all cursor-pointer ${
+                    className={`py-2 px-2 text-xs sm:text-sm font-display font-bold rounded-lg transition-all cursor-pointer truncate ${
                       effectiveMode === 'login'
-                        ? 'bg-primary text-on-primary shadow-xs'
-                        : 'text-secondary-text hover:text-foreground'
+                        ? 'bg-primary text-on-primary border border-primary-hover shadow-xs'
+                        : 'border border-transparent text-secondary-text hover:text-foreground'
                     }`}
                   >
-                    Đăng nhập
+                    {t('authPage.tabLogin')}
                   </button>
                   <button
                     type="button"
                     aria-pressed={effectiveMode === 'register'}
                     disabled={isBusy}
                     onClick={() => switchMode('register')}
-                    className={`flex-1 py-2.5 text-sm font-display font-bold rounded-lg transition-all cursor-pointer ${
+                    className={`py-2 px-2 text-xs sm:text-sm font-display font-bold rounded-lg transition-all cursor-pointer truncate ${
                       effectiveMode === 'register'
-                        ? 'bg-primary text-on-primary shadow-xs'
-                        : 'text-secondary-text hover:text-foreground'
+                        ? 'bg-primary text-on-primary border border-primary-hover shadow-xs'
+                        : 'border border-transparent text-secondary-text hover:text-foreground'
                     }`}
                   >
-                    Đăng ký
+                    {t('authPage.tabRegister')}
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={effectiveMode === 'forgot-password'}
+                    disabled={isBusy}
+                    onClick={() => switchMode('forgot-password')}
+                    className={`py-2 px-2 text-xs sm:text-sm font-display font-bold rounded-lg transition-all cursor-pointer truncate ${
+                      effectiveMode === 'forgot-password'
+                        ? 'bg-primary text-on-primary border border-primary-hover shadow-xs'
+                        : 'border border-transparent text-secondary-text hover:text-foreground'
+                    }`}
+                  >
+                    {t('authPage.tabForgot')}
                   </button>
                 </div>
               )}
@@ -559,35 +600,35 @@ export default function AuthScreen() {
                         >
                           progress_activity
                         </span>
-                        <span>Đang chuyển tới Google...</span>
+                        <span>{t('authPage.googleRedirecting')}</span>
                       </>
                     ) : (
                       <>
                         <GoogleLogoMark />
                         <span>
                           {effectiveMode === 'register'
-                            ? 'Đăng ký nhanh bằng Google'
-                            : 'Tiếp tục với Google'}
+                            ? t('authPage.googleRegister')
+                            : t('authPage.googleContinue')}
                         </span>
                       </>
                     )}
                   </button>
 
                   <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground text-center px-1">
-                    Khuyên dùng tài khoản Google để mở trực tiếp kho Học Online &amp; Google Sheets không cần đăng nhập lại.
+                    {t('authPage.googleHint')}
                   </p>
 
                   <div
                     className="mt-4 space-y-2"
                     role="separator"
-                    aria-label="Hoặc dùng Email"
+                    aria-label={t('authPage.orUseEmail')}
                   >
                     <div
                       className="lattice-divider [&::before]:!bg-surface"
                       aria-hidden="true"
                     />
                     <p className="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-                      Hoặc dùng Email
+                      {t('authPage.orUseEmail')}
                     </p>
                   </div>
                 </div>
@@ -647,8 +688,8 @@ export default function AuthScreen() {
                       </span>
                       <span>
                         {isResending
-                          ? 'Đang gửi lại...'
-                          : 'Gửi lại email xác nhận'}
+                          ? t('authPage.resendingBtn')
+                          : t('authPage.resendConfirmBtn')}
                       </span>
                     </button>
                   )}
@@ -659,14 +700,14 @@ export default function AuthScreen() {
               {effectiveMode === 'update-password' && !authLoading && !user ? (
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl bg-gold-soft border border-gold-border text-foreground text-xs sm:text-sm leading-relaxed">
-                    Phiên đặt lại mật khẩu đã hết hạn hoặc đường dẫn không còn hiệu lực. Vui lòng yêu cầu gửi lại liên kết khôi phục mới vào email của bạn.
+                    {t('authPage.expiredRecoveryNotice')}
                   </div>
                   <button
                     type="button"
                     onClick={() => switchMode('forgot-password')}
                     className="btn-arena btn-arena-primary w-full"
                   >
-                    <span>Yêu cầu liên kết khôi phục mới</span>
+                    <span>{t('authPage.requestNewRecoveryBtn')}</span>
                     <span
                       className="material-symbols-outlined text-lg"
                       aria-hidden="true"
@@ -679,7 +720,7 @@ export default function AuthScreen() {
                     onClick={() => switchMode('login')}
                     className="btn-arena btn-arena-secondary w-full"
                   >
-                    Quay lại Đăng nhập
+                    {t('authPage.backToLogin')}
                   </button>
                 </div>
               ) : (
@@ -691,7 +732,7 @@ export default function AuthScreen() {
                         htmlFor="auth-fullname"
                         className="block text-xs font-bold text-foreground mb-1.5 ml-1"
                       >
-                        Họ và tên hiển thị
+                        {t('authPage.fullNameLabel')}
                       </label>
                       <div className="relative flex items-center">
                         <span
@@ -709,7 +750,7 @@ export default function AuthScreen() {
                           aria-invalid={Boolean(errorMsg && !fullName.trim())}
                           aria-describedby={errorMsg ? 'auth-error-box' : undefined}
                           className={inputBaseClass}
-                          placeholder="Nguyễn Văn A"
+                          placeholder={t('authPage.fullNamePlaceholder')}
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                         />
@@ -724,7 +765,7 @@ export default function AuthScreen() {
                         htmlFor="auth-email"
                         className="block text-xs font-bold text-foreground mb-1.5 ml-1"
                       >
-                        Địa chỉ Email
+                        {t('authPage.emailLabel')}
                       </label>
                       <div className="relative flex items-center">
                         <span
@@ -742,7 +783,7 @@ export default function AuthScreen() {
                           aria-invalid={Boolean(errorMsg)}
                           aria-describedby={errorMsg ? 'auth-error-box' : undefined}
                           className={inputBaseClass}
-                          placeholder="hocsinh@example.com"
+                          placeholder={t('authPage.emailPlaceholder')}
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                         />
@@ -758,8 +799,8 @@ export default function AuthScreen() {
                         className="block text-xs font-bold text-foreground mb-1.5 ml-1"
                       >
                         {effectiveMode === 'update-password'
-                          ? 'Mật khẩu mới'
-                          : 'Mật khẩu'}
+                          ? t('authPage.newPasswordLabel')
+                          : t('authPage.passwordLabel')}
                       </label>
                       <div className="relative flex items-center">
                         <span
@@ -781,13 +822,17 @@ export default function AuthScreen() {
                           aria-invalid={Boolean(errorMsg)}
                           aria-describedby={errorMsg ? 'auth-error-box' : undefined}
                           className={`${inputBaseClass} pr-12`}
-                          placeholder="•••••••• (Tối thiểu 6 ký tự)"
+                          placeholder={t('authPage.passwordPlaceholder')}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                         />
                         <button
                           type="button"
-                          aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                          aria-label={
+                            showPassword
+                              ? t('authPage.hidePasswordAria')
+                              : t('authPage.showPasswordAria')
+                          }
                           aria-pressed={showPassword}
                           onClick={() => setShowPassword((prev) => !prev)}
                           className="absolute right-1.5 h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-surface-alt transition-colors flex items-center justify-center cursor-pointer"
@@ -810,7 +855,7 @@ export default function AuthScreen() {
                         htmlFor="auth-confirm-password"
                         className="block text-xs font-bold text-foreground mb-1.5 ml-1"
                       >
-                        Xác nhận mật khẩu mới
+                        {t('authPage.confirmPasswordLabel')}
                       </label>
                       <div className="relative flex items-center">
                         <span
@@ -828,7 +873,7 @@ export default function AuthScreen() {
                           aria-invalid={Boolean(errorMsg)}
                           aria-describedby={errorMsg ? 'auth-error-box' : undefined}
                           className={`${inputBaseClass} pr-12`}
-                          placeholder="Nhập lại mật khẩu mới"
+                          placeholder={t('authPage.confirmPasswordPlaceholder')}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                         />
@@ -836,8 +881,8 @@ export default function AuthScreen() {
                           type="button"
                           aria-label={
                             showConfirmPassword
-                              ? 'Ẩn mật khẩu xác nhận'
-                              : 'Hiện mật khẩu xác nhận'
+                              ? t('authPage.hideConfirmPasswordAria')
+                              : t('authPage.showConfirmPasswordAria')
                           }
                           aria-pressed={showConfirmPassword}
                           onClick={() =>
@@ -868,8 +913,8 @@ export default function AuthScreen() {
                         className="text-xs font-medium text-secondary-text hover:text-primary transition-colors cursor-pointer py-1"
                       >
                         {isResending
-                          ? 'Đang gửi...'
-                          : 'Chưa nhận được mail kích hoạt?'}
+                          ? t('authPage.sendingShort')
+                          : t('authPage.missingActivationPrompt')}
                       </button>
                       <button
                         type="button"
@@ -877,7 +922,7 @@ export default function AuthScreen() {
                         onClick={() => switchMode('forgot-password')}
                         className="text-xs font-bold text-primary hover:underline cursor-pointer py-1"
                       >
-                        Quên mật khẩu?
+                        {t('authPage.forgotPasswordPrompt')}
                       </button>
                     </div>
                   )}
@@ -896,18 +941,18 @@ export default function AuthScreen() {
                         >
                           progress_activity
                         </span>
-                        <span>Đang xử lý...</span>
+                        <span>{t('authPage.processing')}</span>
                       </>
                     ) : (
                       <>
                         <span>
                           {effectiveMode === 'update-password'
-                            ? 'Lưu mật khẩu mới'
+                            ? t('authPage.submitUpdatePassword')
                             : effectiveMode === 'forgot-password'
-                              ? 'Gửi liên kết khôi phục'
+                              ? t('authPage.submitForgotPassword')
                               : effectiveMode === 'login'
-                                ? 'Vào học ngay'
-                                : 'Đăng ký bằng Email'}
+                                ? t('authPage.submitLogin')
+                                : t('authPage.submitRegister')}
                         </span>
                         <span
                           className="material-symbols-outlined text-lg"
@@ -928,7 +973,7 @@ export default function AuthScreen() {
                       onClick={() => switchMode('login')}
                       className="btn-arena btn-arena-secondary w-full mt-2"
                     >
-                      Quay lại Đăng nhập
+                      {t('authPage.backToLogin')}
                     </button>
                   )}
                 </form>
@@ -939,8 +984,8 @@ export default function AuthScreen() {
             {showGoogleAndTabs && (
               <p className="text-center text-xs text-secondary-text mt-5">
                 {effectiveMode === 'login'
-                  ? 'Chưa có tài khoản sĩ tử? '
-                  : 'Đã có tài khoản trên hệ thống? '}
+                  ? t('authPage.noAccountPrompt')
+                  : t('authPage.hasAccountPrompt')}
                 <button
                   type="button"
                   disabled={isBusy}
@@ -952,8 +997,8 @@ export default function AuthScreen() {
                   className="font-bold text-primary hover:underline cursor-pointer py-1"
                 >
                   {effectiveMode === 'login'
-                    ? 'Đăng ký miễn phí'
-                    : 'Đăng nhập tại đây'}
+                    ? t('authPage.switchRegisterLink')
+                    : t('authPage.switchLoginLink')}
                 </button>
               </p>
             )}

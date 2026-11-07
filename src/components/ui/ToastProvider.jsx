@@ -1,5 +1,6 @@
-﻿/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useCallback, useContext, useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const ToastContext = createContext(null);
 
@@ -28,6 +29,7 @@ const TOAST_STYLES = {
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
+  const { t } = useLanguage();
 
   const dismiss = useCallback((id) => {
     setToasts((prev) => prev.filter((item) => item.id !== id));
@@ -62,7 +64,7 @@ export function ToastProvider({ children }) {
                 className={`pointer-events-auto flex items-start gap-2.5 rounded-xl border px-3.5 py-3 shadow-md transition-all ${style.border}`}
               >
                 <span
-                  className={`material-symbols-outlined text-lg no-shrink mt-0.5 ${style.iconColor}`}
+                  className={`material-symbols-outlined text-lg shrink-0 mt-0.5 ${style.iconColor}`}
                   aria-hidden="true"
                 >
                   {style.icon}
@@ -73,8 +75,8 @@ export function ToastProvider({ children }) {
                 <button
                   type="button"
                   onClick={() => dismiss(toast.id)}
-                  aria-label="Đóng thông báo"
-                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  aria-label={t('toast.closeAria')}
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer shrink-0"
                 >
                   <span className="material-symbols-outlined text-base" aria-hidden="true">
                     close

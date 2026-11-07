@@ -31,13 +31,13 @@ export default function Chip({
       {...rest}
     >
       {icon ? (
-        <span className="material-symbols-outlined text-sm leading-none" aria-hidden="true">
+        <span className="material-symbols-outlined text-sm leading-none shrink-0" aria-hidden="true">
           {icon}
         </span>
       ) : dot ? (
-        <span className="w-1.5 h-1.5 rounded-full bg-current no-shrink" aria-hidden="true" />
+        <span className="w-1.5 h-1.5 rounded-full bg-current shrink-0" aria-hidden="true" />
       ) : null}
-      <span>{children}</span>
+      <span className="truncate">{children}</span>
     </Tag>
   );
 }

@@ -1,54 +1,38 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useId } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
-import { EXAMS, REGION_PRIORITY, CATEGORY_PRIORITY } from '../lib/admission/exams';
-import { migrateLegacyScores, validateScoreInput, saveScoreEntry, SCORES_VERSION } from '../lib/admission/scores';
+import { EXAMS, REGION_PRIORITY, CATEGORY_PRIORITY, getExamMeta } from '../lib/admission/exams';
+import {
+  migrateLegacyScores,
+  validateScoreInput,
+  validateEntry,
+  saveScoreEntry,
+  SCORES_VERSION,
+} from '../lib/admission/scores';
 import { priorityApplied } from '../lib/admission/predict';
-import { SUBJECTS, canonicalSubjects } from '../lib/admission/subjects';
+import { SUBJECTS, canonicalSubjects, getSubjectLabel } from '../lib/admission/subjects';
 import { COMBOS as COMBO_DEFS, comboRawScore } from '../lib/admission/combos';
-import { bcaCombinedScore, integrated100Score, hcmutCombinedScore } from '../lib/admission/formulas';
+import {
+  bcaCombinedScore,
+  integrated100Score,
+  hcmutCombinedScore,
+  hscaComboScore,
+  vsatComboScore,
+} from '../lib/admission/formulas';
+import { fmt } from '../lib/admission/format';
 import ProgressBar from '../components/ui/ProgressBar';
 
-// Tổ hợp dùng chung từ lib/admission/combos.js (đầy đủ — không còn bản 8 tổ
-// hợp tự khai trong trang). Dạng rút gọn { mã: [môn...] } cho các vòng lặp cũ.
+// Tổ hợp dùng chung từ lib/admission/combos.js.
 const COMBOS = Object.fromEntries(
   Object.entries(COMBO_DEFS).map(([code, def]) => [code, def.subjects]),
 );
 
-// Trang nhập điểm hợp nhất — thay bản cũ từng đảo nhãn HSA/V-ACT và dùng sai
-// thang 1200 cho cả hai. Mọi nhãn/thang lấy từ registry src/lib/admission/exams.js:
-//   HSA = ĐHQG Hà Nội, thang 150 · V-ACT = ĐHQG TP.HCM, thang 1200
-//   TSA = thang 100 · BCA = thang 100
-// Điểm lưu vào profiles.admission_scores dạng v2 (scores.js), merge sâu giữ
-// nguyên các key khác; pattern ref chống ghi đè stale như GPACalculator.
-
-const DRAFT_KEY = 'admission_scores_v2'; // giữ nguyên khoá lưu nháp để không mất dữ liệu v2 của người dùng; nội dung đã là schema v3
+const DRAFT_KEY = 'admission_scores_v2'; // giữ nguyên khoá lưu nháp để không mất dữ liệu của người dùng; nội dung là schema v3
 const ENTRY_EXAMS = ['thpt', 'hocba', 'hsa', 'vact', 'tsa', 'spt', 'hsca', 'bca', 'vsat'];
 const PART_EXAMS = ['hsa', 'vact', 'tsa', 'bca'];
-const TRIO_EXAMS = ['spt', 'hsca']; // điểm từng môn thang 10, tổng tổ hợp thang 30
-
-const PART_LABELS = {
-  hsa: { dinh_luong: 'Định lượng', dinh_tinh: 'Định tính', khoa_hoc: 'Khoa học' },
-  vact: { ngon_ngu: 'Sử dụng ngôn ngữ', toan: 'Toán học', tu_duy_kh: 'Tư duy khoa học' },
-  tsa: { toan: 'Tư duy Toán học', doc_hieu: 'Tư duy Đọc hiểu', khoa_hoc: 'Tư duy Khoa học & GQVĐ' },
-  bca: {
-    tu_luan: 'Nghị luận xã hội (tự luận)', toan: 'Toán trắc nghiệm', lich_su: 'Lịch sử',
-    ngoai_ngu: 'Ngoại ngữ', tu_chon: 'Môn tự chọn (Lý / Hoá / Sinh / Địa)',
-  },
-};
-
-const STATUS_OPTIONS = [
-  { value: 'actual', label: 'Điểm thật' },
-  { value: 'mock', label: 'Điểm thi thử' },
-  { value: 'target', label: 'Điểm mục tiêu (what-if)' },
-];
-const STATUS_LABEL = { actual: 'Điểm thật', mock: 'Thi thử', target: 'Mục tiêu', none: '—' };
-
-const fmt = (n, digits = 2) =>
-  n == null || !Number.isFinite(Number(n))
-    ? '—'
-    : Number(n).toLocaleString('vi-VN', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const TRIO_EXAMS = ['spt', 'hsca'];
 
 function readLocalKeys() {
   try {
@@ -73,14 +57,13 @@ function readDraft() {
   }
 }
 
-// ---------------------------------------------------------------------------
-
 export default function AdmissionCalculator() {
   const navigate = useNavigate();
   const { user, profile, refreshProfile } = useAuth();
+  const { lang, locale, pick, t } = useLanguage();
 
-  const admissionScoresRef = useRef(null); // object admission_scores thô (chống stale khi merge)
-  const v2Ref = useRef(null); // hồ sơ v2 đã migrate
+  const admissionScoresRef = useRef(null);
+  const v2Ref = useRef(null);
   const hydratedForRef = useRef(null);
 
   const [savedV2, setSavedV2] = useState(null);
@@ -89,11 +72,11 @@ export default function AdmissionCalculator() {
   const [category, setCategory] = useState('NONE');
   const [subjectsThpt, setSubjectsThpt] = useState({});
   const [subjectsHb, setSubjectsHb] = useState({});
-  const [parts, setParts] = useState({}); // `${code}.${part}` -> string
-  const [totals, setTotals] = useState({}); // code -> string (tổng nhập trực tiếp / vsat)
-  const [trios, setTrios] = useState({}); // `${code}.${idx}` -> string (spt/hsca)
-  const [vsatSubjects, setVsatSubjects] = useState({}); // môn -> điểm V-SAT thang 150
-  const [bonus100, setBonus100] = useState(''); // điểm cộng thang 100 (BKHCM)
+  const [parts, setParts] = useState({});
+  const [totals, setTotals] = useState({});
+  const [trios, setTrios] = useState({});
+  const [vsatSubjects, setVsatSubjects] = useState({});
+  const [bonus100, setBonus100] = useState('');
   const [statuses, setStatuses] = useState({});
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -102,7 +85,7 @@ export default function AdmissionCalculator() {
   useEffect(() => {
     const hydKey = user?.id || 'guest';
     if (hydratedForRef.current === hydKey) return;
-    if (user && !profile) return; // chờ profile tải xong
+    if (user && !profile) return;
 
     const raw = profile?.admission_scores || null;
     admissionScoresRef.current = raw || {};
@@ -144,7 +127,9 @@ export default function AdmissionCalculator() {
       } else if (code === 'vsat') {
         if (entry.total != null) nextTotals[code] = String(entry.total);
         if (entry.subjects) {
-          setVsatSubjects(Object.fromEntries(Object.entries(entry.subjects).map(([k, v]) => [k, String(v)])));
+          setVsatSubjects(
+            Object.fromEntries(Object.entries(entry.subjects).map(([k, v]) => [k, String(v)])),
+          );
         }
       }
     }
@@ -156,6 +141,28 @@ export default function AdmissionCalculator() {
 
   const statusOf = (code) => statuses[code] || 'actual';
   const setStatus = (code, v) => setStatuses((p) => ({ ...p, [code]: v }));
+
+  const getPartLabel = (code, pk) => {
+    const key = `academics.examParts.${code}.${pk}`;
+    const resolved = t(key);
+    return resolved !== key ? resolved : pk;
+  };
+
+  const getStatusShortLabel = (st) => {
+    if (st === 'mock') return t('academics.status.mockShort');
+    if (st === 'target') return t('academics.status.targetShort');
+    if (st === 'none') return '—';
+    return t('academics.status.actual');
+  };
+
+  const statusOptions = useMemo(
+    () => [
+      { value: 'actual', label: t('academics.status.actual') },
+      { value: 'mock', label: t('academics.status.mock') },
+      { value: 'target', label: t('academics.status.target') },
+    ],
+    [t],
+  );
 
   // --- Lưu ---
   const persistV2 = async (nextV2) => {
@@ -172,12 +179,19 @@ export default function AdmissionCalculator() {
     } else {
       try {
         localStorage.setItem(DRAFT_KEY, JSON.stringify(nextV2));
-      } catch { /* bỏ qua nếu localStorage bị chặn */ }
+      } catch {
+        /* ignore blocked storage */
+      }
     }
     setSavedV2(nextV2);
   };
 
   const saveEntry = async (code, entry) => {
+    const validation = validateEntry(code, entry, lang);
+    if (!validation.ok) {
+      setMessage({ type: 'error', text: validation.error });
+      return;
+    }
     setIsSaving(true);
     setMessage({ type: '', text: '' });
     try {
@@ -185,10 +199,20 @@ export default function AdmissionCalculator() {
       const withCandidate = { ...base, candidate: { region, category } };
       const nextV2 = saveScoreEntry(withCandidate, code, entry);
       await persistV2(nextV2);
-      setMessage({ type: 'success', text: `Đã lưu điểm ${EXAMS[code].label}${user ? ' vào hồ sơ' : ' (nháp trên thiết bị này)'}!` });
+      const examLabel = getExamMeta(code, lang).displayLabel;
+      setMessage({
+        type: 'success',
+        text: pick(
+          `Đã lưu điểm ${examLabel}${user ? ' vào hồ sơ' : ' (nháp trên thiết bị này)'}!`,
+          `Saved ${examLabel} scores${user ? ' to your profile' : ' (draft on this device)'}!`,
+        ),
+      });
       setTimeout(() => setMessage({ type: '', text: '' }), 3500);
     } catch (err) {
-      setMessage({ type: 'error', text: 'Lỗi khi lưu: ' + err.message });
+      setMessage({
+        type: 'error',
+        text: pick('Lỗi khi lưu: ', 'Save failed: ') + err.message,
+      });
     } finally {
       setIsSaving(false);
     }
@@ -200,27 +224,83 @@ export default function AdmissionCalculator() {
     try {
       const base = v2Ref.current || migrateLegacyScores({}, {});
       await persistV2({ ...base, version: SCORES_VERSION, candidate: { region, category } });
-      setMessage({ type: 'success', text: 'Đã lưu thông tin ưu tiên!' });
+      setMessage({
+        type: 'success',
+        text: pick('Đã lưu thông tin ưu tiên!', 'Saved priority profile!'),
+      });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     } catch (err) {
-      setMessage({ type: 'error', text: 'Lỗi khi lưu: ' + err.message });
+      setMessage({
+        type: 'error',
+        text: pick('Lỗi khi lưu: ', 'Save failed: ') + err.message,
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
-  // --- Builders (validate -> entry v2) ---
+  // --- Đặt lại các ô đang nhập của kỳ thi hiện tại ---
+  const handleResetSelected = () => {
+    if (selectedExam === 'thpt') {
+      setSubjectsThpt({});
+    } else if (selectedExam === 'hocba') {
+      setSubjectsHb({});
+    } else if (PART_EXAMS.includes(selectedExam)) {
+      setParts((prev) => {
+        const next = { ...prev };
+        for (const pk of Object.keys(EXAMS[selectedExam]?.parts || {})) {
+          delete next[`${selectedExam}.${pk}`];
+        }
+        return next;
+      });
+      setTotals((prev) => ({ ...prev, [selectedExam]: '' }));
+    } else if (TRIO_EXAMS.includes(selectedExam)) {
+      setTrios((prev) => {
+        const next = { ...prev };
+        [0, 1, 2].forEach((i) => {
+          delete next[`${selectedExam}.${i}`];
+        });
+        return next;
+      });
+      setTotals((prev) => ({ ...prev, [selectedExam]: '' }));
+    } else if (selectedExam === 'vsat') {
+      setVsatSubjects({});
+      setTotals((prev) => ({ ...prev, vsat: '' }));
+    }
+    setMessage({
+      type: 'info',
+      text: pick(
+        `Đã xoá trắng các ô nhập ${getExamMeta(selectedExam, lang).displayLabel} trên màn hình.`,
+        `Cleared ${getExamMeta(selectedExam, lang).displayLabel} form fields on screen.`,
+      ),
+    });
+  };
+
+  // --- Builders (validate -> entry v3) ---
   const buildSubjectsEntry = (subjectsState) => {
     const subjects = {};
     for (const [k, v] of Object.entries(subjectsState)) {
       if (v === '' || v == null) continue;
       const n = parseFloat(v);
+      const subjLabel = getSubjectLabel(k, lang);
       if (!Number.isFinite(n) || n < 0 || n > 10) {
-        return { error: `Điểm môn ${SUBJECTS.find((s) => s.key === k)?.label || k} phải trong khoảng 0–10` };
+        return {
+          error: pick(
+            `Điểm môn ${subjLabel} phải trong khoảng 0–10`,
+            `Score for ${subjLabel} must be between 0 and 10`,
+          ),
+        };
       }
       subjects[k] = n;
     }
-    if (Object.keys(subjects).length === 0) return { error: 'Hãy nhập điểm ít nhất một môn.' };
+    if (Object.keys(subjects).length === 0) {
+      return {
+        error: pick(
+          'Hãy nhập điểm ít nhất một môn.',
+          'Please enter a score for at least one subject.',
+        ),
+      };
+    }
     const byGroup = {};
     for (const [combo, keys] of Object.entries(COMBOS)) {
       if (keys.every((k) => subjects[k] != null)) {
@@ -247,8 +327,14 @@ export default function AdmissionCalculator() {
       const raw = parts[`${code}.${pk}`];
       if (raw === '' || raw == null) continue;
       const n = parseFloat(raw);
+      const pLabel = getPartLabel(code, pk);
       if (!Number.isFinite(n) || n < 0 || n > max) {
-        return { error: `Điểm phần ${PART_LABELS[code]?.[pk] || pk} phải trong khoảng 0–${max}` };
+        return {
+          error: pick(
+            `Điểm phần ${pLabel} phải trong khoảng 0–${max}`,
+            `Score for ${pLabel} must be between 0 and ${max}`,
+          ),
+        };
       }
       partValues[pk] = n;
       filled += 1;
@@ -257,11 +343,16 @@ export default function AdmissionCalculator() {
     if (filled === Object.keys(def).length && filled > 0) {
       total = Math.round(Object.values(partValues).reduce((s, v) => s + v, 0) * 100) / 100;
     } else if (totals[code] !== '' && totals[code] != null) {
-      const check = validateScoreInput(code, totals[code]);
+      const check = validateScoreInput(code, totals[code], lang);
       if (!check.ok) return { error: check.error };
       total = check.value;
     } else {
-      return { error: 'Hãy nhập đủ điểm từng phần, hoặc nhập thẳng tổng điểm.' };
+      return {
+        error: pick(
+          'Hãy nhập đủ điểm từng phần, hoặc nhập thẳng tổng điểm.',
+          'Please enter scores for all sections, or enter the total score directly.',
+        ),
+      };
     }
     return {
       entry: {
@@ -277,19 +368,31 @@ export default function AdmissionCalculator() {
   const buildTrioEntry = (code) => {
     const values = [0, 1, 2].map((i) => trios[`${code}.${i}`]);
     if (values.some((v) => v === '' || v == null)) {
-      return { error: 'Hãy nhập điểm cả 3 môn thi chuyên biệt (mỗi môn thang 10).' };
+      return {
+        error: pick(
+          'Hãy nhập điểm cả 3 môn thi chuyên biệt (mỗi môn thang 10).',
+          'Please enter scores for all 3 specialized subjects (0–10 each).',
+        ),
+      };
     }
     const nums = [];
     for (const v of values) {
-      const n = parseFloat(v); // từng môn SPT/H-SCA thang 10 (registry: subjectScale)
-      if (!Number.isFinite(n) || n < 0 || n > 10) return { error: 'Mỗi môn phải trong khoảng 0–10' };
+      const n = parseFloat(v);
+      if (!Number.isFinite(n) || n < 0 || n > 10) {
+        return {
+          error: pick(
+            'Mỗi môn phải trong khoảng 0–10',
+            'Each subject score must be between 0 and 10',
+          ),
+        };
+      }
       nums.push(n);
     }
     return {
       entry: {
         status: statusOf(code),
         total: Math.round(nums.reduce((s, v) => s + v, 0) * 100) / 100,
-        scale: 30, // tổng tổ hợp thang 30 — khớp thang điểm chuẩn quy tổ hợp của trường
+        scale: 30,
         parts: { mon_1: nums[0], mon_2: nums[1], mon_3: nums[2] },
         scoreMode: 'combo30',
         updatedAt: new Date().toISOString(),
@@ -302,13 +405,26 @@ export default function AdmissionCalculator() {
     for (const [k, v] of Object.entries(vsatSubjects)) {
       if (v === '' || v == null) continue;
       const n = parseFloat(v);
+      const subjLabel = getSubjectLabel(k, lang);
       if (!Number.isFinite(n) || n < 0 || n > 150) {
-        return { error: `Điểm V-SAT môn ${SUBJECTS.find((x) => x.key === k)?.label || k} phải trong khoảng 0–150` };
+        return {
+          error: pick(
+            `Điểm V-SAT môn ${subjLabel} phải trong khoảng 0–150`,
+            `V-SAT score for ${subjLabel} must be between 0 and 150`,
+          ),
+        };
       }
       subjects[k] = n;
     }
     if (Object.keys(subjects).length > 0) {
-      if (Object.keys(subjects).length < 3) return { error: 'Hãy nhập điểm V-SAT ít nhất 3 môn để tính tổ hợp.' };
+      if (Object.keys(subjects).length < 3) {
+        return {
+          error: pick(
+            'Hãy nhập điểm V-SAT ít nhất 3 môn để tính tổ hợp.',
+            'Please enter at least 3 V-SAT subject scores to compute a 3-subject combo.',
+          ),
+        };
+      }
       const byGroup = {};
       for (const code of Object.keys(COMBOS)) {
         const sc = comboRawScore(subjects, code);
@@ -321,11 +437,35 @@ export default function AdmissionCalculator() {
           : Object.keys(subjects).length === 3
             ? Math.round(Object.values(subjects).reduce((a, b) => a + b, 0) * 100) / 100
             : null;
-      return { entry: { status: statusOf('vsat'), subjects, byGroup, total, scale: 450, scoreMode: 'per-subject-150', updatedAt: new Date().toISOString() } };
+      return {
+        entry: {
+          status: statusOf('vsat'),
+          subjects,
+          byGroup,
+          total,
+          scale: 450,
+          scoreMode: 'per-subject-150',
+          updatedAt: new Date().toISOString(),
+        },
+      };
     }
-    const check = validateScoreInput('vsat', totals.vsat);
-    if (!check.ok) return { error: 'Hãy nhập điểm V-SAT theo từng môn, hoặc nhập thẳng tổng điểm tổ hợp (0–450).' };
-    return { entry: { status: statusOf('vsat'), total: check.value, scale: 450, updatedAt: new Date().toISOString() } };
+    const check = validateScoreInput('vsat', totals.vsat, lang);
+    if (!check.ok) {
+      return {
+        error: pick(
+          'Hãy nhập điểm V-SAT theo từng môn, hoặc nhập thẳng tổng điểm tổ hợp (0–450).',
+          'Please enter V-SAT subject scores or enter the 3-subject combo total directly (0–450).',
+        ),
+      };
+    }
+    return {
+      entry: {
+        status: statusOf('vsat'),
+        total: check.value,
+        scale: 450,
+        updatedAt: new Date().toISOString(),
+      },
+    };
   };
 
   const handleSaveSelected = () => {
@@ -336,7 +476,7 @@ export default function AdmissionCalculator() {
     else if (PART_EXAMS.includes(selectedExam)) built = buildPartsEntry(selectedExam);
     else if (TRIO_EXAMS.includes(selectedExam)) built = buildTrioEntry(selectedExam);
     else {
-      const check = validateScoreInput(selectedExam, totals[selectedExam]);
+      const check = validateScoreInput(selectedExam, totals[selectedExam], lang);
       built = check.ok
         ? {
             entry: {
@@ -357,22 +497,18 @@ export default function AdmissionCalculator() {
 
   // --- Tính hiển thị ---
   const thptPreview = useMemo(() => {
-    const built = buildSubjectsEntryQuiet(subjectsThpt);
-    return built;
-    function buildSubjectsEntryQuiet(state) {
-      const subjects = {};
-      for (const [k, v] of Object.entries(state)) {
-        const n = parseFloat(v);
-        if (Number.isFinite(n)) subjects[k] = n;
-      }
-      const byGroup = {};
-      for (const [combo, keys] of Object.entries(COMBOS)) {
-        if (keys.every((k) => subjects[k] != null)) {
-          byGroup[combo] = keys.reduce((s, k) => s + subjects[k], 0);
-        }
-      }
-      return byGroup;
+    const subjects = {};
+    for (const [k, v] of Object.entries(subjectsThpt)) {
+      const n = parseFloat(v);
+      if (Number.isFinite(n)) subjects[k] = n;
     }
+    const byGroup = {};
+    for (const [combo, keys] of Object.entries(COMBOS)) {
+      if (keys.every((k) => subjects[k] != null)) {
+        byGroup[combo] = keys.reduce((s, k) => s + subjects[k], 0);
+      }
+    }
+    return byGroup;
   }, [subjectsThpt]);
 
   const bestThptRaw = useMemo(() => {
@@ -380,10 +516,9 @@ export default function AdmissionCalculator() {
     return vals.length ? Math.max(...vals) : null;
   }, [thptPreview]);
 
-  const priorityPreview = bestThptRaw != null ? priorityApplied(bestThptRaw, region, category) : null;
+  const priorityPreview =
+    bestThptRaw != null ? priorityApplied(bestThptRaw, region, category) : null;
 
-  // Máy tính kết hợp — đầu vào lấy từ chính các ô nhập của trang này, công
-  // thức ở lib/admission/formulas.js (không tính trong trang).
   const thptNums = useMemo(() => {
     const out = {};
     for (const [k, v] of Object.entries(subjectsThpt)) {
@@ -392,6 +527,7 @@ export default function AdmissionCalculator() {
     }
     return out;
   }, [subjectsThpt]);
+
   const hbNums = useMemo(() => {
     const out = {};
     for (const [k, v] of Object.entries(subjectsHb)) {
@@ -400,11 +536,19 @@ export default function AdmissionCalculator() {
     }
     return out;
   }, [subjectsHb]);
+
   const bcaPreview = useMemo(() => {
     const bcaTotal = previewPartsTotal('bca', parts, totals);
     if (bcaTotal == null || !Number.isFinite(bcaTotal) || bestThptRaw == null) return null;
-    return bcaCombinedScore({ thptComboScore: bestThptRaw, bcaExamScore: bcaTotal, region, category });
-  }, [parts, totals, bestThptRaw, region, category]);
+    return bcaCombinedScore({
+      thptComboScore: bestThptRaw,
+      bcaExamScore: bcaTotal,
+      region,
+      category,
+      lang,
+    });
+  }, [parts, totals, bestThptRaw, region, category, lang]);
+
   const hcmutPreview = useMemo(() => {
     const comboCodes = Object.keys(thptPreview);
     if (!comboCodes.length) return null;
@@ -419,36 +563,83 @@ export default function AdmissionCalculator() {
       vactTotal: vactTotal != null && Number.isFinite(vactTotal) ? vactTotal : null,
       vactToan: Number.isFinite(vactToanPart) ? vactToanPart : null,
       doubleMath: keys.includes('toan'),
-      thptScores, thptMathScore: thptNums.toan,
-      hocbaScores, hocbaMathScore: hbNums.toan,
-      bonus: parseFloat(bonus100) || 0, region, category,
+      thptScores,
+      thptMathScore: thptNums.toan,
+      hocbaScores,
+      hocbaMathScore: hbNums.toan,
+      bonus: parseFloat(bonus100) || 0,
+      region,
+      category,
+      lang,
     });
-  }, [thptPreview, thptNums, hbNums, totals, parts, bonus100, region, category]);
-  const uehCheck = useMemo(() => integrated100Score('UEH', {}), []);
+  }, [thptPreview, thptNums, hbNums, totals, parts, bonus100, region, category, lang]);
+
+  const hscaWeightedPreview = useMemo(() => {
+    const main = parseFloat(trios['hsca.0']);
+    const hbVals = Object.values(hbNums)
+      .filter((n) => Number.isFinite(n))
+      .sort((a, b) => b - a);
+    const sub1 = Number.isFinite(parseFloat(trios['hsca.1']))
+      ? parseFloat(trios['hsca.1'])
+      : hbVals[0];
+    const sub2 = Number.isFinite(parseFloat(trios['hsca.2']))
+      ? parseFloat(trios['hsca.2'])
+      : hbVals[1];
+    if (!Number.isFinite(main) || !Number.isFinite(sub1) || !Number.isFinite(sub2)) return null;
+    return hscaComboScore({ monChinh: main, hb1: sub1, hb2: sub2, lang });
+  }, [trios, hbNums, lang]);
+
+  const vsatExactThreeExplain = useMemo(() => {
+    const clean = {};
+    for (const [k, v] of Object.entries(vsatSubjects)) {
+      if (v === '' || v == null) continue;
+      const n = parseFloat(v);
+      if (Number.isFinite(n) && n >= 0 && n <= 150) clean[k] = n;
+    }
+    if (Object.keys(clean).length !== 3) return null;
+    return vsatComboScore(clean, lang);
+  }, [vsatSubjects, lang]);
+
+  const uehCheck = useMemo(() => integrated100Score('UEH', {}, lang), [lang]);
+
   const handleSaveHcmut = async () => {
     if (!hcmutPreview) return;
     setIsSaving(true);
     try {
       const base = v2Ref.current || migrateLegacyScores({}, {});
       const next = {
-        ...base, version: SCORES_VERSION, candidate: { region, category },
+        ...base,
+        version: SCORES_VERSION,
+        candidate: { region, category },
         scores: {
           ...(base.scores || {}),
           combined: {
             ...((base.scores || {}).combined || {}),
             HCMUT: {
-              status: 'actual', total: hcmutPreview.value, scale: 100,
-              formulaVersion: hcmutPreview.formulaVersion, breakdown: hcmutPreview.breakdown,
+              status: 'actual',
+              total: hcmutPreview.value,
+              scale: 100,
+              formulaVersion: hcmutPreview.formulaVersion,
+              breakdown: hcmutPreview.breakdown,
               updatedAt: new Date().toISOString(),
             },
           },
         },
       };
       await persistV2(next);
-      setMessage({ type: 'success', text: `Đã lưu điểm tổng hợp BKHCM: ${fmt(hcmutPreview.value)} / 100 vào hồ sơ!` });
+      setMessage({
+        type: 'success',
+        text: pick(
+          `Đã lưu điểm tổng hợp BKHCM: ${fmt(hcmutPreview.value, 2, locale)} / 100 vào hồ sơ!`,
+          `Saved HCMUT composite score: ${fmt(hcmutPreview.value, 2, locale)} / 100 to profile!`,
+        ),
+      });
       setTimeout(() => setMessage({ type: '', text: '' }), 3500);
     } catch (err) {
-      setMessage({ type: 'error', text: 'Lỗi khi lưu: ' + err.message });
+      setMessage({
+        type: 'error',
+        text: pick('Lỗi khi lưu: ', 'Save failed: ') + err.message,
+      });
     } finally {
       setIsSaving(false);
     }
@@ -458,377 +649,683 @@ export default function AdmissionCalculator() {
   const savedEntries = useMemo(
     () =>
       Object.entries(savedV2?.scores || {}).filter(
-        ([, v]) => v && v.status !== 'none' && (v.total != null || v.subjects),
+        ([k, v]) => k !== 'combined' && v && v.status !== 'none' && (v.total != null || v.subjects),
       ),
     [savedV2],
   );
+  const savedHcmut = savedV2?.scores?.combined?.HCMUT;
 
-  const exam = EXAMS[selectedExam];
+  const exam = getExamMeta(selectedExam, lang);
 
   return (
-    <div className="min-h-dvh font-sans text-foreground bg-background relative">
-      <header className="sticky top-0 z-20 backdrop-blur-md bg-surface/95 border-b border-border">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            aria-label="Quay lại"
-            className="w-11 h-11 no-shrink rounded-full bg-surface-alt border border-border flex items-center justify-center hover:bg-surface-hover text-foreground transition-colors cursor-pointer"
-          >
-            <span className="material-symbols-outlined" aria-hidden="true">arrow_back_ios_new</span>
-          </button>
-          <div className="flex-1 min-w-0">
-            <h1 className="font-display font-bold text-xl leading-tight text-foreground">Nhập điểm xét tuyển</h1>
-            <p className="text-xs text-text-secondary">Một hồ sơ điểm duy nhất cho mọi kỳ thi — dùng ở trang Tìm trường</p>
-          </div>
-          <button onClick={() => navigate('/tim-truong')} className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer no-shrink">
-            <span className="material-symbols-outlined text-base" aria-hidden="true">school</span>
-            Tìm trường
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-4 py-5 space-y-4">
-        {!user && (
-          <div className="arena-card p-4 flex gap-3 border-accent/35 bg-accent/5">
-            <span className="material-symbols-outlined no-shrink text-accent" aria-hidden="true">info</span>
-            <p className="text-xs leading-relaxed text-text-secondary">
-              Bạn chưa đăng nhập — điểm sẽ lưu nháp trên thiết bị này. Đăng nhập để điểm đồng bộ vào hồ sơ
-              và dùng được trên mọi thiết bị.
-            </p>
-          </div>
-        )}
-
-        {legacyKeys.length > 0 && (
-          <div className="arena-card p-4 flex gap-3 border-accent/45 bg-accent/5">
-            <span className="material-symbols-outlined no-shrink text-accent" aria-hidden="true">warning</span>
-            <p className="text-xs leading-relaxed text-text-secondary">
-              Điểm HSA / V-ACT bạn lưu ở bản cũ đang bị cách ly vì bản cũ ghi sai thang điểm hai kỳ thi này
-              (HSA đúng là thang 150 của ĐHQG Hà Nội, V-ACT đúng là thang 1200 của ĐHQG TP.HCM).
-              Hãy nhập lại điểm ở hai mục HSA và V-ACT bên dưới — điểm cũ không được tự gán lại để tránh sai lệch.
-            </p>
-          </div>
-        )}
-
-        {/* Điểm đã lưu */}
-        {savedEntries.length > 0 && (
-          <section className="arena-card p-4">
-            <h2 className="font-display font-bold text-foreground">Điểm đã lưu trong hồ sơ</h2>
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {savedEntries.map(([code, v]) => (
-                <span key={code} className="arena-chip">
-                  {EXAMS[code]?.label || code.toUpperCase()}:
-                  <span className="tabular font-bold text-primary">
-                    {v.total != null ? `${fmt(parseFloat(v.total), code === 'vact' || code === 'vsat' ? 0 : 2)} / ${v.scale ?? EXAMS[code]?.scale ?? ''}` : 'theo tổ hợp'}
-                  </span>
-                  <span className="text-text-secondary">({STATUS_LABEL[v.status] || 'Điểm thật'})</span>
-                </span>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Ưu tiên khu vực / đối tượng */}
-        <section className="arena-card p-4 space-y-3">
-          <h2 className="font-display font-bold text-foreground">Khu vực & đối tượng ưu tiên</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label htmlFor="region-select" className="block text-xs font-semibold mb-1.5 text-text-secondary">Khu vực ưu tiên</label>
-              <select
-                id="region-select"
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                className="w-full min-h-[44px] bg-surface-alt border border-border rounded-xl px-3 text-sm text-foreground outline-none focus:border-primary cursor-pointer"
-              >
-                {Object.entries(REGION_PRIORITY).map(([k, v]) => (
-                  <option key={k} value={k}>{k} (+{fmt(v)} điểm danh nghĩa)</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="category-select" className="block text-xs font-semibold mb-1.5 text-text-secondary">Nhóm đối tượng ưu tiên</label>
-              <select
-                id="category-select"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full min-h-[44px] bg-surface-alt border border-border rounded-xl px-3 text-sm text-foreground outline-none focus:border-primary cursor-pointer"
-              >
-                {Object.keys(CATEGORY_PRIORITY).length > 0 && (
-                  <>
-                    <option value="NONE">Không thuộc nhóm ưu tiên (+0)</option>
-                    <option value="UT1">Nhóm UT1 (+2,0 điểm danh nghĩa)</option>
-                    <option value="UT2">Nhóm UT2 (+1,0 điểm danh nghĩa)</option>
-                  </>
-                )}
-              </select>
-            </div>
-          </div>
-          <p className="text-xs text-text-secondary leading-relaxed">
-            Theo quy chế của Bộ GD&ĐT, từ mốc tổng điểm 22,5 trở lên điểm ưu tiên thực tế giảm dần:
-            ưu tiên thực = (30 − tổng điểm) / 7,5 × ưu tiên danh nghĩa.
-            {priorityPreview != null && bestThptRaw != null && (
-              <>
-                {' '}Với tổ hợp THPT cao nhất hiện tại (<span className="tabular font-semibold">{fmt(bestThptRaw)}</span>),
-                ưu tiên thực của bạn là <span className="tabular font-bold text-secondary">+{fmt(priorityPreview)}</span> — không phải cộng thẳng điểm danh nghĩa.
-              </>
-            )}
-          </p>
-          <button onClick={saveCandidate} disabled={isSaving} className="btn-arena btn-arena-sm btn-arena-ghost cursor-pointer">
-            <span className="material-symbols-outlined text-base" aria-hidden="true">save</span>
-            {isSaving ? 'Đang lưu...' : 'Lưu thông tin ưu tiên'}
-          </button>
-        </section>
-
-        {/* Chọn kỳ thi */}
-        <section aria-label="Chọn kỳ thi">
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-            {ENTRY_EXAMS.map((code) => {
-              const e = EXAMS[code];
-              const active = selectedExam === code;
-              const has = !!savedV2?.scores?.[code];
-              return (
-                <button
-                  key={code}
-                  onClick={() => { setSelectedExam(code); setMessage({ type: '', text: '' }); }}
-                  aria-pressed={active}
-                  className={`arena-card arena-card-interactive p-3 text-left cursor-pointer ${
-                    active ? 'border-primary bg-primary/8' : ''
-                  }`}
-                >
-                  <span className={`font-display font-bold block ${active ? 'text-primary' : 'text-foreground'}`}>
-                    {e.label}
-                  </span>
-                  <span className="text-[11px] text-text-secondary block leading-snug mt-0.5">{e.org}</span>
-                  <span className="text-[11px] text-muted block mt-0.5">
-                    Thang {code === 'spt' || code === 'hsca' ? '10/môn' : e.scale}
-                    {has ? ' · Đã lưu' : ''}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Form nhập điểm của kỳ thi đang chọn */}
-        <section className="arena-card p-4 sm:p-5 space-y-5">
-          <div>
-            <h2 className="font-display font-bold text-lg text-foreground">{exam.full}</h2>
-            <p className="text-xs text-text-secondary mt-1">
-              Đơn vị tổ chức: {exam.org} · Thang điểm:{' '}
-              {selectedExam === 'spt' || selectedExam === 'hsca'
-                ? '10 điểm/môn — tổng tổ hợp 30 để so với điểm chuẩn của trường'
-                : `${exam.scale} (${exam.unit})`}
-            </p>
-          </div>
-
-          <div>
-            <label htmlFor="status-select" className="block text-xs font-semibold mb-1.5 text-text-secondary">Loại điểm</label>
-            <select
-              id="status-select"
-              value={statusOf(selectedExam)}
-              onChange={(e) => setStatus(selectedExam, e.target.value)}
-              className="w-full sm:w-64 min-h-[44px] bg-surface-alt border border-border rounded-xl px-3 text-sm text-foreground outline-none focus:border-primary cursor-pointer"
-            >
-              {STATUS_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-            {statusOf(selectedExam) !== 'actual' && (
-              <p className="text-[11px] text-muted mt-1.5">
-                Đang ở chế độ điểm {statusOf(selectedExam) === 'mock' ? 'thi thử' : 'mục tiêu'} — ước tính ở trang Tìm trường là kịch bản giả định, không phải điểm thật.
-              </p>
-            )}
-          </div>
-
-          {(selectedExam === 'thpt' || selectedExam === 'hocba') && (
-            <SubjectForm
-              subjectsState={selectedExam === 'thpt' ? subjectsThpt : subjectsHb}
-              onChange={selectedExam === 'thpt' ? setSubjectsThpt : setSubjectsHb}
-              transcript={selectedExam === 'hocba'}
-            />
-          )}
-
-          {PART_EXAMS.includes(selectedExam) && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                {Object.entries(EXAMS[selectedExam].parts).map(([pk, max]) => (
-                  <NumberField
-                    key={pk}
-                    label={`${PART_LABELS[selectedExam]?.[pk] || pk} (0–${max})`}
-                    value={parts[`${selectedExam}.${pk}`] ?? ''}
-                    onChange={(v) => setParts((p) => ({ ...p, [`${selectedExam}.${pk}`]: v }))}
-                    max={max}
-                  />
-                ))}
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted">
-                <span className="flex-1 border-t border-border" />
-                hoặc nhập thẳng tổng điểm nếu bạn chỉ nhớ tổng
-                <span className="flex-1 border-t border-border" />
-              </div>
-              <NumberField
-                label={`Tổng điểm ${exam.label} (0–${exam.scale})`}
-                value={totals[selectedExam] ?? ''}
-                onChange={(v) => setTotals((p) => ({ ...p, [selectedExam]: v }))}
-                max={exam.scale}
-              />
-              {selectedExam === 'bca' && (
-                <p className="text-xs text-text-secondary leading-relaxed">
-                  Lưu ý: điểm xét tuyển khối Công an (phương thức 3) = điểm tổ hợp THPT × 2/5 + điểm bài thi
-                  BCA × 3/5 + điểm cộng. Hãy nhập thêm điểm THPT ở mục THPT để trang Tìm trường ước tính đúng.
-                </p>
-              )}
-              <TotalPreview
-                label={`Tổng điểm ${exam.label}`}
-                value={previewPartsTotal(selectedExam, parts, totals)}
-                scale={exam.scale}
-              />
-            </div>
-          )}
-
-          {TRIO_EXAMS.includes(selectedExam) && (
-            <div className="space-y-4">
-              <p className="text-xs text-text-secondary leading-relaxed">
-                Nhập điểm 3 môn bạn đã thi trong kỳ thi chuyên biệt (mỗi môn thang 10). Hệ thống cộng thành
-                tổng tổ hợp thang 30 — đúng thang các trường dùng khi công bố điểm chuẩn quy tổ hợp.
-              </p>
-              <div className="grid grid-cols-3 gap-3">
-                {[0, 1, 2].map((i) => (
-                  <NumberField
-                    key={i}
-                    label={`Môn thi ${i + 1} (0–10)`}
-                    value={trios[`${selectedExam}.${i}`] ?? ''}
-                    onChange={(v) => setTrios((p) => ({ ...p, [`${selectedExam}.${i}`]: v }))}
-                    max={10}
-                  />
-                ))}
-              </div>
-              <TotalPreview
-                label="Tổng tổ hợp (thang 30)"
-                value={previewTrioTotal(selectedExam, trios)}
-                scale={30}
-              />
-            </div>
-          )}
-
-          {selectedExam === 'vsat' && (
-            <div className="space-y-4">
-              <p className="text-xs text-text-secondary leading-relaxed">
-                Nhập điểm V-SAT theo từng môn (mỗi môn thang 150) — hệ thống tự tính tổng cho từng tổ hợp
-                khi trường chọn tổ hợp khác nhau. Nhập đúng 3 môn thì tổng tổ hợp được lưu kèm.
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {SUBJECTS.slice(0, 9).map((sj) => (
-                  <NumberField
-                    key={sj.key}
-                    label={`${sj.label} (0–150)`}
-                    value={vsatSubjects[sj.key] ?? ''}
-                    onChange={(v) => setVsatSubjects((p) => ({ ...p, [sj.key]: v }))}
-                    max={150}
-                    step="1"
-                  />
-                ))}
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted">
-                <span className="flex-1 border-t border-border" />
-                hoặc nhập thẳng tổng điểm tổ hợp nếu bạn chỉ nhớ tổng
-                <span className="flex-1 border-t border-border" />
-              </div>
-              <NumberField
-                label="Tổng điểm tổ hợp V-SAT (0–450, 3 môn × 150)"
-                value={totals.vsat ?? ''}
-                onChange={(v) => setTotals((p) => ({ ...p, vsat: v }))}
-                max={450}
-              />
-              <TotalPreview label="Tổng điểm V-SAT" value={previewVsatTotal(vsatSubjects, totals)} scale={450} digits={0} />
-            </div>
-          )}
-
-          <div className="space-y-2">
+    <div className="min-h-dvh font-sans text-foreground bg-background relative pb-24">
+      <div className="max-w-4xl mx-auto w-full">
+        {/* Sticky App Bar */}
+        <header className="sticky top-0 z-40 backdrop-blur-md bg-paper/95 border-b border-border px-4 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <button
-              onClick={handleSaveSelected}
+              type="button"
+              onClick={() => navigate(-1)}
+              aria-label={pick('Quay lại', 'Go back')}
+              className="w-10 h-10 shrink-0 rounded-full bg-surface-alt border border-border flex items-center justify-center hover:bg-surface text-foreground transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined" aria-hidden="true">
+                arrow_back
+              </span>
+            </button>
+            <div className="min-w-0">
+              <h1 className="font-display font-extrabold text-lg tracking-tight text-foreground truncate">
+                {pick('Nhập điểm xét tuyển', 'Admission Score Profile')}
+              </h1>
+              <p className="text-[11px] text-secondary-text truncate">
+                {pick(
+                  'Một hồ sơ điểm duy nhất cho mọi kỳ thi — đồng bộ sang trang Chọn Trường',
+                  'One unified score profile across all entrance exams — synced with School Finder',
+                )}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/tim-truong')}
+            className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer shrink-0"
+          >
+            <span className="material-symbols-outlined text-base" aria-hidden="true">
+              school
+            </span>
+            <span>{pick('Tìm trường', 'Find Schools')}</span>
+          </button>
+        </header>
+
+        {/* Cross-page Navigation Tabs */}
+        <nav
+          aria-label={pick('Điều hướng công cụ học thuật', 'Academic tools navigation')}
+          className="px-4 pt-4"
+        >
+          <div className="flex border-b border-border gap-6 overflow-x-auto no-scrollbar">
+            <button
+              type="button"
+              onClick={() => navigate('/gpa')}
+              className="pb-3 border-b-2 border-transparent text-secondary-text hover:text-foreground font-display font-semibold text-sm whitespace-nowrap flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                school
+              </span>
+              {t('academics.nav.gpa')}
+            </button>
+            <button
+              type="button"
+              aria-current="page"
+              className="pb-3 border-b-2 border-primary text-primary font-display font-bold text-sm whitespace-nowrap flex items-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                calculate
+              </span>
+              {t('academics.nav.admission')}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/schools')}
+              className="pb-3 border-b-2 border-transparent text-secondary-text hover:text-foreground font-display font-semibold text-sm whitespace-nowrap flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                account_balance
+              </span>
+              {t('academics.nav.schools')}
+            </button>
+          </div>
+        </nav>
+
+        <main className="px-4 py-5 space-y-5">
+          {!user && (
+            <div className="paper-card border border-gold/60 bg-gold-soft/40 p-4 flex gap-3 items-start">
+              <span className="material-symbols-outlined shrink-0 text-accent" aria-hidden="true">
+                info
+              </span>
+              <p className="text-xs leading-relaxed text-secondary-text">
+                {pick(
+                  'Bạn chưa đăng nhập — điểm sẽ lưu nháp trên thiết bị này. Đăng nhập để điểm đồng bộ vào hồ sơ và dùng được trên mọi thiết bị.',
+                  'You are not signed in — scores are saved locally as a draft on this device. Sign in to sync your admission profile across devices.',
+                )}
+              </p>
+            </div>
+          )}
+
+          {legacyKeys.length > 0 && (
+            <div className="paper-card border border-accent/45 bg-gold-soft/40 p-4 flex gap-3 items-start">
+              <span className="material-symbols-outlined shrink-0 text-accent" aria-hidden="true">
+                warning
+              </span>
+              <p className="text-xs leading-relaxed text-secondary-text">
+                {pick(
+                  'Điểm HSA / V-ACT bạn lưu ở bản cũ đang bị cách ly vì bản cũ ghi sai thang điểm hai kỳ thi này (HSA đúng là thang 150 của ĐHQG Hà Nội, V-ACT đúng là thang 1200 của ĐHQG TP.HCM). Hãy nhập lại điểm ở hai mục HSA và V-ACT bên dưới — điểm cũ không được tự gán lại để tránh sai lệch.',
+                  'Your previously saved HSA / V-ACT scores have been quarantined because an earlier version swapped their scales (HSA uses VNU Hanoi’s 150-pt scale; V-ACT uses VNU-HCM’s 1200-pt scale). Please re-enter your HSA and V-ACT scores below for accurate predictions.',
+                )}
+              </p>
+            </div>
+          )}
+
+          {/* Điểm đã lưu */}
+          {(savedEntries.length > 0 || savedHcmut?.total != null) && (
+            <section className="paper-card border border-border p-4">
+              <h2 className="font-display font-bold text-sm text-foreground">
+                {pick('Điểm đã lưu trong hồ sơ', 'Saved Scores in Profile')}
+              </h2>
+              <div className="flex flex-wrap gap-1.5 mt-2.5">
+                {savedEntries.map(([code, v]) => {
+                  const meta = getExamMeta(code, lang);
+                  return (
+                    <span key={code} className="arena-chip">
+                      {meta.displayLabel}:{' '}
+                      <span className="tabular font-bold text-primary">
+                        {v.total != null
+                          ? `${fmt(parseFloat(v.total), code === 'vact' || code === 'vsat' ? 0 : 2, locale)} / ${v.scale ?? meta.scale ?? ''}`
+                          : pick('theo tổ hợp', 'by combo')}
+                      </span>
+                      <span className="text-secondary-text">
+                        ({getStatusShortLabel(v.status)})
+                      </span>
+                    </span>
+                  );
+                })}
+                {savedHcmut?.total != null && (
+                  <span className="arena-chip">
+                    HCMUT:{' '}
+                    <span className="tabular font-bold text-primary">
+                      {fmt(parseFloat(savedHcmut.total), 2, locale)} / 100
+                    </span>
+                  </span>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Ưu tiên khu vực / đối tượng */}
+          <section className="paper-card border border-border p-4 sm:p-5 space-y-3.5">
+            <h2 className="font-display font-bold text-base text-foreground">
+              {pick('Khu vực & đối tượng ưu tiên', 'Regional & Policy Priority Profile')}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label
+                  htmlFor="region-select"
+                  className="block text-xs font-semibold mb-1.5 text-secondary-text"
+                >
+                  {pick('Khu vực ưu tiên', 'Priority Region')}
+                </label>
+                <select
+                  id="region-select"
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                  className="w-full min-h-[44px] bg-surface border border-border rounded-xl px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary cursor-pointer"
+                >
+                  {Object.entries(REGION_PRIORITY).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {t(`academics.priority.regions.${k}`)} (+{fmt(v, 2, locale)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="category-select"
+                  className="block text-xs font-semibold mb-1.5 text-secondary-text"
+                >
+                  {pick('Nhóm đối tượng ưu tiên', 'Policy Priority Category')}
+                </label>
+                <select
+                  id="category-select"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full min-h-[44px] bg-surface border border-border rounded-xl px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary cursor-pointer"
+                >
+                  {Object.keys(CATEGORY_PRIORITY).length > 0 && (
+                    <>
+                      <option value="NONE">{t('academics.priority.categories.NONE')}</option>
+                      <option value="UT1">{t('academics.priority.categories.UT1')}</option>
+                      <option value="UT2">{t('academics.priority.categories.UT2')}</option>
+                    </>
+                  )}
+                </select>
+              </div>
+            </div>
+            <p className="text-xs text-secondary-text leading-relaxed">
+              {pick(
+                `Theo quy chế của Bộ GD&ĐT, từ mốc tổng điểm ${fmt(22.5, 1, locale)} trở lên điểm ưu tiên thực tế giảm dần tuyến tính: ưu tiên thực = (30 − tổng điểm) / ${fmt(7.5, 1, locale)} × ưu tiên danh nghĩa.`,
+                `Under MOET regulations, once a raw 30-pt score reaches ${fmt(22.5, 1, locale)} or above, bonus points taper linearly: effective bonus = (30 − raw score) / ${fmt(7.5, 1, locale)} × nominal bonus.`,
+              )}
+              {priorityPreview != null && bestThptRaw != null && (
+                <>
+                  {' '}
+                  {pick(
+                    <>
+                      Với tổ hợp THPT cao nhất hiện tại (
+                      <span className="tabular font-semibold">{fmt(bestThptRaw, 2, locale)}</span>
+                      ), ưu tiên thực của bạn là{' '}
+                      <span className="tabular font-bold text-jade">
+                        +{fmt(priorityPreview, 2, locale)}
+                      </span>{' '}
+                      — không phải cộng thẳng điểm danh nghĩa.
+                    </>,
+                    <>
+                      With your highest National Exam combo (
+                      <span className="tabular font-semibold">{fmt(bestThptRaw, 2, locale)}</span>
+                      ), your effective priority bonus is{' '}
+                      <span className="tabular font-bold text-jade">
+                        +{fmt(priorityPreview, 2, locale)}
+                      </span>{' '}
+                      rather than the full nominal amount.
+                    </>,
+                  )}
+                </>
+              )}
+            </p>
+            <button
+              type="button"
+              onClick={saveCandidate}
               disabled={isSaving}
-              className={`btn-arena w-full cursor-pointer ${message.type === 'success' ? 'btn-arena-jade' : 'btn-arena-primary'}`}
+              className="btn-arena btn-arena-sm btn-arena-ghost cursor-pointer"
             >
               <span className="material-symbols-outlined text-base" aria-hidden="true">
-                {isSaving ? 'sync' : message.type === 'success' ? 'check_circle' : 'save'}
+                save
               </span>
-              {isSaving ? 'Đang lưu...' : message.type === 'success' ? 'Đã lưu điểm!' : `Lưu điểm ${exam.label}`}
+              <span>
+                {isSaving
+                  ? pick('Đang lưu...', 'Saving...')
+                  : pick('Lưu thông tin ưu tiên', 'Save Priority Profile')}
+              </span>
             </button>
-            {message.text && (
-              <p className={`text-center text-xs font-medium ${message.type === 'error' ? 'text-danger' : 'text-secondary'}`} role="status">
-                {message.text}
+          </section>
+
+          {/* Chọn kỳ thi */}
+          <section aria-label={pick('Chọn kỳ thi', 'Select Entrance Exam')}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+              {ENTRY_EXAMS.map((code) => {
+                const e = getExamMeta(code, lang);
+                const active = selectedExam === code;
+                const has = !!savedV2?.scores?.[code];
+                return (
+                  <button
+                    type="button"
+                    key={code}
+                    onClick={() => {
+                      setSelectedExam(code);
+                      setMessage({ type: '', text: '' });
+                    }}
+                    aria-pressed={active}
+                    className={`paper-card p-3 text-left transition-all cursor-pointer min-w-0 ${
+                      active
+                        ? 'border-2 border-primary bg-primary-soft/60 shadow-xs'
+                        : 'border border-border hover:border-border-strong hover:bg-surface-alt/60'
+                    }`}
+                  >
+                    <span
+                      className={`font-display font-bold text-sm block truncate ${
+                        active ? 'text-primary' : 'text-foreground'
+                      }`}
+                    >
+                      {e.displayLabel}
+                    </span>
+                    <span className="text-[11px] text-secondary-text block leading-snug mt-0.5 truncate">
+                      {e.displayOrg}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground block mt-1 truncate">
+                      {code === 'spt' || code === 'hsca'
+                        ? pick('Thang 10/môn', 'Scale 10/subj')
+                        : pick(`Thang ${e.scale}`, `Scale ${e.scale}`)}
+                      {has ? pick(' · Đã lưu', ' · Saved') : ''}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Form nhập điểm của kỳ thi đang chọn */}
+          <section className="paper-card border border-border p-4 sm:p-5 space-y-5">
+            <div>
+              <h2 className="font-display font-bold text-lg text-foreground">{exam.displayFull}</h2>
+              <p className="text-xs text-secondary-text mt-1">
+                {pick('Đơn vị tổ chức:', 'Organizer:')} {exam.displayOrg} ·{' '}
+                {pick('Thang điểm:', 'Scale:')}{' '}
+                {selectedExam === 'spt' || selectedExam === 'hsca'
+                  ? pick(
+                      '10 điểm/môn — tổng tổ hợp 30 để so với điểm chuẩn của trường',
+                      '10 pts/subject — 30-pt 3-subject total matched against university cutoffs',
+                    )
+                  : `${exam.scale} (${exam.displayUnit})`}
               </p>
-            )}
-          </div>
-        </section>
+            </div>
 
-        {/* Máy tính kết hợp: BCA + tổng hợp thang 100 (formulas.js) */}
-        <section className="arena-card p-4 sm:p-5 space-y-4">
-          <div>
-            <h2 className="font-display font-bold text-lg text-foreground">Máy tính điểm kết hợp & tổng hợp</h2>
-            <p className="text-xs text-text-secondary mt-1 leading-relaxed">
-              Dùng ngay điểm bạn đã nhập ở trên — không phải nhập lại. Công thức nằm ở thư viện dùng chung,
-              kết quả được lưu vào hồ sơ để trang Tìm trường ước tính đúng thang điểm.
-            </p>
-          </div>
-
-          <div className="rounded-xl border border-border bg-surface-alt/50 p-3 space-y-2">
-            <h3 className="font-display font-bold text-sm text-foreground">Khối Công an (BCA) — phương thức 3</h3>
-            <p className="text-xs text-text-secondary leading-relaxed">
-              Điểm xét tuyển thang 30 = điểm tổ hợp THPT × 2/5 + (điểm bài thi BCA quy thang 30) × 3/5 + điểm cộng/ưu tiên.
-            </p>
-            {bcaPreview ? (
-              <p className="text-sm text-foreground">
-                Điểm kết hợp của bạn: <span className="tabular font-bold text-secondary">{fmt(bcaPreview.value)} / 30</span>
-                <span className="block text-xs text-text-secondary mt-1">
-                  THPT đóng góp {fmt(bcaPreview.breakdown.thptPhan)} · BCA đóng góp {fmt(bcaPreview.breakdown.bcaPhan)} · Ưu tiên +{fmt(bcaPreview.breakdown.uuTien)}
-                </span>
-              </p>
-            ) : (
-              <p className="text-xs text-muted">Nhập điểm tổ hợp THPT (mục THPT) và tổng điểm bài thi BCA (mục BCA) để xem điểm kết hợp.</p>
-            )}
-          </div>
-
-          <div className="rounded-xl border border-border bg-surface-alt/50 p-3 space-y-2">
-            <h3 className="font-display font-bold text-sm text-foreground">ĐH Bách khoa TP.HCM (HCMUT) — tổng hợp thang 100</h3>
-            <p className="text-xs text-text-secondary leading-relaxed">
-              Điểm học lực = Điểm năng lực × 70% + TNTHPT quy đổi × 20% + Học bạ quy đổi × 10%.
-              Khi tổ hợp không nhân đôi Toán, điểm năng lực chia cho 12 (không phải 15) — lỗi mẫu số ở bản cũ đã được sửa.
-            </p>
-            <NumberField label="Điểm cộng (chứng chỉ / giải thưởng, 0–10)" value={bonus100} onChange={setBonus100} max={10} />
-            {hcmutPreview ? (
-              <div className="text-sm space-y-1 text-foreground">
-                <p>
-                  Điểm tổng hợp của bạn: <span className="tabular font-bold text-secondary">{fmt(hcmutPreview.value)} / 100</span>
-                  <span className="text-xs text-text-secondary"> ({hcmutPreview.breakdown.doiTuong})</span>
+            <div>
+              <label
+                htmlFor="status-select"
+                className="block text-xs font-semibold mb-1.5 text-secondary-text"
+              >
+                {pick('Loại điểm', 'Score Type')}
+              </label>
+              <select
+                id="status-select"
+                value={statusOf(selectedExam)}
+                onChange={(e) => setStatus(selectedExam, e.target.value)}
+                className="w-full sm:w-72 min-h-[44px] bg-surface border border-border rounded-xl px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary cursor-pointer"
+              >
+                {statusOptions.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+              {statusOf(selectedExam) !== 'actual' && (
+                <p className="text-[11px] text-muted-foreground mt-1.5">
+                  {statusOf(selectedExam) === 'mock'
+                    ? pick(
+                        'Đang ở chế độ điểm thi thử — ước tính ở trang Chọn Trường là kịch bản giả định, không phải điểm thật.',
+                        'Mock score mode active — School Finder estimates will reflect a practice scenario rather than official results.',
+                      )
+                    : pick(
+                        'Đang ở chế độ điểm mục tiêu (what-if) — dùng để mô phỏng kịch bản điểm mong muốn ở trang Chọn Trường.',
+                        'Target (what-if) mode active — School Finder estimates will simulate your target scenario.',
+                      )}
                 </p>
-                <p className="text-xs text-text-secondary">
-                  Điểm năng lực {fmt(hcmutPreview.breakdown.diemNL)} · TNTHPT quy đổi {fmt(hcmutPreview.breakdown.tnthptQD)} ·
-                  Học bạ quy đổi {fmt(hcmutPreview.breakdown.hbQD)} · Ưu tiên +{fmt(hcmutPreview.breakdown.uuTien)}
+              )}
+            </div>
+
+            {(selectedExam === 'thpt' || selectedExam === 'hocba') && (
+              <SubjectForm
+                subjectsState={selectedExam === 'thpt' ? subjectsThpt : subjectsHb}
+                onChange={selectedExam === 'thpt' ? setSubjectsThpt : setSubjectsHb}
+                transcript={selectedExam === 'hocba'}
+              />
+            )}
+
+            {PART_EXAMS.includes(selectedExam) && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {Object.entries(EXAMS[selectedExam].parts).map(([pk, max]) => (
+                    <NumberField
+                      key={pk}
+                      label={`${getPartLabel(selectedExam, pk)} (0–${max})`}
+                      value={parts[`${selectedExam}.${pk}`] ?? ''}
+                      onChange={(v) => setParts((p) => ({ ...p, [`${selectedExam}.${pk}`]: v }))}
+                      max={max}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="flex-1 border-t border-border" />
+                  <span>
+                    {pick(
+                      'hoặc nhập thẳng tổng điểm nếu bạn chỉ nhớ tổng',
+                      'or enter the total score directly if you only have the total',
+                    )}
+                  </span>
+                  <span className="flex-1 border-t border-border" />
+                </div>
+                <NumberField
+                  label={pick(
+                    `Tổng điểm ${exam.displayLabel} (0–${exam.scale})`,
+                    `Total ${exam.displayLabel} Score (0–${exam.scale})`,
+                  )}
+                  value={totals[selectedExam] ?? ''}
+                  onChange={(v) => setTotals((p) => ({ ...p, [selectedExam]: v }))}
+                  max={exam.scale}
+                />
+                {selectedExam === 'bca' && (
+                  <p className="text-xs text-secondary-text leading-relaxed">
+                    {pick(
+                      'Lưu ý: điểm xét tuyển khối Công an (phương thức 3) = điểm tổ hợp THPT × 2/5 + điểm bài thi BCA (quy thang 30) × 3/5 + điểm cộng. Hãy nhập thêm điểm THPT ở mục THPT để trang Chọn Trường ước tính đúng.',
+                      'Note: Ministry of Public Security Method 3 score = National Exam combo × 2/5 + BCA exam (on 30-pt scale) × 3/5 + priority bonus. Enter your National Exam scores in the National Exam tab as well.',
+                    )}
+                  </p>
+                )}
+                <TotalPreview
+                  label={pick(
+                    `Tổng điểm ${exam.displayLabel}`,
+                    `Total ${exam.displayLabel} Score`,
+                  )}
+                  value={previewPartsTotal(selectedExam, parts, totals)}
+                  scale={exam.scale}
+                  digits={selectedExam === 'vact' ? 0 : 2}
+                />
+              </div>
+            )}
+
+            {TRIO_EXAMS.includes(selectedExam) && (
+              <div className="space-y-4">
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  {pick(
+                    'Nhập điểm 3 môn bạn đã thi trong kỳ thi chuyên biệt (mỗi môn thang 10). Hệ thống cộng thành tổng tổ hợp thang 30 — đúng thang các trường dùng khi công bố điểm chuẩn quy tổ hợp.',
+                    'Enter scores for the 3 specialized exam subjects (0–10 scale each). They sum to a 30-point combination score matching official university cutoff scales.',
+                  )}
                 </p>
-                <button onClick={handleSaveHcmut} disabled={isSaving} className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer">
-                  <span className="material-symbols-outlined text-base" aria-hidden="true">save</span>
-                  Lưu điểm tổng hợp HCMUT vào hồ sơ
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[0, 1, 2].map((i) => (
+                    <NumberField
+                      key={i}
+                      label={pick(`Môn thi ${i + 1} (0–10)`, `Exam Subject ${i + 1} (0–10)`)}
+                      value={trios[`${selectedExam}.${i}`] ?? ''}
+                      onChange={(v) => setTrios((p) => ({ ...p, [`${selectedExam}.${i}`]: v }))}
+                      max={10}
+                    />
+                  ))}
+                </div>
+                <TotalPreview
+                  label={pick('Tổng tổ hợp (thang 30)', '3-Subject Total (30-pt scale)')}
+                  value={previewTrioTotal(selectedExam, trios)}
+                  scale={30}
+                />
+                {selectedExam === 'hsca' && hscaWeightedPreview && (
+                  <p className="text-xs text-secondary-text leading-relaxed">
+                    {hscaWeightedPreview.explain[0]}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {selectedExam === 'vsat' && (
+              <div className="space-y-4">
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  {pick(
+                    'Nhập điểm V-SAT theo từng môn (mỗi môn thang 150) — hệ thống tự tính tổng cho từng tổ hợp khi trường chọn tổ hợp khác nhau. Nhập từ 3 môn trở lên để tự động lưu điểm các tổ hợp.',
+                    'Enter per-subject V-SAT scores (0–150 each) — the calculator automatically evaluates every 3-subject combination required by different majors.',
+                  )}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {SUBJECTS.slice(0, 9).map((sj) => (
+                    <NumberField
+                      key={sj.key}
+                      label={`${getSubjectLabel(sj.key, lang)} (0–150)`}
+                      value={vsatSubjects[sj.key] ?? ''}
+                      onChange={(v) => setVsatSubjects((p) => ({ ...p, [sj.key]: v }))}
+                      max={150}
+                      step="1"
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="flex-1 border-t border-border" />
+                  <span>
+                    {pick(
+                      'hoặc nhập thẳng tổng điểm tổ hợp nếu bạn chỉ nhớ tổng',
+                      'or enter your 3-subject combo total directly',
+                    )}
+                  </span>
+                  <span className="flex-1 border-t border-border" />
+                </div>
+                <NumberField
+                  label={pick(
+                    'Tổng điểm tổ hợp V-SAT (0–450, 3 môn × 150)',
+                    'Total V-SAT Combo Score (0–450, 3 subjects × 150)',
+                  )}
+                  value={totals.vsat ?? ''}
+                  onChange={(v) => setTotals((p) => ({ ...p, vsat: v }))}
+                  max={450}
+                />
+                <TotalPreview
+                  label={pick('Tổng điểm V-SAT', 'Total V-SAT Score')}
+                  value={previewVsatTotal(vsatSubjects, totals)}
+                  scale={450}
+                  digits={0}
+                />
+                {vsatExactThreeExplain && (
+                  <p className="text-xs text-secondary-text">{vsatExactThreeExplain.explain[0]}</p>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2.5">
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <button
+                  type="button"
+                  onClick={handleSaveSelected}
+                  disabled={isSaving}
+                  className={`btn-arena flex-1 cursor-pointer ${
+                    message.type === 'success' ? 'btn-arena-jade' : 'btn-arena-primary'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">
+                    {isSaving ? 'sync' : message.type === 'success' ? 'check_circle' : 'save'}
+                  </span>
+                  <span>
+                    {isSaving
+                      ? pick('Đang lưu...', 'Saving...')
+                      : message.type === 'success'
+                        ? pick('Đã lưu điểm!', 'Scores Saved!')
+                        : pick(`Lưu điểm ${exam.displayLabel}`, `Save ${exam.displayLabel} Scores`)}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetSelected}
+                  disabled={isSaving}
+                  className="btn-arena btn-arena-ghost cursor-pointer shrink-0"
+                >
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">
+                    restart_alt
+                  </span>
+                  <span>{pick('Xoá trắng mục này', 'Clear Fields')}</span>
                 </button>
               </div>
-            ) : (
-              <p className="text-xs text-muted">Nhập đủ điểm THPT từng môn (mục THPT) và điểm học bạ từng môn (mục Học bạ) để tính điểm tổng hợp. Có điểm V-ACT thì nhập thêm ở mục V-ACT (đối tượng ĐT 2.1).</p>
+              {message.text && (
+                <p
+                  className={`text-center text-xs font-medium ${
+                    message.type === 'error'
+                      ? 'text-danger'
+                      : message.type === 'info'
+                        ? 'text-secondary-text'
+                        : 'text-jade'
+                  }`}
+                  role="status"
+                >
+                  {message.text}
+                </p>
+              )}
+            </div>
+          </section>
+
+          {/* Máy tính kết hợp: BCA + tổng hợp thang 100 (formulas.js) */}
+          <section className="paper-card border border-border p-4 sm:p-5 space-y-4">
+            <div>
+              <h2 className="font-display font-bold text-lg text-foreground">
+                {pick(
+                  'Máy tính điểm kết hợp & tổng hợp',
+                  'Combined & Composite Score Calculators',
+                )}
+              </h2>
+              <p className="text-xs text-secondary-text mt-1 leading-relaxed">
+                {pick(
+                  'Dùng ngay điểm bạn đã nhập ở trên — không phải nhập lại. Công thức nằm ở thư viện dùng chung, kết quả được lưu vào hồ sơ để trang Chọn Trường ước tính đúng thang điểm.',
+                  'Automatically computed from the exam scores entered above — no duplicate input required. Save composite scores to your profile for accurate 100-pt university cutoff comparisons.',
+                )}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-surface-alt/60 p-3.5 space-y-2">
+              <h3 className="font-display font-bold text-sm text-foreground">
+                {pick(
+                  'Khối Công an (BCA) — phương thức 3',
+                  'Public Security Academies (BCA) — Method 3',
+                )}
+              </h3>
+              <p className="text-xs text-secondary-text leading-relaxed">
+                {pick(
+                  'Điểm xét tuyển thang 30 = điểm tổ hợp THPT × 2/5 + (điểm bài thi BCA quy thang 30) × 3/5 + điểm cộng/ưu tiên.',
+                  '30-pt Admission Score = National Exam combo × 2/5 + (BCA exam scaled to 30) × 3/5 + priority bonus.',
+                )}
+              </p>
+              {bcaPreview ? (
+                <div className="text-sm text-foreground space-y-1">
+                  <p>
+                    {pick('Điểm kết hợp của bạn:', 'Your combined score:')}{' '}
+                    <span className="tabular font-bold text-jade">
+                      {fmt(bcaPreview.value, 2, locale)} / 30
+                    </span>
+                  </p>
+                  <p className="text-xs text-secondary-text">
+                    {bcaPreview.explain.join(' · ')}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  {pick(
+                    'Nhập điểm tổ hợp THPT (mục THPT) và tổng điểm bài thi BCA (mục BCA) để xem điểm kết hợp.',
+                    'Enter your National Exam subject scores and BCA exam score above to preview your Method 3 combined score.',
+                  )}
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-border bg-surface-alt/60 p-3.5 space-y-2.5">
+              <h3 className="font-display font-bold text-sm text-foreground">
+                {pick(
+                  'ĐH Bách khoa TP.HCM (HCMUT) — tổng hợp thang 100',
+                  'HCMUT (Ho Chi Minh City Univ. of Technology) — 100-pt Composite',
+                )}
+              </h3>
+              <p className="text-xs text-secondary-text leading-relaxed">
+                {pick(
+                  'Điểm học lực = Điểm năng lực × 70% + TNTHPT quy đổi × 20% + Học bạ quy đổi × 10%. Khi tổ hợp không nhân đôi Toán, điểm năng lực chia cho 12 (không phải 15).',
+                  'Academic Score = Competency × 70% + Converted National Exam × 20% + Converted Transcript × 10%. Unweighted Math combos divide V-ACT by 12 (weighted Math divides by 15).',
+                )}
+              </p>
+              <NumberField
+                label={pick(
+                  'Điểm cộng (chứng chỉ / giải thưởng, 0–10)',
+                  'Bonus Points (awards / certificates, 0–10)',
+                )}
+                value={bonus100}
+                onChange={setBonus100}
+                max={10}
+              />
+              {hcmutPreview ? (
+                <div className="text-sm space-y-1.5 text-foreground">
+                  <p>
+                    {pick('Điểm tổng hợp của bạn:', 'Your composite score:')}{' '}
+                    <span className="tabular font-bold text-jade">
+                      {fmt(hcmutPreview.value, 2, locale)} / 100
+                    </span>
+                    <span className="text-xs text-secondary-text">
+                      {' '}
+                      ({hcmutPreview.breakdown.doiTuong})
+                    </span>
+                  </p>
+                  <p className="text-xs text-secondary-text">
+                    {hcmutPreview.explain.join(' · ')} ·{' '}
+                    {pick('Ưu tiên', 'Priority')} +{fmt(hcmutPreview.breakdown.uuTien, 2, locale)}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleSaveHcmut}
+                    disabled={isSaving}
+                    className="btn-arena btn-arena-sm btn-arena-jade cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-base" aria-hidden="true">
+                      save
+                    </span>
+                    <span>
+                      {pick(
+                        'Lưu điểm tổng hợp HCMUT vào hồ sơ',
+                        'Save HCMUT Composite Score to Profile',
+                      )}
+                    </span>
+                  </button>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  {pick(
+                    'Nhập đủ điểm THPT từng môn (mục THPT) và điểm học bạ từng môn (mục Học bạ) để tính điểm tổng hợp. Có điểm V-ACT thì nhập thêm ở mục V-ACT (đối tượng ĐT 2.1).',
+                    'Enter at least 3 matching subjects in both National Exam and Transcript tabs to compute the composite score. Add your V-ACT score in the V-ACT tab for Group 2.1.',
+                  )}
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-border bg-surface-alt/60 p-3.5 space-y-1">
+              <h3 className="font-display font-bold text-sm text-foreground">
+                {pick(
+                  'Đại học Kinh tế TP.HCM (UEH) — tổng hợp thang 100',
+                  'UEH (Univ. of Economics Ho Chi Minh City) — 100-pt Integrated',
+                )}
+              </h3>
+              <p className="text-xs text-secondary-text leading-relaxed">
+                {uehCheck.explain[0]}{' '}
+                {pick(
+                  'Bạn vẫn tra được điểm chuẩn tích hợp của UEH ở trang Chọn Trường.',
+                  'You can still browse UEH’s historical integrated cutoffs in School Finder.',
+                )}
+              </p>
+            </div>
+          </section>
+
+          <p className="text-[11px] text-muted-foreground text-center leading-relaxed pb-4">
+            {pick(
+              'Điểm bạn nhập được dùng để ước tính khả năng ở trang Chọn Trường. Ước tính dựa trên điểm chuẩn các năm trước — không phải cam kết trúng tuyển. Điểm 0 là giá trị hợp lệ và được lưu như các điểm khác.',
+              'Entered scores power statistical admission estimates in School Finder based on prior years’ cutoffs — not an official admission guarantee. A score of 0 is treated as a valid numeric entry.',
             )}
-          </div>
-
-          <div className="rounded-xl border border-border bg-surface-alt/50 p-3 space-y-1">
-            <h3 className="font-display font-bold text-sm text-foreground">Đại học Kinh tế TP.HCM (UEH) — tổng hợp thang 100</h3>
-            <p className="text-xs text-text-secondary leading-relaxed">
-              {uehCheck.explain[0]} Bạn vẫn tra được điểm chuẩn tích hợp của UEH ở trang Tìm trường.
-            </p>
-          </div>
-        </section>
-
-        <p className="text-[11px] text-muted text-center leading-relaxed pb-4">
-          Điểm bạn nhập được dùng để ước tính khả năng ở trang Tìm trường. Ước tính dựa trên điểm chuẩn
-          các năm trước — không phải cam kết trúng tuyển. Điểm 0 là giá trị hợp lệ và được lưu như các điểm khác.
-        </p>
-      </main>
+          </p>
+        </main>
+      </div>
     </div>
   );
 }
@@ -876,28 +1373,44 @@ function previewVsatTotal(vsatSubjects, totals) {
 }
 
 function SubjectForm({ subjectsState, onChange, transcript }) {
-  const byGroup = useMemo(() => {
-    const out = {};
+  const { lang, locale, pick } = useLanguage();
+
+  const sortedCombos = useMemo(() => {
+    const out = [];
     for (const [combo, keys] of Object.entries(COMBOS)) {
-      if (keys.every((k) => subjectsState[k] !== '' && subjectsState[k] != null && Number.isFinite(parseFloat(subjectsState[k])))) {
-        out[combo] = keys.reduce((s, k) => s + parseFloat(subjectsState[k]), 0);
+      if (
+        keys.every(
+          (k) =>
+            subjectsState[k] !== '' &&
+            subjectsState[k] != null &&
+            Number.isFinite(parseFloat(subjectsState[k])),
+        )
+      ) {
+        const sum = keys.reduce((s, k) => s + parseFloat(subjectsState[k]), 0);
+        out.push([combo, Math.round(sum * 100) / 100]);
       }
     }
-    return out;
+    return out.sort((a, b) => b[1] - a[1]);
   }, [subjectsState]);
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-text-secondary leading-relaxed">
+      <p className="text-xs text-secondary-text leading-relaxed">
         {transcript
-          ? 'Nhập điểm trung bình môn dùng cho xét học bạ (theo cách tính của bạn / của trường). Tổng tổ hợp được tính tự động cho các tổ hợp đủ 3 môn.'
-          : 'Nhập điểm từng môn thi tốt nghiệp THPT. Tổng các tổ hợp đủ 3 môn được tính tự động — trang Tìm trường sẽ dùng tổ hợp khớp với từng ngành.'}
+          ? pick(
+              'Nhập điểm trung bình môn dùng cho xét học bạ (theo cách tính của bạn / của trường). Tổng tổ hợp được tính tự động cho các tổ hợp đủ 3 môn.',
+              'Enter your per-subject transcript averages (per university guidelines). All eligible 3-subject combinations are calculated automatically.',
+            )
+          : pick(
+              'Nhập điểm từng môn thi tốt nghiệp THPT. Tổng các tổ hợp đủ 3 môn được tính tự động — trang Chọn Trường sẽ dùng tổ hợp khớp với từng ngành.',
+              'Enter your National Graduation Exam subject scores. Eligible 3-subject combinations are computed automatically and matched per major in School Finder.',
+            )}
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {SUBJECTS.map((s) => (
           <NumberField
             key={s.key}
-            label={`${s.label} (0–10)`}
+            label={`${getSubjectLabel(s.key, lang)} (0–10)`}
             value={subjectsState[s.key] ?? ''}
             onChange={(v) => onChange((p) => ({ ...p, [s.key]: v }))}
             max={10}
@@ -905,13 +1418,18 @@ function SubjectForm({ subjectsState, onChange, transcript }) {
           />
         ))}
       </div>
-      {Object.keys(byGroup).length > 0 && (
-        <div className="rounded-xl border border-border bg-surface-alt px-3 py-2.5">
-          <p className="text-xs text-text-secondary mb-1.5">Tổng theo tổ hợp (chưa gồm điểm ưu tiên):</p>
+      {sortedCombos.length > 0 && (
+        <div className="rounded-xl border border-border bg-surface-alt px-3.5 py-3">
+          <p className="text-xs text-secondary-text mb-2">
+            {pick(
+              `Tổng theo tổ hợp 3 môn (chưa gồm điểm ưu tiên · ${sortedCombos.length} tổ hợp):`,
+              `3-subject combination totals (before priority bonus · ${sortedCombos.length} combos):`,
+            )}
+          </p>
           <div className="flex flex-wrap gap-1.5">
-            {Object.entries(byGroup).map(([combo, sum]) => (
+            {sortedCombos.map(([combo, sum]) => (
               <span key={combo} className="arena-chip">
-                {combo}: <span className="tabular font-bold text-primary">{fmt(sum)}</span>
+                {combo}: <span className="tabular font-bold text-primary">{fmt(sum, 2, locale)}</span>
               </span>
             ))}
           </div>
@@ -922,10 +1440,17 @@ function SubjectForm({ subjectsState, onChange, transcript }) {
 }
 
 function NumberField({ label, value, onChange, max, step = '0.1' }) {
+  const inputId = useId();
   return (
     <div>
-      <label className="block text-xs font-semibold mb-1.5 text-text-secondary">{label}</label>
+      <label
+        htmlFor={inputId}
+        className="block text-xs font-semibold mb-1.5 text-secondary-text"
+      >
+        {label}
+      </label>
       <input
+        id={inputId}
         type="number"
         min="0"
         max={max}
@@ -933,24 +1458,25 @@ function NumberField({ label, value, onChange, max, step = '0.1' }) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="0"
-        className="w-full min-h-[44px] bg-surface-alt border border-border rounded-xl px-3 text-sm text-foreground tabular outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary"
+        className="w-full min-h-[44px] bg-surface border border-border rounded-xl px-3 text-sm text-foreground tabular outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary placeholder:text-muted-foreground"
       />
     </div>
   );
 }
 
 function TotalPreview({ label, value, scale, digits = 2 }) {
+  const { locale } = useLanguage();
   const pct = value != null && scale ? Math.min((value / scale) * 100, 100) : 0;
   return (
     <div className="rounded-xl border border-border bg-surface-alt px-4 py-3 flex items-center justify-between gap-3">
       <div>
-        <p className="text-xs text-text-secondary">{label}</p>
+        <p className="text-xs text-secondary-text">{label}</p>
         <p className="font-display font-bold text-2xl leading-tight text-foreground">
-          <span className="tabular">{value != null ? fmt(value, digits) : '—'}</span>
-          <span className="text-sm text-muted font-medium"> / {scale}</span>
+          <span className="tabular">{value != null ? fmt(value, digits, locale) : '—'}</span>
+          <span className="text-sm text-muted-foreground font-medium"> / {scale}</span>
         </p>
       </div>
-      <div className="w-24 no-shrink">
+      <div className="w-24 shrink-0">
         <ProgressBar value={pct} max={100} variant="jade" size="md" ariaLabel={label} />
       </div>
     </div>

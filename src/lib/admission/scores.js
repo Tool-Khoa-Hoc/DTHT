@@ -126,6 +126,8 @@ export function migrateLegacyScores(legacy, local = {}) {
         migratedFrom: 'v1-bkhcm',
         recalcNote:
           'Điểm BKHCM của bạn đã được chuyển sang hồ sơ v3 và sẽ được tính lại bằng công thức đã sửa mẫu số (không nhân đôi Toán thì chia 12, không phải 15).',
+        recalcNoteEn:
+          'Your HCMUT score was migrated to profile v3 and recalculated using the corrected divisor (12 when Math is unweighted, instead of 15).',
         rawInput: bk,
         updatedAt: now(),
       },
@@ -187,6 +189,8 @@ export function migrateLegacyScores(legacy, local = {}) {
             status: 'actual', scale: 100, migratedFrom: 'v1-bkhcm',
             recalcNote:
               'Điểm BKHCM của bạn đã được chuyển sang hồ sơ v3 và sẽ được tính lại bằng công thức đã sửa mẫu số (không nhân đôi Toán thì chia 12, không phải 15).',
+            recalcNoteEn:
+              'Your HCMUT score was migrated to profile v3 and recalculated using the corrected divisor (12 when Math is unweighted, instead of 15).',
             rawInput: bkLocal, updatedAt: now(),
           },
         };
@@ -251,18 +255,37 @@ export function saveScoreEntry(profileV3, code, entry) {
 
 // Validate 1 entry theo registry: từng phần theo parts, từng môn theo
 // subjectScale, tổng theo thang bài thi. 0 là điểm HỢP LỆ.
-export function validateEntry(code, entry) {
+export function validateEntry(code, entry, lang = 'vi') {
+  const isEn = lang === 'en';
   const exam = EXAMS[normalizeMethodCode(code)];
-  if (!exam) return { ok: false, error: 'Phương thức không tồn tại trong registry' };
-  if (!entry || typeof entry !== 'object') return { ok: false, error: 'Chưa nhập điểm' };
+  if (!exam) {
+    return {
+      ok: false,
+      error: isEn ? 'Admission method not found in registry' : 'Phương thức không tồn tại trong registry',
+    };
+  }
+  if (!entry || typeof entry !== 'object') {
+    return { ok: false, error: isEn ? 'Score not entered yet' : 'Chưa nhập điểm' };
+  }
   if (entry.parts) {
     for (const [pk, pv] of Object.entries(entry.parts)) {
       if (pv == null || pv === '') continue;
       const n = num(pv);
       const max = exam.parts?.[pk];
-      if (n == null) return { ok: false, error: `Điểm phần ${pk} không hợp lệ` };
-      if (max != null && (n < 0 || n > max))
-        return { ok: false, error: `Điểm phần ${pk} phải trong khoảng 0–${max}` };
+      if (n == null) {
+        return {
+          ok: false,
+          error: isEn ? `Invalid score for section ${pk}` : `Điểm phần ${pk} không hợp lệ`,
+        };
+      }
+      if (max != null && (n < 0 || n > max)) {
+        return {
+          ok: false,
+          error: isEn
+            ? `Section ${pk} score must be between 0 and ${max}`
+            : `Điểm phần ${pk} phải trong khoảng 0–${max}`,
+        };
+      }
     }
   }
   if (entry.subjects) {
@@ -270,26 +293,47 @@ export function validateEntry(code, entry) {
     for (const [sk, sv] of Object.entries(entry.subjects)) {
       if (sv == null || sv === '') continue;
       const n = num(sv);
-      if (n == null || n < 0 || n > maxSubject)
-        return { ok: false, error: `Điểm môn ${sk} phải trong khoảng 0–${maxSubject}` };
+      if (n == null || n < 0 || n > maxSubject) {
+        return {
+          ok: false,
+          error: isEn
+            ? `Subject ${sk} score must be between 0 and ${maxSubject}`
+            : `Điểm môn ${sk} phải trong khoảng 0–${maxSubject}`,
+        };
+      }
     }
   }
   if (entry.total != null && entry.total !== '') {
     const n = num(entry.total);
-    if (n == null) return { ok: false, error: 'Điểm tổng không hợp lệ' };
+    if (n == null) {
+      return { ok: false, error: isEn ? 'Invalid total score' : 'Điểm tổng không hợp lệ' };
+    }
     const maxTotal = entry.scale ?? exam.scale;
-    if (maxTotal != null && (n < 0 || n > maxTotal))
-      return { ok: false, error: `Điểm tổng phải trong khoảng 0–${maxTotal}` };
+    if (maxTotal != null && (n < 0 || n > maxTotal)) {
+      return {
+        ok: false,
+        error: isEn
+          ? `Total score must be between 0 and ${maxTotal}`
+          : `Điểm tổng phải trong khoảng 0–${maxTotal}`,
+      };
+    }
   }
   return { ok: true };
 }
 
 // Giữ tương thích nơi gọi cũ.
-export function validateScoreInput(code, total) {
+export function validateScoreInput(code, total, lang = 'vi') {
+  const isEn = lang === 'en';
   const exam = EXAMS[normalizeMethodCode(code)];
   const n = num(total);
-  if (n == null) return { ok: false, error: 'Chưa nhập điểm' };
-  if (exam?.scale != null && (n < 0 || n > exam.scale))
-    return { ok: false, error: `Điểm phải trong khoảng 0–${exam.scale}` };
+  if (n == null) return { ok: false, error: isEn ? 'Score not entered yet' : 'Chưa nhập điểm' };
+  if (exam?.scale != null && (n < 0 || n > exam.scale)) {
+    return {
+      ok: false,
+      error: isEn
+        ? `Score must be between 0 and ${exam.scale}`
+        : `Điểm phải trong khoảng 0–${exam.scale}`,
+    };
+  }
   return { ok: true, value: n };
 }

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 /*
   ============================================================
@@ -9,7 +10,7 @@
   ============================================================
 */
 @theme {
-  /* Typography — tự host qua @fontsource, đầy đủ subset tiếng Việt */
+  /* Typography — tự host qua @fontsource, đầy đủ subset tiếng Việt + Latin */
   --font-sans: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: "Spectral", "Be Vietnam Pro", Georgia, serif;
   --font-arena: "Spectral", "Be Vietnam Pro", Georgia, serif;
@@ -21,12 +22,14 @@
   --color-paper: #FDFBF6;
   --color-surface: #FFFFFF;
   --color-surface-alt: #F3EDE2;
+  --color-surface-hover: #EBE3D3;
   --color-muted: #EFE8DA;
 
   /* Mực tàu & Chữ (WCAG AA/AAA verified trên #FAF7F0 & #FFFFFF) */
   --color-foreground: #1C1917;
   --color-charcoal: #26221F;
   --color-secondary-text: #57534E;
+  --color-text-secondary: #57534E;
   --color-muted-foreground: #78716C;
   --color-subtle: #A8A29E;
 
@@ -36,6 +39,7 @@
   --color-primary-soft: #FEF2F2;
   --color-primary-border: #FECACA;
   --color-on-primary: #FFFFFF;
+  --color-primary-foreground: #FFFFFF;
   --color-cinnabar-50: #FEF2F2;
   --color-cinnabar-100: #FEE2E2;
   --color-cinnabar-500: #DC2626;
@@ -61,11 +65,12 @@
   --color-completed-soft: #F0FDF4;
   --color-completed-border: #BBF7D0;
 
-  /* Viền & Focus ring */
+  /* Viền, Cảnh báo & Focus ring */
   --color-border: #E7E0D2;
   --color-border-strong: #D6C7AE;
   --color-ring: #B91C1C;
   --color-destructive: #DC2626;
+  --color-danger: #B91C1C;
 
   /* Bóng đổ ấm nhẹ kiểu giấy */
   --shadow-paper: 0 2px 8px -2px rgba(28, 25, 23, 0.05), 0 1px 3px 0 rgba(28, 25, 23, 0.04);
@@ -87,12 +92,14 @@ html.dark, :root.dark {
   --color-paper: #1A1714;
   --color-surface: #221E1A;
   --color-surface-alt: #2B2521;
+  --color-surface-hover: #342D27;
   --color-muted: #27221E;
 
   /* Chữ Bạch Ngọc Ánh Trăng & Mực Nhạt (WCAG AAA) */
   --color-foreground: #F5EFE6;
   --color-charcoal: #EAE2D5;
   --color-secondary-text: #BDB4A5;
+  --color-text-secondary: #BDB4A5;
   --color-muted-foreground: #8C8275;
   --color-subtle: #665D52;
 
@@ -102,6 +109,7 @@ html.dark, :root.dark {
   --color-primary-soft: rgba(220, 38, 38, 0.16);
   --color-primary-border: rgba(220, 38, 38, 0.35);
   --color-on-primary: #FFFFFF;
+  --color-primary-foreground: #FFFFFF;
   --color-cinnabar-50: rgba(220, 38, 38, 0.1);
   --color-cinnabar-100: rgba(220, 38, 38, 0.18);
   --color-cinnabar-500: #EF4444;
@@ -132,6 +140,7 @@ html.dark, :root.dark {
   --color-border-strong: #453A31;
   --color-ring: #DC2626;
   --color-destructive: #EF4444;
+  --color-danger: #F87171;
 
   /* Bóng Đổ Sâu Của Nghiên Mực */
   --shadow-paper: 0 4px 16px -2px rgba(0, 0, 0, 0.45), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
@@ -180,10 +189,316 @@ html.dark, :root.dark {
   }
 }
 
-/* ═══════════ Utilities & Hoạ tiết Trung Hoa (Sáng & Tối) ═══════════ */
+/* ═══════════ Component Layer — Cho phép Tailwind @layer utilities ghi đè sạch sẽ ═══════════ */
+@layer components {
+  /* Chữ Hán trang trí mờ (chỉ làm decor, luôn có aria-hidden="true") */
+  .hanzi-watermark {
+    font-family: var(--font-han);
+    user-select: none;
+    pointer-events: none;
+    line-height: 1;
+  }
 
+  /* Ấn triện đỏ (Seal Stamp) cho quân hàm / cấp bậc */
+  .seal-stamp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    border-radius: 10px;
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border: 1.5px solid var(--color-gold);
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.18), var(--shadow-seal);
+    font-family: var(--font-display);
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .seal-stamp-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    border-radius: 10px;
+    background-color: var(--color-primary-soft);
+    color: var(--color-primary);
+    border: 1.5px solid rgba(185, 28, 28, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(185, 28, 28, 0.12);
+    font-family: var(--font-display);
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  html.dark .seal-stamp-outline {
+    border-color: rgba(220, 38, 38, 0.5);
+    box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.2);
+  }
+
+  /* Nét cọ gạch chân tiêu đề */
+  .brush-underline {
+    position: relative;
+    display: inline-block;
+  }
+  .brush-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #B91C1C 0%, #C9A227 72%, transparent 100%);
+    opacity: 0.85;
+  }
+
+  html.dark .brush-underline::after {
+    background: linear-gradient(90deg, #DC2626 0%, #E5B842 72%, transparent 100%);
+    opacity: 0.9;
+  }
+
+  /* Đường phân cách song cửa / vân mây Á Đông */
+  .lattice-divider {
+    position: relative;
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent 0%, #D6C7AE 18%, #C9A227 50%, #D6C7AE 82%, transparent 100%);
+  }
+  .lattice-divider::before {
+    content: "❖";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-background);
+    color: var(--color-accent);
+    padding: 0 10px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  html.dark .lattice-divider {
+    background: linear-gradient(90deg, transparent 0%, #453A31 18%, #E5B842 50%, #453A31 82%, transparent 100%);
+  }
+  html.dark .lattice-divider::before {
+    background-color: var(--color-background);
+    color: var(--color-accent);
+  }
+
+  /* Thẻ giấy chuẩn (Paper Card) */
+  .paper-card,
+  .arena-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-paper);
+    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 180ms ease,
+                background-color 180ms ease;
+  }
+
+  .paper-card-interactive:hover,
+  .arena-card-interactive:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-paper-md);
+  }
+
+  .paper-card-interactive:active,
+  .arena-card-interactive:active {
+    transform: scale(0.99);
+  }
+
+  /* Khung viền đôi đồng tâm cung đình (Concentric R_outer=16px, inset=5px, R_inner=11px) */
+  .imperial-frame {
+    position: relative;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 16px;
+    box-shadow: var(--shadow-paper-md);
+    transition: background-color 180ms ease, border-color 180ms ease;
+  }
+  .imperial-frame::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1px solid rgba(201, 162, 39, 0.25);
+    border-radius: 11px;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  html.dark .imperial-frame::before {
+    border-color: rgba(229, 184, 66, 0.28);
+  }
+
+  /* Chip / Huy hiệu chuẩn — giữ gọn trên 1 dòng, tự cắt ellipsis khi quá dài */
+  .paper-chip,
+  .arena-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 28px;
+    max-width: 100%;
+    padding: 0.25rem 0.6875rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    background-color: var(--color-surface-alt);
+    color: var(--color-secondary-text);
+    border: 1px solid var(--color-border);
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  }
+
+  .paper-chip-active,
+  .arena-chip[aria-pressed="true"],
+  .arena-chip[data-active="true"] {
+    background-color: var(--color-primary-soft);
+    color: var(--color-primary);
+    border-color: rgba(185, 28, 28, 0.4);
+  }
+
+  html.dark .paper-chip-active,
+  html.dark .arena-chip[aria-pressed="true"],
+  html.dark .arena-chip[data-active="true"] {
+    border-color: rgba(220, 38, 38, 0.5);
+  }
+
+  /* Hệ nút chuẩn (Button / ArenaButton) — Font sans tối ưu độ sắc nét cho nút */
+  .btn-arena {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 46px;
+    max-width: 100%;
+    padding: 0.625rem 1.125rem;
+    border-radius: 12px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  }
+  .btn-arena:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .btn-arena:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-arena-primary {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border: 1px solid var(--color-primary-hover);
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.2);
+  }
+  .btn-arena-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+    box-shadow: 0 6px 16px rgba(185, 28, 28, 0.28);
+  }
+  html.dark .btn-arena-primary {
+    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.35);
+  }
+
+  .btn-arena-secondary,
+  .btn-arena-ghost {
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    border: 1px solid var(--color-border-strong);
+    box-shadow: var(--shadow-paper);
+  }
+  .btn-arena-secondary:hover:not(:disabled),
+  .btn-arena-ghost:hover:not(:disabled) {
+    background-color: var(--color-surface-alt);
+    border-color: var(--color-gold);
+  }
+
+  .btn-arena-gold {
+    background-color: var(--color-gold-soft);
+    color: var(--color-gold-dark);
+    border: 1px solid var(--color-gold);
+  }
+  .btn-arena-gold:hover:not(:disabled) {
+    background-color: #FDE68A;
+  }
+  html.dark .btn-arena-gold {
+    background-color: var(--color-gold-soft);
+    color: var(--color-gold);
+    border-color: var(--color-gold);
+  }
+  html.dark .btn-arena-gold:hover:not(:disabled) {
+    background-color: rgba(229, 184, 66, 0.25);
+  }
+
+  .btn-arena-jade {
+    background-color: var(--color-jade);
+    color: var(--color-on-secondary);
+    border: 1px solid var(--color-jade-hover);
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.18);
+  }
+  .btn-arena-jade:hover:not(:disabled) {
+    background-color: var(--color-jade-hover);
+  }
+  html.dark .btn-arena-jade {
+    box-shadow: 0 4px 16px rgba(20, 184, 166, 0.3);
+  }
+
+  .btn-arena-sm {
+    min-height: 40px;
+    padding: 0.45rem 0.875rem;
+    font-size: 0.8125rem;
+    border-radius: 10px;
+  }
+
+  /* ═══════════ Bảng màu theo môn học (Light & Dark) ═══════════ */
+  .subject-badge-TOAN { background-color: #E0F2FE; color: #0369A1; border-color: #BAE6FD; }
+  .subject-badge-LY   { background-color: #EEF2FF; color: #4338CA; border-color: #C7D2FE; }
+  .subject-badge-HOA  { background-color: #FEF3C7; color: #B45309; border-color: #FDE68A; }
+  .subject-badge-ANH  { background-color: #F3E8FF; color: #6D28D9; border-color: #DDD6FE; }
+  .subject-badge-SINH { background-color: #D1FAE5; color: #047857; border-color: #A7F3D0; }
+  .subject-badge-VAN  { background-color: #FCE7F3; color: #BE185D; border-color: #FBCFE8; }
+  .subject-badge-SU   { background-color: #FFEDD5; color: #9A3412; border-color: #FED7AA; }
+  .subject-badge-DIA  { background-color: #CCFBF1; color: #0F766E; border-color: #99F6E4; }
+  .subject-badge-DGNL { background-color: #FEE2E2; color: #B91C1C; border-color: #FECACA; }
+  .subject-badge-DGTD { background-color: #FFEDD5; color: #C2410C; border-color: #FED7AA; }
+  .subject-badge-DEFAULT { background-color: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
+
+  html.dark .subject-badge-TOAN { background-color: rgba(2, 132, 199, 0.16); color: #38BDF8; border-color: rgba(56, 189, 248, 0.35); }
+  html.dark .subject-badge-LY   { background-color: rgba(99, 102, 241, 0.16); color: #818CF8; border-color: rgba(129, 140, 248, 0.35); }
+  html.dark .subject-badge-HOA  { background-color: rgba(217, 119, 6, 0.16); color: #FBBF24; border-color: rgba(251, 191, 36, 0.35); }
+  html.dark .subject-badge-ANH  { background-color: rgba(147, 51, 234, 0.16); color: #C084FC; border-color: rgba(192, 132, 252, 0.35); }
+  html.dark .subject-badge-SINH { background-color: rgba(5, 150, 105, 0.16); color: #34D399; border-color: rgba(52, 211, 153, 0.35); }
+  html.dark .subject-badge-VAN  { background-color: rgba(219, 39, 119, 0.16); color: #F472B6; border-color: rgba(244, 114, 182, 0.35); }
+  html.dark .subject-badge-SU   { background-color: rgba(234, 88, 12, 0.16); color: #FB923C; border-color: rgba(251, 146, 60, 0.35); }
+  html.dark .subject-badge-DIA  { background-color: rgba(13, 148, 136, 0.16); color: #2DD4BF; border-color: rgba(45, 212, 191, 0.35); }
+  html.dark .subject-badge-DGNL { background-color: rgba(220, 38, 38, 0.16); color: #F87171; border-color: rgba(248, 113, 113, 0.35); }
+  html.dark .subject-badge-DGTD { background-color: rgba(234, 88, 12, 0.16); color: #FB923C; border-color: rgba(251, 146, 60, 0.35); }
+  html.dark .subject-badge-DEFAULT { background-color: rgba(220, 38, 38, 0.16); color: #F87171; border-color: rgba(248, 113, 113, 0.35); }
+
+  .subject-solid-TOAN { background-color: #0284C7; color: #FFFFFF; border-color: #0369A1; }
+  .subject-solid-LY   { background-color: #4F46E5; color: #FFFFFF; border-color: #4338CA; }
+  .subject-solid-HOA  { background-color: #D97706; color: #FFFFFF; border-color: #B45309; }
+  .subject-solid-ANH  { background-color: #7C3AED; color: #FFFFFF; border-color: #6D28D9; }
+  .subject-solid-SINH { background-color: #059669; color: #FFFFFF; border-color: #047857; }
+  .subject-solid-VAN  { background-color: #DB2777; color: #FFFFFF; border-color: #BE185D; }
+  .subject-solid-SU   { background-color: #B45309; color: #FFFFFF; border-color: #92400E; }
+  .subject-solid-DIA  { background-color: #0D9488; color: #FFFFFF; border-color: #0F766E; }
+  .subject-solid-DGNL { background-color: #B91C1C; color: #FFFFFF; border-color: #991B1B; }
+  .subject-solid-DGTD { background-color: #EA580C; color: #FFFFFF; border-color: #C2410C; }
+  .subject-solid-DEFAULT { background-color: #B91C1C; color: #FFFFFF; border-color: #991B1B; }
+}
+
+/* ═══════════ Utilities (Sáng & Tối) ═══════════ */
 .tabular {
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 .no-shrink {
@@ -194,301 +509,6 @@ html.dark, :root.dark {
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* Chữ Hán trang trí mờ (chỉ làm decor, luôn có aria-hidden="true") */
-.hanzi-watermark {
-  font-family: var(--font-han);
-  user-select: none;
-  pointer-events: none;
-  line-height: 1;
-}
-
-/* Ấn triện đỏ (Seal Stamp) cho quân hàm / cấp bậc */
-.seal-stamp {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background-color: var(--color-primary);
-  color: var(--color-on-primary);
-  border: 1.5px solid var(--color-gold);
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.2), var(--shadow-seal);
-  font-family: var(--font-display);
-  font-weight: 800;
-}
-
-.seal-stamp-outline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary);
-  border: 1.5px solid rgba(185, 28, 28, 0.35);
-  box-shadow: inset 0 0 0 1px rgba(185, 28, 28, 0.12);
-  font-family: var(--font-display);
-  font-weight: 800;
-}
-
-html.dark .seal-stamp-outline {
-  border-color: rgba(220, 38, 38, 0.5);
-  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.2);
-}
-
-/* Nét cọ gạch chân tiêu đề */
-.brush-underline {
-  position: relative;
-  display: inline-block;
-}
-.brush-underline::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  width: 100%;
-  height: 4px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #B91C1C 0%, #C9A227 72%, transparent 100%);
-  opacity: 0.85;
-}
-
-html.dark .brush-underline::after {
-  background: linear-gradient(90deg, #DC2626 0%, #E5B842 72%, transparent 100%);
-  opacity: 0.9;
-}
-
-/* Đường phân cách song cửa / vân mây Á Đông */
-.lattice-divider {
-  position: relative;
-  height: 1px;
-  width: 100%;
-  background: linear-gradient(90deg, transparent 0%, #D6C7AE 18%, #C9A227 50%, #D6C7AE 82%, transparent 100%);
-}
-.lattice-divider::before {
-  content: "❖";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background-color: var(--color-background);
-  color: var(--color-accent);
-  padding: 0 10px;
-  font-size: 11px;
-  line-height: 1;
-}
-
-html.dark .lattice-divider {
-  background: linear-gradient(90deg, transparent 0%, #453A31 18%, #E5B842 50%, #453A31 82%, transparent 100%);
-}
-html.dark .lattice-divider::before {
-  background-color: var(--color-background);
-  color: var(--color-accent);
-}
-
-/* Thẻ giấy chuẩn (Paper Card) */
-.paper-card,
-.arena-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  box-shadow: var(--shadow-paper);
-  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 180ms ease,
-              background-color 180ms ease;
-}
-
-.paper-card-interactive:hover,
-.arena-card-interactive:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-paper-md);
-}
-
-.paper-card-interactive:active,
-.arena-card-interactive:active {
-  transform: scale(0.99);
-}
-
-/* Khung viền góc họa tiết cung đình nhẹ */
-.imperial-frame {
-  position: relative;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
-  border-radius: 16px;
-  box-shadow: var(--shadow-paper-md);
-  transition: background-color 180ms ease, border-color 180ms ease;
-}
-.imperial-frame::before {
-  content: "";
-  position: absolute;
-  inset: 4px;
-  border: 1px solid rgba(201, 162, 39, 0.24);
-  border-radius: 12px;
-  pointer-events: none;
-}
-
-html.dark .imperial-frame::before {
-  border-color: rgba(229, 184, 66, 0.28);
-}
-
-/* Chip / Huy hiệu chuẩn */
-.paper-chip,
-.arena-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-height: 30px;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.2;
-  background-color: var(--color-surface-alt);
-  color: var(--color-secondary-text);
-  border: 1px solid var(--color-border);
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
-}
-
-.paper-chip-active,
-.arena-chip[aria-pressed="true"],
-.arena-chip[data-active="true"] {
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary);
-  border-color: rgba(185, 28, 28, 0.4);
-}
-
-html.dark .paper-chip-active,
-html.dark .arena-chip[aria-pressed="true"],
-html.dark .arena-chip[data-active="true"] {
-  border-color: rgba(220, 38, 38, 0.5);
-}
-
-/* Hệ nút chuẩn (Button / ArenaButton) — Font sans tối ưu độ sắc nét cho nút */
-.btn-arena {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 46px;
-  padding: 0.625rem 1.25rem;
-  border-radius: 12px;
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 0.9375rem;
-  line-height: 1.2;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease, border-color 150ms ease;
-}
-.btn-arena:active:not(:disabled) {
-  transform: scale(0.98);
-}
-.btn-arena:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-arena-primary {
-  background-color: var(--color-primary);
-  color: var(--color-on-primary);
-  border: 1px solid var(--color-primary-hover);
-  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.2);
-}
-.btn-arena-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-hover);
-  box-shadow: 0 6px 16px rgba(185, 28, 28, 0.28);
-}
-html.dark .btn-arena-primary {
-  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.35);
-}
-
-.btn-arena-secondary,
-.btn-arena-ghost {
-  background-color: var(--color-surface);
-  color: var(--color-foreground);
-  border: 1px solid var(--color-border-strong);
-  box-shadow: var(--shadow-paper);
-}
-.btn-arena-secondary:hover:not(:disabled),
-.btn-arena-ghost:hover:not(:disabled) {
-  background-color: var(--color-surface-alt);
-  border-color: var(--color-gold);
-}
-
-.btn-arena-gold {
-  background-color: var(--color-gold-soft);
-  color: var(--color-gold-dark);
-  border: 1px solid var(--color-gold);
-}
-.btn-arena-gold:hover:not(:disabled) {
-  background-color: #FDE68A;
-}
-html.dark .btn-arena-gold {
-  background-color: var(--color-gold-soft);
-  color: var(--color-gold);
-  border-color: var(--color-gold);
-}
-html.dark .btn-arena-gold:hover:not(:disabled) {
-  background-color: rgba(229, 184, 66, 0.25);
-}
-
-.btn-arena-jade {
-  background-color: var(--color-jade);
-  color: var(--color-on-secondary);
-  border: 1px solid var(--color-jade-hover);
-  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.18);
-}
-.btn-arena-jade:hover:not(:disabled) {
-  background-color: var(--color-jade-hover);
-}
-html.dark .btn-arena-jade {
-  box-shadow: 0 4px 16px rgba(20, 184, 166, 0.3);
-}
-
-.btn-arena-sm {
-  min-height: 44px;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.875rem;
-  border-radius: 10px;
-}
-
-/* ═══════════ Bảng màu theo môn học (Light & Dark) ═══════════ */
-.subject-badge-TOAN { background-color: #E0F2FE; color: #0369A1; border-color: #BAE6FD; }
-.subject-badge-LY   { background-color: #EEF2FF; color: #4338CA; border-color: #C7D2FE; }
-.subject-badge-HOA  { background-color: #FEF3C7; color: #B45309; border-color: #FDE68A; }
-.subject-badge-ANH  { background-color: #F3E8FF; color: #6D28D9; border-color: #DDD6FE; }
-.subject-badge-SINH { background-color: #D1FAE5; color: #047857; border-color: #A7F3D0; }
-.subject-badge-VAN  { background-color: #FCE7F3; color: #BE185D; border-color: #FBCFE8; }
-.subject-badge-SU   { background-color: #FFEDD5; color: #9A3412; border-color: #FED7AA; }
-.subject-badge-DIA  { background-color: #CCFBF1; color: #0F766E; border-color: #99F6E4; }
-.subject-badge-DGNL { background-color: #FEE2E2; color: #B91C1C; border-color: #FECACA; }
-.subject-badge-DGTD { background-color: #FFEDD5; color: #C2410C; border-color: #FED7AA; }
-.subject-badge-DEFAULT { background-color: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
-
-html.dark .subject-badge-TOAN { background-color: rgba(2, 132, 199, 0.16); color: #38BDF8; border-color: rgba(56, 189, 248, 0.35); }
-html.dark .subject-badge-LY   { background-color: rgba(99, 102, 241, 0.16); color: #818CF8; border-color: rgba(129, 140, 248, 0.35); }
-html.dark .subject-badge-HOA  { background-color: rgba(217, 119, 6, 0.16); color: #FBBF24; border-color: rgba(251, 191, 36, 0.35); }
-html.dark .subject-badge-ANH  { background-color: rgba(147, 51, 234, 0.16); color: #C084FC; border-color: rgba(192, 132, 252, 0.35); }
-html.dark .subject-badge-SINH { background-color: rgba(5, 150, 105, 0.16); color: #34D399; border-color: rgba(52, 211, 153, 0.35); }
-html.dark .subject-badge-VAN  { background-color: rgba(219, 39, 119, 0.16); color: #F472B6; border-color: rgba(244, 114, 182, 0.35); }
-html.dark .subject-badge-SU   { background-color: rgba(234, 88, 12, 0.16); color: #FB923C; border-color: rgba(251, 146, 60, 0.35); }
-html.dark .subject-badge-DIA  { background-color: rgba(13, 148, 136, 0.16); color: #2DD4BF; border-color: rgba(45, 212, 191, 0.35); }
-html.dark .subject-badge-DGNL { background-color: rgba(220, 38, 38, 0.16); color: #F87171; border-color: rgba(248, 113, 113, 0.35); }
-html.dark .subject-badge-DGTD { background-color: rgba(234, 88, 12, 0.16); color: #FB923C; border-color: rgba(251, 146, 60, 0.35); }
-html.dark .subject-badge-DEFAULT { background-color: rgba(220, 38, 38, 0.16); color: #F87171; border-color: rgba(248, 113, 113, 0.35); }
-
-.subject-solid-TOAN { background-color: #0284C7; color: #FFFFFF; border-color: #0369A1; }
-.subject-solid-LY   { background-color: #4F46E5; color: #FFFFFF; border-color: #4338CA; }
-.subject-solid-HOA  { background-color: #D97706; color: #FFFFFF; border-color: #B45309; }
-.subject-solid-ANH  { background-color: #7C3AED; color: #FFFFFF; border-color: #6D28D9; }
-.subject-solid-SINH { background-color: #059669; color: #FFFFFF; border-color: #047857; }
-.subject-solid-VAN  { background-color: #DB2777; color: #FFFFFF; border-color: #BE185D; }
-.subject-solid-SU   { background-color: #B45309; color: #FFFFFF; border-color: #92400E; }
-.subject-solid-DIA  { background-color: #0D9488; color: #FFFFFF; border-color: #0F766E; }
-.subject-solid-DGNL { background-color: #B91C1C; color: #FFFFFF; border-color: #991B1B; }
-.subject-solid-DGTD { background-color: #EA580C; color: #FFFFFF; border-color: #C2410C; }
-.subject-solid-DEFAULT { background-color: #B91C1C; color: #FFFFFF; border-color: #991B1B; }
-
 /* Thích ứng các màu phụ bậc quân hàm/danh hiệu trong dark mode */
 html.dark .bg-sky-50 {
   background-color: rgba(2, 132, 199, 0.15) !important;
@@ -498,15 +518,18 @@ html.dark .text-sky-800,
 html.dark .text-sky-900 {
   color: #38BDF8 !important;
 }
+html.dark .border-sky-200,
 html.dark .border-sky-300 {
   border-color: rgba(56, 189, 248, 0.35) !important;
 }
 html.dark .bg-indigo-50 {
   background-color: rgba(99, 102, 241, 0.15) !important;
 }
-html.dark .text-indigo-700 {
+html.dark .text-indigo-700,
+html.dark .text-indigo-800 {
   color: #818CF8 !important;
 }
+html.dark .border-indigo-200,
 html.dark .border-indigo-300 {
   border-color: rgba(129, 140, 248, 0.35) !important;
 }

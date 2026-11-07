@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import Button from './Button';
 
 function formatElapsed(sec = 0) {
@@ -27,6 +28,7 @@ export default function SessionBar({
   onResume,
   onEnd,
 }) {
+  const { t, isEn } = useLanguage();
   const seconds = sessionSeconds ?? elapsedSec ?? 0;
   const handleResume = onConfirmContinue || onResume || onStartSession;
   const handleStart = onStartSession || onConfirmContinue || onResume;
@@ -41,15 +43,21 @@ export default function SessionBar({
 
   const pauseMessage =
     idleReason === 'hidden-timeout'
-      ? 'Đã tạm dừng sau 20 phút ở tab ngoài — bấm “Tiếp tục học” để tính giờ tiếp'
+      ? t('session.pausedHidden')
       : idleReason === 'checkin-expired'
-        ? 'Tạm dừng do quá hạn điểm danh 25 phút — bấm “Tiếp tục học” để mở lại'
-        : 'Tạm dừng do không thao tác — bấm “Tiếp tục học” để cộng tiếp phút học & EXP';
+        ? t('session.pausedCheckin')
+        : t('session.pausedIdle');
+
+  const checkinTargetLabel = checkinPrompt
+    ? isEn
+      ? checkinPrompt.targetLabelEn || checkinPrompt.targetLabel
+      : checkinPrompt.targetLabel
+    : '';
 
   const statusMeta = checkinPrompt
     ? {
         dot: 'bg-primary animate-ping',
-        text: `Điểm danh Pomodoro (+10 EXP): Chọn đúng biểu tượng ${checkinPrompt.targetSymbol} (${checkinPrompt.targetLabel})`,
+        text: t('session.checkinPrompt', { label: checkinTargetLabel }),
         tone: 'border-primary bg-primary-soft/85 text-foreground',
       }
     : needsConfirm
@@ -61,18 +69,18 @@ export default function SessionBar({
       : isReady
         ? {
             dot: 'bg-secondary-text',
-            text: 'Chờ bắt đầu — cuộn bảng bài giảng hoặc bấm “Bắt đầu tính giờ”',
+            text: t('session.ready'),
             tone: 'border-border-strong bg-surface text-foreground',
           }
         : isFallback
           ? {
-              dot: 'bg-sky-600',
-              text: 'Chế độ dự phòng · đang ghi nhận số phút học thực tế',
-              tone: 'border-sky-300 bg-sky-50 text-sky-900',
+              dot: 'bg-jade',
+              text: t('session.fallback'),
+              tone: 'border-jade-border bg-surface-alt text-foreground',
             }
           : {
               dot: 'bg-jade animate-pulse',
-              text: 'Đang ghi nhận phút học & EXP (chống treo máy)',
+              text: t('session.active'),
               tone: 'border-jade-border bg-jade-soft text-foreground',
             };
 
@@ -83,10 +91,17 @@ export default function SessionBar({
       className={`paper-card sticky top-2 z-20 flex flex-wrap items-center justify-between gap-3 px-4 py-3 border ${statusMeta.tone}`}
     >
       <div className="flex items-center gap-3 min-w-0">
-        <span className={`h-2.5 w-2.5 no-shrink rounded-full ${statusMeta.dot}`} aria-hidden="true" />
+        <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusMeta.dot}`} aria-hidden="true" />
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs font-bold text-foreground">
             <span>{statusMeta.text}</span>
+            {checkinPrompt?.targetIcon && (
+              <span className="inline-flex items-center gap-1 rounded-md border border-primary/35 bg-surface px-1.5 py-0.5 text-primary">
+                <span className="material-symbols-outlined text-sm leading-none" aria-hidden="true">
+                  {checkinPrompt.targetIcon}
+                </span>
+              </span>
+            )}
             {subjectLabel && !checkinPrompt && (
               <span className="text-secondary-text font-medium truncate">
                 · {subjectLabel}
@@ -98,53 +113,59 @@ export default function SessionBar({
             <p className="text-xs font-extrabold text-jade tabular mt-0.5">
               +{flashExp.amount ?? flashExp.gained} EXP{' '}
               {flashExp.type === 'levelup' || flashExp.leveledUp
-                ? `· Thăng cấp Lv.${flashExp.level}!`
+                ? t('session.levelUp', { level: flashExp.level })
                 : flashExp.type === 'checkin'
-                  ? '· Thưởng Điểm Danh Tập Trung!'
+                  ? t('session.checkinBonus')
                   : ''}
             </p>
           ) : null}
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 no-shrink">
+      <div className="flex flex-wrap items-center gap-2 shrink-0">
         {checkinPrompt && Array.isArray(checkinPrompt.options) && (
           <div className="flex items-center gap-1.5 bg-paper px-2.5 py-1 rounded-xl border border-border-strong">
             <span className="text-[11px] font-bold text-primary tabular mr-1">
               {formatElapsed(checkinRemainingSec)}
             </span>
-            {checkinPrompt.options.map((opt) => (
-              <button
-                key={opt.symbol}
-                type="button"
-                onClick={() => onSubmitCheckin?.(opt.symbol)}
-                title={`Chọn ${opt.label}`}
-                aria-label={`Chọn biểu tượng ${opt.label}`}
-                className="px-2.5 py-1 rounded-lg bg-surface hover:bg-primary-soft border border-border hover:border-primary text-sm font-bold transition-all cursor-pointer"
-              >
-                {opt.symbol}
-              </button>
-            ))}
+            {checkinPrompt.options.map((opt) => {
+              const optLabel = isEn ? opt.labelEn || opt.label : opt.label;
+              const optAria = t('session.chooseSymbol', { label: optLabel });
+              return (
+                <button
+                  key={opt.symbol}
+                  type="button"
+                  onClick={() => onSubmitCheckin?.(opt.symbol)}
+                  title={optAria}
+                  aria-label={optAria}
+                  className="inline-flex h-8 w-9 items-center justify-center rounded-lg bg-surface hover:bg-primary-soft border border-border hover:border-primary text-foreground hover:text-primary transition-all cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-base leading-none" aria-hidden="true">
+                    {opt.icon || opt.symbol}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         )}
 
         {todayMinutes > 0 && (
           <div
             className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-gold-soft text-gold-dark border border-gold tabular"
-            title="Tổng số phút học của bạn trong ngày hôm nay"
+            title={t('session.todayTitle')}
           >
-            <span className="material-symbols-outlined text-sm text-accent" aria-hidden="true">
+            <span className="material-symbols-outlined text-sm text-accent shrink-0" aria-hidden="true">
               local_fire_department
             </span>
-            <span>Hôm nay: {todayMinutes}p</span>
+            <span>{t('session.todayBadge', { minutes: todayMinutes })}</span>
           </div>
         )}
 
         <div
           className="paper-chip tabular text-sm font-bold text-foreground bg-surface border-border-strong"
-          aria-label="Thời gian phiên học"
+          aria-label={t('session.timerAria')}
         >
-          <span className="material-symbols-outlined text-base text-jade" aria-hidden="true">
+          <span className="material-symbols-outlined text-base text-jade shrink-0" aria-hidden="true">
             schedule
           </span>
           {formatElapsed(seconds)}
@@ -152,19 +173,19 @@ export default function SessionBar({
 
         {isReady && handleStart && (
           <Button variant="primary" size="sm" icon="play_arrow" onClick={handleStart}>
-            Bắt đầu tính giờ
+            {t('session.startBtn')}
           </Button>
         )}
 
         {needsConfirm && handleResume && (
           <Button variant="gold" size="sm" icon="play_circle" onClick={handleResume}>
-            Tiếp tục học
+            {t('session.resumeBtn')}
           </Button>
         )}
 
         {(isRunning || needsConfirm || isFallback) && handleEnd && (
           <Button variant="ghost" size="sm" icon="check_circle" onClick={handleEnd}>
-            Kết thúc phiên
+            {t('session.endBtn')}
           </Button>
         )}
       </div>

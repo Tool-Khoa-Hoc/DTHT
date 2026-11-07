@@ -1,4 +1,5 @@
-﻿import React from 'react';
+import React from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const TONE_FILL = {
   jade: 'bg-gradient-to-r from-jade to-completed',
@@ -22,6 +23,7 @@ export default function ProgressBar({
   size = 'md',
   className = '',
 }) {
+  const { t } = useLanguage();
   const safeMax = max > 0 ? max : 100;
   const pct = Math.max(0, Math.min(100, Math.round((Number(value) / safeMax) * 100)));
   const fillClass = TONE_FILL[tone] || TONE_FILL.jade;
@@ -36,7 +38,7 @@ export default function ProgressBar({
           ) : (
             <span />
           )}
-          <span className="tabular font-bold text-secondary-text no-shrink">
+          <span className="tabular font-bold text-secondary-text shrink-0">
             {sublabel ? <span className="mr-1.5 text-muted-foreground font-medium">{sublabel}</span> : null}
             {showPercent ? `${pct}%` : null}
           </span>
@@ -47,7 +49,7 @@ export default function ProgressBar({
         aria-valuenow={pct}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={label || 'Tiến độ'}
+        aria-label={label || t('skeleton.progress')}
         className={`${trackHeight} w-full overflow-hidden rounded-full bg-surface-alt border border-border`}
       >
         <div

@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { getUserRank } from '../utils/rankHelper';
 import { getLevelFromExp, getLevelAccent, formatStudyTime } from '../utils/levelHelper';
 import { sanitizeExternalUrl } from '../utils/urlSecurity';
 import { getDocumentKindMeta } from '../lib/documents';
+import { getLocalizedCategoryLabel } from '../i18n/communityAndAdmin';
 import Avatar from '../components/Avatar';
 import ProgressBar from '../components/ui/ProgressBar';
 import { ListItemSkeleton } from '../components/ui/Skeleton';
@@ -17,28 +19,27 @@ const PUBLIC_VIEW_FULL_COLS =
 const PUBLIC_VIEW_FALLBACK_COLS =
   'id, display_name, avatar_url, role, university, user_mode, target_gpa, target_thpt, target_dgnl, current_gpa, is_approved_bang_chu';
 
-function computeCampaignProgress(targets, isCompleted) {
-  if (isCompleted) return { pct: 100, label: '100% · Hoàn thành' };
+function computeCampaignProgress(targets, isCompleted, t) {
+  if (isCompleted) return { pct: 100, label: t('userProfile.campaignCompletedLabel') };
   if (!Array.isArray(targets) || targets.length === 0) {
-    return { pct: 0, label: 'Đang thực hiện' };
+    return { pct: 0, label: t('userProfile.campaignInProgress') };
   }
-  const done = targets.filter((t) => Boolean(t?.completed || t?.is_completed)).length;
+  const done = targets.filter((item) => Boolean(item?.completed || item?.is_completed)).length;
   const pct = Math.round((done / targets.length) * 100);
   return { pct, label: `${pct}% (${done}/${targets.length})` };
-}
-
-function formatViDate(value) {
-  if (!value) return null;
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString('vi-VN');
 }
 
 export default function UserProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
+  const { lang, t, formatNumber, formatDate } = useLanguage();
   const { showToast } = useToast();
+
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
 
   const [scholar, setScholar] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -146,8 +147,8 @@ export default function UserProfile() {
         setDocuments(pubDocsRes.data || []);
       }
     } catch (err) {
-      console.error('Lỗi tải hồ sơ học giả:', err);
-      showToast('Không thể tải hồ sơ sĩ tử lúc này.', 'error');
+      console.error('Error loading public scholar profile:', err);
+      showToast(tRef.current('userProfile.toastLoadError'), 'error');
     } finally {
       setLoading(false);
     }
@@ -172,7 +173,7 @@ export default function UserProfile() {
 
   const handleToggleFollow = async () => {
     if (!currentUser) {
-      showToast('Vui lòng đăng nhập để theo dõi sĩ tử này.', 'warning');
+      showToast(t('userProfile.toastSignInToFollow'), 'warning');
       navigate('/auth');
       return;
     }
@@ -190,7 +191,7 @@ export default function UserProfile() {
         if (error) throw error;
         setIsFollowing(false);
         setFollowersCount((prev) => Math.max(0, prev - 1));
-        showToast('Đã bỏ theo dõi.', 'info');
+        showToast(t('userProfile.toastUnfollowed'), 'info');
       } else {
         const { error } = await supabase
           .from('follows')
@@ -199,11 +200,16 @@ export default function UserProfile() {
         if (error) throw error;
         setIsFollowing(true);
         setFollowersCount((prev) => prev + 1);
-        showToast(`Đã theo dõi ${scholar?.display_name || 'sĩ tử'}!`, 'success');
+        showToast(
+          t('userProfile.toastFollowed', {
+            name: scholar?.display_name || t('userProfile.defaultScholar'),
+          }),
+          'success',
+        );
       }
     } catch (err) {
-      console.error('Lỗi cập nhật theo dõi:', err);
-      showToast('Không thể cập nhật trạng thái theo dõi: ' + err.message, 'error');
+      console.error('Error updating follow status:', err);
+      showToast(t('userProfile.toastFollowError', { error: err.message }), 'error');
     } finally {
       setFollowLoading(false);
     }
@@ -229,16 +235,16 @@ export default function UserProfile() {
           person_off
         </span>
         <h2 className="text-xl font-display font-bold text-foreground mb-1">
-          Không tìm thấy danh thiếp sĩ tử
+          {t('userProfile.notFoundTitle')}
         </h2>
-        <p className="text-xs text-secondary-text mb-6">
-          Hồ sơ này không tồn tại hoặc chưa được khởi tạo trên Đấu Trường Học Tập.
+        <p className="text-xs text-secondary-text mb-6 max-w-md">
+          {t('userProfile.notFoundDesc')}
         </p>
         <Link to="/arena" className="btn-arena btn-arena-primary btn-arena-sm">
           <span className="material-symbols-outlined text-base" aria-hidden="true">
             arrow_back
           </span>
-          <span>Quay lại Bảng Vàng</span>
+          <span>{t('userProfile.backToArenaBtn')}</span>
         </Link>
       </div>
     );
@@ -255,9 +261,11 @@ export default function UserProfile() {
     scholar.role,
     scholar.is_approved_bang_chu,
     scholar.id,
+    lang,
   );
   const levelInfo = getLevelFromExp(expTotal);
   const levelAccent = getLevelAccent(levelInfo.level);
+  const joinedStr = scholar.created_at ? formatDate(scholar.created_at) : null;
 
   return (
     <div className="bg-background font-sans text-foreground min-h-full pb-24">
@@ -278,19 +286,19 @@ export default function UserProfile() {
           <span className="material-symbols-outlined text-base" aria-hidden="true">
             arrow_back
           </span>
-          <span>Quay lại</span>
+          <span>{t('userProfile.backBtn')}</span>
         </button>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10 space-y-6">
-        {/* SCHOLAR IDENTITY HEADER CARD */}
-        <section className="imperial-frame p-6">
+        {/* SCHOLAR IDENTITY HEADER CARD — calibrated p-5 sm:p-8 */}
+        <section className="imperial-frame p-5 sm:p-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-5">
             <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
               <div className="relative shrink-0">
                 <Avatar
                   src={scholar.avatar_url}
-                  name={scholar.display_name || 'Sĩ tử'}
+                  name={scholar.display_name || t('userProfile.defaultScholar')}
                   className="w-24 h-24 border-4 border-surface shadow-md"
                   textSize="text-3xl"
                 />
@@ -300,63 +308,70 @@ export default function UserProfile() {
                   <span className="material-symbols-outlined text-[13px]" aria-hidden="true">
                     {rankInfo.icon}
                   </span>
-                  <span>{rankInfo.name}</span>
+                  <span>{rankInfo.displayName}</span>
                 </div>
               </div>
 
               <div className="mt-2 sm:mt-0 space-y-1.5">
                 <div className="flex flex-col sm:flex-row items-center gap-2 flex-wrap justify-center sm:justify-start">
-                  <h1 className="text-2xl font-display font-extrabold text-foreground">
-                    {scholar.display_name || 'Sĩ tử ẩn danh'}
+                  <h1 className="text-2xl font-display font-extrabold text-foreground leading-snug">
+                    {scholar.display_name || t('userProfile.anonymousScholar')}
                   </h1>
 
                   <span
-                    className={`tabular inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${levelAccent.badge}`}
+                    className={`tabular inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold border whitespace-nowrap ${levelAccent.badge}`}
                   >
                     <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
                       bolt
                     </span>
-                    Lv.{levelInfo.level} · {levelInfo.totalExp.toLocaleString('vi-VN')} EXP
+                    Lv.{levelInfo.level} · {formatNumber(levelInfo.totalExp)} EXP
                   </span>
 
                   {scholar.role === 'admin' && (
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary text-primary-foreground">
-                      Quản trị viên
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary text-on-primary whitespace-nowrap">
+                      {t('userProfile.roleAdmin')}
                     </span>
                   )}
                   {scholar.role === 'collaborator' && (
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-jade text-white">
-                      Truyền Đạo Sư
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-jade text-white whitespace-nowrap">
+                      {t('userProfile.roleCurator')}
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs sm:text-sm text-secondary-text flex items-center justify-center sm:justify-start gap-1.5">
+                <p className="text-xs sm:text-sm text-secondary-text flex items-center justify-center sm:justify-start gap-1.5 flex-wrap">
                   <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
                     {scholarMode === 'student' ? 'local_library' : 'school'}
                   </span>
                   <span>
                     {scholar.university ||
                       (scholarMode === 'student'
-                        ? 'Học sinh THPT · Chưa cập nhật trường'
-                        : 'Sinh viên Đại học · Chưa cập nhật trường')}
+                        ? t('userProfile.studentNoSchool')
+                        : t('userProfile.uniNoSchool'))}
                   </span>
+                  {joinedStr && (
+                    <span className="text-muted-foreground tabular">
+                      · {t('userProfile.joinedOn', { date: joinedStr })}
+                    </span>
+                  )}
                 </p>
 
                 {/* Follower / Following Counters */}
                 <div className="flex items-center justify-center sm:justify-start gap-4 pt-1 text-xs">
                   <span className="text-secondary-text">
                     <strong className="text-foreground font-display tabular">
-                      {followersCount}
+                      {formatNumber(followersCount)}
                     </strong>{' '}
-                    người theo dõi
+                    {t('userProfile.followers')}
                   </span>
-                  <span className="text-border-strong">•</span>
+                  <span className="text-border-strong" aria-hidden="true">
+                    •
+                  </span>
                   <span className="text-secondary-text">
                     <strong className="text-foreground font-display tabular">
-                      {followingCount}
+                      {formatNumber(followingCount)}
                     </strong>{' '}
-                    đang theo dõi
+                    {t('userProfile.following')}
                   </span>
                 </div>
               </div>
@@ -368,7 +383,7 @@ export default function UserProfile() {
                 type="button"
                 onClick={handleToggleFollow}
                 disabled={followLoading}
-                className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 ${
+                className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                   isFollowing
                     ? 'bg-surface-alt border border-border-strong text-foreground hover:border-primary hover:text-primary'
                     : 'btn-arena btn-arena-primary'
@@ -379,10 +394,10 @@ export default function UserProfile() {
                 </span>
                 <span>
                   {followLoading
-                    ? 'Đang xử lý...'
+                    ? t('userProfile.processingBtn')
                     : isFollowing
-                      ? 'Đang theo dõi'
-                      : 'Theo dõi sĩ tử'}
+                      ? t('userProfile.followingBtn')
+                      : t('userProfile.followScholarBtn')}
                 </span>
               </button>
             )}
@@ -400,12 +415,15 @@ export default function UserProfile() {
               </span>
             </div>
             <div>
-              <p className="text-xs text-secondary-text">Quân hàm Công Lực</p>
-              <p className={`text-lg font-display font-extrabold ${rankInfo.color}`}>
-                {rankInfo.name}
+              <p className="text-xs text-secondary-text">{t('userProfile.rankCardLabel')}</p>
+              <p className={`text-lg font-display font-extrabold leading-snug ${rankInfo.color}`}>
+                {rankInfo.displayName}
               </p>
               <p className="text-[11px] text-secondary-text tabular">
-                {expTotal.toLocaleString('vi-VN')} EXP · {completedCampaignsCount} chiến dịch
+                {t('userProfile.expAndCampaigns', {
+                  exp: formatNumber(expTotal),
+                  count: formatNumber(completedCampaignsCount),
+                })}
               </p>
             </div>
           </div>
@@ -417,12 +435,12 @@ export default function UserProfile() {
               </span>
             </div>
             <div>
-              <p className="text-xs text-secondary-text">Giờ học xác thực</p>
-              <p className="text-lg font-display font-extrabold text-foreground tabular">
-                {formatStudyTime(studySeconds)}
+              <p className="text-xs text-secondary-text">{t('userProfile.verifiedStudyTime')}</p>
+              <p className="text-lg font-display font-extrabold text-foreground tabular leading-snug">
+                {formatStudyTime(studySeconds, lang)}
               </p>
               <p className="text-[11px] text-secondary-text tabular">
-                Chuỗi chuyên cần: {studyStreak} ngày
+                {t('userProfile.streakLabel', { days: formatNumber(studyStreak) })}
               </p>
             </div>
           </div>
@@ -435,25 +453,29 @@ export default function UserProfile() {
             </div>
             <div>
               <p className="text-xs text-secondary-text">
-                {scholarMode === 'student' ? 'Mục tiêu THPTQG' : 'Mục tiêu GPA ĐH'}
+                {scholarMode === 'student'
+                  ? t('userProfile.targetThptLabel')
+                  : t('userProfile.targetGpaLabel')}
               </p>
-              <p className="text-lg font-display font-extrabold text-foreground tabular">
+              <p className="text-lg font-display font-extrabold text-foreground tabular leading-snug">
                 {scholarMode === 'student'
                   ? scholar.target_thpt != null
                     ? `${Number(scholar.target_thpt).toFixed(2)} / 30`
-                    : 'Chưa đặt'
+                    : t('userProfile.notSet')
                   : scholar.target_gpa != null
                     ? `${Number(scholar.target_gpa).toFixed(2)} / 4.00`
-                    : 'Chưa đặt'}
+                    : t('userProfile.notSet')}
               </p>
               {scholarMode === 'university' && scholar.current_gpa != null && (
                 <p className="text-[11px] text-jade font-semibold tabular">
-                  GPA hiện tại: {Number(scholar.current_gpa).toFixed(2)}
+                  {t('userProfile.currentGpa', {
+                    gpa: Number(scholar.current_gpa).toFixed(2),
+                  })}
                 </p>
               )}
               {scholarMode === 'student' && scholar.target_dgnl != null && (
                 <p className="text-[11px] text-secondary-text tabular">
-                  ĐGNL mục tiêu: {scholar.target_dgnl}
+                  {t('userProfile.targetDgnl', { score: scholar.target_dgnl })}
                 </p>
               )}
             </div>
@@ -469,11 +491,11 @@ export default function UserProfile() {
               >
                 Lv.{levelInfo.level}
               </span>
-              <span>Tiến độ Công Lực (EXP)</span>
+              <span>{t('userProfile.expProgressLabel')}</span>
             </span>
             <span className="tabular font-bold text-foreground">
-              {levelInfo.expIntoLevel.toLocaleString('vi-VN')} /{' '}
-              {levelInfo.expForThisLevel.toLocaleString('vi-VN')} EXP ({levelInfo.progressPct}%)
+              {formatNumber(levelInfo.expIntoLevel)} / {formatNumber(levelInfo.expForThisLevel)} EXP (
+              {levelInfo.progressPct}%)
             </span>
           </div>
           <ProgressBar
@@ -488,15 +510,15 @@ export default function UserProfile() {
         <section className="space-y-4">
           <div
             role="tablist"
-            aria-label="Hoạt động công khai của sĩ tử"
-            className="grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-surface-alt border border-border"
+            aria-label={t('userProfile.publicActivityAria')}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-surface-alt border border-border"
           >
             <button
               type="button"
               role="tab"
               aria-selected={activeTab === 'campaigns'}
               onClick={() => setActiveTab('campaigns')}
-              className={`py-2.5 px-3 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              className={`py-2.5 px-3 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'campaigns'
                   ? 'bg-paper text-primary border border-border-strong shadow-2xs'
                   : 'text-secondary-text hover:text-foreground'
@@ -505,7 +527,9 @@ export default function UserProfile() {
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 swords
               </span>
-              <span>Chiến Dịch Công Khai ({campaigns.length})</span>
+              <span>
+                {t('userProfile.publicCampaignsTab', { count: formatNumber(campaigns.length) })}
+              </span>
             </button>
 
             <button
@@ -513,7 +537,7 @@ export default function UserProfile() {
               role="tab"
               aria-selected={activeTab === 'documents'}
               onClick={() => setActiveTab('documents')}
-              className={`py-2.5 px-3 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              className={`py-2.5 px-3 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'documents'
                   ? 'bg-paper text-primary border border-border-strong shadow-2xs'
                   : 'text-secondary-text hover:text-foreground'
@@ -522,7 +546,9 @@ export default function UserProfile() {
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 folder_open
               </span>
-              <span>Tài Liệu Đóng Góp ({documents.length})</span>
+              <span>
+                {t('userProfile.contributedDocsTab', { count: formatNumber(documents.length) })}
+              </span>
             </button>
           </div>
 
@@ -536,17 +562,15 @@ export default function UserProfile() {
                   event_busy
                 </span>
                 <p className="font-display font-bold text-foreground">
-                  Chưa có chiến dịch công khai nào
+                  {t('userProfile.emptyCampaignsTitle')}
                 </p>
-                <p className="text-xs text-secondary-text">
-                  Các chiến dịch được sĩ tử bật chế độ Công khai sẽ hiển thị tại đây.
-                </p>
+                <p className="text-xs text-secondary-text">{t('userProfile.emptyCampaignsDesc')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {campaigns.map((camp) => {
-                  const prog = computeCampaignProgress(camp.targets, camp.is_completed);
-                  const endFmt = formatViDate(camp.end_date);
+                  const prog = computeCampaignProgress(camp.targets, camp.is_completed, t);
+                  const endFmt = formatDate(camp.end_date);
                   return (
                     <article
                       key={camp.id}
@@ -554,29 +578,29 @@ export default function UserProfile() {
                     >
                       <div className="space-y-2">
                         <div className="flex items-start justify-between gap-2">
-                          <h3 className="font-display text-base font-extrabold text-foreground">
+                          <h3 className="font-display text-base font-extrabold text-foreground leading-snug">
                             {camp.title}
                           </h3>
                           {camp.is_completed ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-completed-soft text-completed border border-completed-border shrink-0">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-completed-soft text-completed border border-completed-border shrink-0 whitespace-nowrap">
                               <span
                                 className="material-symbols-outlined text-[12px]"
                                 aria-hidden="true"
                               >
                                 verified
                               </span>
-                              Hoàn thành
+                              <span>{t('userProfile.completedBadge')}</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gold-soft text-gold-dark border border-gold shrink-0">
-                              Đang chạy
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gold-soft text-gold-dark border border-gold shrink-0 whitespace-nowrap">
+                              {t('userProfile.runningBadge')}
                             </span>
                           )}
                         </div>
 
                         {camp.target && (
                           <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-surface-alt border border-border text-primary">
-                            Đích: {camp.target}
+                            {t('userProfile.targetBadgePrefix', { target: camp.target })}
                           </span>
                         )}
 
@@ -590,12 +614,12 @@ export default function UserProfile() {
                           value={prog.pct}
                           max={100}
                           tone={camp.is_completed ? 'jade' : 'primary'}
-                          label="Tiến độ"
+                          label={t('userProfile.progressLabel')}
                           sublabel={prog.label}
                         />
                         {endFmt && (
                           <p className="text-[11px] text-secondary-text text-right tabular">
-                            Hạn hoàn thành: {endFmt}
+                            {t('userProfile.deadlinePrefix', { date: endFmt })}
                           </p>
                         )}
                       </div>
@@ -613,18 +637,20 @@ export default function UserProfile() {
                 folder_off
               </span>
               <p className="font-display font-bold text-foreground">
-                Chưa đóng góp tài liệu công khai nào
+                {t('userProfile.emptyDocsTitle')}
               </p>
-              <p className="text-xs text-secondary-text">
-                Tài liệu do sĩ tử chia sẻ lên Thư Viện sẽ xuất hiện tại đây.
-              </p>
+              <p className="text-xs text-secondary-text">{t('userProfile.emptyDocsDesc')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {documents.map((doc) => {
                 const safeUrl = sanitizeExternalUrl(doc.file_url);
-                const meta = getDocumentKindMeta(doc.file_type || doc.title, doc.file_url);
-                const uploadedStr = formatViDate(doc.uploaded_at || doc.created_at);
+                const meta = getDocumentKindMeta(
+                  doc.file_type || doc.title,
+                  doc.file_url,
+                  lang,
+                );
+                const uploadedStr = formatDate(doc.uploaded_at || doc.created_at);
 
                 return safeUrl ? (
                   <a
@@ -642,13 +668,13 @@ export default function UserProfile() {
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${meta.badgeClass}`}
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${meta.badgeClass}`}
                         >
                           {meta.label}
                         </span>
                         {doc.category && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-surface-alt border border-border text-secondary-text">
-                            {doc.category}
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-surface-alt border border-border text-secondary-text whitespace-nowrap">
+                            {getLocalizedCategoryLabel(doc.category, t)}
                           </span>
                         )}
                       </div>
@@ -656,8 +682,14 @@ export default function UserProfile() {
                         {doc.title}
                       </h3>
                       <p className="text-[11px] text-secondary-text tabular">
-                        {uploadedStr ? `Đăng ngày ${uploadedStr}` : 'Tài liệu học tập'}
-                        {doc.downloads_count ? ` · ${doc.downloads_count} lượt mở` : ''}
+                        {uploadedStr
+                          ? t('userProfile.uploadedOn', { date: uploadedStr })
+                          : t('userProfile.studyResourceFallback')}
+                        {doc.downloads_count
+                          ? t('userProfile.opensCount', {
+                              count: formatNumber(doc.downloads_count),
+                            })
+                          : ''}
                       </p>
                     </div>
                     <span
@@ -681,7 +713,9 @@ export default function UserProfile() {
                       <h3 className="font-display font-bold text-sm text-foreground truncate">
                         {doc.title}
                       </h3>
-                      <p className="text-xs text-secondary-text">Liên kết tài liệu không khả dụng</p>
+                      <p className="text-xs text-secondary-text">
+                        {t('userProfile.unavailableLink')}
+                      </p>
                     </div>
                   </div>
                 );

@@ -1,6 +1,9 @@
 import React from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { getSubjectDisplayLabel } from '../../config/onlineLearning';
 
 export default function SubjectCard({ subject, count, active = false, onSelect }) {
+  const { lang, t } = useLanguage();
   const subjectCode = subject.id || 'DEFAULT';
   const badgeClass = active
     ? 'bg-white/20 text-white border border-white/30'
@@ -8,6 +11,9 @@ export default function SubjectCard({ subject, count, active = false, onSelect }
   const cardTone = active
     ? `subject-solid-${subjectCode} shadow-md`
     : 'bg-surface hover:bg-surface-alt text-foreground border-border hover:border-border-strong';
+
+  const displayTitle = getSubjectDisplayLabel(subject, lang, true);
+  const teacherCount = count ?? subject.teachers?.length ?? 0;
 
   return (
     <button
@@ -18,9 +24,11 @@ export default function SubjectCard({ subject, count, active = false, onSelect }
     >
       <span
         aria-hidden="true"
-        className={`flex h-11 w-11 no-shrink items-center justify-center rounded-xl transition-transform group-hover:scale-105 ${badgeClass}`}
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105 ${badgeClass}`}
       >
-        <span className="material-symbols-outlined text-2xl" aria-hidden="true">{subject.icon || 'menu_book'}</span>
+        <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+          {subject.icon || 'menu_book'}
+        </span>
       </span>
 
       <span className="min-w-0 flex-1">
@@ -29,21 +37,21 @@ export default function SubjectCard({ subject, count, active = false, onSelect }
             active ? 'text-white' : 'text-foreground'
           }`}
         >
-          {subject.shortLabel || subject.label}
+          {displayTitle}
         </span>
         <span
-          className={`tabular mt-0.5 block text-xs font-medium ${
+          className={`tabular mt-0.5 block text-xs font-medium truncate ${
             active ? 'text-white/90' : 'text-secondary-text'
           }`}
         >
-          {count ?? subject.teachers?.length ?? 0} giáo viên · sheet
+          {t('cards.teacherCount', { count: teacherCount })}
         </span>
       </span>
 
       {active && (
         <span
           aria-hidden="true"
-          className="material-symbols-outlined text-lg text-white no-shrink"
+          className="material-symbols-outlined text-lg text-white shrink-0"
         >
           check_circle
         </span>

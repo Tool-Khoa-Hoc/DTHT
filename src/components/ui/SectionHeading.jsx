@@ -1,7 +1,7 @@
-﻿import React from 'react';
+import React from 'react';
 
 /**
- * SectionHeading — Tiêu đề khu vực phong cách Trung Hoa Sáng
+ * SectionHeading — Tiêu đề khu vực phong cách Trung Hoa Sáng / Mặc Dạ Tối
  * Có eyebrow, tiêu đề Baloo 2, gạch chân nét cọ (brush-underline) và chữ Hán decor mờ (aria-hidden).
  */
 export default function SectionHeading({
@@ -25,13 +25,13 @@ export default function SectionHeading({
           </span>
         ) : null}
         {eyebrow ? (
-          <p className="relative z-10 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-primary mb-1">
+          <p className="relative z-10 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-primary mb-1">
             {icon ? (
-              <span className="material-symbols-outlined text-sm leading-none" aria-hidden="true">
+              <span className="material-symbols-outlined text-sm leading-none shrink-0" aria-hidden="true">
                 {icon}
               </span>
             ) : (
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary" aria-hidden="true" />
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shrink-0" aria-hidden="true" />
             )}
             <span>{eyebrow}</span>
           </p>
@@ -45,7 +45,7 @@ export default function SectionHeading({
           </p>
         ) : null}
       </div>
-      {action ? <div className="relative z-10 no-shrink">{action}</div> : null}
+      {action ? <div className="relative z-10 shrink-0">{action}</div> : null}
     </div>
   );
 }

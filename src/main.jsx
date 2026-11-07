@@ -19,11 +19,14 @@ import '@fontsource/spectral/vietnamese-800.css';
 import './index.css';
 import App from './App.jsx';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider>
-      <App />
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
     </ThemeProvider>
   </StrictMode>,
 );

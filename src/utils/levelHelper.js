@@ -105,11 +105,17 @@ export function getLevelAccent(level) {
   };
 }
 
-/** Humanise a study-time total in seconds → e.g. "12 giờ 30 phút". */
-export function formatStudyTime(totalSeconds) {
+/** Humanise a study-time total in seconds → e.g. "12 giờ 30 phút" / "12h 30m". */
+export function formatStudyTime(totalSeconds, lang = 'vi') {
   const s = Math.max(0, Math.floor(Number(totalSeconds) || 0));
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
+  if (lang === 'en') {
+    if (h > 0 && m > 0) return `${h}h ${m}m`;
+    if (h > 0) return `${h}h`;
+    if (m > 0) return `${m}m`;
+    return `${s}s`;
+  }
   if (h > 0 && m > 0) return `${h} giờ ${m} phút`;
   if (h > 0) return `${h} giờ`;
   if (m > 0) return `${m} phút`;

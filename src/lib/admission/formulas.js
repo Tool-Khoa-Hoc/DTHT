@@ -24,8 +24,10 @@ export function bcaCombinedScore({
   bonus = 0,
   region = 'KV3',
   category = 'NONE',
+  lang = 'vi',
 } = {}) {
   if (thptComboScore == null || bcaExamScore == null) return null;
+  const isEn = lang === 'en';
   const bcaOn30 = (Number(bcaExamScore) / 100) * 30;
   const base = Number(thptComboScore) * (2 / 5) + bcaOn30 * (3 / 5);
   const uuTien = priorityApplied(base, region, category);
@@ -41,11 +43,17 @@ export function bcaCombinedScore({
       diemCong: Number(bonus || 0),
       uuTien: round2(uuTien),
     },
-    explain: [
-      `Điểm tổ hợp THPT đóng góp: ${round2(Number(thptComboScore) * (2 / 5))} (× 2/5)`,
-      `Điểm bài thi BCA quy thang 30: ${round2(bcaOn30)}, đóng góp: ${round2(bcaOn30 * (3 / 5))} (× 3/5)`,
-      `Điểm ưu tiên thực áp dụng (thang 30): +${round2(uuTien)}`,
-    ],
+    explain: isEn
+      ? [
+          `National Exam combo contribution: ${round2(Number(thptComboScore) * (2 / 5))} (× 2/5)`,
+          `BCA exam on 30-pt scale: ${round2(bcaOn30)}, contribution: ${round2(bcaOn30 * (3 / 5))} (× 3/5)`,
+          `Effective priority bonus (30-pt scale): +${round2(uuTien)}`,
+        ]
+      : [
+          `Điểm tổ hợp THPT đóng góp: ${round2(Number(thptComboScore) * (2 / 5))} (× 2/5)`,
+          `Điểm bài thi BCA quy thang 30: ${round2(bcaOn30)}, đóng góp: ${round2(bcaOn30 * (3 / 5))} (× 3/5)`,
+          `Điểm ưu tiên thực áp dụng (thang 30): +${round2(uuTien)}`,
+        ],
   };
 }
 
@@ -68,7 +76,9 @@ export function hcmutCombinedScore(input = {}) {
     bonus = 0,
     region = 'KV3',
     category = 'NONE',
+    lang = 'vi',
   } = input;
+  const isEn = lang === 'en';
 
   const quyDoi100 = (scores, mathScore) => {
     if (!scores || scores.length !== 3 || scores.some((s) => s == null)) return null;
@@ -105,13 +115,25 @@ export function hcmutCombinedScore(input = {}) {
       hocLuc: round2(hocLuc),
       diemCong: Number(bonus || 0),
       uuTien: round2(uuTien),
-      doiTuong: hasVact ? 'ĐT 2.1 (có điểm ĐGNL)' : 'ĐT 2.2 (không có điểm ĐGNL)',
+      doiTuong: isEn
+        ? hasVact
+          ? 'Group 2.1 (with V-ACT score)'
+          : 'Group 2.2 (without V-ACT score)'
+        : hasVact
+          ? 'ĐT 2.1 (có điểm ĐGNL)'
+          : 'ĐT 2.2 (không có điểm ĐGNL)',
     },
-    explain: [
-      `Điểm năng lực: ${round2(diemNL)} (${hasVact ? `V-ACT quy đổi, mẫu số ${doubleMath ? 15 : 12}` : 'TNTHPT quy đổi × 0,75'})`,
-      `Điểm TNTHPT quy đổi: ${round2(tnthptQD)} · Điểm học bạ quy đổi: ${round2(hbQD)}`,
-      `Điểm học lực = ${round2(diemNL)} × 70% + ${round2(tnthptQD)} × 20% + ${round2(hbQD)} × 10% = ${round2(hocLuc)}`,
-    ],
+    explain: isEn
+      ? [
+          `Competency score: ${round2(diemNL)} (${hasVact ? `converted V-ACT, divisor ${doubleMath ? 15 : 12}` : 'converted National Exam × 0.75'})`,
+          `Converted National Exam: ${round2(tnthptQD)} · Converted Transcript: ${round2(hbQD)}`,
+          `Academic score = ${round2(diemNL)} × 70% + ${round2(tnthptQD)} × 20% + ${round2(hbQD)} × 10% = ${round2(hocLuc)}`,
+        ]
+      : [
+          `Điểm năng lực: ${round2(diemNL)} (${hasVact ? `V-ACT quy đổi, mẫu số ${doubleMath ? 15 : 12}` : 'TNTHPT quy đổi × 0,75'})`,
+          `Điểm TNTHPT quy đổi: ${round2(tnthptQD)} · Điểm học bạ quy đổi: ${round2(hbQD)}`,
+          `Điểm học lực = ${round2(diemNL)} × 70% + ${round2(tnthptQD)} × 20% + ${round2(hbQD)} × 10% = ${round2(hocLuc)}`,
+        ],
   };
 }
 
@@ -119,15 +141,18 @@ export function hcmutCombinedScore(input = {}) {
 // H-SCA (ĐH Sư phạm TP.HCM) — điểm xét tuyển thang 30 đã kết hợp:
 //   ĐT = (0,5 × điểm môn chính ĐGNLCB + 0,35 × ĐHB1 + 0,15 × ĐHB2) × 3
 // (ĐHB1/ĐHB2: điểm học bạ hai môn còn lại trong tổ hợp, thang 10.)
-export function hscaComboScore({ monChinh, hb1, hb2 } = {}) {
+export function hscaComboScore({ monChinh, hb1, hb2, lang = 'vi' } = {}) {
   if (monChinh == null || hb1 == null || hb2 == null) return null;
+  const isEn = lang === 'en';
   const value = (0.5 * Number(monChinh) + 0.35 * Number(hb1) + 0.15 * Number(hb2)) * 3;
   return {
     value: round2(value),
     scale: 30,
     formulaVersion: 'hsca-hcmue-v1',
     explain: [
-      `Điểm xét tuyển H-SCA = (0,5 × ${monChinh} + 0,35 × ${hb1} + 0,15 × ${hb2}) × 3 = ${round2(value)}`,
+      isEn
+        ? `H-SCA Admission Score = (0.5 × ${monChinh} + 0.35 × ${hb1} + 0.15 × ${hb2}) × 3 = ${round2(value)}`
+        : `Điểm xét tuyển H-SCA = (0,5 × ${monChinh} + 0,35 × ${hb1} + 0,15 × ${hb2}) × 3 = ${round2(value)}`,
     ],
   };
 }
@@ -147,17 +172,22 @@ export function sptComboScore(subjectScores, comboCode, { weights } = {}) {
 }
 
 // V-SAT — tổng tổ hợp 3 môn, mỗi môn thang 150.
-export function vsatComboScore(subjectScores150) {
+export function vsatComboScore(subjectScores150, lang = 'vi') {
   if (!subjectScores150) return null;
   const values = Object.values(subjectScores150).filter((v) => v != null).map(Number);
   if (values.length !== 3) return null;
   if (values.some((v) => !Number.isFinite(v) || v < 0 || v > 150)) return null;
   const value = values.reduce((a, b) => a + b, 0);
+  const isEn = lang === 'en';
   return {
     value,
     scale: 450,
     formulaVersion: 'vsat-combo-v1',
-    explain: [`Tổng tổ hợp V-SAT = ${values.join(' + ')} = ${value} (thang 450)`],
+    explain: [
+      isEn
+        ? `V-SAT 3-subject total = ${values.join(' + ')} = ${value} (450-pt scale)`
+        : `Tổng tổ hợp V-SAT = ${values.join(' + ')} = ${value} (thang 450)`,
+    ],
   };
 }
 
@@ -174,39 +204,62 @@ export const INTEGRATED_FORMULAS = {
     schoolCode: 'UEH', method: 'combined', scale: 100, status: 'cho-van-ban-chinh-thuc',
     formulaVersion: null, compute: null,
     note: 'UEH công bố điểm chuẩn tích hợp thang 100 nhưng hệ thống chưa có văn bản công thức chính thức đã kiểm chứng theo năm — chưa hỗ trợ tính điểm tổng hợp cho UEH.',
+    noteEn: 'UEH publishes 100-pt integrated cutoffs, but the annual official formula specification is not yet verified in our registry — cutoff lookup only.',
   },
   UIT: {
     schoolCode: 'UIT', method: 'combined', scale: 100, status: 'cho-van-ban-chinh-thuc',
     formulaVersion: null, compute: null,
     note: 'UIT công bố điểm chuẩn tổng hợp thang 100 (2026) nhưng công thức dự kiến trong nguồn chưa phải văn bản chính thức — chưa hỗ trợ tính, chỉ tra được điểm chuẩn.',
+    noteEn: 'UIT publishes 100-pt composite cutoffs (2026), but the draft formula has not yet been finalized as an official decree — cutoff lookup only.',
   },
 };
 
-export function integrated100Score(schoolCode, input = {}) {
+export function integrated100Score(schoolCode, input = {}, lang = 'vi') {
+  const resolvedLang = input?.lang || lang || 'vi';
+  const isEn = resolvedLang === 'en';
   const reg = INTEGRATED_FORMULAS[String(schoolCode || '').toUpperCase()];
   if (!reg) {
-    return { value: null, reason: 'school-not-registered', scale: 100, explain: ['Trường này chưa đăng ký công thức tổng hợp thang 100 trong hệ thống.'] };
+    return {
+      value: null,
+      reason: 'school-not-registered',
+      scale: 100,
+      explain: [
+        isEn
+          ? 'This university has not registered a 100-pt composite formula in the system.'
+          : 'Trường này chưa đăng ký công thức tổng hợp thang 100 trong hệ thống.',
+      ],
+    };
   }
   if (reg.status !== 'verified' || !reg.compute) {
     return {
-      value: null, reason: 'formula-unverified', scale: 100,
-      explain: [reg.note || 'Chưa có công thức chính thức đã kiểm chứng cho trường này.'],
+      value: null,
+      reason: 'formula-unverified',
+      scale: 100,
+      explain: [
+        isEn
+          ? reg.noteEn || 'No verified official composite formula available for this university yet.'
+          : reg.note || 'Chưa có công thức chính thức đã kiểm chứng cho trường này.',
+      ],
     };
   }
-  const result = reg.compute(input);
+  const result = reg.compute({ ...input, lang: resolvedLang });
   if (!result) {
     return {
       value: null,
       reason: 'missing-input',
       scale: reg.scale || 100,
       formulaVersion: reg.formulaVersion,
-      explain: ['Chưa đủ dữ liệu điểm để tính theo công thức tổng hợp của trường này.'],
+      explain: [
+        isEn
+          ? 'Insufficient score inputs to compute this university’s composite formula.'
+          : 'Chưa đủ dữ liệu điểm để tính theo công thức tổng hợp của trường này.',
+      ],
     };
   }
   return result;
 }
 
 // Tên cũ giữ tương thích với bản thiết kế (uehIntegratedScore).
-export function uehIntegratedScore(input = {}) {
-  return integrated100Score('UEH', input);
+export function uehIntegratedScore(input = {}, lang = 'vi') {
+  return integrated100Score('UEH', input, lang);
 }

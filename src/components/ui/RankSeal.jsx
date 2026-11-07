@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * RankSeal — Ấn triện đỏ / vàng kim cho cấp bậc & quân hàm (Trung Hoa Sáng)
+ * RankSeal — Ấn triện đỏ / vàng kim cho cấp bậc & quân hàm (Trung Hoa Sáng / Mặc Dạ Tối)
  */
 export default function RankSeal({
   label,
@@ -15,7 +15,7 @@ export default function RankSeal({
     size === 'sm'
       ? 'px-2.5 py-1 text-xs gap-1.5'
       : size === 'lg'
-        ? 'px-4 py-2 text-sm gap-2'
+        ? 'px-3.5 py-2 text-sm gap-2'
         : 'px-3 py-1.5 text-xs gap-1.5';
 
   const variantClass =
@@ -26,13 +26,13 @@ export default function RankSeal({
         : 'seal-stamp';
 
   return (
-    <span className={`${variantClass} ${sizeClass} ${className}`.trim()}>
+    <span className={`max-w-full flex-wrap leading-tight ${variantClass} ${sizeClass} ${className}`.trim()}>
       {icon ? (
-        <span className="material-symbols-outlined text-base leading-none icon-fill" aria-hidden="true">
+        <span className="material-symbols-outlined text-base leading-none icon-fill shrink-0" aria-hidden="true">
           {icon}
         </span>
       ) : null}
-      <span className="tracking-wide uppercase">{label}</span>
+      <span className="tracking-[0.04em] uppercase">{label}</span>
       {sublabel ? (
         <span className="opacity-85 font-semibold normal-case tabular">· {sublabel}</span>
       ) : null}

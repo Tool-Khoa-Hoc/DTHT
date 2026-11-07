@@ -1,14 +1,17 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
 import { useStudyTracker } from '../hooks/useStudyTracker';
 import { getLevelAccent, formatStudyTime } from '../utils/levelHelper';
 import {
   ONLINE_SHEET_TITLE,
+  ONLINE_SHEET_TITLE_EN,
   ONLINE_SUBJECTS,
   ONLINE_TEACHER_COUNT,
   buildSheetEmbedUrl,
   buildSheetOpenUrl,
+  getSubjectDisplayLabel,
   getTeacherKey,
 } from '../config/onlineLearning';
 import ArenaButton from '../components/ui/ArenaButton';
@@ -24,7 +27,10 @@ const IFRAME_STALL_MS = 9000;
 function isGoogleAccount(user) {
   if (!user) return false;
   if (user.app_metadata?.provider === 'google') return true;
-  if (Array.isArray(user.app_metadata?.providers) && user.app_metadata.providers.includes('google')) {
+  if (
+    Array.isArray(user.app_metadata?.providers) &&
+    user.app_metadata.providers.includes('google')
+  ) {
     return true;
   }
   const identities = Array.isArray(user.identities) ? user.identities : [];
@@ -49,9 +55,12 @@ export default function OnlineLearning() {
     isGoogleLinked,
     signInWithGoogle,
   } = useAuth();
+  const { lang, isEn, t, formatNumber } = useLanguage();
   const { showToast } = useToast();
 
-  const [selectedSubjectId, setSelectedSubjectId] = useState(ONLINE_SUBJECTS[0]?.id || 'TOAN');
+  const [selectedSubjectId, setSelectedSubjectId] = useState(
+    ONLINE_SUBJECTS[0]?.id || 'TOAN',
+  );
   const [selectedTeacherIndex, setSelectedTeacherIndex] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [refreshSeed, setRefreshSeed] = useState(0);
@@ -60,12 +69,14 @@ export default function OnlineLearning() {
   const [isFullscreenSheet, setIsFullscreenSheet] = useState(false);
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
 
+  const teachersSectionRef = useRef(null);
   const viewerSectionRef = useRef(null);
   const googleLinked = Boolean(isGoogleLinked ?? isGoogleAccount(user));
 
   const selectedSubject = useMemo(
     () =>
-      ONLINE_SUBJECTS.find((subject) => subject.id === selectedSubjectId) || ONLINE_SUBJECTS[0],
+      ONLINE_SUBJECTS.find((subject) => subject.id === selectedSubjectId) ||
+      ONLINE_SUBJECTS[0],
     [selectedSubjectId],
   );
 
@@ -73,7 +84,9 @@ export default function OnlineLearning() {
     const keyword = normalizeViSearch(searchTerm);
     const teachers = selectedSubject?.teachers || [];
     if (!keyword) return teachers;
-    return teachers.filter((teacher) => normalizeViSearch(teacher.title).includes(keyword));
+    return teachers.filter((teacher) =>
+      normalizeViSearch(teacher.title).includes(keyword),
+    );
   }, [selectedSubject, searchTerm]);
 
   const activeTeacher =
@@ -82,7 +95,9 @@ export default function OnlineLearning() {
     selectedSubject?.teachers?.[0] ||
     null;
 
-  const embedUrl = activeTeacher ? buildSheetEmbedUrl(activeTeacher, String(refreshSeed || '')) : '';
+  const embedUrl = activeTeacher
+    ? buildSheetEmbedUrl(activeTeacher, String(refreshSeed || ''))
+    : '';
   const openUrl = activeTeacher ? buildSheetOpenUrl(activeTeacher) : '#';
   const isSheetLoading = Boolean(embedUrl) && loadedEmbedUrl !== embedUrl;
   const isSheetStalled = isSheetLoading && stalledEmbedUrl === embedUrl;
@@ -111,16 +126,19 @@ export default function OnlineLearning() {
     submitCheckin,
   } = study;
   const levelAccent = getLevelAccent(levelInfo.level);
-  const sessionStatus = study.sessionStatus ?? study.status ?? (isAccruing ? 'active' : 'idle');
+  const sessionStatus =
+    study.sessionStatus ?? study.status ?? (isAccruing ? 'active' : 'idle');
   const sessionSeconds = study.sessionSeconds ?? 0;
-  const sessionFallback = Boolean(study.isFallback ?? study.fallback ?? study.legacyMode);
+  const sessionFallback = Boolean(
+    study.isFallback ?? study.fallback ?? study.legacyMode,
+  );
 
   const callStudy = useCallback((fn, arg) => {
     if (typeof fn !== 'function') return;
     try {
       fn(arg);
     } catch {
-      /* tracker lỗi không được làm hỏng luồng học */
+      /* tracker failure must never interrupt study flow */
     }
   }, []);
 
@@ -129,7 +147,9 @@ export default function OnlineLearning() {
     [callStudy, study.startSession],
   );
   const handleEndSession =
-    typeof study.endSession === 'function' ? () => callStudy(study.endSession) : undefined;
+    typeof study.endSession === 'function'
+      ? () => callStudy(study.endSession)
+      : undefined;
   const handleConfirmContinue =
     typeof study.confirmContinue === 'function'
       ? () => callStudy(study.confirmContinue)
@@ -188,7 +208,10 @@ export default function OnlineLearning() {
       }
     } catch (error) {
       console.error('Lỗi đăng nhập Google:', error);
-      showToast('Không thể chuyển hướng đăng nhập Google: ' + error.message, 'error');
+      showToast(
+        t('onlinePage.googleRedirectError', { message: error.message }),
+        'error',
+      );
       setIsConnectingGoogle(false);
     }
   };
@@ -204,24 +227,47 @@ export default function OnlineLearning() {
     setSelectedTeacherIndex(idx);
     handleStartSession();
     if (viewerSectionRef.current) {
-      viewerSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      viewerSectionRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
+
+  const handleScrollToTeachers = () => {
+    if (teachersSectionRef.current) {
+      teachersSectionRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
     }
   };
 
   const expInCurrentLevel = levelInfo.expInLevel ?? levelInfo.expIntoLevel ?? 0;
-  const expRequiredCurrentLevel = levelInfo.expForNext ?? levelInfo.expForThisLevel ?? 100;
+  const expRequiredCurrentLevel =
+    levelInfo.expForNext ?? levelInfo.expForThisLevel ?? 100;
   const shortTeacherTitle = activeTeacher?.title?.split(/\s+-\s+/)[0] || '';
+  const selectedSubjectFullLabel = getSubjectDisplayLabel(
+    selectedSubject,
+    lang,
+    false,
+  );
+  const selectedSubjectShortLabel = getSubjectDisplayLabel(
+    selectedSubject,
+    lang,
+    true,
+  );
 
   return (
     <div className="min-h-full bg-background text-foreground pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         {/* ═══ BENTO HEADER — Dual-Theme Trung Hoa Cổ Phong ═══ */}
         <section
-          aria-label="Tổng quan Học online"
+          aria-label={t('onlinePage.overviewAria')}
           className="grid grid-cols-1 lg:grid-cols-12 gap-4"
         >
           {/* Main Hero Tile (8 cols) */}
-          <div className="imperial-frame relative overflow-hidden p-5 sm:p-7 lg:col-span-8 flex flex-col justify-between gap-5">
+          <div className="imperial-frame relative overflow-hidden p-6 sm:p-8 lg:col-span-8 flex flex-col justify-between gap-5">
             <span
               aria-hidden="true"
               className="hanzi-watermark absolute -top-2 right-4 text-8xl font-bold text-accent/8 select-none pointer-events-none"
@@ -231,7 +277,11 @@ export default function OnlineLearning() {
 
             <div className="relative space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <RankSeal size="sm" icon="cast_for_education" label="Học online · Khoa Bảng" />
+                <RankSeal
+                  size="sm"
+                  icon="cast_for_education"
+                  label={t('onlinePage.sealLabel')}
+                />
                 <span className="paper-chip tabular">
                   <span
                     className="material-symbols-outlined text-sm text-accent"
@@ -239,23 +289,29 @@ export default function OnlineLearning() {
                   >
                     groups
                   </span>
-                  {ONLINE_TEACHER_COUNT} giáo viên · {ONLINE_SUBJECTS.length} môn
+                  <span>
+                    {t('onlinePage.statsChip', {
+                      teachers: ONLINE_TEACHER_COUNT,
+                      subjects: ONLINE_SUBJECTS.length,
+                    })}
+                  </span>
                 </span>
               </div>
 
               <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold leading-tight text-foreground">
-                {ONLINE_SHEET_TITLE}
+                {isEn ? ONLINE_SHEET_TITLE_EN : ONLINE_SHEET_TITLE}
               </h1>
               <p className="text-sm sm:text-base text-secondary-text max-w-2xl leading-relaxed">
-                Chọn môn học và giáo viên để mở bảng bài giảng Google Sheets ngay trên trang hoặc ở
-                chế độ toàn khung. Trong suốt phiên học, hệ thống tự động tích luỹ{' '}
-                <strong className="text-foreground">+10 EXP/phút</strong> kể cả khi bạn mở bài ở
-                tab riêng!
+                {t('onlinePage.heroDescLead')}
+                <strong className="text-foreground">
+                  {t('onlinePage.heroDescRate')}
+                </strong>
+                {t('onlinePage.heroDescTail')}
               </p>
             </div>
 
             {activeTeacher && (
-              <div className="relative flex flex-wrap items-center gap-2.5 pt-2 border-t border-border">
+              <div className="relative flex flex-wrap items-center gap-2.5 pt-3 border-t border-border">
                 <ArenaButton
                   variant="primary"
                   icon="fullscreen"
@@ -264,7 +320,7 @@ export default function OnlineLearning() {
                     setIsFullscreenSheet(true);
                   }}
                 >
-                  Chế độ tập trung toàn khung
+                  {t('onlinePage.fullscreenFocusBtn')}
                 </ArenaButton>
                 <ArenaButton
                   as="a"
@@ -276,7 +332,7 @@ export default function OnlineLearning() {
                   icon="open_in_new"
                   onClick={handleStartSession}
                 >
-                  Mở Google Sheets tab mới
+                  {t('onlinePage.openInSheetsBtn')}
                 </ArenaButton>
                 <ArenaButton
                   variant="ghost"
@@ -284,7 +340,7 @@ export default function OnlineLearning() {
                   icon="refresh"
                   onClick={() => setRefreshSeed((prev) => prev + 1)}
                 >
-                  Làm mới bảng nhúng
+                  {t('onlinePage.refreshEmbedBtn')}
                 </ArenaButton>
               </div>
             )}
@@ -292,15 +348,15 @@ export default function OnlineLearning() {
 
           {/* Right Column (4 cols): Live Level / EXP + Current Subject */}
           <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-            <div className="paper-card p-5 flex flex-col justify-between gap-3">
+            <div className="paper-card p-5 flex flex-col justify-between gap-3 border border-border">
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-secondary-text">
-                    Công lực tu luyện
+                    {t('onlinePage.powerEyebrow')}
                   </p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <p className="font-display tabular text-2xl font-extrabold text-foreground">
-                      Cấp {levelInfo.level}
+                      {t('onlinePage.levelHeading', { level: levelInfo.level })}
                     </p>
                     <span
                       className={`tabular text-[11px] font-extrabold px-2 py-0.5 rounded-full border ${levelAccent.badge}`}
@@ -316,7 +372,7 @@ export default function OnlineLearning() {
                   >
                     bolt
                   </span>
-                  {levelInfo.totalExp.toLocaleString('vi-VN')} EXP
+                  <span>{formatNumber(levelInfo.totalExp)} EXP</span>
                 </span>
               </div>
 
@@ -324,33 +380,37 @@ export default function OnlineLearning() {
                 value={expInCurrentLevel}
                 max={expRequiredCurrentLevel}
                 tone="jade"
-                label={`Tiến trình lên Cấp ${levelInfo.level + 1}`}
-                sublabel={`${expInCurrentLevel.toLocaleString('vi-VN')}/${expRequiredCurrentLevel.toLocaleString('vi-VN')} EXP`}
+                label={t('onlinePage.nextLevelProgress', {
+                  level: levelInfo.level + 1,
+                })}
+                sublabel={`${formatNumber(expInCurrentLevel)}/${formatNumber(expRequiredCurrentLevel)} EXP`}
               />
 
               {user ? (
-                <div className="flex items-center justify-between text-xs text-secondary-text pt-1.5 border-t border-border">
+                <div className="flex items-center justify-between gap-2 text-xs text-secondary-text pt-1.5 border-t border-border">
                   <span>
-                    Đã học:{' '}
+                    {t('onlinePage.studiedLabel')}{' '}
                     <strong className="tabular text-foreground">
-                      {formatStudyTime(studySeconds)}
+                      {formatStudyTime(studySeconds, lang)}
                     </strong>
                   </span>
                   <span>
-                    Chuỗi:{' '}
+                    {t('onlinePage.streakLabel')}{' '}
                     <strong className="tabular text-accent">
-                      {streak > 0 ? `${streak} ngày` : '—'}
+                      {streak > 0
+                        ? t('onlinePage.streakValue', { count: streak })
+                        : '—'}
                     </strong>
                   </span>
                 </div>
               ) : (
                 <p className="text-xs text-secondary-text pt-1 border-t border-border">
-                  Đăng nhập tài khoản để lưu giờ học và nhận EXP tự động.
+                  {t('onlinePage.guestTrackerHint')}
                 </p>
               )}
             </div>
 
-            <div className="paper-card p-5 flex items-center gap-3.5 bg-paper">
+            <div className="paper-card p-5 flex items-center gap-3.5 bg-paper border border-border">
               <div
                 aria-hidden="true"
                 className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border shadow-xs subject-solid-${selectedSubject?.id || 'DEFAULT'}`}
@@ -361,13 +421,15 @@ export default function OnlineLearning() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold uppercase tracking-wider text-secondary-text">
-                  Môn đang chọn
+                  {t('onlinePage.selectedSubjectEyebrow')}
                 </p>
                 <p className="font-display text-lg font-bold text-foreground truncate">
-                  {selectedSubject?.label}
+                  {selectedSubjectFullLabel}
                 </p>
                 <p className="tabular text-xs text-secondary-text">
-                  {selectedSubject?.teachers?.length || 0} khoá / giáo viên sẵn sàng
+                  {t('onlinePage.readyTeachersCount', {
+                    count: selectedSubject?.teachers?.length || 0,
+                  })}
                 </p>
               </div>
             </div>
@@ -376,7 +438,7 @@ export default function OnlineLearning() {
 
         {/* ═══ GOOGLE PERMISSION BANNER ═══ */}
         {!googleLinked && (
-          <div className="paper-card border-gold bg-gold-soft/50 px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="paper-card border border-gold bg-gold-soft/50 px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-start sm:items-center gap-2.5">
               <span
                 className="material-symbols-outlined text-accent text-xl shrink-0"
@@ -385,8 +447,7 @@ export default function OnlineLearning() {
                 key
               </span>
               <p className="text-xs sm:text-sm font-semibold text-foreground leading-relaxed">
-                Phiên hiện tại chưa xác thực Google. Để mở các bảng bài giảng nội bộ được phân quyền
-                theo email, hãy đăng nhập bằng Google!
+                {t('onlinePage.googleNotice')}
               </p>
             </div>
             <ArenaButton
@@ -396,7 +457,9 @@ export default function OnlineLearning() {
               disabled={isConnectingGoogle}
               onClick={handleGoogleLogin}
             >
-              {isConnectingGoogle ? 'Đang kết nối...' : 'Đăng nhập Google'}
+              {isConnectingGoogle
+                ? t('onlinePage.googleConnecting')
+                : t('onlinePage.googleSignInBtn')}
             </ArenaButton>
           </div>
         )}
@@ -411,7 +474,7 @@ export default function OnlineLearning() {
             idleReason={idleReason}
             checkinPrompt={checkinPrompt}
             checkinRemainingSec={checkinRemainingSec}
-            subjectLabel={selectedSubject?.shortLabel}
+            subjectLabel={selectedSubjectShortLabel}
             teacherTitle={shortTeacherTitle}
             flashExp={flash}
             onStartSession={handleStartSession}
@@ -428,10 +491,12 @@ export default function OnlineLearning() {
               id="subjects-heading"
               className="font-display text-lg sm:text-xl font-bold text-foreground"
             >
-              1. Chọn môn học
+              {t('onlinePage.step1Heading')}
             </h2>
             <span className="tabular text-xs text-secondary-text">
-              {ONLINE_SUBJECTS.length} môn thi
+              {t('onlinePage.subjectCountLabel', {
+                count: ONLINE_SUBJECTS.length,
+              })}
             </span>
           </div>
 
@@ -449,17 +514,23 @@ export default function OnlineLearning() {
         </section>
 
         {/* ═══ STEP 2: TEACHER LIST IN SELECTED SUBJECT ═══ */}
-        <section aria-labelledby="teachers-heading" className="space-y-4">
+        <section
+          ref={teachersSectionRef}
+          aria-labelledby="teachers-heading"
+          className="space-y-4 scroll-mt-16"
+        >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2
                 id="teachers-heading"
                 className="font-display text-lg sm:text-xl font-bold text-foreground"
               >
-                2. Chọn giáo viên · {selectedSubject?.label}
+                {t('onlinePage.step2Heading', {
+                  subject: selectedSubjectFullLabel,
+                })}
               </h2>
               <p className="text-xs sm:text-sm text-secondary-text">
-                Nhấn chọn thẻ thầy/cô để nạp bảng bài giảng xuống khung học bên dưới.
+                {t('onlinePage.step2Sub')}
               </p>
             </div>
 
@@ -477,8 +548,10 @@ export default function OnlineLearning() {
                   setSearchTerm(e.target.value);
                   setSelectedTeacherIndex(0);
                 }}
-                placeholder={`Tìm trong ${selectedSubject?.shortLabel || 'môn này'}...`}
-                aria-label="Tìm giáo viên hoặc tên khoá học"
+                placeholder={t('onlinePage.searchPlaceholder', {
+                  subject: selectedSubjectShortLabel,
+                })}
+                aria-label={t('onlinePage.searchAria')}
                 className="w-full min-h-[44px] rounded-xl bg-surface border border-border-strong pl-10 pr-9 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               />
               {searchTerm && (
@@ -488,7 +561,7 @@ export default function OnlineLearning() {
                     setSearchTerm('');
                     setSelectedTeacherIndex(0);
                   }}
-                  aria-label="Xoá từ khoá tìm kiếm"
+                  aria-label={t('onlinePage.clearSearchAria')}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-base" aria-hidden="true">
@@ -500,24 +573,40 @@ export default function OnlineLearning() {
           </div>
 
           {filteredTeachers.length === 0 ? (
-            <div className="paper-card p-8 text-center space-y-2">
+            <div className="paper-card p-8 text-center space-y-3 border border-border">
               <span
                 className="material-symbols-outlined text-3xl text-muted-foreground"
                 aria-hidden="true"
               >
                 search_off
               </span>
-              <p className="text-sm font-semibold text-foreground">
-                Không tìm thấy giáo viên phù hợp với từ khoá &ldquo;{searchTerm}&rdquo;.
-              </p>
-              <p className="text-xs text-secondary-text">
-                Thử gõ tên không dấu ngắn gọn hoặc xoá bộ lọc để xem toàn bộ danh sách.
-              </p>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-foreground">
+                  {t('onlinePage.emptySearchTitle', { query: searchTerm })}
+                </p>
+                <p className="text-xs text-secondary-text">
+                  {t('onlinePage.emptySearchHint')}
+                </p>
+              </div>
+              <div>
+                <ArenaButton
+                  variant="secondary"
+                  size="sm"
+                  icon="close"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSelectedTeacherIndex(0);
+                  }}
+                >
+                  {t('onlinePage.clearFilterBtn')}
+                </ArenaButton>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {filteredTeachers.map((teacher, index) => {
-                const isSelected = activeTeacher && teacher.title === activeTeacher.title;
+                const isSelected =
+                  activeTeacher && teacher.title === activeTeacher.title;
                 return (
                   <TeacherCard
                     key={getTeacherKey(selectedSubject.id, teacher, index)}
@@ -537,7 +626,7 @@ export default function OnlineLearning() {
         <section
           ref={viewerSectionRef}
           aria-labelledby="sheet-viewer-heading"
-          className="paper-card overflow-hidden"
+          className="paper-card overflow-hidden border border-border"
         >
           <div className="p-4 sm:p-5 border-b border-border bg-paper flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex items-start gap-3 min-w-0">
@@ -552,16 +641,19 @@ export default function OnlineLearning() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-1.5 mb-1">
                   <span className="paper-chip bg-jade-soft text-jade border-jade-border">
-                    <span className="h-1.5 w-1.5 rounded-full bg-jade" aria-hidden="true" />
-                    3. Bảng bài giảng đang mở
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-jade"
+                      aria-hidden="true"
+                    />
+                    <span>{t('onlinePage.step3Chip')}</span>
                   </span>
-                  <span className="paper-chip">{selectedSubject?.label}</span>
+                  <span className="paper-chip">{selectedSubjectFullLabel}</span>
                 </div>
                 <h2
                   id="sheet-viewer-heading"
                   className="font-display text-base sm:text-lg font-bold text-foreground break-words"
                 >
-                  {activeTeacher?.title || 'Chưa chọn giáo viên'}
+                  {activeTeacher?.title || t('onlinePage.noTeacherSelected')}
                 </h2>
               </div>
             </div>
@@ -571,10 +663,18 @@ export default function OnlineLearning() {
                 <ArenaButton
                   variant="ghost"
                   size="sm"
+                  icon="arrow_upward"
+                  onClick={handleScrollToTeachers}
+                >
+                  {t('onlinePage.backToInstructorsBtn')}
+                </ArenaButton>
+                <ArenaButton
+                  variant="ghost"
+                  size="sm"
                   icon="refresh"
                   onClick={() => setRefreshSeed((prev) => prev + 1)}
                 >
-                  Tải lại sheet
+                  {t('onlinePage.reloadSheetBtn')}
                 </ArenaButton>
                 <ArenaButton
                   variant="secondary"
@@ -585,7 +685,7 @@ export default function OnlineLearning() {
                     setIsFullscreenSheet(true);
                   }}
                 >
-                  Toàn khung
+                  {t('onlinePage.fullscreenBtn')}
                 </ArenaButton>
                 <ArenaButton
                   as="a"
@@ -597,79 +697,79 @@ export default function OnlineLearning() {
                   icon="open_in_new"
                   onClick={handleStartSession}
                 >
-                  Mở tab mới
+                  {t('onlinePage.openSheetsShortBtn')}
                 </ArenaButton>
               </div>
             )}
           </div>
 
-          {activeTeacher && !isFullscreenSheet ? (
-            <div className="relative bg-surface min-h-[560px] lg:min-h-[720px]">
-              {isSheetLoading && (
-                <div
-                  role="status"
-                  aria-live="polite"
-                  className="absolute inset-0 z-10 bg-paper/95 backdrop-blur-xs flex flex-col items-center justify-center gap-3 p-6 text-center"
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-primary-soft border border-primary/30 flex items-center justify-center">
-                    <span
-                      className="material-symbols-outlined text-2xl text-primary animate-spin"
-                      aria-hidden="true"
-                    >
-                      progress_activity
-                    </span>
+          <div className="p-3 sm:p-4 bg-paper">
+            {activeTeacher && !isFullscreenSheet ? (
+              <div className="relative rounded-2xl border border-border-strong overflow-hidden bg-surface min-h-[540px] lg:min-h-[720px]">
+                {isSheetLoading && (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="absolute inset-0 z-10 bg-paper/95 backdrop-blur-xs flex flex-col items-center justify-center gap-3 p-6 text-center"
+                  >
+                    <div className="w-12 h-12 rounded-2xl bg-primary-soft border border-primary/30 flex items-center justify-center">
+                      <span
+                        className="material-symbols-outlined text-2xl text-primary animate-spin"
+                        aria-hidden="true"
+                      >
+                        progress_activity
+                      </span>
+                    </div>
+                    <p className="font-display text-base font-bold text-foreground">
+                      {t('onlinePage.loadingSheetTitle')}
+                    </p>
+                    <p className="text-xs text-secondary-text max-w-md leading-relaxed">
+                      {isSheetStalled
+                        ? t('onlinePage.stalledHint')
+                        : t('onlinePage.loadingHint')}
+                    </p>
+                    {isSheetStalled && (
+                      <ArenaButton
+                        as="a"
+                        href={openUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        variant="primary"
+                        size="sm"
+                        icon="open_in_new"
+                        onClick={handleStartSession}
+                      >
+                        {t('onlinePage.openDirectBtn')}
+                      </ArenaButton>
+                    )}
                   </div>
-                  <p className="font-display text-base font-bold text-foreground">
-                    Đang tải bảng bài giảng của giáo viên...
-                  </p>
-                  <p className="text-xs text-secondary-text max-w-md">
-                    {isSheetStalled
-                      ? 'Trình duyệt có thể đang chặn cookie bên thứ ba của Google Sheets. Hãy bấm nút bên dưới để mở trực tiếp trên Google Sheets!'
-                      : 'Nếu trình duyệt chặn nhúng Google Sheet hoặc mạng chậm, bấm “Mở tab mới” để học trực tiếp.'}
-                  </p>
-                  {isSheetStalled && (
-                    <ArenaButton
-                      as="a"
-                      href={openUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      variant="primary"
-                      size="sm"
-                      icon="open_in_new"
-                      onClick={handleStartSession}
-                    >
-                      Mở trực tiếp trên Google Sheets
-                    </ArenaButton>
-                  )}
-                </div>
-              )}
+                )}
 
-              <iframe
-                key={`${activeTeacher.sheetId}-${refreshSeed}`}
-                src={embedUrl}
-                title={activeTeacher.title}
-                className="w-full h-[640px] lg:h-[760px] border-0 bg-surface"
-                loading="lazy"
-                referrerPolicy="strict-origin-when-cross-origin"
-                onLoad={() => setLoadedEmbedUrl(embedUrl)}
-              />
-            </div>
-          ) : !activeTeacher ? (
-            <div className="p-10 text-center text-secondary-text">
-              Chọn một môn học và giáo viên ở phía trên để bắt đầu.
-            </div>
-          ) : (
-            <div className="p-8 text-center text-secondary-text text-sm bg-surface-alt">
-              Đang mở bảng bài giảng ở chế độ tập trung toàn khung...
-            </div>
-          )}
+                <iframe
+                  key={`${activeTeacher.sheetId}-${refreshSeed}`}
+                  src={embedUrl}
+                  title={activeTeacher.title}
+                  className="w-full h-[600px] lg:h-[760px] border-0 bg-surface"
+                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  onLoad={() => setLoadedEmbedUrl(embedUrl)}
+                />
+              </div>
+            ) : !activeTeacher ? (
+              <div className="rounded-2xl border border-border-strong overflow-hidden bg-surface p-10 text-center text-secondary-text">
+                {t('onlinePage.emptyViewerPrompt')}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-border-strong overflow-hidden bg-surface-alt p-8 text-center text-secondary-text text-sm">
+                {t('onlinePage.fullscreenActiveNotice')}
+              </div>
+            )}
+          </div>
 
           <div className="px-4 py-3 bg-paper border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-secondary-text">
-            <span>
-              Mẹo: Dùng nút &ldquo;Toàn khung&rdquo; để phóng rộng bảng tính ngay trên web, hoặc &ldquo;Mở tab mới&rdquo; để thao tác đa tab.
-            </span>
-            <span className="text-muted-foreground font-medium">
-              Nguồn dữ liệu: Google Sheets chính thức của khoá học
+            <span>{t('onlinePage.viewerFooterTip')}</span>
+            <span className="text-muted-foreground font-medium shrink-0">
+              {t('onlinePage.viewerFooterSource')}
             </span>
           </div>
         </section>
@@ -680,29 +780,33 @@ export default function OnlineLearning() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={`Chế độ toàn khung: ${activeTeacher.title}`}
+          aria-label={t('onlinePage.fullscreenDialogAria', {
+            title: activeTeacher.title,
+          })}
           className="fixed inset-0 z-50 bg-background text-foreground flex flex-col"
         >
           {/* Compact Dual-Theme Top Bar */}
           <div className="shrink-0 px-3 sm:px-5 py-2.5 bg-paper border-b border-border flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="paper-chip bg-jade-soft text-jade border-jade-border shrink-0">
-                {selectedSubject?.shortLabel || selectedSubject?.label}
+                {selectedSubjectShortLabel}
               </span>
               <h2 className="font-display font-bold text-sm sm:text-base text-foreground truncate">
                 {activeTeacher.title}
               </h2>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0">
               {user && (
                 <span
-                  className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold border tabular ${levelAccent.badge}`}
+                  className={`hidden md:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold border tabular ${levelAccent.badge}`}
                 >
                   <span className="material-symbols-outlined text-sm" aria-hidden="true">
                     bolt
                   </span>
-                  Lv.{levelInfo.level} · {levelInfo.totalExp.toLocaleString('vi-VN')} EXP
+                  <span>
+                    Lv.{levelInfo.level} · {formatNumber(levelInfo.totalExp)} EXP
+                  </span>
                 </span>
               )}
 
@@ -712,7 +816,7 @@ export default function OnlineLearning() {
                 icon="refresh"
                 onClick={() => setRefreshSeed((prev) => prev + 1)}
               >
-                Tải lại
+                {t('onlinePage.reloadShortBtn')}
               </ArenaButton>
 
               <ArenaButton
@@ -725,7 +829,7 @@ export default function OnlineLearning() {
                 icon="open_in_new"
                 onClick={handleStartSession}
               >
-                Tab mới
+                {t('onlinePage.openSheetsShortBtn')}
               </ArenaButton>
 
               <ArenaButton
@@ -734,7 +838,7 @@ export default function OnlineLearning() {
                 icon="fullscreen_exit"
                 onClick={() => setIsFullscreenSheet(false)}
               >
-                Thu nhỏ
+                {t('onlinePage.exitFullscreenBtn')}
               </ArenaButton>
             </div>
           </div>
@@ -750,7 +854,7 @@ export default function OnlineLearning() {
                 idleReason={idleReason}
                 checkinPrompt={checkinPrompt}
                 checkinRemainingSec={checkinRemainingSec}
-                subjectLabel={selectedSubject?.shortLabel}
+                subjectLabel={selectedSubjectShortLabel}
                 teacherTitle={shortTeacherTitle}
                 flashExp={flash}
                 onStartSession={handleStartSession}
@@ -778,7 +882,7 @@ export default function OnlineLearning() {
                   </span>
                 </div>
                 <p className="font-display text-base font-bold text-foreground">
-                  Đang mở bảng bài giảng chế độ toàn khung...
+                  {t('onlinePage.loadingFullscreenTitle')}
                 </p>
                 {isSheetStalled && (
                   <ArenaButton
@@ -791,7 +895,7 @@ export default function OnlineLearning() {
                     icon="open_in_new"
                     onClick={handleStartSession}
                   >
-                    Mở trực tiếp trên Google Sheets
+                    {t('onlinePage.openDirectBtn')}
                   </ArenaButton>
                 )}
               </div>
@@ -800,7 +904,9 @@ export default function OnlineLearning() {
             <iframe
               key={`fs-${activeTeacher.sheetId}-${refreshSeed}`}
               src={embedUrl}
-              title={`Toàn khung: ${activeTeacher.title}`}
+              title={t('onlinePage.fullscreenIframeTitle', {
+                title: activeTeacher.title,
+              })}
               className="w-full h-full border-0 bg-surface"
               referrerPolicy="strict-origin-when-cross-origin"
               onLoad={() => setLoadedEmbedUrl(embedUrl)}
@@ -818,7 +924,7 @@ export default function OnlineLearning() {
           className="pointer-events-none fixed bottom-20 sm:bottom-6 right-4 z-50"
         >
           {flash.type === 'levelup' ? (
-            <div className="imperial-frame bg-paper px-5 py-3.5 flex items-center gap-3 shadow-lg">
+            <div className="imperial-frame bg-paper px-6 py-4 flex items-center gap-3 shadow-lg">
               <div className="w-10 h-10 rounded-xl bg-gold-soft border border-gold text-accent flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-2xl" aria-hidden="true">
                   military_tech
@@ -826,20 +932,20 @@ export default function OnlineLearning() {
               </div>
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider text-gold-dark">
-                  Đột phá Công lực!
+                  {t('onlinePage.levelUpBannerEyebrow')}
                 </p>
                 <p className="font-display text-base font-extrabold text-foreground tabular">
-                  Thăng Cấp {flash.level}
+                  {t('onlinePage.levelUpBannerTitle', { level: flash.level })}
                 </p>
               </div>
             </div>
           ) : (
-            <div className="paper-card border-jade-border bg-jade-soft px-4 py-2.5 flex items-center gap-2 shadow-md">
+            <div className="paper-card border border-jade-border bg-jade-soft px-4 py-2.5 flex items-center gap-2 shadow-md">
               <span className="material-symbols-outlined text-lg text-jade" aria-hidden="true">
                 bolt
               </span>
               <span className="font-display text-sm font-extrabold text-foreground tabular">
-                +{flash.amount} EXP Công lực
+                {t('onlinePage.expFlashLabel', { amount: flash.amount })}
               </span>
             </div>
           )}

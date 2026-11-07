@@ -10,7 +10,9 @@ export const isSoleBangChuAccount = (role, userId) => {
 
 export const RANK_TIERS = [
   {
+    key: 'initiate',
     name: 'Tân Binh',
+    nameEn: 'Initiate',
     min: 0,
     color: 'text-secondary-text',
     bg: 'bg-surface-alt',
@@ -18,7 +20,9 @@ export const RANK_TIERS = [
     icon: 'local_library',
   },
   {
+    key: 'young_knight',
     name: 'Thiếu Hiệp',
+    nameEn: 'Young Knight',
     min: 200,
     color: 'text-sky-700',
     bg: 'bg-sky-50',
@@ -26,7 +30,9 @@ export const RANK_TIERS = [
     icon: 'swords',
   },
   {
+    key: 'grand_knight',
     name: 'Đại Hiệp',
+    nameEn: 'Grand Knight',
     min: 1000,
     color: 'text-jade',
     bg: 'bg-jade-soft',
@@ -34,7 +40,9 @@ export const RANK_TIERS = [
     icon: 'shield',
   },
   {
+    key: 'elder',
     name: 'Trưởng Lão',
+    nameEn: 'Elder',
     min: 3000,
     color: 'text-indigo-700',
     bg: 'bg-indigo-50',
@@ -42,7 +50,9 @@ export const RANK_TIERS = [
     icon: 'auto_awesome',
   },
   {
+    key: 'grandmaster',
     name: 'Chưởng Môn',
+    nameEn: 'Grandmaster',
     min: 6000,
     color: 'text-accent',
     bg: 'bg-gold-soft',
@@ -50,7 +60,9 @@ export const RANK_TIERS = [
     icon: 'account_balance',
   },
   {
+    key: 'vice_guildmaster',
     name: 'Phó Bang Chủ',
+    nameEn: 'Vice Master',
     min: 12000,
     color: 'text-primary',
     bg: 'bg-primary-soft',
@@ -58,7 +70,9 @@ export const RANK_TIERS = [
     icon: 'military_tech',
   },
   {
+    key: 'guildmaster',
     name: 'Bang Chủ',
+    nameEn: 'Guildmaster',
     min: 25000,
     color: 'text-gold-dark',
     bg: 'bg-gold-soft',
@@ -69,20 +83,24 @@ export const RANK_TIERS = [
   },
 ];
 
+export function getRankDisplayName(tier, lang = 'vi') {
+  if (!tier) return '';
+  return lang === 'en' ? tier.nameEn || tier.name : tier.name;
+}
+
 const EXP_EARNABLE_TIERS = RANK_TIERS.filter((tier) => !tier.exclusiveBangChu);
 const BANG_CHU_TIER = RANK_TIERS[RANK_TIERS.length - 1];
 
 /**
  * Tính mức hạng (Quân hàm / Danh hiệu) dựa trực tiếp trên tổng EXP tích lũy.
- * - EXP càng cao thì mức hạng càng cao (Tân Binh -> Thiếu Hiệp -> Đại Hiệp -> Trưởng Lão -> Chưởng Môn -> Phó Bang Chủ).
- * - Duy nhất 1 tài khoản tối cao (Admin / SOLE_BANG_CHU_ID) giữ ngôi vị Bang Chủ; không ai khác được phép là Bang Chủ.
  */
-export const getUserRank = (exp = 0, role, _isApprovedBangChu, userId) => {
+export const getUserRank = (exp = 0, role, _isApprovedBangChu, userId, lang = 'vi') => {
   const safeExp = Math.max(0, Math.floor(Number(exp) || 0));
 
   if (isSoleBangChuAccount(role, userId)) {
     return {
       ...BANG_CHU_TIER,
+      displayName: getRankDisplayName(BANG_CHU_TIER, lang),
       isBangChu: true,
       isMax: true,
       nextRank: null,
@@ -104,19 +122,24 @@ export const getUserRank = (exp = 0, role, _isApprovedBangChu, userId) => {
     }
   }
 
+  const localizedNext = nextRank
+    ? { ...nextRank, displayName: getRankDisplayName(nextRank, lang) }
+    : null;
+
   return {
     ...currentRank,
+    displayName: getRankDisplayName(currentRank, lang),
     isBangChu: false,
-    nextRank,
-    isMax: !nextRank,
-    progress: nextRank
+    nextRank: localizedNext,
+    isMax: !localizedNext,
+    progress: localizedNext
       ? {
           current: safeExp,
-          target: nextRank.min,
-          remaining: Math.max(0, nextRank.min - safeExp),
+          target: localizedNext.min,
+          remaining: Math.max(0, localizedNext.min - safeExp),
           percentage:
-            nextRank.min > 0
-              ? Math.min(100, Math.max(0, Math.round((safeExp / nextRank.min) * 100)))
+            localizedNext.min > 0
+              ? Math.min(100, Math.max(0, Math.round((safeExp / localizedNext.min) * 100)))
               : 100,
           pendingApproval: false,
         }

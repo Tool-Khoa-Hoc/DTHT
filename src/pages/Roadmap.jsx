@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
 import ProgressBar from '../components/ui/ProgressBar';
 import RankSeal from '../components/ui/RankSeal';
@@ -13,8 +14,11 @@ const STARTER_MILESTONES = {
       id: 'starter-s1',
       sort_order: 0,
       title: 'Giai đoạn 1 · Tổng ôn nền tảng THPT',
+      titleEn: 'Stage 1 · Core High School Foundations',
       subtitle:
         'Hệ thống hoá kiến thức cốt lõi các môn trong tổ hợp xét tuyển, nắm chắc cấu trúc đề mới.',
+      subtitleEn:
+        'Systematize core concepts across your target exam subjects and master the updated exam structure.',
       status: 'done',
       progress: 100,
     },
@@ -22,8 +26,11 @@ const STARTER_MILESTONES = {
       id: 'starter-s2',
       sort_order: 1,
       title: 'Giai đoạn 2 · Chuyên đề vận dụng & ĐGNL đợt sớm',
+      titleEn: 'Stage 2 · Advanced Topics & Early Aptitude Tests',
       subtitle:
         'Chinh phục nhóm câu hỏi phân loại 8.5+ và rèn chiến thuật làm bài HSA / V-ACT / TSA.',
+      subtitleEn:
+        'Tackle high-distinction 8.5+ problem sets and sharpen test-taking strategies for HSA / V-ACT / TSA.',
       status: 'active',
       progress: 60,
     },
@@ -31,8 +38,11 @@ const STARTER_MILESTONES = {
       id: 'starter-s3',
       sort_order: 2,
       title: 'Giai đoạn 3 · Thực chiến luyện đề bấm giờ',
+      titleEn: 'Stage 3 · Timed Full-Length Mock Exams',
       subtitle:
         'Hoàn thành 25–30 đề chuẩn cấu trúc, ghi chép sổ tay lỗi sai và lấp lỗ hổng từng chương.',
+      subtitleEn:
+        'Complete 25–30 full timed mock papers, log error patterns, and close remaining chapter gaps.',
       status: 'locked',
       progress: 0,
     },
@@ -40,8 +50,11 @@ const STARTER_MILESTONES = {
       id: 'starter-s4',
       sort_order: 3,
       title: 'Giai đoạn 4 · Về đích & Tối ưu Nguyện vọng 1',
+      titleEn: 'Stage 4 · Final Sprint & Top-Choice Admission',
       subtitle:
         'Ổn định tâm lý phòng thi, đối chiếu phổ điểm chuẩn và sắp xếp danh sách nguyện vọng tối ưu.',
+      subtitleEn:
+        'Build exam-day composure, benchmark score distributions, and optimize your university preference order.',
       status: 'locked',
       progress: 0,
     },
@@ -51,8 +64,11 @@ const STARTER_MILESTONES = {
       id: 'starter-u1',
       sort_order: 0,
       title: 'Năm 1 · Chinh phục Đại cương & Phương pháp Đại học',
+      titleEn: 'Year 1 · General Curriculum & University Study Habits',
       subtitle:
         'Làm chủ Toán cao cấp, Triết học, Pháp luật đại cương; xây dựng nền tảng GPA ≥ 3.2/4.0.',
+      subtitleEn:
+        'Master Higher Mathematics, Philosophy, and General Law while building a ≥ 3.2/4.0 GPA foundation.',
       status: 'done',
       progress: 100,
     },
@@ -60,8 +76,11 @@ const STARTER_MILESTONES = {
       id: 'starter-u2',
       sort_order: 1,
       title: 'Năm 2 · Cơ sở ngành & Chuẩn ngoại ngữ đầu ra',
+      titleEn: 'Year 2 · Core Major Courses & Foreign Language Benchmark',
       subtitle:
         'Tập trung các học phần cốt lõi chuyên ngành và hoàn thành chứng chỉ Tiếng Anh quốc tế.',
+      subtitleEn:
+        'Focus on foundational major coursework and complete your international English proficiency certificate.',
       status: 'active',
       progress: 45,
     },
@@ -69,8 +88,11 @@ const STARTER_MILESTONES = {
       id: 'starter-u3',
       sort_order: 2,
       title: 'Năm 3 · Chuyên ngành sâu, Nghiên cứu & Thực tập',
+      titleEn: 'Year 3 · Advanced Specialization, Research & Internship',
       subtitle:
         'Tham gia nhóm nghiên cứu khoa học / đồ án thực tế và ứng tuyển kỳ thực tập doanh nghiệp.',
+      subtitleEn:
+        'Join faculty research labs or capstone projects and secure a competitive industry internship.',
       status: 'locked',
       progress: 0,
     },
@@ -78,13 +100,31 @@ const STARTER_MILESTONES = {
       id: 'starter-u4',
       sort_order: 3,
       title: 'Năm 4 · Khoá luận tốt nghiệp & Bứt phá sự nghiệp',
+      titleEn: 'Year 4 · Honors Thesis & Career Launch',
       subtitle:
         'Bảo vệ khoá luận xuất sắc, tối ưu GPA tích luỹ toàn khoá và sẵn sàng chinh phục nhà tuyển dụng.',
+      subtitleEn:
+        'Defend your graduation thesis with honors, maximize cumulative GPA, and launch your career.',
       status: 'locked',
       progress: 0,
     },
   ],
 };
+
+const STARTER_BY_ID = Object.values(STARTER_MILESTONES)
+  .flat()
+  .reduce((acc, item) => {
+    acc[item.id] = item;
+    return acc;
+  }, {});
+
+function buildStarterSource(targetMode, isEn) {
+  return (STARTER_MILESTONES[targetMode] || []).map((item) => ({
+    ...item,
+    title: isEn && item.titleEn ? item.titleEn : item.title,
+    subtitle: isEn && item.subtitleEn ? item.subtitleEn : item.subtitle,
+  }));
+}
 
 function normalizeRoadmapMode(raw) {
   if (raw === 'university' || raw === 'uni' || raw === 'sv') return 'university';
@@ -120,29 +160,32 @@ function mapMilestoneRow(row, fallbackIdx = 0) {
 
 const STATUS_META = {
   done: {
-    label: 'Hoàn thành',
+    labelVi: 'Hoàn thành',
+    labelEn: 'Completed',
     icon: 'check_circle',
     badgeClass: 'bg-completed-soft text-completed border-completed-border',
     nodeClass: 'bg-completed border-completed text-white shadow-xs',
-    cardClass: 'border-completed-border/80 bg-surface',
+    cardClass: 'border-completed-border bg-surface hover:border-completed',
     barTone: 'completed',
     next: 'locked',
   },
   active: {
-    label: 'Đang thực hiện',
+    labelVi: 'Đang thực hiện',
+    labelEn: 'In Progress',
     icon: 'trending_up',
     badgeClass: 'bg-gold-soft text-gold-dark border-gold',
-    nodeClass: 'bg-primary border-primary text-white ring-4 ring-primary/15',
-    cardClass: 'border-primary/45 shadow-md bg-surface',
+    nodeClass: 'bg-primary border-primary text-on-primary ring-4 ring-primary/15',
+    cardClass: 'border-primary/50 shadow-sm bg-surface hover:border-primary',
     barTone: 'primary',
     next: 'done',
   },
   locked: {
-    label: 'Đang chờ',
+    labelVi: 'Đang chờ',
+    labelEn: 'Upcoming',
     icon: 'schedule',
     badgeClass: 'bg-surface-alt text-secondary-text border-border-strong',
     nodeClass: 'bg-surface border-border-strong text-secondary-text hover:border-primary',
-    cardClass: 'border-border bg-paper/70 hover:border-border-strong',
+    cardClass: 'border-border bg-paper/75 hover:border-border-strong',
     barTone: 'jade',
     next: 'active',
   },
@@ -152,10 +195,12 @@ const QUICK_STEPS = [0, 25, 50, 75, 100];
 
 export default function Roadmap() {
   const { user, profile, refreshProfile } = useAuth();
+  const { isEn, pick } = useLanguage();
   const navigate = useNavigate();
   const { showToast } = useToast();
 
   const [mode, setMode] = useState(() => normalizeRoadmapMode(profile?.user_mode));
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'active' | 'done'
   const [milestones, setMilestones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSeeding, setIsSeeding] = useState(false);
@@ -192,24 +237,27 @@ export default function Roadmap() {
   const seedStarterToDb = useCallback(
     async (targetMode, sourceList) => {
       if (!user) return [];
-      const rowsToInsert = (sourceList || STARTER_MILESTONES[targetMode]).map((item, idx) => {
-        const status = normalizeStatus(item.status);
-        const progress =
-          status === 'done'
-            ? 100
-            : status === 'locked'
-              ? 0
-              : normalizeProgress(item.progress ?? 50);
-        return {
-          user_id: user.id,
-          mode: targetMode,
-          sort_order: idx,
-          title: (item.title || `Cột mốc ${idx + 1}`).trim(),
-          subtitle: (item.subtitle || '').trim(),
-          status,
-          progress,
-        };
-      });
+      const fallbackPrefix = isEn ? 'Milestone' : 'Cột mốc';
+      const rowsToInsert = (sourceList || buildStarterSource(targetMode, isEn)).map(
+        (item, idx) => {
+          const status = normalizeStatus(item.status);
+          const progress =
+            status === 'done'
+              ? 100
+              : status === 'locked'
+                ? 0
+                : normalizeProgress(item.progress ?? 50);
+          return {
+            user_id: user.id,
+            mode: targetMode,
+            sort_order: idx,
+            title: (item.title || `${fallbackPrefix} ${idx + 1}`).trim(),
+            subtitle: (item.subtitle || '').trim(),
+            status,
+            progress,
+          };
+        },
+      );
 
       const { data: inserted, error } = await supabase
         .from('roadmap_milestones')
@@ -231,7 +279,7 @@ export default function Roadmap() {
         .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
         .map(mapMilestoneRow);
     },
-    [user],
+    [user, isEn],
   );
 
   const fetchMilestones = useCallback(
@@ -279,7 +327,7 @@ export default function Roadmap() {
           if (!alreadySeeded) {
             const seeded = await seedStarterToDb(
               targetMode,
-              legacySaved || STARTER_MILESTONES[targetMode],
+              legacySaved || buildStarterSource(targetMode, isEn),
             );
             setMilestones(seeded);
           } else {
@@ -288,13 +336,19 @@ export default function Roadmap() {
         }
       } catch (err) {
         console.error('Lỗi tải lộ trình:', err);
-        showToast('Không thể tải lộ trình từ máy chủ. Đang hiển thị bản xem trước.', 'error');
+        showToast(
+          pick(
+            'Không thể tải lộ trình từ máy chủ. Đang hiển thị bản xem trước.',
+            'Unable to load roadmap from server. Showing preview template.',
+          ),
+          'error',
+        );
         setMilestones((STARTER_MILESTONES[targetMode] || []).map(mapMilestoneRow));
       } finally {
         setLoading(false);
       }
     },
-    [seedStarterToDb, showToast, user],
+    [seedStarterToDb, showToast, user, isEn, pick],
   );
 
   useEffect(() => {
@@ -314,6 +368,7 @@ export default function Roadmap() {
     if (nextMode === mode) return;
     setHasManualMode(true);
     setConfirmDeleteId(null);
+    setStatusFilter('all');
     setLoading(true);
     setMode(nextMode);
 
@@ -331,17 +386,32 @@ export default function Roadmap() {
   const handleSeedStarterClick = async () => {
     if (!user) {
       setMilestones((STARTER_MILESTONES[mode] || []).map(mapMilestoneRow));
-      showToast('Đã nạp lộ trình mẫu (đăng nhập để lưu vĩnh viễn).', 'info');
+      showToast(
+        pick(
+          'Đã nạp lộ trình mẫu (đăng nhập để lưu vĩnh viễn).',
+          'Starter roadmap loaded (sign in to save permanently).',
+        ),
+        'info',
+      );
       return;
     }
 
     setIsSeeding(true);
     try {
-      const seeded = await seedStarterToDb(mode, STARTER_MILESTONES[mode]);
+      const seeded = await seedStarterToDb(mode, buildStarterSource(mode, isEn));
       setMilestones(seeded);
-      showToast('Đã khởi tạo lộ trình mẫu thành công!', 'success');
+      showToast(
+        pick('Đã khởi tạo lộ trình mẫu thành công!', 'Starter roadmap initialized!'),
+        'success',
+      );
     } catch (err) {
-      showToast(`Không thể khởi tạo lộ trình mẫu: ${err.message}`, 'error');
+      showToast(
+        pick(
+          `Không thể khởi tạo lộ trình mẫu: ${err.message}`,
+          `Failed to initialize starter roadmap: ${err.message}`,
+        ),
+        'error',
+      );
     } finally {
       setIsSeeding(false);
     }
@@ -349,7 +419,13 @@ export default function Roadmap() {
 
   const openCreateModal = () => {
     if (!user) {
-      showToast('Vui lòng đăng nhập để thêm cột mốc cá nhân.', 'warning');
+      showToast(
+        pick(
+          'Vui lòng đăng nhập để thêm cột mốc cá nhân.',
+          'Please sign in to add personal milestones.',
+        ),
+        'warning',
+      );
       return;
     }
     setEditingForm({
@@ -364,7 +440,13 @@ export default function Roadmap() {
 
   const openEditModal = (milestone) => {
     if (!user) {
-      showToast('Vui lòng đăng nhập để chỉnh sửa lộ trình cá nhân.', 'warning');
+      showToast(
+        pick(
+          'Vui lòng đăng nhập để chỉnh sửa lộ trình cá nhân.',
+          'Please sign in to edit your personal roadmap.',
+        ),
+        'warning',
+      );
       return;
     }
     setEditingForm({
@@ -382,7 +464,13 @@ export default function Roadmap() {
     if (!user) return;
     const trimmedTitle = editingForm.title.trim();
     if (!trimmedTitle) {
-      showToast('Vui lòng nhập tiêu đề giai đoạn / cột mốc.', 'warning');
+      showToast(
+        pick(
+          'Vui lòng nhập tiêu đề giai đoạn / cột mốc.',
+          'Please enter a milestone title.',
+        ),
+        'warning',
+      );
       return;
     }
 
@@ -424,7 +512,10 @@ export default function Roadmap() {
 
         if (error) throw error;
         setMilestones((prev) => [...prev, mapMilestoneRow(data, nextSortOrder)]);
-        showToast('Đã thêm cột mốc mới vào lộ trình!', 'success');
+        showToast(
+          pick('Đã thêm cột mốc mới vào lộ trình!', 'New milestone added to your roadmap!'),
+          'success',
+        );
       } else {
         const { error } = await supabase
           .from('roadmap_milestones')
@@ -436,11 +527,17 @@ export default function Roadmap() {
         setMilestones((prev) =>
           prev.map((m) => (m.id === editingForm.id ? { ...m, ...payload } : m)),
         );
-        showToast('Đã cập nhật cột mốc thành công!', 'success');
+        showToast(
+          pick('Đã cập nhật cột mốc thành công!', 'Milestone updated!'),
+          'success',
+        );
       }
       setIsEditModalOpen(false);
     } catch (err) {
-      showToast(`Lỗi lưu cột mốc: ${err.message}`, 'error');
+      showToast(
+        pick(`Lỗi lưu cột mốc: ${err.message}`, `Failed to save milestone: ${err.message}`),
+        'error',
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -475,7 +572,13 @@ export default function Roadmap() {
 
     if (error) {
       setMilestones(prevMilestones);
-      showToast(`Không thể cập nhật trạng thái: ${error.message}`, 'error');
+      showToast(
+        pick(
+          `Không thể cập nhật trạng thái: ${error.message}`,
+          `Failed to update status: ${error.message}`,
+        ),
+        'error',
+      );
     }
   };
 
@@ -501,7 +604,13 @@ export default function Roadmap() {
 
     if (error) {
       setMilestones(prevMilestones);
-      showToast(`Không thể lưu tiến độ: ${error.message}`, 'error');
+      showToast(
+        pick(
+          `Không thể lưu tiến độ: ${error.message}`,
+          `Failed to save progress: ${error.message}`,
+        ),
+        'error',
+      );
     }
   };
 
@@ -570,7 +679,13 @@ export default function Roadmap() {
       }
     } catch (err) {
       setMilestones(prevMilestones);
-      showToast(`Không thể đổi thứ tự cột mốc: ${err.message}`, 'error');
+      showToast(
+        pick(
+          `Không thể đổi thứ tự cột mốc: ${err.message}`,
+          `Failed to reorder milestones: ${err.message}`,
+        ),
+        'error',
+      );
     } finally {
       setReorderingId(null);
     }
@@ -590,9 +705,18 @@ export default function Roadmap() {
 
     if (error) {
       setMilestones(prevMilestones);
-      showToast(`Lỗi khi xoá cột mốc: ${error.message}`, 'error');
+      showToast(
+        pick(
+          `Lỗi khi xoá cột mốc: ${error.message}`,
+          `Failed to delete milestone: ${error.message}`,
+        ),
+        'error',
+      );
     } else {
-      showToast('Đã xoá cột mốc khỏi lộ trình.', 'info');
+      showToast(
+        pick('Đã xoá cột mốc khỏi lộ trình.', 'Milestone removed from roadmap.'),
+        'info',
+      );
     }
   };
 
@@ -607,7 +731,13 @@ export default function Roadmap() {
   const handleSaveSettings = async (e) => {
     e.preventDefault();
     if (!user) {
-      showToast('Vui lòng đăng nhập để lưu mục tiêu chiến lược.', 'warning');
+      showToast(
+        pick(
+          'Vui lòng đăng nhập để lưu mục tiêu chiến lược.',
+          'Please sign in to save your strategic targets.',
+        ),
+        'warning',
+      );
       return;
     }
 
@@ -629,9 +759,15 @@ export default function Roadmap() {
 
       await refreshProfile?.();
       setIsSettingsOpen(false);
-      showToast('Đã cập nhật mục tiêu chiến lược!', 'success');
+      showToast(
+        pick('Đã cập nhật mục tiêu chiến lược!', 'Strategic targets updated!'),
+        'success',
+      );
     } catch (err) {
-      showToast(`Lỗi lưu mục tiêu: ${err.message}`, 'error');
+      showToast(
+        pick(`Lỗi lưu mục tiêu: ${err.message}`, `Failed to save targets: ${err.message}`),
+        'error',
+      );
     } finally {
       setIsSavingSettings(false);
     }
@@ -650,6 +786,12 @@ export default function Roadmap() {
           ) / totalCount,
         )
       : 0;
+
+  const visibleMilestones = milestones.filter((m) => {
+    if (statusFilter === 'active') return m.status === 'active';
+    if (statusFilter === 'done') return m.status === 'done';
+    return true;
+  });
 
   return (
     <div className="bg-background font-sans text-foreground min-h-full pb-24">
@@ -671,8 +813,11 @@ export default function Roadmap() {
                   icon="route"
                   label={
                     mode === 'student'
-                      ? 'Chiến Lược Khoa Trường · THPT'
-                      : 'Lộ Trình Học Thuật · Đại Học'
+                      ? pick(
+                          'Chiến Lược Khoa Trường · THPT',
+                          'Imperial Exam Strategy · High School',
+                        )
+                      : pick('Lộ Trình Học Thuật · Đại Học', 'Academic Roadmap · University')
                   }
                 />
                 {user && (
@@ -680,16 +825,18 @@ export default function Roadmap() {
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
                       cloud_done
                     </span>
-                    Đồng bộ trực tiếp
+                    <span>{pick('Đồng bộ trực tiếp', 'Live Cloud Sync')}</span>
                   </span>
                 )}
               </div>
               <h1 className="text-2xl sm:text-3xl font-display font-extrabold tracking-tight text-foreground">
-                Lộ Trình Học Tập Cá Nhân
+                {pick('Lộ Trình Học Tập Cá Nhân', 'Personal Study Roadmap')}
               </h1>
               <p className="text-xs sm:text-sm text-secondary-text mt-1 max-w-2xl">
-                Thiết lập các cột mốc chiến lược, theo dõi tiến độ từng giai đoạn và giữ vững mục
-                tiêu chinh phục bảng vàng.
+                {pick(
+                  'Thiết lập các cột mốc chiến lược, theo dõi tiến độ từng giai đoạn và giữ vững mục tiêu chinh phục bảng vàng.',
+                  'Set strategic milestones, track stage-by-stage progress, and stay aligned with your Honor Roll goals.',
+                )}
               </p>
             </div>
 
@@ -702,7 +849,7 @@ export default function Roadmap() {
                 <span className="material-symbols-outlined text-base text-accent" aria-hidden="true">
                   tune
                 </span>
-                Mục tiêu
+                <span>{pick('Mục tiêu', 'Targets')}</span>
               </button>
               <button
                 type="button"
@@ -712,7 +859,7 @@ export default function Roadmap() {
                 <span className="material-symbols-outlined text-base" aria-hidden="true">
                   add_circle
                 </span>
-                Thêm cột mốc
+                <span>{pick('Thêm cột mốc', 'Add Milestone')}</span>
               </button>
             </div>
           </div>
@@ -721,8 +868,8 @@ export default function Roadmap() {
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-border">
             <div
               role="tablist"
-              aria-label="Chọn bậc học lộ trình"
-              className="inline-flex p-1 bg-surface-alt border border-border rounded-xl self-start"
+              aria-label={pick('Chọn bậc học lộ trình', 'Select education track')}
+              className="inline-flex flex-wrap p-1 bg-surface-alt border border-border rounded-xl self-start gap-1"
             >
               <button
                 type="button"
@@ -738,7 +885,7 @@ export default function Roadmap() {
                 <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                   backpack
                 </span>
-                Học Sinh THPT
+                <span>{pick('Học Sinh THPT', 'High School')}</span>
               </button>
               <button
                 type="button"
@@ -754,7 +901,7 @@ export default function Roadmap() {
                 <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                   school
                 </span>
-                Sinh Viên Đại Học
+                <span>{pick('Sinh Viên Đại Học', 'University')}</span>
               </button>
             </div>
 
@@ -766,13 +913,17 @@ export default function Roadmap() {
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
                       flag
                     </span>
-                    THPT: {profile?.target_thpt ?? 27.0}/30
+                    <span>
+                      {pick('THPT', 'HS Exam')}: {profile?.target_thpt ?? 27.0}/30
+                    </span>
                   </span>
                   <span className="paper-chip bg-jade-soft text-jade border-jade-border tabular">
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
                       psychology
                     </span>
-                    ĐGNL: {profile?.target_dgnl ?? 900}
+                    <span>
+                      {pick('ĐGNL', 'Aptitude')}: {profile?.target_dgnl ?? 900}
+                    </span>
                   </span>
                   <button
                     type="button"
@@ -782,7 +933,7 @@ export default function Roadmap() {
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
                       account_balance
                     </span>
-                    Tra cứu điểm chuẩn
+                    <span>{pick('Tra cứu điểm chuẩn', 'Admission Cutoffs')}</span>
                   </button>
                 </>
               ) : (
@@ -791,18 +942,22 @@ export default function Roadmap() {
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
                       analytics
                     </span>
-                    GPA hiện tại:{' '}
-                    {profile?.current_gpa ? Number(profile.current_gpa).toFixed(2) : '—'}/4.0
+                    <span>
+                      {pick('GPA hiện tại:', 'Current GPA:')}{' '}
+                      {profile?.current_gpa ? Number(profile.current_gpa).toFixed(2) : '—'}/4.0
+                    </span>
                   </span>
                   <span className="paper-chip bg-gold-soft text-gold-dark border-gold tabular">
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
                       workspace_premium
                     </span>
-                    Mục tiêu:{' '}
-                    {profile?.target_gpa && Number(profile.target_gpa) <= 4
-                      ? Number(profile.target_gpa).toFixed(2)
-                      : '3.60'}
-                    /4.0
+                    <span>
+                      {pick('Mục tiêu:', 'Target:')}{' '}
+                      {profile?.target_gpa && Number(profile.target_gpa) <= 4
+                        ? Number(profile.target_gpa).toFixed(2)
+                        : '3.60'}
+                      /4.0
+                    </span>
                   </span>
                   <button
                     type="button"
@@ -812,7 +967,7 @@ export default function Roadmap() {
                     <span className="material-symbols-outlined text-sm" aria-hidden="true">
                       calculate
                     </span>
-                    Bàn tính GPA
+                    <span>{pick('Bàn tính GPA', 'GPA Calculator')}</span>
                   </button>
                 </>
               )}
@@ -821,46 +976,64 @@ export default function Roadmap() {
         </header>
 
         {!user && (
-          <div className="paper-card border-gold bg-gold-soft/50 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="paper-card border border-gold bg-gold-soft/50 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <p className="text-xs sm:text-sm font-medium text-foreground">
-              Bạn đang xem lộ trình mẫu ở chế độ khách. Đăng nhập để lưu trữ và tuỳ biến cột mốc
-              cá nhân trên đám mây.
+              {pick(
+                'Bạn đang xem lộ trình mẫu ở chế độ khách. Đăng nhập để lưu trữ và tuỳ biến cột mốc cá nhân trên đám mây.',
+                'You are viewing a sample roadmap in guest mode. Sign in to save and customize your personal milestones in the cloud.',
+              )}
             </p>
             <button
               type="button"
               onClick={() => navigate('/auth')}
-              className="btn-arena btn-arena-gold btn-arena-sm self-start sm:self-auto"
+              className="btn-arena btn-arena-gold btn-arena-sm self-start sm:self-auto shrink-0"
             >
               <span className="material-symbols-outlined text-base" aria-hidden="true">
                 login
               </span>
-              Đăng nhập ngay
+              <span>{pick('Đăng nhập ngay', 'Sign in now')}</span>
             </button>
           </div>
         )}
 
         {/* Overall Progress Summary Card */}
-        <section aria-label="Tổng quan tiến độ" className="paper-card p-5 sm:p-6">
+        <section
+          aria-label={pick('Tổng quan tiến độ', 'Overall progress summary')}
+          className="paper-card border border-border p-5 sm:p-6"
+        >
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4">
             <div>
               <span className="inline-block text-[11px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md bg-primary-soft text-primary border border-primary/30 mb-2">
-                {mode === 'student' ? 'Chiến dịch Vượt Vũ Môn' : 'Hành trình Tốt Nghiệp Xuất Sắc'}
+                {mode === 'student'
+                  ? pick('Chiến dịch Vượt Vũ Môn', 'Dragon Gate Campaign')
+                  : pick('Hành trình Tốt Nghiệp Xuất Sắc', 'Honors Graduation Track')}
               </span>
               <h2 className="text-xl sm:text-2xl font-display font-extrabold text-foreground">
-                Tổng Tiến Độ Lộ Trình
+                {pick('Tổng Tiến Độ Lộ Trình', 'Overall Roadmap Progress')}
               </h2>
               <p className="text-xs sm:text-sm text-secondary-text mt-1 tabular">
-                Đã hoàn thành <strong className="text-completed">{doneCount}</strong>/{totalCount}{' '}
-                cột mốc · Đang thực hiện <strong className="text-accent">{activeCount}</strong> giai
-                đoạn
+                {isEn ? (
+                  <>
+                    Completed <strong className="text-completed">{doneCount}</strong>/{totalCount}{' '}
+                    milestones · <strong className="text-accent">{activeCount}</strong> in progress
+                  </>
+                ) : (
+                  <>
+                    Đã hoàn thành <strong className="text-completed">{doneCount}</strong>/
+                    {totalCount} cột mốc · Đang thực hiện{' '}
+                    <strong className="text-accent">{activeCount}</strong> giai đoạn
+                  </>
+                )}
               </p>
             </div>
 
-            <div className="text-left sm:text-right no-shrink">
+            <div className="text-left sm:text-right shrink-0">
               <div className="text-3xl sm:text-4xl font-display font-extrabold text-primary tabular">
                 {overallPercent}%
               </div>
-              <p className="text-xs text-muted-foreground">Hoàn thành toàn lộ trình</p>
+              <p className="text-xs text-muted-foreground">
+                {pick('Hoàn thành toàn lộ trình', 'Total completion')}
+              </p>
             </div>
           </div>
 
@@ -874,26 +1047,66 @@ export default function Roadmap() {
 
         {/* Timeline Milestones */}
         <main className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-base sm:text-lg font-display font-extrabold text-foreground flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary" aria-hidden="true">
-                timeline
-              </span>
-              Các Cột Mốc Chiến Lược ({totalCount})
-            </h3>
-            <p className="text-xs text-secondary-text">
-              Nhấn vào nhãn trạng thái hoặc thanh phần trăm để cập nhật nhanh
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-base sm:text-lg font-display font-extrabold text-foreground flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary" aria-hidden="true">
+                  timeline
+                </span>
+                <span>
+                  {pick('Các Cột Mốc Chiến Lược', 'Strategic Milestones')} ({totalCount})
+                </span>
+              </h3>
+              <p className="text-xs text-secondary-text mt-0.5">
+                {pick(
+                  'Nhấn vào nhãn trạng thái hoặc thanh phần trăm để cập nhật nhanh',
+                  'Click a status badge or percentage chip to update progress quickly',
+                )}
+              </p>
+            </div>
+
+            {milestones.length > 0 && (
+              <div
+                role="tablist"
+                aria-label={pick('Lọc trạng thái cột mốc', 'Filter milestones by status')}
+                className="inline-flex flex-wrap p-1 rounded-xl bg-surface-alt border border-border gap-1 self-start sm:self-auto"
+              >
+                {[
+                  { id: 'all', label: pick('Tất cả', 'All'), count: totalCount },
+                  { id: 'active', label: pick('Đang thực hiện', 'In Progress'), count: activeCount },
+                  { id: 'done', label: pick('Hoàn thành', 'Completed'), count: doneCount },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={statusFilter === tab.id}
+                    onClick={() => setStatusFilter(tab.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer tabular ${
+                      statusFilter === tab.id
+                        ? 'bg-paper text-primary border border-border-strong shadow-2xs'
+                        : 'text-secondary-text hover:text-foreground'
+                    }`}
+                  >
+                    {tab.label} ({tab.count})
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {loading ? (
-            <div className="space-y-3" role="status" aria-label="Đang tải lộ trình">
+            <div
+              className="space-y-3"
+              role="status"
+              aria-label={pick('Đang tải lộ trình', 'Loading roadmap')}
+            >
               <ListItemSkeleton />
               <ListItemSkeleton />
               <ListItemSkeleton />
             </div>
           ) : milestones.length === 0 ? (
-            <div className="paper-card p-10 text-center space-y-4 border-dashed">
+            <div className="paper-card p-10 text-center space-y-4 border border-dashed border-border-strong">
               <div className="w-14 h-14 mx-auto rounded-2xl bg-gold-soft border border-gold flex items-center justify-center text-accent">
                 <span className="material-symbols-outlined text-3xl" aria-hidden="true">
                   explore
@@ -901,11 +1114,16 @@ export default function Roadmap() {
               </div>
               <div className="space-y-1 max-w-md mx-auto">
                 <h4 className="font-display text-lg font-bold text-foreground">
-                  Chưa có cột mốc nào cho chế độ này
+                  {pick(
+                    'Chưa có cột mốc nào cho chế độ này',
+                    'No milestones for this track yet',
+                  )}
                 </h4>
                 <p className="text-xs sm:text-sm text-secondary-text leading-relaxed">
-                  Khởi tạo bộ lộ trình chuẩn chỉ với 1 cú nhấp hoặc tự thiết kế các giai đoạn ôn
-                  luyện mang dấu ấn riêng của bạn.
+                  {pick(
+                    'Khởi tạo bộ lộ trình chuẩn chỉ với 1 cú nhấp hoặc tự thiết kế các giai đoạn ôn luyện mang dấu ấn riêng của bạn.',
+                    'Initialize our curated starter roadmap in one click, or design custom study stages tailored to your goals.',
+                  )}
                 </p>
               </div>
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -918,7 +1136,11 @@ export default function Roadmap() {
                   <span className="material-symbols-outlined text-base" aria-hidden="true">
                     auto_awesome
                   </span>
-                  {isSeeding ? 'Đang khởi tạo...' : 'Khởi tạo lộ trình mẫu'}
+                  <span>
+                    {isSeeding
+                      ? pick('Đang khởi tạo...', 'Initializing...')
+                      : pick('Khởi tạo lộ trình mẫu', 'Load Starter Roadmap')}
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -928,17 +1150,46 @@ export default function Roadmap() {
                   <span className="material-symbols-outlined text-base" aria-hidden="true">
                     add
                   </span>
-                  Tự tạo cột mốc đầu tiên
+                  <span>{pick('Tự tạo cột mốc đầu tiên', 'Create First Milestone')}</span>
                 </button>
               </div>
             </div>
+          ) : visibleMilestones.length === 0 ? (
+            <div className="paper-card p-8 text-center space-y-3 border border-dashed border-border-strong">
+              <span
+                className="material-symbols-outlined text-3xl text-muted-foreground"
+                aria-hidden="true"
+              >
+                filter_list_off
+              </span>
+              <p className="font-display font-bold text-sm text-foreground">
+                {pick(
+                  'Không có cột mốc nào thuộc bộ lọc trạng thái này',
+                  'No milestones match this status filter',
+                )}
+              </p>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('all')}
+                className="btn-arena btn-arena-secondary btn-arena-sm"
+              >
+                {pick('Xem tất cả cột mốc', 'Show all milestones')}
+              </button>
+            </div>
           ) : (
-            <div className="relative pl-5 sm:pl-7 border-l-2 border-border-strong space-y-5">
-              {milestones.map((m, index) => {
+            <div className="relative ml-3.5 sm:ml-4 pl-5 sm:pl-7 border-l-2 border-border-strong space-y-5">
+              {visibleMilestones.map((m) => {
+                const realIndex = milestones.findIndex((item) => item.id === m.id);
                 const meta = STATUS_META[m.status] || STATUS_META.locked;
-                const isFirst = index === 0;
-                const isLast = index === milestones.length - 1;
+                const statusLabel = isEn ? meta.labelEn : meta.labelVi;
+                const isFirst = realIndex <= 0;
+                const isLast = realIndex === milestones.length - 1;
                 const isConfirmingDelete = confirmDeleteId === m.id;
+                const starterRef = STARTER_BY_ID[m.id];
+                const displayTitle =
+                  starterRef && isEn ? starterRef.titleEn : m.title;
+                const displaySubtitle =
+                  starterRef && isEn ? starterRef.subtitleEn : m.subtitle;
 
                 return (
                   <article key={m.id} className="relative">
@@ -946,9 +1197,15 @@ export default function Roadmap() {
                     <button
                       type="button"
                       onClick={() => handleCycleStatus(m)}
-                      title={`Đổi trạng thái cột mốc (hiện tại: ${meta.label})`}
-                      aria-label={`Đổi trạng thái cột mốc ${index + 1}: ${m.title}`}
-                      className={`absolute -left-[33px] sm:-left-[41px] top-4 w-7 h-7 rounded-full flex items-center justify-center cursor-pointer transition-all border-2 ${meta.nodeClass}`}
+                      title={pick(
+                        `Đổi trạng thái cột mốc (hiện tại: ${statusLabel})`,
+                        `Cycle milestone status (current: ${statusLabel})`,
+                      )}
+                      aria-label={pick(
+                        `Đổi trạng thái cột mốc ${realIndex + 1}: ${displayTitle}`,
+                        `Cycle status for milestone ${realIndex + 1}: ${displayTitle}`,
+                      )}
+                      className={`absolute -left-[35px] sm:-left-[43px] top-4 w-7 h-7 rounded-full flex items-center justify-center cursor-pointer transition-all border-2 ${meta.nodeClass}`}
                     >
                       {m.status === 'done' ? (
                         <span
@@ -958,18 +1215,21 @@ export default function Roadmap() {
                           check
                         </span>
                       ) : (
-                        <span className="text-xs font-bold tabular">{index + 1}</span>
+                        <span className="text-xs font-bold tabular">{realIndex + 1}</span>
                       )}
                     </button>
 
-                    <div className={`paper-card p-4 sm:p-5 transition-all ${meta.cardClass}`}>
+                    <div className={`paper-card border p-4 sm:p-5 transition-all ${meta.cardClass}`}>
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                         <div className="space-y-1.5 flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <button
                               type="button"
                               onClick={() => handleCycleStatus(m)}
-                              title="Nhấn để chuyển trạng thái tiếp theo"
+                              title={pick(
+                                'Nhấn để chuyển trạng thái tiếp theo',
+                                'Click to cycle to next status',
+                              )}
                               className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full border transition-opacity hover:opacity-85 cursor-pointer ${meta.badgeClass}`}
                             >
                               <span
@@ -978,10 +1238,10 @@ export default function Roadmap() {
                               >
                                 {meta.icon}
                               </span>
-                              {meta.label}
+                              <span>{statusLabel}</span>
                             </button>
                             <span className="text-xs font-bold text-secondary-text tabular">
-                              • Tiến độ {m.progress}%
+                              {pick(`• Tiến độ ${m.progress}%`, `• ${m.progress}% complete`)}
                             </span>
                           </div>
 
@@ -990,23 +1250,23 @@ export default function Roadmap() {
                               m.status === 'locked' ? 'text-secondary-text' : 'text-foreground'
                             }`}
                           >
-                            {m.title}
+                            {displayTitle}
                           </h4>
-                          {m.subtitle && (
+                          {displaySubtitle && (
                             <p className="text-xs sm:text-sm text-secondary-text leading-relaxed">
-                              {m.subtitle}
+                              {displaySubtitle}
                             </p>
                           )}
                         </div>
 
                         {/* Action Controls */}
-                        <div className="flex items-center gap-1 self-end sm:self-start no-shrink">
+                        <div className="flex items-center gap-1 self-end sm:self-start shrink-0">
                           <button
                             type="button"
-                            disabled={isFirst || Boolean(reorderingId)}
-                            onClick={() => handleMoveMilestone(index, 'up')}
-                            aria-label="Chuyển lên trên"
-                            title="Chuyển lên trên"
+                            disabled={statusFilter !== 'all' || isFirst || Boolean(reorderingId)}
+                            onClick={() => handleMoveMilestone(realIndex, 'up')}
+                            aria-label={pick('Chuyển lên trên', 'Move milestone up')}
+                            title={pick('Chuyển lên trên', 'Move up')}
                             className="w-9 h-9 rounded-lg bg-surface-alt border border-border text-secondary-text hover:text-foreground hover:border-border-strong disabled:opacity-40 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
                           >
                             <span
@@ -1018,10 +1278,10 @@ export default function Roadmap() {
                           </button>
                           <button
                             type="button"
-                            disabled={isLast || Boolean(reorderingId)}
-                            onClick={() => handleMoveMilestone(index, 'down')}
-                            aria-label="Chuyển xuống dưới"
-                            title="Chuyển xuống dưới"
+                            disabled={statusFilter !== 'all' || isLast || Boolean(reorderingId)}
+                            onClick={() => handleMoveMilestone(realIndex, 'down')}
+                            aria-label={pick('Chuyển xuống dưới', 'Move milestone down')}
+                            title={pick('Chuyển xuống dưới', 'Move down')}
                             className="w-9 h-9 rounded-lg bg-surface-alt border border-border text-secondary-text hover:text-foreground hover:border-border-strong disabled:opacity-40 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
                           >
                             <span
@@ -1034,8 +1294,11 @@ export default function Roadmap() {
                           <button
                             type="button"
                             onClick={() => openEditModal(m)}
-                            aria-label={`Chỉnh sửa ${m.title}`}
-                            title="Chỉnh sửa"
+                            aria-label={pick(
+                              `Chỉnh sửa ${displayTitle}`,
+                              `Edit ${displayTitle}`,
+                            )}
+                            title={pick('Chỉnh sửa', 'Edit')}
                             className="w-9 h-9 rounded-lg bg-surface-alt border border-border text-secondary-text hover:text-primary hover:border-primary/40 flex items-center justify-center cursor-pointer"
                           >
                             <span
@@ -1050,8 +1313,8 @@ export default function Roadmap() {
                             onClick={() =>
                               setConfirmDeleteId(isConfirmingDelete ? null : m.id)
                             }
-                            aria-label={`Xoá ${m.title}`}
-                            title="Xoá cột mốc"
+                            aria-label={pick(`Xoá ${displayTitle}`, `Delete ${displayTitle}`)}
+                            title={pick('Xoá cột mốc', 'Delete milestone')}
                             className="w-9 h-9 rounded-lg bg-surface-alt border border-border text-secondary-text hover:text-primary hover:border-primary/40 flex items-center justify-center cursor-pointer"
                           >
                             <span
@@ -1068,7 +1331,10 @@ export default function Roadmap() {
                       {isConfirmingDelete && (
                         <div className="mt-3 p-3 rounded-xl bg-primary-soft border border-primary/35 flex flex-wrap items-center justify-between gap-2">
                           <span className="text-xs font-semibold text-foreground">
-                            Bạn chắc chắn muốn xoá cột mốc này khỏi lộ trình?
+                            {pick(
+                              'Bạn chắc chắn muốn xoá cột mốc này khỏi lộ trình?',
+                              'Are you sure you want to remove this milestone from your roadmap?',
+                            )}
                           </span>
                           <div className="flex items-center gap-2">
                             <button
@@ -1076,14 +1342,14 @@ export default function Roadmap() {
                               onClick={() => setConfirmDeleteId(null)}
                               className="px-3 py-1.5 rounded-lg bg-surface border border-border text-xs font-bold text-secondary-text hover:text-foreground cursor-pointer"
                             >
-                              Huỷ
+                              {pick('Huỷ', 'Cancel')}
                             </button>
                             <button
                               type="button"
                               onClick={() => handleDeleteMilestone(m.id)}
                               className="px-3 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-bold cursor-pointer"
                             >
-                              Xác nhận xoá
+                              {pick('Xác nhận xoá', 'Confirm Delete')}
                             </button>
                           </div>
                         </div>
@@ -1105,7 +1371,7 @@ export default function Roadmap() {
                               htmlFor={`progress-range-${m.id}`}
                               className="text-[11px] font-semibold text-muted-foreground whitespace-nowrap"
                             >
-                              Kéo tiến độ:
+                              {pick('Kéo tiến độ:', 'Slide progress:')}
                             </label>
                             <input
                               id={`progress-range-${m.id}`}
@@ -1158,7 +1424,9 @@ export default function Roadmap() {
                 <span className="material-symbols-outlined text-lg" aria-hidden="true">
                   add_circle
                 </span>
-                Thêm cột mốc chiến lược mới
+                <span>
+                  {pick('Thêm cột mốc chiến lược mới', 'Add a new strategic milestone')}
+                </span>
               </button>
             </div>
           )}
@@ -1172,7 +1440,7 @@ export default function Roadmap() {
           onClick={() => setIsEditModalOpen(false)}
         >
           <div
-            className="imperial-frame w-full max-w-md p-6"
+            className="imperial-frame w-full max-w-md p-6 bg-surface"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -1180,12 +1448,16 @@ export default function Roadmap() {
                 <span className="material-symbols-outlined text-primary" aria-hidden="true">
                   edit_note
                 </span>
-                {editingForm.id ? 'Chỉnh sửa cột mốc' : 'Thêm cột mốc mới'}
+                <span>
+                  {editingForm.id
+                    ? pick('Chỉnh sửa cột mốc', 'Edit Milestone')
+                    : pick('Thêm cột mốc mới', 'Add New Milestone')}
+                </span>
               </h3>
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(false)}
-                aria-label="Đóng hộp thoại"
+                aria-label={pick('Đóng hộp thoại', 'Close dialog')}
                 className="text-muted-foreground hover:text-foreground p-1 rounded-lg cursor-pointer"
               >
                 <span className="material-symbols-outlined" aria-hidden="true">
@@ -1200,14 +1472,18 @@ export default function Roadmap() {
                   htmlFor="milestone-title"
                   className="block text-xs font-bold text-foreground mb-1.5"
                 >
-                  Tiêu đề giai đoạn / Mục tiêu <span className="text-primary">*</span>
+                  {pick('Tiêu đề giai đoạn / Mục tiêu', 'Stage / Milestone Title')}{' '}
+                  <span className="text-primary">*</span>
                 </label>
                 <input
                   id="milestone-title"
                   type="text"
                   required
                   maxLength={140}
-                  placeholder="VD: Giai đoạn luyện 20 đề thực chiến Toán - Lý - Hoá"
+                  placeholder={pick(
+                    'VD: Giai đoạn luyện 20 đề thực chiến Toán - Lý - Hoá',
+                    'e.g., Complete 20 full-length Math–Physics–Chemistry mock tests',
+                  )}
                   value={editingForm.title}
                   onChange={(e) =>
                     setEditingForm((prev) => ({ ...prev, title: e.target.value }))
@@ -1221,13 +1497,16 @@ export default function Roadmap() {
                   htmlFor="milestone-subtitle"
                   className="block text-xs font-bold text-foreground mb-1.5"
                 >
-                  Mô tả chi tiết / Kế hoạch hành động
+                  {pick('Mô tả chi tiết / Kế hoạch hành động', 'Description / Action Plan')}
                 </label>
                 <textarea
                   id="milestone-subtitle"
                   rows={3}
                   maxLength={400}
-                  placeholder="VD: Mỗi tuần giải 3 đề bấm giờ, tổng hợp công thức giải nhanh..."
+                  placeholder={pick(
+                    'VD: Mỗi tuần giải 3 đề bấm giờ, tổng hợp công thức giải nhanh...',
+                    'e.g., Solve 3 timed papers per week and summarize key shortcut formulas...',
+                  )}
                   value={editingForm.subtitle}
                   onChange={(e) =>
                     setEditingForm((prev) => ({ ...prev, subtitle: e.target.value }))
@@ -1242,7 +1521,7 @@ export default function Roadmap() {
                     htmlFor="milestone-status"
                     className="block text-xs font-bold text-foreground mb-1.5"
                   >
-                    Trạng thái
+                    {pick('Trạng thái', 'Status')}
                   </label>
                   <select
                     id="milestone-status"
@@ -1264,9 +1543,9 @@ export default function Roadmap() {
                     }}
                     className="w-full px-3.5 py-2.5 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
                   >
-                    <option value="active">Đang thực hiện</option>
-                    <option value="done">Hoàn thành (100%)</option>
-                    <option value="locked">Đang chờ (0%)</option>
+                    <option value="active">{pick('Đang thực hiện', 'In Progress')}</option>
+                    <option value="done">{pick('Hoàn thành (100%)', 'Completed (100%)')}</option>
+                    <option value="locked">{pick('Đang chờ (0%)', 'Upcoming (0%)')}</option>
                   </select>
                 </div>
 
@@ -1275,7 +1554,7 @@ export default function Roadmap() {
                     htmlFor="milestone-progress"
                     className="block text-xs font-bold text-foreground mb-1.5 tabular"
                   >
-                    Tiến độ ({editingForm.progress}%)
+                    {pick('Tiến độ', 'Progress')} ({editingForm.progress}%)
                   </label>
                   <input
                     id="milestone-progress"
@@ -1302,7 +1581,7 @@ export default function Roadmap() {
                   onClick={() => setIsEditModalOpen(false)}
                   className="btn-arena btn-arena-secondary btn-arena-sm"
                 >
-                  Huỷ
+                  {pick('Huỷ', 'Cancel')}
                 </button>
                 <button
                   type="submit"
@@ -1312,7 +1591,11 @@ export default function Roadmap() {
                   <span className="material-symbols-outlined text-base" aria-hidden="true">
                     save
                   </span>
-                  {isSubmitting ? 'Đang lưu...' : 'Lưu cột mốc'}
+                  <span>
+                    {isSubmitting
+                      ? pick('Đang lưu...', 'Saving...')
+                      : pick('Lưu cột mốc', 'Save Milestone')}
+                  </span>
                 </button>
               </div>
             </form>
@@ -1327,7 +1610,7 @@ export default function Roadmap() {
           onClick={() => setIsSettingsOpen(false)}
         >
           <div
-            className="imperial-frame w-full max-w-md p-6"
+            className="imperial-frame w-full max-w-md p-6 bg-surface"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -1335,12 +1618,18 @@ export default function Roadmap() {
                 <span className="material-symbols-outlined text-accent" aria-hidden="true">
                   tune
                 </span>
-                Thiết lập Mục tiêu ({mode === 'student' ? 'THPT' : 'Đại học'})
+                <span>
+                  {pick('Thiết lập Mục tiêu', 'Strategic Targets')} (
+                  {mode === 'student'
+                    ? pick('THPT', 'High School')
+                    : pick('Đại học', 'University')}
+                  )
+                </span>
               </h3>
               <button
                 type="button"
                 onClick={() => setIsSettingsOpen(false)}
-                aria-label="Đóng hộp thoại mục tiêu"
+                aria-label={pick('Đóng hộp thoại mục tiêu', 'Close targets dialog')}
                 className="text-muted-foreground hover:text-foreground p-1 rounded-lg cursor-pointer"
               >
                 <span className="material-symbols-outlined" aria-hidden="true">
@@ -1353,12 +1642,16 @@ export default function Roadmap() {
               {mode === 'student' ? (
                 <>
                   <div className="p-4 rounded-xl bg-paper border border-border space-y-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <label htmlFor="target-thpt" className="text-xs font-bold text-foreground">
-                        Mục tiêu điểm thi THPT Quốc Gia (Hệ 30)
+                        {pick(
+                          'Mục tiêu điểm thi THPT Quốc Gia (Hệ 30)',
+                          'National High School Exam Target (Scale 30)',
+                        )}
                       </label>
-                      <span className="font-display font-extrabold text-lg text-primary tabular">
-                        {targetThpt}đ
+                      <span className="font-display font-extrabold text-lg text-primary tabular shrink-0">
+                        {targetThpt}
+                        {pick('đ', ' pts')}
                       </span>
                     </div>
                     <input
@@ -1374,12 +1667,16 @@ export default function Roadmap() {
                   </div>
 
                   <div className="p-4 rounded-xl bg-paper border border-border space-y-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <label htmlFor="target-dgnl" className="text-xs font-bold text-foreground">
-                        Mục tiêu Đánh giá năng lực (Thang 1200)
+                        {pick(
+                          'Mục tiêu Đánh giá năng lực (Thang 1200)',
+                          'Aptitude Test Target (Scale 1200)',
+                        )}
                       </label>
-                      <span className="font-display font-extrabold text-lg text-jade tabular">
-                        {targetDgnl}đ
+                      <span className="font-display font-extrabold text-lg text-jade tabular shrink-0">
+                        {targetDgnl}
+                        {pick('đ', ' pts')}
                       </span>
                     </div>
                     <input
@@ -1396,11 +1693,14 @@ export default function Roadmap() {
                 </>
               ) : (
                 <div className="p-4 rounded-xl bg-paper border border-border space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <label htmlFor="target-gpa-uni" className="text-xs font-bold text-foreground">
-                      Mục tiêu GPA tích luỹ Đại học (Hệ 4.0)
+                      {pick(
+                        'Mục tiêu GPA tích luỹ Đại học (Hệ 4.0)',
+                        'Cumulative University GPA Target (Scale 4.0)',
+                      )}
                     </label>
-                    <span className="font-display font-extrabold text-lg text-primary tabular">
+                    <span className="font-display font-extrabold text-lg text-primary tabular shrink-0">
                       {Number(targetGpa).toFixed(2)} / 4.0
                     </span>
                   </div>
@@ -1423,7 +1723,7 @@ export default function Roadmap() {
                   onClick={() => setIsSettingsOpen(false)}
                   className="btn-arena btn-arena-secondary btn-arena-sm"
                 >
-                  Huỷ
+                  {pick('Huỷ', 'Cancel')}
                 </button>
                 <button
                   type="submit"
@@ -1433,7 +1733,11 @@ export default function Roadmap() {
                   <span className="material-symbols-outlined text-base" aria-hidden="true">
                     save
                   </span>
-                  {isSavingSettings ? 'Đang lưu...' : 'Lưu mục tiêu'}
+                  <span>
+                    {isSavingSettings
+                      ? pick('Đang lưu...', 'Saving...')
+                      : pick('Lưu mục tiêu', 'Save Targets')}
+                  </span>
                 </button>
               </div>
             </form>

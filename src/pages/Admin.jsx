@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Navigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../components/ui/ToastProvider';
 import { assertSafeExternalUrl } from '../utils/urlSecurity';
@@ -27,7 +28,13 @@ const normalizeDirectoryRow = (row) => ({
 
 export default function Admin() {
   const { user, profile, isAdmin } = useAuth();
+  const { locale, t, formatNumber } = useLanguage();
   const { showToast } = useToast();
+
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
 
   const [activeTab, setActiveTab] = useState('library'); // 'library' | 'users' | 'thongsoai' | 'orders'
 
@@ -54,7 +61,7 @@ export default function Admin() {
   const [searchResults, setSearchResults] = useState([]);
   const [collaborators, setCollaborators] = useState([]);
   const [loadingCollabs, setLoadingCollabs] = useState(false);
-  const [directoryWarning, setDirectoryWarning] = useState('');
+  const [hasDirectoryWarning, setHasDirectoryWarning] = useState(false);
 
   // Tab 3: Thong Soai & Bang Chu State
   const [candidates, setCandidates] = useState([]);
@@ -83,8 +90,8 @@ export default function Admin() {
       if (error) throw error;
       setDocuments(data || []);
     } catch (err) {
-      console.error('Lỗi tải tài liệu:', err.message);
-      showToast('Lỗi tải kho tài liệu: ' + err.message, 'error');
+      console.error('Error loading documents:', err.message);
+      showToast(tRef.current('admin.toastLoadDocsError', { error: err.message }), 'error');
     } finally {
       setLoadingDocs(false);
     }
@@ -103,7 +110,7 @@ export default function Admin() {
       if (error) throw error;
       setReports(data || []);
     } catch (err) {
-      console.error('Lỗi tải báo cáo:', err.message);
+      console.error('Error loading reports:', err.message);
     } finally {
       setLoadingReports(false);
     }
@@ -140,13 +147,13 @@ export default function Admin() {
   const handleSaveDocument = async (e) => {
     e.preventDefault();
     if (!title.trim()) {
-      showToast('Vui lòng nhập tiêu đề tài liệu!', 'warning');
+      showToast(t('admin.toastTitleRequired'), 'warning');
       return;
     }
 
     let safeUrl = '';
     try {
-      safeUrl = assertSafeExternalUrl(fileUrl, 'URL tài liệu không hợp lệ!');
+      safeUrl = assertSafeExternalUrl(fileUrl, t('admin.toastInvalidUrl'));
     } catch (urlErr) {
       showToast(urlErr.message, 'warning');
       return;
@@ -162,7 +169,7 @@ export default function Admin() {
         category_id: category,
         education_level: educationLevel,
         major: major.trim(),
-        author_name: authorName.trim() || profile?.display_name || 'Khuyết danh',
+        author_name: authorName.trim() || profile?.display_name || t('admin.anonymousAuthor'),
         file_url: safeUrl,
         is_featured: isFeatured,
         is_public: isPublic,
@@ -177,17 +184,17 @@ export default function Admin() {
           .eq('id', docId);
 
         if (error) throw error;
-        showToast('Đã cập nhật tài liệu thành công!', 'success');
+        showToast(t('admin.toastDocUpdated'), 'success');
       } else {
         const { error } = await supabase.from('documents').insert([payload]);
         if (error) throw error;
-        showToast('Đã thêm tài liệu mới vào Thư viện!', 'success');
+        showToast(t('admin.toastDocAdded'), 'success');
       }
 
       handleResetDocForm();
       fetchDocuments();
     } catch (err) {
-      showToast('Lỗi lưu tài liệu: ' + err.message, 'error');
+      showToast(t('admin.toastSaveDocError', { error: err.message }), 'error');
     } finally {
       setIsUploading(false);
     }
@@ -197,11 +204,11 @@ export default function Admin() {
     try {
       const { error } = await supabase.from('documents').delete().eq('id', targetDocId);
       if (error) throw error;
-      showToast('Đã xóa tài liệu khỏi hệ thống', 'info');
+      showToast(t('admin.toastDocDeleted'), 'info');
       fetchDocuments();
       fetchReports();
     } catch (err) {
-      showToast('Lỗi khi xóa tài liệu: ' + err.message, 'error');
+      showToast(t('admin.toastDeleteDocError', { error: err.message }), 'error');
     }
   };
 
@@ -213,10 +220,10 @@ export default function Admin() {
         .eq('id', reportId);
 
       if (error) throw error;
-      showToast('Đã giải quyết báo cáo sự cố', 'success');
+      showToast(t('admin.toastReportResolved'), 'success');
       setReports((prev) => prev.filter((r) => r.id !== reportId));
     } catch (err) {
-      showToast('Lỗi xử lý báo cáo: ' + err.message, 'error');
+      showToast(t('admin.toastReportError', { error: err.message }), 'error');
     }
   };
 
@@ -235,7 +242,7 @@ export default function Admin() {
       if (error) throw error;
       setCollaborators((data || []).map(normalizeDirectoryRow));
     } catch (err) {
-      console.error('Lỗi tải danh sách CTV:', err);
+      console.error('Error loading collaborators:', err);
     } finally {
       setLoadingCollabs(false);
     }
@@ -247,7 +254,7 @@ export default function Admin() {
     if (!queryTerm) return;
 
     setLoadingCollabs(true);
-    setDirectoryWarning('');
+    setHasDirectoryWarning(false);
     try {
       // 1. Try RPC admin_user_directory first
       const { data, error } = await supabase.rpc('admin_user_directory', {
@@ -263,7 +270,7 @@ export default function Admin() {
     } catch (rpcErr) {
       // 2. Fallback to profiles query
       console.warn('admin_user_directory rpc failed, fallback to profiles query:', rpcErr);
-      setDirectoryWarning('Đang tìm kiếm dự phòng qua bảng profiles.');
+      setHasDirectoryWarning(true);
       try {
         const { data: fallbackData, error: fallbackErr } = await supabase
           .from('profiles')
@@ -275,7 +282,7 @@ export default function Admin() {
           setSearchResults(fallbackData.map(normalizeDirectoryRow));
         }
       } catch (fErr) {
-        showToast('Lỗi tìm kiếm: ' + fErr.message, 'error');
+        showToast(t('admin.toastSearchError', { error: fErr.message }), 'error');
       }
     } finally {
       setLoadingCollabs(false);
@@ -293,8 +300,8 @@ export default function Admin() {
 
       showToast(
         newRole === 'collaborator'
-          ? `Đã sắc phong Truyền Đạo Sư cho ${name}!`
-          : `Đã thu hồi quyền Truyền Đạo Sư của ${name}!`,
+          ? t('admin.toastGrantedCurator', { name })
+          : t('admin.toastRevokedCurator', { name }),
         'success',
       );
 
@@ -304,7 +311,7 @@ export default function Admin() {
         prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)),
       );
     } catch (err) {
-      showToast('Lỗi cập nhật phân quyền: ' + err.message, 'error');
+      showToast(t('admin.toastRoleError', { error: err.message }), 'error');
     }
   };
 
@@ -341,7 +348,7 @@ export default function Admin() {
         setApprovedBangChuList(bangChuData.map(normalizeDirectoryRow));
       }
     } catch (err) {
-      console.error('Lỗi tải dữ liệu Bang Chủ:', err);
+      console.error('Error loading Guildmaster data:', err);
     } finally {
       setLoadingCandidates(false);
     }
@@ -350,10 +357,7 @@ export default function Admin() {
   const handleToggleBangChu = async (userId, currentStatus, name) => {
     const nextStatus = !currentStatus;
     if (nextStatus && !isSoleBangChuAccount(null, userId)) {
-      showToast(
-        'Ngôi vị Bang Chủ là độc tôn — không tài khoản nào khác được phép là Bang Chủ!',
-        'warning',
-      );
+      showToast(t('admin.toastSoleBangChuWarning'), 'warning');
       return;
     }
     try {
@@ -366,14 +370,14 @@ export default function Admin() {
 
       showToast(
         nextStatus
-          ? `Đã xác nhận ngôi vị Bang Chủ cho ${name}!`
-          : `Đã thu hồi danh hiệu Bang Chủ của ${name}!`,
+          ? t('admin.toastApprovedBangChu', { name })
+          : t('admin.toastRevokedBangChu', { name }),
         'success',
       );
 
       fetchThongSoaiData();
     } catch (err) {
-      showToast('Lỗi cập nhật Bang Chủ: ' + err.message, 'error');
+      showToast(t('admin.toastBangChuError', { error: err.message }), 'error');
     }
   };
 
@@ -399,8 +403,8 @@ export default function Admin() {
       if (error) throw error;
       setOrders(data || []);
     } catch (err) {
-      console.error('Lỗi tải danh sách đơn hàng:', err);
-      showToast('Lỗi tải đơn hàng: ' + err.message, 'error');
+      console.error('Error loading orders:', err);
+      showToast(tRef.current('admin.toastLoadOrdersError', { error: err.message }), 'error');
     } finally {
       setLoadingOrders(false);
     }
@@ -429,16 +433,30 @@ export default function Admin() {
           .eq('id', userId);
       }
 
-      showToast(`Đã cập nhật trạng thái đơn thành "${newStatus}"!`, 'success');
+      const localizedStatus =
+        newStatus === 'paid'
+          ? t('admin.statusPaid')
+          : newStatus === 'expired'
+            ? t('admin.statusExpired')
+            : t('admin.statusPending');
+      showToast(t('admin.toastOrderUpdated', { status: localizedStatus }), 'success');
       fetchOrders();
     } catch (err) {
-      showToast('Lỗi cập nhật đơn: ' + err.message, 'error');
+      showToast(t('admin.toastOrderError', { error: err.message }), 'error');
     } finally {
       setProcessingOrderId(null);
     }
   };
 
-  // Trigger loads based on active tab
+  // Load baseline overview metrics once for admins
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetchDocuments();
+    fetchReports();
+    fetchCollaborators();
+  }, [isAdmin, fetchDocuments, fetchReports, fetchCollaborators]);
+
+  // Trigger tab-specific refreshes
   useEffect(() => {
     if (!isAdmin) return;
     if (activeTab === 'library') {
@@ -464,65 +482,99 @@ export default function Admin() {
   if (!isAdmin) {
     return (
       <div className="min-h-full bg-background flex items-center justify-center p-6">
-        <div className="imperial-frame p-8 max-w-md text-center space-y-4">
+        <div className="imperial-frame p-6 sm:p-8 max-w-md text-center space-y-4">
           <div className="w-14 h-14 rounded-2xl bg-primary-soft text-primary flex items-center justify-center mx-auto">
             <span className="material-symbols-outlined text-3xl" aria-hidden="true">
               admin_panel_settings
             </span>
           </div>
-          <h2 className="font-display font-bold text-xl text-foreground">
-            Khu vực Quản trị Quân Sư
+          <h2 className="font-display font-bold text-xl text-foreground leading-snug">
+            {t('admin.restrictedTitle')}
           </h2>
           <p className="text-xs text-secondary-text leading-relaxed">
-            Trang này chỉ dành riêng cho Ban Quản trị hệ thống Đấu Trường Học Tập.
+            {t('admin.restrictedDesc')}
           </p>
           <Link to="/" className="btn-arena btn-arena-primary inline-flex">
-            <span>Về trang chủ</span>
+            <span>{t('admin.backHome')}</span>
           </Link>
         </div>
       </div>
     );
   }
 
+  const tabs = [
+    { id: 'library', label: t('admin.tabLibrary'), icon: 'menu_book' },
+    { id: 'users', label: t('admin.tabUsers'), icon: 'groups' },
+    { id: 'thongsoai', label: t('admin.tabThongSoai'), icon: 'workspace_premium' },
+    { id: 'orders', label: t('admin.tabOrders'), icon: 'receipt_long' },
+  ];
+
   return (
     <div className="bg-background font-sans text-foreground min-h-full pb-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        {/* Header */}
-        <header className="imperial-frame p-5 sm:p-7 mb-6 relative overflow-hidden">
+        {/* Header — calibrated p-5 sm:p-8 */}
+        <header className="imperial-frame p-5 sm:p-8 mb-6 relative overflow-hidden">
           <span
             aria-hidden="true"
-            className="hanzi-watermark absolute top-2 right-6 text-8xl font-bold text-accent/8"
+            className="hanzi-watermark absolute top-2 right-6 text-8xl font-bold text-accent/8 select-none pointer-events-none"
           >
             政務
           </span>
 
-          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
             <div>
               <div className="mb-2">
-                <RankSeal size="sm" icon="admin_panel_settings" label="Nội Các Triều Đình" />
+                <RankSeal size="sm" icon="admin_panel_settings" label={t('admin.sealLabel')} />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-display font-extrabold tracking-tight text-foreground">
-                Trung Tâm Quản Trị Hệ Thống
+              <h1 className="text-2xl sm:text-3xl font-display font-extrabold tracking-tight text-foreground leading-snug">
+                {t('admin.title')}
               </h1>
-              <p className="text-xs sm:text-sm text-secondary-text mt-1">
-                Điều phối kho tàng học liệu, duyệt Bang Chủ, quản lý đơn hàng &amp; danh bạ sĩ tử
+              <p className="text-xs sm:text-sm text-secondary-text mt-1">{t('admin.subtitle')}</p>
+            </div>
+          </div>
+
+          {/* Overview Quick Stats Tiles */}
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+            <div className="p-3.5 rounded-xl bg-paper border border-border">
+              <p className="text-[11px] text-secondary-text">{t('admin.statDocs')}</p>
+              <p className="text-lg font-display font-extrabold text-foreground tabular mt-0.5">
+                {formatNumber(documents.length)}
+              </p>
+            </div>
+            <div className="p-3.5 rounded-xl bg-paper border border-border">
+              <p className="text-[11px] text-secondary-text">{t('admin.statReports')}</p>
+              <p className="text-lg font-display font-extrabold text-primary tabular mt-0.5">
+                {formatNumber(reports.length)}
+              </p>
+            </div>
+            <div className="p-3.5 rounded-xl bg-paper border border-border">
+              <p className="text-[11px] text-secondary-text">{t('admin.statCurators')}</p>
+              <p className="text-lg font-display font-extrabold text-jade tabular mt-0.5">
+                {formatNumber(collaborators.length)}
+              </p>
+            </div>
+            <div className="p-3.5 rounded-xl bg-paper border border-border">
+              <p className="text-[11px] text-secondary-text">{t('admin.statOrders')}</p>
+              <p className="text-lg font-display font-extrabold text-accent tabular mt-0.5">
+                {formatNumber(orders.length)}
               </p>
             </div>
           </div>
 
-          {/* Tab Navigation */}
-          <div className="relative z-10 flex gap-2 overflow-x-auto pt-3 border-t border-border no-scrollbar">
-            {[
-              { id: 'library', label: 'Quản lý Thư viện', icon: 'menu_book' },
-              { id: 'users', label: 'Danh bạ & Truyền Đạo Sư', icon: 'groups' },
-              { id: 'thongsoai', label: 'Sắc phong Bang Chủ', icon: 'workspace_premium' },
-              { id: 'orders', label: 'Lịch sử Đơn hàng & VIP', icon: 'receipt_long' },
-            ].map((tab) => (
+          {/* Tab Navigation — clean pill borders on 375px mobile */}
+          <div
+            role="tablist"
+            aria-label={t('admin.tabsAria')}
+            className="relative z-10 flex flex-wrap sm:flex-nowrap gap-2 overflow-x-auto pt-3 border-t border-border no-scrollbar"
+          >
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
+                role="tab"
+                aria-selected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all border cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all border cursor-pointer ${
                   activeTab === tab.id
                     ? 'bg-primary text-white border-primary shadow-xs'
                     : 'bg-surface border-border text-secondary-text hover:text-foreground hover:border-border-strong'
@@ -582,7 +634,7 @@ export default function Admin() {
               collabSearchTerm={collabSearchTerm}
               setCollabSearchTerm={setCollabSearchTerm}
               loadingCollabs={loadingCollabs}
-              directoryWarning={directoryWarning}
+              directoryWarning={hasDirectoryWarning ? t('admin.directoryFallbackWarning') : ''}
               onSearchUsers={handleSearchUsers}
               onSetUserRole={handleSetUserRole}
             />
@@ -606,138 +658,151 @@ export default function Admin() {
                     <span className="material-symbols-outlined text-primary" aria-hidden="true">
                       receipt_long
                     </span>
-                    <span>Danh sách Giao dịch &amp; Đơn hàng ({orders.length})</span>
+                    <span>
+                      {t('admin.ordersTitle', { count: formatNumber(orders.length) })}
+                    </span>
                   </h3>
-                  <p className="text-xs text-secondary-text mt-0.5">
-                    Quản lý các yêu cầu nâng cấp gói VIP &amp; đối soát thanh toán VietQR
-                  </p>
+                  <p className="text-xs text-secondary-text mt-0.5">{t('admin.ordersDesc')}</p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-secondary-text">Trạng thái:</span>
+                  <label
+                    htmlFor="admin-order-status-filter"
+                    className="text-xs font-bold text-secondary-text whitespace-nowrap"
+                  >
+                    {t('admin.statusFilterLabel')}
+                  </label>
                   <select
+                    id="admin-order-status-filter"
                     value={orderFilterStatus}
                     onChange={(e) => setOrderFilterStatus(e.target.value)}
-                    className="px-3 py-1.5 bg-paper border border-border-strong rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
+                    className="px-3 py-1.5 bg-paper border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
                   >
-                    <option value="all">Tất cả đơn</option>
-                    <option value="pending">Chờ thanh toán (pending)</option>
-                    <option value="paid">Đã thanh toán (paid)</option>
-                    <option value="expired">Đã hết hạn (expired)</option>
+                    <option value="all">{t('admin.filterAll')}</option>
+                    <option value="pending">{t('admin.filterPending')}</option>
+                    <option value="paid">{t('admin.filterPaid')}</option>
+                    <option value="expired">{t('admin.filterExpired')}</option>
                   </select>
                 </div>
               </div>
 
-              {/* Orders Table */}
-              <div className="paper-card overflow-hidden">
-                {loadingOrders ? (
-                  <div className="py-16 flex justify-center">
-                    <span
-                      className="material-symbols-outlined animate-spin text-3xl text-primary"
-                      aria-hidden="true"
-                    >
-                      sync
-                    </span>
-                  </div>
-                ) : orders.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-paper border-b border-border text-secondary-text font-bold uppercase tracking-wider text-[10px]">
-                        <tr>
-                          <th className="p-3.5">Mã chuyển khoản</th>
-                          <th className="p-3.5">Gói VIP</th>
-                          <th className="p-3.5">Số tiền</th>
-                          <th className="p-3.5">Thời gian tạo</th>
-                          <th className="p-3.5">Trạng thái</th>
-                          <th className="p-3.5 text-right">Thao tác</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {orders.map((ord) => {
-                          const isPending = ord.status === 'pending';
-                          const isPaid = ord.status === 'paid';
+              {/* Orders Table — calibrated overflow-x-auto rounded-2xl border border-border bg-surface */}
+              {loadingOrders ? (
+                <div className="rounded-2xl border border-border bg-surface py-16 flex justify-center">
+                  <span
+                    className="material-symbols-outlined animate-spin text-3xl text-primary"
+                    aria-hidden="true"
+                  >
+                    sync
+                  </span>
+                </div>
+              ) : orders.length > 0 ? (
+                <div className="overflow-x-auto rounded-2xl border border-border bg-surface">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-paper border-b border-border text-secondary-text font-bold uppercase tracking-wider text-[10px]">
+                      <tr>
+                        <th className="p-3.5 whitespace-nowrap">{t('admin.colTransferCode')}</th>
+                        <th className="p-3.5 whitespace-nowrap">{t('admin.colVipPackage')}</th>
+                        <th className="p-3.5 whitespace-nowrap">{t('admin.colAmount')}</th>
+                        <th className="p-3.5 whitespace-nowrap">{t('admin.colCreatedAt')}</th>
+                        <th className="p-3.5 whitespace-nowrap">{t('admin.colStatus')}</th>
+                        <th className="p-3.5 text-right whitespace-nowrap">
+                          {t('admin.colActions')}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {orders.map((ord) => {
+                        const isPending = ord.status === 'pending';
+                        const isPaid = ord.status === 'paid';
+                        const statusLabel = isPaid
+                          ? t('admin.statusPaid')
+                          : isPending
+                            ? t('admin.statusPending')
+                            : t('admin.statusExpired');
 
-                          return (
-                            <tr
-                              key={ord.id}
-                              className="hover:bg-surface-alt transition-colors"
-                            >
-                              <td className="p-3.5 font-mono font-bold text-foreground">
-                                {ord.transfer_code || 'Chưa tạo'}
-                              </td>
-                              <td className="p-3.5">
-                                <span className="font-bold text-foreground">
-                                  {ord.package_id || '1m'}
-                                </span>{' '}
-                                ({ord.vip_days || 30} ngày)
-                              </td>
-                              <td className="p-3.5 font-bold text-primary tabular">
-                                {Number(ord.amount || 0).toLocaleString('vi-VN')} đ
-                              </td>
-                              <td className="p-3.5 text-muted-foreground">
-                                {new Date(ord.created_at).toLocaleString('vi-VN')}
-                              </td>
-                              <td className="p-3.5">
-                                <span
-                                  className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase ${
-                                    isPaid
-                                      ? 'bg-jade-soft text-jade border-jade-border'
-                                      : isPending
-                                        ? 'bg-gold-soft text-gold-dark border-gold'
-                                        : 'bg-surface-alt text-muted-foreground border-border'
-                                  }`}
+                        return (
+                          <tr
+                            key={ord.id}
+                            className="hover:bg-surface-alt transition-colors"
+                          >
+                            <td className="p-3.5 font-mono font-bold text-foreground whitespace-nowrap">
+                              {ord.transfer_code || t('admin.notGenerated')}
+                            </td>
+                            <td className="p-3.5 whitespace-nowrap">
+                              <span className="font-bold text-foreground">
+                                {ord.package_id || '1m'}
+                              </span>{' '}
+                              {t('admin.vipDaysCount', { days: ord.vip_days || 30 })}
+                            </td>
+                            <td className="p-3.5 font-bold text-primary tabular whitespace-nowrap">
+                              {formatNumber(Number(ord.amount || 0))} ₫
+                            </td>
+                            <td className="p-3.5 text-muted-foreground tabular whitespace-nowrap">
+                              {ord.created_at
+                                ? new Date(ord.created_at).toLocaleString(locale)
+                                : '—'}
+                            </td>
+                            <td className="p-3.5">
+                              <span
+                                className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase whitespace-nowrap ${
+                                  isPaid
+                                    ? 'bg-jade-soft text-jade border-jade-border'
+                                    : isPending
+                                      ? 'bg-gold-soft text-gold-dark border-gold'
+                                      : 'bg-surface-alt text-muted-foreground border-border'
+                                }`}
+                              >
+                                {statusLabel}
+                              </span>
+                            </td>
+                            <td className="p-3.5 text-right whitespace-nowrap space-x-2">
+                              {isPending && (
+                                <button
+                                  type="button"
+                                  disabled={processingOrderId === ord.id}
+                                  onClick={() =>
+                                    handleUpdateOrderStatus(
+                                      ord.id,
+                                      'paid',
+                                      ord.user_id,
+                                      ord.vip_days,
+                                    )
+                                  }
+                                  className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-jade-soft text-jade border border-jade-border hover:bg-jade hover:text-white transition-all cursor-pointer whitespace-nowrap"
                                 >
-                                  {ord.status}
-                                </span>
-                              </td>
-                              <td className="p-3.5 text-right space-x-2">
-                                {isPending && (
-                                  <button
-                                    type="button"
-                                    disabled={processingOrderId === ord.id}
-                                    onClick={() =>
-                                      handleUpdateOrderStatus(
-                                        ord.id,
-                                        'paid',
-                                        ord.user_id,
-                                        ord.vip_days,
-                                      )
-                                    }
-                                    className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-jade-soft text-jade border border-jade-border hover:bg-jade hover:text-white transition-all cursor-pointer"
-                                  >
-                                    Duyệt kích hoạt
-                                  </button>
-                                )}
-                                {isPaid && (
-                                  <button
-                                    type="button"
-                                    disabled={processingOrderId === ord.id}
-                                    onClick={() =>
-                                      handleUpdateOrderStatus(
-                                        ord.id,
-                                        'expired',
-                                        ord.user_id,
-                                        0,
-                                      )
-                                    }
-                                    className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-surface-alt text-secondary-text border border-border hover:text-primary transition-all cursor-pointer"
-                                  >
-                                    Đánh dấu hết hạn
-                                  </button>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="p-12 text-center text-sm text-secondary-text">
-                    Không có đơn hàng nào khớp bộ lọc.
-                  </div>
-                )}
-              </div>
+                                  {t('admin.approveActivateBtn')}
+                                </button>
+                              )}
+                              {isPaid && (
+                                <button
+                                  type="button"
+                                  disabled={processingOrderId === ord.id}
+                                  onClick={() =>
+                                    handleUpdateOrderStatus(
+                                      ord.id,
+                                      'expired',
+                                      ord.user_id,
+                                      0,
+                                    )
+                                  }
+                                  className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-surface-alt text-secondary-text border border-border hover:text-primary transition-all cursor-pointer whitespace-nowrap"
+                                >
+                                  {t('admin.markExpiredBtn')}
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-border bg-surface p-12 text-center text-sm text-secondary-text">
+                  {t('admin.emptyOrders')}
+                </div>
+              )}
             </div>
           )}
         </main>

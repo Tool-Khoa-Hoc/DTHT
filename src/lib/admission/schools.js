@@ -12,6 +12,20 @@ export const REGION_LABELS = {
   khac: 'Khu vực khác',
 };
 
+export const REGION_LABELS_EN = {
+  bac: 'Northern Vietnam',
+  trung: 'Central Vietnam',
+  nam: 'Southern Vietnam',
+  khac: 'Other Regions',
+};
+
+export function getRegionLabel(regionKey, lang = 'vi') {
+  if (lang === 'en') {
+    return REGION_LABELS_EN[regionKey] || REGION_LABELS[regionKey] || regionKey;
+  }
+  return REGION_LABELS[regionKey] || regionKey;
+}
+
 export const SCHOOL_REGIONS = {
   // Miền Bắc
   HUST: 'bac', NEU: 'bac', FTU: 'bac', HMU: 'bac', UET: 'bac', UED: 'bac',

@@ -1,37 +1,29 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Navigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../components/ui/ToastProvider';
 import { sanitizeExternalUrl, assertSafeExternalUrl } from '../utils/urlSecurity';
 import { getDocumentKindMeta } from '../lib/documents';
+import {
+  THPT_CATEGORY_KEYS,
+  UNI_CATEGORY_KEYS,
+  getLocalizedDocCategories,
+  getLocalizedCategoryLabel,
+  getLocalizedEducationLevel,
+} from '../i18n/communityAndAdmin';
 import RankSeal from '../components/ui/RankSeal';
-
-const THPT_CATEGORIES = [
-  { label: 'Toán', value: 'toan' },
-  { label: 'Vật Lý', value: 'ly' },
-  { label: 'Hóa Học', value: 'hoa' },
-  { label: 'Sinh Học', value: 'sinh' },
-  { label: 'Ngữ Văn', value: 'van' },
-  { label: 'Tiếng Anh', value: 'anh' },
-  { label: 'Lịch Sử', value: 'su' },
-  { label: 'Địa Lý', value: 'dia' },
-  { label: 'GDCD', value: 'gdcd' },
-  { label: 'Tin Học', value: 'tin' },
-  { label: 'Khác', value: 'khac' },
-];
-
-const UNI_CATEGORIES = [
-  { label: 'Giải Tích', value: 'giai_tich' },
-  { label: 'Lập Trình', value: 'lap_trinh' },
-  { label: 'Kinh Tế', value: 'kinh_te' },
-  { label: 'Kiến Trúc', value: 'kien_truc' },
-  { label: 'Khác', value: 'khac' },
-];
 
 export default function Collaborator() {
   const { user, profile } = useAuth();
+  const { lang, t, formatNumber, formatDate } = useLanguage();
   const { showToast } = useToast();
+
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
 
   const canManage = profile?.role === 'collaborator' || profile?.role === 'admin';
 
@@ -54,7 +46,15 @@ export default function Collaborator() {
   const [loadingDocs, setLoadingDocs] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
-  const categories = educationLevel === 'university' ? UNI_CATEGORIES : THPT_CATEGORIES;
+  const categories = getLocalizedDocCategories(educationLevel, t);
+
+  const handleEducationLevelChange = (nextLevel) => {
+    setEducationLevel(nextLevel);
+    const validKeys = nextLevel === 'university' ? UNI_CATEGORY_KEYS : THPT_CATEGORY_KEYS;
+    if (!validKeys.includes(category)) {
+      setCategory(validKeys[0]);
+    }
+  };
 
   const fetchMyDocuments = useCallback(async () => {
     if (!user) return;
@@ -72,8 +72,8 @@ export default function Collaborator() {
       if (error) throw error;
       setMyDocuments(data || []);
     } catch (err) {
-      console.error('Lỗi tải tài liệu của tôi:', err);
-      showToast('Không thể tải danh sách tài liệu: ' + err.message, 'error');
+      console.error('Error loading collaborator documents:', err);
+      showToast(tRef.current('collaborator.toastLoadError', { error: err.message }), 'error');
     } finally {
       setLoadingDocs(false);
     }
@@ -96,8 +96,9 @@ export default function Collaborator() {
     setFileUrl('');
     setPublishDate('');
     setSelectedFile(null);
-    if (document.getElementById('collab-file-input')) {
-      document.getElementById('collab-file-input').value = '';
+    const fileInputEl = document.getElementById('collab-file-input');
+    if (fileInputEl) {
+      fileInputEl.value = '';
     }
   };
 
@@ -120,7 +121,7 @@ export default function Collaborator() {
     if (!user) return;
 
     if (!title.trim()) {
-      showToast('Vui lòng nhập tiêu đề tài liệu!', 'warning');
+      showToast(t('collaborator.toastTitleRequired'), 'warning');
       return;
     }
 
@@ -147,7 +148,7 @@ export default function Collaborator() {
         finalUrl = publicUrl;
       }
 
-      const safeUrl = assertSafeExternalUrl(finalUrl, 'Link tài liệu không hợp lệ!');
+      const safeUrl = assertSafeExternalUrl(finalUrl, t('collaborator.toastInvalidUrl'));
 
       // ONLY valid columns for public.documents
       const payload = {
@@ -157,7 +158,8 @@ export default function Collaborator() {
         category_id: category,
         education_level: educationLevel,
         major: major.trim(),
-        author_name: authorName.trim() || profile?.display_name || 'Khuyết danh',
+        author_name:
+          authorName.trim() || profile?.display_name || t('collaborator.anonymousAuthor'),
         file_url: safeUrl,
         publish_date: publishDate || null,
         uploaded_by: user.id,
@@ -172,17 +174,17 @@ export default function Collaborator() {
           .eq('uploaded_by', user.id);
 
         if (error) throw error;
-        showToast('Đã cập nhật tài liệu thành công!', 'success');
+        showToast(t('collaborator.toastDocUpdated'), 'success');
       } else {
         const { error } = await supabase.from('documents').insert([payload]);
         if (error) throw error;
-        showToast('Đã đăng tài liệu thành công!', 'success');
+        showToast(t('collaborator.toastDocPublished'), 'success');
       }
 
       resetForm();
       fetchMyDocuments();
     } catch (err) {
-      showToast('Lỗi khi lưu tài liệu: ' + err.message, 'error');
+      showToast(t('collaborator.toastSaveError', { error: err.message }), 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -201,26 +203,53 @@ export default function Collaborator() {
         .eq('uploaded_by', user.id);
 
       if (error) throw error;
-      showToast('Đã xóa tài liệu của bạn', 'info');
+      showToast(t('collaborator.toastDocDeleted'), 'info');
       if (docId === targetId) resetForm();
       setMyDocuments((prev) => prev.filter((d) => d.id !== targetId));
     } catch (err) {
-      showToast('Lỗi khi xóa tài liệu: ' + err.message, 'error');
+      showToast(t('collaborator.toastDeleteError', { error: err.message }), 'error');
     }
   };
 
   if (!canManage) {
-    return <Navigate to="/home" />;
+    return (
+      <div className="min-h-full bg-background flex items-center justify-center p-6">
+        <div className="imperial-frame p-6 sm:p-8 max-w-md text-center space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-jade-soft text-jade border border-jade-border flex items-center justify-center mx-auto">
+            <span className="material-symbols-outlined text-3xl" aria-hidden="true">
+              security
+            </span>
+          </div>
+          <h2 className="font-display font-bold text-xl text-foreground leading-snug">
+            {t('collaborator.restrictedTitle')}
+          </h2>
+          <p className="text-xs text-secondary-text leading-relaxed">
+            {t('collaborator.restrictedDesc')}
+          </p>
+          <div className="flex items-center justify-center gap-2.5 flex-wrap pt-1">
+            <Link to="/library" className="btn-arena btn-arena-jade btn-arena-sm">
+              <span className="material-symbols-outlined text-base" aria-hidden="true">
+                menu_book
+              </span>
+              <span>{t('collaborator.backToLibrary')}</span>
+            </Link>
+            <Link to="/home" className="btn-arena btn-arena-secondary btn-arena-sm">
+              <span>{t('collaborator.backToHome')}</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="bg-background font-sans text-foreground min-h-full pb-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        {/* Header */}
-        <header className="imperial-frame p-5 sm:p-7 mb-6 relative overflow-hidden">
+        {/* Header — calibrated p-5 sm:p-8 */}
+        <header className="imperial-frame p-5 sm:p-8 mb-6 relative overflow-hidden">
           <span
             aria-hidden="true"
-            className="hanzi-watermark absolute top-2 right-6 text-8xl font-bold text-jade/10"
+            className="hanzi-watermark absolute top-2 right-6 text-8xl font-bold text-jade/10 select-none pointer-events-none"
           >
             傳道
           </span>
@@ -228,21 +257,24 @@ export default function Collaborator() {
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="mb-2">
-                <RankSeal size="sm" icon="edit_document" label="Thư Viện · Truyền Đạo Sư" />
+                <RankSeal size="sm" icon="edit_document" label={t('collaborator.sealLabel')} />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-display font-extrabold tracking-tight text-foreground">
-                Góc Đóng Góp Học Liệu
+              <h1 className="text-2xl sm:text-3xl font-display font-extrabold tracking-tight text-foreground leading-snug">
+                {t('collaborator.headerTitle')}
               </h1>
               <p className="text-xs sm:text-sm text-secondary-text mt-1">
-                Khu vực dành cho Truyền Đạo Sư &amp; Cộng tác viên đăng tải đề thi, tài liệu và sơ đồ tư duy cho cộng đồng
+                {t('collaborator.headerDesc')}
               </p>
             </div>
 
-            <Link to="/library" className="btn-arena btn-arena-secondary btn-arena-sm">
+            <Link
+              to="/library"
+              className="btn-arena btn-arena-secondary btn-arena-sm self-start sm:self-auto shrink-0"
+            >
               <span className="material-symbols-outlined text-base" aria-hidden="true">
                 menu_book
               </span>
-              <span>Xem Thư Viện</span>
+              <span>{t('collaborator.viewLibraryBtn')}</span>
             </Link>
           </div>
         </header>
@@ -257,7 +289,9 @@ export default function Collaborator() {
                   <span className="material-symbols-outlined text-jade" aria-hidden="true">
                     {docId ? 'edit' : 'cloud_upload'}
                   </span>
-                  <span>{docId ? 'Cập nhật tài liệu' : 'Đăng tải tài liệu mới'}</span>
+                  <span>
+                    {docId ? t('collaborator.formTitleEdit') : t('collaborator.formTitleNew')}
+                  </span>
                 </h2>
                 {docId && (
                   <button
@@ -265,57 +299,77 @@ export default function Collaborator() {
                     onClick={resetForm}
                     className="text-xs text-secondary-text hover:text-primary transition-colors cursor-pointer"
                   >
-                    Hủy sửa
+                    {t('collaborator.cancelEditBtn')}
                   </button>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-foreground mb-1">
-                  Tiêu đề tài liệu <span className="text-primary">*</span>
+                <label
+                  htmlFor="collab-doc-title"
+                  className="block text-xs font-bold text-foreground mb-1"
+                >
+                  {t('collaborator.docTitleLabel')} <span className="text-primary">*</span>
                 </label>
                 <input
+                  id="collab-doc-title"
                   type="text"
                   required
-                  placeholder="VD: Chuyên đề Hàm Số & Cực Trị Vận Dụng Cao 2027..."
+                  placeholder={t('collaborator.docTitlePlaceholder')}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
+                  className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-foreground mb-1">
-                  Mô tả nội dung tóm tắt
+                <label
+                  htmlFor="collab-doc-desc"
+                  className="block text-xs font-bold text-foreground mb-1"
+                >
+                  {t('collaborator.docDescLabel')}
                 </label>
                 <textarea
+                  id="collab-doc-desc"
                   rows={3}
-                  placeholder="Phương pháp giải, dạng bài tập phân loại, cấu trúc..."
+                  placeholder={t('collaborator.docDescPlaceholder')}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-xs text-foreground focus:outline-none focus:border-primary leading-relaxed"
+                  className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-primary leading-relaxed"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">Cấp học</label>
-                  <select
-                    value={educationLevel}
-                    onChange={(e) => setEducationLevel(e.target.value)}
-                    className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
+                  <label
+                    htmlFor="collab-edu-level"
+                    className="block text-xs font-bold text-foreground mb-1"
                   >
-                    <option value="thpt">THPT</option>
-                    <option value="university">Đại học</option>
+                    {t('collaborator.eduLevelLabel')}
+                  </label>
+                  <select
+                    id="collab-edu-level"
+                    value={educationLevel}
+                    onChange={(e) => handleEducationLevelChange(e.target.value)}
+                    className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
+                  >
+                    <option value="thpt">{t('docCategories.levelThpt')}</option>
+                    <option value="university">{t('docCategories.levelUniversity')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">Danh mục môn</label>
+                  <label
+                    htmlFor="collab-category"
+                    className="block text-xs font-bold text-foreground mb-1"
+                  >
+                    {t('collaborator.subjectCategoryLabel')}
+                  </label>
                   <select
+                    id="collab-category"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
+                    className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
                   >
                     {categories.map((c) => (
                       <option key={c.value} value={c.value}>
@@ -326,30 +380,38 @@ export default function Collaborator() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">
-                    Tên tác giả / Biên soạn
+                  <label
+                    htmlFor="collab-author"
+                    className="block text-xs font-bold text-foreground mb-1"
+                  >
+                    {t('collaborator.authorLabel')}
                   </label>
                   <input
+                    id="collab-author"
                     type="text"
-                    placeholder="VD: Ban Học Thuật DTHT..."
+                    placeholder={t('collaborator.authorPlaceholder')}
                     value={authorName}
                     onChange={(e) => setAuthorName(e.target.value)}
-                    className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
+                    className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">
-                    Trường / Khối ngành
+                  <label
+                    htmlFor="collab-major"
+                    className="block text-xs font-bold text-foreground mb-1"
+                  >
+                    {t('collaborator.schoolMajorLabel')}
                   </label>
                   <input
+                    id="collab-major"
                     type="text"
-                    placeholder="VD: THPT Chuyên Sư Phạm..."
+                    placeholder={t('collaborator.schoolMajorPlaceholder')}
                     value={major}
                     onChange={(e) => setMajor(e.target.value)}
-                    className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
+                    className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
@@ -359,65 +421,76 @@ export default function Collaborator() {
                 <button
                   type="button"
                   onClick={() => setUploadMode('link')}
-                  className={`py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     uploadMode === 'link'
                       ? 'bg-jade text-white'
                       : 'text-secondary-text hover:text-foreground'
                   }`}
                 >
-                  Dán link Sheet / Drive
+                  {t('collaborator.modeLinkBtn')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setUploadMode('file')}
-                  className={`py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     uploadMode === 'file'
                       ? 'bg-jade text-white'
                       : 'text-secondary-text hover:text-foreground'
                   }`}
                 >
-                  Tải file trực tiếp
+                  {t('collaborator.modeFileBtn')}
                 </button>
               </div>
 
               {uploadMode === 'link' ? (
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">
-                    Link tài liệu (Google Sheet / Google Drive / URL) <span className="text-primary">*</span>
+                  <label
+                    htmlFor="collab-file-url"
+                    className="block text-xs font-bold text-foreground mb-1"
+                  >
+                    {t('collaborator.docUrlLabel')} <span className="text-primary">*</span>
                   </label>
                   <input
+                    id="collab-file-url"
                     type="url"
                     required
-                    placeholder="https://docs.google.com/spreadsheets/d/..."
+                    placeholder={t('collaborator.docUrlPlaceholder')}
                     value={fileUrl}
                     onChange={(e) => setFileUrl(e.target.value)}
-                    className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
+                    className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
               ) : (
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">
-                    Chọn file tải lên (PDF, Doc)
+                  <label
+                    htmlFor="collab-file-input"
+                    className="block text-xs font-bold text-foreground mb-1"
+                  >
+                    {t('collaborator.docFileLabel')}
                   </label>
                   <input
                     id="collab-file-input"
                     type="file"
                     accept=".pdf,.doc,.docx"
-                    onChange={(e) => setSelectedFile(e.target.files[0])}
+                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                     className="w-full text-xs text-secondary-text file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-jade-soft file:text-jade hover:file:bg-jade/20 cursor-pointer"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-foreground mb-1">
-                  Ngày phát hành tài liệu (tuỳ chọn)
+                <label
+                  htmlFor="collab-publish-date"
+                  className="block text-xs font-bold text-foreground mb-1"
+                >
+                  {t('collaborator.publishDateLabel')}
                 </label>
                 <input
+                  id="collab-publish-date"
                   type="date"
                   value={publishDate}
                   onChange={(e) => setPublishDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-paper border border-border-strong rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
+                  className="w-full px-3 py-2 bg-paper border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-primary"
                 />
               </div>
 
@@ -426,25 +499,25 @@ export default function Collaborator() {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="btn-arena btn-arena-secondary btn-arena-sm flex-1"
+                    className="btn-arena btn-arena-secondary btn-arena-sm flex-1 cursor-pointer"
                   >
-                    Hủy
+                    {t('collaborator.cancelBtn')}
                   </button>
                 )}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-arena btn-arena-jade btn-arena-sm flex-1"
+                  className="btn-arena btn-arena-jade btn-arena-sm flex-1 cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-base" aria-hidden="true">
                     {isSubmitting ? 'hourglass_empty' : 'save'}
                   </span>
                   <span>
                     {isSubmitting
-                      ? 'Đang tải lên...'
+                      ? t('collaborator.uploadingBtn')
                       : docId
-                        ? 'Cập nhật tài liệu'
-                        : 'Đăng tải tài liệu'}
+                        ? t('collaborator.updateDocBtn')
+                        : t('collaborator.publishDocBtn')}
                   </span>
                 </button>
               </div>
@@ -457,7 +530,9 @@ export default function Collaborator() {
               <span className="material-symbols-outlined text-jade" aria-hidden="true">
                 inventory_2
               </span>
-              <span>Tài liệu do tôi đóng góp ({myDocuments.length})</span>
+              <span>
+                {t('collaborator.myDocsTitle', { count: formatNumber(myDocuments.length) })}
+              </span>
             </h3>
 
             {loadingDocs ? (
@@ -472,8 +547,9 @@ export default function Collaborator() {
             ) : myDocuments.length > 0 ? (
               <div className="space-y-3 max-h-[680px] overflow-y-auto pr-1">
                 {myDocuments.map((doc) => {
-                  const kind = getDocumentKindMeta(doc.title, doc.file_url);
+                  const kind = getDocumentKindMeta(doc.title, doc.file_url, lang);
                   const safeUrl = sanitizeExternalUrl(doc.file_url);
+                  const createdStr = formatDate(doc.created_at);
 
                   return (
                     <div
@@ -482,38 +558,61 @@ export default function Collaborator() {
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${kind.badgeClass}`}>
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded whitespace-nowrap ${kind.badgeClass}`}
+                          >
                             {kind.label}
                           </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-surface-alt text-secondary-text border border-border uppercase">
-                            {doc.education_level || 'THPT'}
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-surface-alt text-secondary-text border border-border uppercase whitespace-nowrap">
+                            {getLocalizedEducationLevel(doc.education_level, t)}
                           </span>
                           {doc.category && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-jade-soft text-jade border border-jade-border">
-                              {doc.category}
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-jade-soft text-jade border border-jade-border whitespace-nowrap">
+                              {getLocalizedCategoryLabel(doc.category, t)}
                             </span>
                           )}
+                          {doc.is_featured && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gold-soft text-gold-dark border border-gold whitespace-nowrap">
+                              {t('collaborator.statusFeatured')}
+                            </span>
+                          )}
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded border whitespace-nowrap ${
+                              doc.is_public !== false
+                                ? 'bg-surface-alt text-secondary-text border-border'
+                                : 'bg-primary-soft text-primary border-primary/30'
+                            }`}
+                          >
+                            {doc.is_public !== false
+                              ? t('collaborator.statusPublic')
+                              : t('collaborator.statusPrivate')}
+                          </span>
                         </div>
 
                         <h4 className="font-display font-bold text-sm text-foreground truncate">
                           {doc.title}
                         </h4>
                         <p className="text-xs text-secondary-text truncate mt-0.5">
-                          {doc.description || 'Chưa có mô tả chi tiết'}
+                          {doc.description || t('collaborator.noDescription')}
                         </p>
-                        <p className="text-[10px] text-muted-foreground mt-1">
-                          Đăng lúc: {new Date(doc.created_at).toLocaleDateString('vi-VN')}
-                        </p>
+                        {createdStr && (
+                          <p className="text-[10px] text-muted-foreground mt-1 tabular">
+                            {t('collaborator.uploadedAtPrefix', { date: createdStr })}
+                          </p>
+                        )}
                       </div>
 
-                      <div className="flex items-center gap-1.5 no-shrink">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         {safeUrl && (
                           <a
                             href={safeUrl}
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label={t('collaborator.openDocAria', {
+                              title: doc.title || '',
+                            }).trim()}
                             className="p-2 text-muted-foreground hover:text-foreground hover:bg-surface-alt rounded-lg transition-colors cursor-pointer"
-                            title="Mở tài liệu"
+                            title={t('collaborator.openDocTitle')}
                           >
                             <span className="material-symbols-outlined text-lg" aria-hidden="true">
                               open_in_new
@@ -523,10 +622,12 @@ export default function Collaborator() {
 
                         <button
                           type="button"
-                          aria-label={`Chỉnh sửa tài liệu ${doc.title || ''}`.trim()}
+                          aria-label={t('collaborator.editDocAria', {
+                            title: doc.title || '',
+                          }).trim()}
                           onClick={() => handleEdit(doc)}
                           className="p-2 text-muted-foreground hover:text-jade hover:bg-jade-soft rounded-lg transition-colors cursor-pointer"
-                          title="Sửa"
+                          title={t('collaborator.editShort')}
                         >
                           <span className="material-symbols-outlined text-lg" aria-hidden="true">
                             edit
@@ -535,10 +636,12 @@ export default function Collaborator() {
 
                         <button
                           type="button"
-                          aria-label={`Xóa tài liệu ${doc.title || ''}`.trim()}
+                          aria-label={t('collaborator.deleteDocAria', {
+                            title: doc.title || '',
+                          }).trim()}
                           onClick={() => setDeleteConfirmId(doc.id)}
                           className="p-2 text-muted-foreground hover:text-primary hover:bg-primary-soft rounded-lg transition-colors cursor-pointer"
-                          title="Xóa"
+                          title={t('collaborator.deleteShort')}
                         >
                           <span className="material-symbols-outlined text-lg" aria-hidden="true">
                             delete
@@ -551,7 +654,7 @@ export default function Collaborator() {
               </div>
             ) : (
               <div className="p-12 text-center text-sm text-secondary-text border-2 border-dashed border-border rounded-xl">
-                Bạn chưa đóng góp tài liệu nào. Hãy điền form bên cạnh để đăng tải bí kíp đầu tiên!
+                {t('collaborator.emptyDocs')}
               </div>
             )}
           </div>
@@ -565,21 +668,24 @@ export default function Collaborator() {
           onClick={() => setDeleteConfirmId(null)}
         >
           <div
-            className="imperial-frame w-full max-w-sm p-6 bg-surface shadow-2xl space-y-4"
+            role="alertdialog"
+            aria-modal="true"
+            aria-label={t('collaborator.deleteModalTitle')}
+            className="imperial-frame w-full max-w-sm p-6 sm:p-7 bg-surface shadow-2xl space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center no-shrink">
+              <div className="w-10 h-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-2xl" aria-hidden="true">
                   delete_forever
                 </span>
               </div>
               <div>
                 <h3 className="font-display font-bold text-base text-foreground">
-                  Xóa tài liệu đóng góp
+                  {t('collaborator.deleteModalTitle')}
                 </h3>
                 <p className="text-xs text-secondary-text mt-0.5">
-                  Tài liệu này sẽ bị gỡ khỏi Thư viện và không thể hoàn tác.
+                  {t('collaborator.deleteModalDesc')}
                 </p>
               </div>
             </div>
@@ -588,16 +694,16 @@ export default function Collaborator() {
               <button
                 type="button"
                 onClick={() => setDeleteConfirmId(null)}
-                className="btn-arena btn-arena-secondary btn-arena-sm"
+                className="btn-arena btn-arena-secondary btn-arena-sm cursor-pointer"
               >
-                Hủy
+                {t('collaborator.cancelBtn')}
               </button>
               <button
                 type="button"
                 onClick={handleConfirmDelete}
-                className="btn-arena btn-arena-primary btn-arena-sm"
+                className="btn-arena btn-arena-primary btn-arena-sm cursor-pointer"
               >
-                Xác nhận xóa
+                {t('collaborator.confirmDeleteBtn')}
               </button>
             </div>
           </div>

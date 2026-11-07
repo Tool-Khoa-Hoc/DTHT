@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function LazyHeavyComponent({
   children,
@@ -73,13 +74,14 @@ export function LazyMath({ children, className = '' }) {
 }
 
 export function LazyPdfSection({ children, className = '' }) {
+  const { pick } = useLanguage();
   return (
     <LazyHeavyComponent
       rootMargin="200px"
       className={className}
       placeholder={
         <div className="w-full aspect-3/4 max-h-96 rounded-xl bg-surface-alt border border-border animate-pulse flex items-center justify-center text-secondary-text text-sm">
-          Đang tải tài liệu...
+          {pick('Đang tải tài liệu...', 'Loading document...')}
         </div>
       }
     >

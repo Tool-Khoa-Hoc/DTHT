@@ -113,3 +113,123 @@ export const comboHs12Course = {
     'Phù hợp để giới thiệu khóa học online của nhiều thầy cô trên cùng một trang.',
   ],
 };
+
+export const comboHs12CourseEn = {
+  id: 'combo-dtht-hs12-2k9-chinh-phuc-dai-hoc',
+  path: '/courses/combo-dtht-hs12-2k9-chinh-phuc-dai-hoc',
+  audience: 'Online exam prep courses for high school scholars',
+  title: 'Online courses curated from top exam prep instructors',
+  subtitle: 'Select the right package for your target subject, exam combination, and admission goal.',
+  summary:
+    'Structured clearly so students and parents can immediately compare options: single courses, single-subject bundles, exam-cluster bundles, or all-in-one full combos.',
+  packageIntro:
+    'Five tiers arranged as a progressive study path: start with a focused need, then expand smoothly toward the National Exam, Competency Assessment (HSA/V-ACT), or Thinking Skills Assessment (TSA).',
+  highlights: [
+    'Individual courses by subject and instructor',
+    'Single-subject combos, exam-cluster combos, and full-access combos',
+    'Clean scholarly interface, accessible anytime on desktop and mobile',
+  ],
+  metrics: [
+    { value: '5', label: 'clear study tiers' },
+    { value: 'By Subject', label: 'pick ideal instructors' },
+    { value: 'By Goal', label: 'National, HSA/V-ACT, TSA' },
+    { value: 'Online', label: 'study 24/7 anywhere' },
+  ],
+  learningPackages: [
+    {
+      id: 'single-course',
+      label: 'Tier 1',
+      name: 'Single Course',
+      subtitle: 'One subject, one instructor',
+      goal: 'Designed for students focusing on a single subject or following one specific teacher.',
+      bestFor: 'Ideal to start light, strengthen weak topics, and keep maximum flexibility.',
+      action: 'Start with the subject that needs improvement first.',
+      icon: 'menu_book',
+      tags: ['By Subject', 'By Instructor', 'Flexible'],
+    },
+    {
+      id: 'one-subject-full',
+      label: 'Tier 2',
+      name: '1-Subject Full Instructors',
+      subtitle: 'Master one subject with every instructor',
+      goal: 'Built for students who want deep mastery of one core subject through multiple teaching styles and materials.',
+      bestFor: 'Best when that subject carries double weight in your admission group or needs rapid acceleration.',
+      action: 'Pick your anchor subject and study comprehensively.',
+      icon: 'school',
+      tags: ['All Instructors', 'Single Subject', 'Accelerate'],
+    },
+    {
+      id: 'exam-cluster',
+      label: 'Tier 3',
+      name: 'Exam Combo or HSA/V-ACT/TSA',
+      subtitle: 'Study by 3-subject group or specialized test',
+      goal: 'Tailored for students with a clear admission group who want synchronized preparation across related subjects.',
+      bestFor: 'Ideal for 3-subject combinations (A00, A01, D01...), Competency Assessment, or Thinking Skills.',
+      action: 'Choose your target exam and follow a unified track.',
+      icon: 'hub',
+      tags: ['Exam Group', 'HSA / V-ACT', 'TSA'],
+    },
+    {
+      id: 'national-exam',
+      label: 'Tier 4',
+      name: 'National Graduation Combo',
+      subtitle: 'Focused on high school graduation & entrance',
+      goal: 'Provides a structured National Exam roadmap covering core compulsory and elective subjects.',
+      bestFor: 'Best when your primary goal is maximizing National Exam scores for university admission.',
+      action: 'Follow the structured National Exam roadmap.',
+      icon: 'workspace_premium',
+      tags: ['National Exam', 'Exam Prep', 'Structured'],
+    },
+    {
+      id: 'full-combo',
+      label: 'Tier 5',
+      name: 'Full All-Access Combo',
+      subtitle: 'Every admission goal in one unified pass',
+      goal: 'Built for comprehensive preparation across National Exam subjects plus HSA, V-ACT, and TSA.',
+      bestFor: 'Best for long-term preparation without buying fragmented individual courses.',
+      action: 'Consolidate every exam target into one long-term plan.',
+      icon: 'auto_awesome',
+      tags: ['All-Inclusive', 'Multi-Exam', 'Long-Term'],
+    },
+  ],
+  outcomes: [
+    'Understand each study tier immediately without parsing cluttered comparison tables.',
+    'Start from a single subject and upgrade smoothly to a combo as your target solidifies.',
+    'Instructor syllabi organized around practical exam milestones rather than scattered folders.',
+    'Parents can immediately grasp the scope, value, and target outcome of each package.',
+  ],
+  modules: [
+    {
+      phase: '01',
+      title: 'Start with your most urgent need',
+      copy: 'If you only need to shore up one subject or follow a specific instructor, the Single Course tier gets you started without overload.',
+      tags: ['Single Course', 'By Subject', 'By Instructor'],
+    },
+    {
+      phase: '02',
+      title: 'Expand to subject or exam-group combos',
+      copy: 'Once your core subject or 3-subject admission group is locked in, switch to a combo for synchronized pacing.',
+      tags: ['1-Subject Combo', 'Group Combo', 'HSA/V-ACT/TSA'],
+    },
+    {
+      phase: '03',
+      title: 'Lock in your full exam roadmap',
+      copy: 'The National Exam and Full All-Access tiers unify your entire preparation into a clear, trackable schedule.',
+      tags: ['National Exam', 'Full Combo', 'Long-Term'],
+    },
+  ],
+  timeline: [
+    { label: 'Step 1', text: 'Decide whether you need a single course, one core subject, or a full exam-target bundle.' },
+    { label: 'Step 2', text: 'Select the tier matching your anchor subject, 3-subject group, or aptitude exam.' },
+    { label: 'Step 3', text: 'Upgrade seamlessly whenever you expand to National Exam, HSA/V-ACT, TSA, or Full Combo.' },
+  ],
+  surfaces: [
+    'Decision-first layout without forcing students through exhausting comparison matrices.',
+    'Every tier states its exact goal, ideal learner profile, and next action.',
+    'Designed to showcase multi-instructor online courses cohesively on one page.',
+  ],
+};
+
+export function getComboHs12Course(lang = 'vi') {
+  return lang === 'en' ? comboHs12CourseEn : comboHs12Course;
+}

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import Button from './ui/Button';
+import LanguageToggle from './ui/LanguageToggle';
 
 const WELCOME_MODAL_DISMISSED_KEY = 'dtht_hide_welcome_modal';
 
 export default function WelcomeModal() {
   const { user, signInWithGoogle } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [dontShowAgain, setDontShowAgain] = useState(true);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -54,27 +57,30 @@ export default function WelcomeModal() {
       >
         <span
           aria-hidden="true"
-          className="hanzi-watermark absolute top-3 right-5 text-6xl font-bold text-accent/10"
+          className="hanzi-watermark absolute top-3 left-5 text-6xl font-bold text-accent/10"
         >
           學堂
         </span>
 
-        <button
-          type="button"
-          onClick={handleClose}
-          aria-label="Đóng cửa sổ chào mừng"
-          className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-surface-alt hover:bg-muted text-secondary-text hover:text-foreground border border-border transition-colors cursor-pointer"
-        >
-          <span className="material-symbols-outlined text-xl" aria-hidden="true">
-            close
-          </span>
-        </button>
+        <div className="absolute top-3.5 right-3.5 z-30 flex items-center gap-1.5">
+          <LanguageToggle variant="compact" />
+          <button
+            type="button"
+            onClick={handleClose}
+            aria-label={t('welcome.closeAria')}
+            className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-alt hover:bg-muted text-secondary-text hover:text-foreground border border-border transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">
+              close
+            </span>
+          </button>
+        </div>
 
-        <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="w-16 h-16 mb-5 rounded-2xl bg-primary-soft border border-primary/30 flex items-center justify-center shadow-xs">
+        <div className="relative z-10 flex flex-col items-center text-center pt-2">
+          <div className="w-16 h-16 mb-4 rounded-2xl bg-primary-soft border border-primary/30 flex items-center justify-center shadow-xs">
             <img
               src="/logo.webp"
-              alt="Logo Đấu Trường Học Tập"
+              alt={t('brand.name')}
               width={48}
               height={48}
               loading="lazy"
@@ -84,59 +90,59 @@ export default function WelcomeModal() {
           </div>
 
           <span className="seal-stamp px-3 py-1 text-[11px] uppercase tracking-wider mb-3">
-            Thư Viện &amp; Khoa Trường 2027
+            {t('welcome.seal')}
           </span>
 
           <h2
             id="welcome-modal-title"
             className="text-2xl sm:text-3xl font-display font-extrabold text-foreground mb-2 tracking-tight"
           >
-            Đấu Trường Học Tập
+            {t('welcome.title')}
           </h2>
 
-          <p className="text-secondary-text text-sm sm:text-base mb-6 max-w-md leading-relaxed">
-            Chào mừng sĩ tử đến với thư phòng ôn luyện! Khám phá kho tài liệu chọn lọc, công cụ tính điểm chuẩn xác và thi đua bảng vàng mỗi ngày.
+          <p className="text-secondary-text text-sm sm:text-base mb-5 max-w-md leading-relaxed">
+            {t('welcome.description')}
           </p>
 
           <div className="w-full space-y-2.5 mb-6 text-left">
             <div className="flex items-center gap-3.5 p-3 rounded-xl bg-paper border border-border">
-              <div className="p-2 rounded-lg bg-primary-soft text-primary border border-primary/25">
+              <div className="p-2 rounded-lg bg-primary-soft text-primary border border-primary/25 shrink-0">
                 <span className="material-symbols-outlined text-xl" aria-hidden="true">
                   library_books
                 </span>
               </div>
-              <div>
-                <h3 className="text-foreground font-bold text-sm">Kho Tài Liệu Chọn Lọc</h3>
-                <p className="text-secondary-text text-xs">
-                  Đề thi thử, chuyên đề và giáo trình từ các trường chuyên toàn quốc
+              <div className="min-w-0">
+                <h3 className="text-foreground font-bold text-sm">{t('welcome.item1Title')}</h3>
+                <p className="text-secondary-text text-xs leading-relaxed">
+                  {t('welcome.item1Desc')}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3.5 p-3 rounded-xl bg-paper border border-border">
-              <div className="p-2 rounded-lg bg-jade-soft text-jade border border-jade-border">
+              <div className="p-2 rounded-lg bg-jade-soft text-jade border border-jade-border shrink-0">
                 <span className="material-symbols-outlined text-xl" aria-hidden="true">
                   calculate
                 </span>
               </div>
-              <div>
-                <h3 className="text-foreground font-bold text-sm">Tính Điểm &amp; Chọn Trường</h3>
-                <p className="text-secondary-text text-xs">
-                  Phân tích GPA, điểm xét tuyển đại học và danh sách nguyện vọng
+              <div className="min-w-0">
+                <h3 className="text-foreground font-bold text-sm">{t('welcome.item2Title')}</h3>
+                <p className="text-secondary-text text-xs leading-relaxed">
+                  {t('welcome.item2Desc')}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3.5 p-3 rounded-xl bg-paper border border-border">
-              <div className="p-2 rounded-lg bg-gold-soft text-accent border border-gold">
+              <div className="p-2 rounded-lg bg-gold-soft text-accent border border-gold shrink-0">
                 <span className="material-symbols-outlined text-xl" aria-hidden="true">
                   local_fire_department
                 </span>
               </div>
-              <div>
-                <h3 className="text-foreground font-bold text-sm">Đấu Trường Bảng Vàng</h3>
-                <p className="text-secondary-text text-xs">
-                  Tích lũy EXP từ giờ học thực tế, EXP càng cao mức hạng quân hàm càng cao
+              <div className="min-w-0">
+                <h3 className="text-foreground font-bold text-sm">{t('welcome.item3Title')}</h3>
+                <p className="text-secondary-text text-xs leading-relaxed">
+                  {t('welcome.item3Desc')}
                 </p>
               </div>
             </div>
@@ -162,9 +168,9 @@ export default function WelcomeModal() {
                   setIsGoogleLoading(false);
                 }
               }}
-              className="w-full min-h-[46px] px-4 py-2.5 mb-2.5 rounded-xl bg-surface hover:bg-surface-alt border-2 border-border-strong hover:border-gold text-foreground font-bold text-sm flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-60 shadow-xs"
+              className="w-full min-h-[46px] px-4 py-2.5 mb-2.5 rounded-xl bg-surface hover:bg-surface-alt border border-border-strong hover:border-gold text-foreground font-bold text-sm flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-60 shadow-xs"
             >
-              <svg className="h-4 w-4 no-shrink" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   fill="#4285F4"
@@ -183,7 +189,7 @@ export default function WelcomeModal() {
                 />
               </svg>
               <span>
-                {isGoogleLoading ? 'Đang chuyển tới Google...' : 'Tiếp tục với Google'}
+                {isGoogleLoading ? t('welcome.googleConnecting') : t('welcome.googleContinue')}
               </span>
             </button>
           )}
@@ -194,26 +200,26 @@ export default function WelcomeModal() {
             onClick={handleJoinNow}
             className="w-full mb-4"
           >
-            {user ? 'Khám Phá Kho Tài Liệu Ngay' : 'Đăng Nhập / Tham Gia Ngay'}
+            {user ? t('welcome.exploreLibrary') : t('welcome.joinNow')}
           </Button>
 
-          <div className="w-full flex items-center justify-between pt-4 border-t border-border text-xs text-secondary-text">
+          <div className="w-full flex items-center justify-between gap-3 pt-4 border-t border-border text-xs text-secondary-text">
             <label className="flex items-center gap-2 cursor-pointer hover:text-foreground transition-colors select-none">
               <input
                 type="checkbox"
                 checked={dontShowAgain}
                 onChange={(e) => setDontShowAgain(e.target.checked)}
-                className="rounded border-border-strong text-primary focus:ring-primary w-4 h-4 cursor-pointer accent-primary"
+                className="rounded border-border-strong text-primary focus:ring-primary w-4 h-4 cursor-pointer accent-primary shrink-0"
               />
-              <span>Không hiển thị lại lần sau</span>
+              <span>{t('welcome.dontShowAgain')}</span>
             </label>
 
             <button
               type="button"
               onClick={handleClose}
-              className="hover:text-foreground underline decoration-border-strong underline-offset-4 transition-colors cursor-pointer font-semibold"
+              className="hover:text-foreground underline decoration-border-strong underline-offset-4 transition-colors cursor-pointer font-semibold shrink-0"
             >
-              Đóng
+              {t('welcome.close')}
             </button>
           </div>
         </div>

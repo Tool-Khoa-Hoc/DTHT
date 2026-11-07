@@ -1,7 +1,8 @@
 // Định dạng hiển thị dùng chung cho phần tính điểm/tìm trường.
-export function fmt(n, digits = 2) {
+export function fmt(n, digits = 2, locale = 'vi-VN') {
   if (n == null || !Number.isFinite(Number(n))) return '—';
-  return Number(n).toLocaleString('vi-VN', {
+  const resolvedLocale = locale === 'en' ? 'en-US' : locale === 'vi' ? 'vi-VN' : locale;
+  return Number(n).toLocaleString(resolvedLocale, {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   });
