@@ -15,6 +15,13 @@ export const routeModuleLoaders = {
   OnlineLearning: () => import('../pages/OnlineLearning'),
   Notes: () => import('../pages/Notes'),
   CourseComboHs12: () => import('../pages/CourseComboHs12'),
+  // Trang public (không yêu cầu đăng nhập) — AdSense "Low value content" fix.
+  PublicLayout: () => import('../components/PublicLayout'),
+  LandingPage: () => import('../pages/LandingPage'),
+  AboutPage: () => import('../pages/AboutPage'),
+  PrivacyPage: () => import('../pages/PrivacyPage'),
+  TermsPage: () => import('../pages/TermsPage'),
+  ContactPage: () => import('../pages/ContactPage'),
 };
 
 const preloadCache = new Map();
