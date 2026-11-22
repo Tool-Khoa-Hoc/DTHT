@@ -5,13 +5,14 @@ Allow: /
 Disallow: /admin
 Disallow: /collaborator
 Disallow: /auth
+Disallow: /profile
+Disallow: /notes
 
 # Allow all crawlers to access public pages
 Allow: /home
-Allow: /gpa
-Allow: /arena
-Allow: /library
-Allow: /roadmap
-Allow: /schools
+Allow: /gioi-thieu
+Allow: /chinh-sach-bao-mat
+Allow: /dieu-khoan
+Allow: /lien-he
 
 Sitemap: https://www.dautruonghoctap.dev/sitemap.xml

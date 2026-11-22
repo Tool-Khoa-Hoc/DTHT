@@ -6,6 +6,7 @@ import { preloadRouteModule } from '../lib/routeModules';
 import { getUserRank } from '../utils/rankHelper';
 import { getLevelFromExp, getLevelAccent } from '../utils/levelHelper';
 import Avatar from './Avatar';
+import PublicFooter from './PublicFooter';
 import { PageSkeleton } from './ui/Skeleton';
 import ThemeToggle from './ui/ThemeToggle';
 import LanguageToggle from './ui/LanguageToggle';
@@ -498,6 +499,11 @@ export default function RootLayout() {
           className="has-bottom-nav flex-1 overflow-y-auto pb-20 md:pb-0 relative"
         >
           <Outlet />
+          {/* Footer với link tới các trang public — chỉ hiện trên /home
+              (trang duy nhất xem được không cần đăng nhập trong layout này),
+              để Googlebot và khách đều thấy link Giới thiệu / Bảo mật /
+              Điều khoản / Liên hệ. */}
+          {location.pathname === '/home' && <PublicFooter />}
           {shouldLoadWelcomeModal ? (
             <Suspense fallback={null}>
               <WelcomeModal />

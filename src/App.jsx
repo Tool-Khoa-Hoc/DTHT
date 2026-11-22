@@ -44,6 +44,16 @@ const Notes = lazyRetry(routeModuleLoaders.Notes);
 const CourseComboHs12 = lazyRetry(routeModuleLoaders.CourseComboHs12);
 const AuthCallback = lazyRetry(routeModuleLoaders.AuthCallback);
 
+// Trang public (không yêu cầu đăng nhập — Googlebot và khách đều đọc được).
+// Dùng để khắc phục AdSense "Low value content": trước đây "/" chỉ là form
+// đăng nhập nên Googlebot không thấy nội dung gì.
+const PublicLayout = lazyRetry(routeModuleLoaders.PublicLayout);
+const LandingPage = lazyRetry(routeModuleLoaders.LandingPage);
+const AboutPage = lazyRetry(routeModuleLoaders.AboutPage);
+const PrivacyPage = lazyRetry(routeModuleLoaders.PrivacyPage);
+const TermsPage = lazyRetry(routeModuleLoaders.TermsPage);
+const ContactPage = lazyRetry(routeModuleLoaders.ContactPage);
+
 const scheduleIdleTask = (callback, timeout = 1500) => {
   if (typeof window === 'undefined') {
     return () => {};
@@ -85,6 +95,7 @@ function DeferredSpeedInsights() {
 }
 
 
+
 function App() {
   React.useEffect(() => {
     const bootShell = document.getElementById('boot-shell');
@@ -108,7 +119,15 @@ function App() {
           <ErrorBoundary>
             <Suspense fallback={<PageSkeleton />}>
               <Routes>
-                <Route path="/" element={<AuthScreen />} />
+                {/* Trang public — render không cần đăng nhập */}
+                <Route path="/" element={<PublicLayout />}>
+                  <Route index element={<LandingPage />} />
+                  <Route path="gioi-thieu" element={<AboutPage />} />
+                  <Route path="chinh-sach-bao-mat" element={<PrivacyPage />} />
+                  <Route path="dieu-khoan" element={<TermsPage />} />
+                  <Route path="lien-he" element={<ContactPage />} />
+                </Route>
+
                 <Route path="/auth" element={<AuthScreen />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
 
